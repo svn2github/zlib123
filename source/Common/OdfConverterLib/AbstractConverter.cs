@@ -147,7 +147,27 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             else
             {
-                return XmlReader.Create(this.ExternalResources + "/" + SOURCE_XML, xrs);
+                string sourceLocation = SOURCE_XML;
+                string sourceFile = Path.Combine(this.ExternalResources, sourceLocation);
+
+                if (!File.Exists(sourceFile))
+                {
+                    // try several subfolders within the project directory tree
+                    sourceLocation = Path.Combine(this.DirectTransform ? "odf2oox" : "oox2odf", sourceLocation);
+                    sourceFile = Path.Combine(this.ExternalResources, sourceLocation);
+
+                    if (!File.Exists(sourceFile))
+                    {
+                        sourceLocation = Path.Combine("resources", sourceLocation);
+                        sourceFile = Path.Combine(this.ExternalResources, sourceLocation);
+
+                        if (!File.Exists(sourceFile))
+                        {
+                            throw new FileNotFoundException("No external source file could be found at the specified location.", this.ExternalResources);
+                        }
+                    }
+                }
+                return XmlReader.Create(sourceFile, xrs);
             }
         }
 
