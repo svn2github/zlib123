@@ -323,7 +323,8 @@ namespace OdfConverter.CommandLineTool
         {
             try
             {
-                DateTime start = DateTime.Now;
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
                 AbstractConverter converter = ConverterFactory.Instance(options.ConversionDirection);
                 converter.ExternalResources = options.XslPath;
                 converter.SkippedPostProcessors = options.SkippedPostProcessors;
@@ -353,9 +354,9 @@ namespace OdfConverter.CommandLineTool
                     Console.Write("                                                                                ");
                     Console.CursorLeft = 0;
                 } 
-                TimeSpan duration = DateTime.Now - start;
+                stopwatch.Stop();
                 this._report.LogInfo(input, "Conversion succeeded");
-                this._report.LogInfo(input, "Total conversion time: {0}", duration);
+                this._report.LogInfo(input, "Total conversion time: {0}", stopwatch.Elapsed);
                 return true;
             }
             catch (EncryptedDocumentException)
@@ -661,7 +662,7 @@ namespace OdfConverter.CommandLineTool
                         // do nothing here
                         break;
                     default:
-                        if (args[i].ToUpperInvariant().Replace('/', '-').Replace('_', '-').StartsWith("-"))
+                        if (args[i].Replace('/', '-').Replace('_', '-').StartsWith("-") && !File.Exists(args[i]))
                         {
                             throw new OdfCommandLineException(string.Format("Invalid parameter {0} found.", args[i]));
                         }
