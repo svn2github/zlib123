@@ -17,16 +17,14 @@
     <cp:coreProperties
         xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
         xmlns:dcmitype="http://purl.org/dc/dcmitype/">
-      <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta"
-          mode="core"/>
+      <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta" mode="core" />
     </cp:coreProperties>
   </xsl:template>
 
   <xsl:template name="docprops-custom">
     <!-- @Description: Custom document properties -->
     <!-- @Context: Any -->
-    <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta"
-        mode="custom"/>
+    <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta" mode="custom" />
   </xsl:template>
 
   <xsl:template match="/office:document-meta/office:meta" mode="core">
@@ -34,43 +32,43 @@
     <!-- @Description: Core meta data -->
     <!-- @Context: Any -->
     <!-- report lost properties -->
-    <xsl:apply-templates select="meta:auto-reload" mode="core"/>
-    <xsl:apply-templates select="meta:hyperlink-behaviour" mode="core"/>
+    <xsl:apply-templates select="meta:auto-reload" mode="core" />
+    <xsl:apply-templates select="meta:hyperlink-behaviour" mode="core" />
     <!-- creation date -->
-    <xsl:apply-templates select="meta:creation-date" mode="core"/>
+    <xsl:apply-templates select="meta:creation-date" mode="core" />
     <!-- creator -->
-    <xsl:apply-templates select="meta:initial-creator" mode="core"/>
+    <xsl:apply-templates select="meta:initial-creator" mode="core" />
     <!-- description -->
-    <xsl:apply-templates select="dc:description" mode="core"/>
+    <xsl:apply-templates select="dc:description" mode="core" />
     <!-- identifier -->
-    <xsl:apply-templates select="dc:identifier" mode="core"/>
+    <xsl:apply-templates select="dc:identifier" mode="core" />
     <!-- keywords -->
-    <xsl:call-template name="MetaKeywords"/>
+    <xsl:call-template name="MetaKeywords" />
     <!-- language -->
-    <xsl:apply-templates select="dc:language" mode="core"/>
+    <xsl:apply-templates select="dc:language" mode="core" />
     <!-- last modification author -->
-    <xsl:apply-templates select="dc:creator" mode="core"/>
+    <xsl:apply-templates select="dc:creator" mode="core" />
     <!-- last printing -->
-    <xsl:apply-templates select="meta:printed-date" mode="core"/>
+    <xsl:apply-templates select="meta:printed-date" mode="core" />
     <!-- last modification date -->
-    <xsl:apply-templates select="dc:date" mode="core"/>
+    <xsl:apply-templates select="dc:date" mode="core" />
     <!-- number of times it was saved -->
-    <xsl:apply-templates select="meta:editing-cycles" mode="core"/>
+    <xsl:apply-templates select="meta:editing-cycles" mode="core" />
     <!-- topic -->
-    <xsl:apply-templates select="dc:subject" mode="core"/>
+    <xsl:apply-templates select="dc:subject" mode="core" />
     <!-- title -->
-    <xsl:apply-templates select="dc:title" mode="core"/>
+    <xsl:apply-templates select="dc:title" mode="core" />
     <!-- category -->
-    <xsl:apply-templates select="meta:user-defined[@meta:name = 'Category']" mode="core"/>
+    <xsl:apply-templates select="meta:user-defined[@meta:name = 'Category']" mode="core" />
     <!-- content status -->
-    <xsl:apply-templates select="meta:user-defined[@meta:name = 'Content Status']" mode="core"/>
+    <xsl:apply-templates select="meta:user-defined[@meta:name = 'Content Status']" mode="core" />
   </xsl:template>
 
   <xsl:template match="/office:document-meta/office:meta" mode="custom">
     <!-- @Description: Produce custom properties -->
     <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
         xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-      <xsl:apply-templates select="meta:user-defined"/>
+      <xsl:apply-templates select="meta:user-defined" />
     </Properties>
   </xsl:template>
 
@@ -79,18 +77,15 @@
     <!-- @Description: creation date -->
     <xsl:variable name="dateIsValid">
       <xsl:call-template name="validateDate">
-        <xsl:with-param name="date">
-          <xsl:value-of select="."/>
-        </xsl:with-param>
+        <xsl:with-param name="date" select="." />
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$dateIsValid != 'false' ">
-        <dcterms:created xmlns:dcterms="http://purl.org/dc/terms/"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
-			<!--<xsl:value-of select="$dateIsValid"/>-->
+        <dcterms:created xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
+			<!--<xsl:value-of select="$dateIsValid" />-->
 			<!-- date is parsed again in post-processor -->
-			<xsl:value-of select="."/>
+			<xsl:value-of select="." />
         </dcterms:created>
       </xsl:when>
       <xsl:otherwise>
@@ -103,7 +98,7 @@
   <xsl:template match="meta:initial-creator" mode="core">
     <!-- @Description: Initial creator -->
     <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </dc:creator>
   </xsl:template>
 
@@ -111,7 +106,7 @@
   <xsl:template match="dc:description" mode="core">
     <!-- @Description: Description/Comment -->
     <dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </dc:description>
   </xsl:template>
 
@@ -119,7 +114,7 @@
   <xsl:template match="dc:identifier" mode="core">
     <!-- @Description: Identifier -->
     <dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </dc:identifier>
   </xsl:template>
 
@@ -128,13 +123,12 @@
     <!-- @Description: Keywords meta -->
     <!-- @Context: /office:document-meta/office:meta -->
     <xsl:if test="/office:document-meta/office:meta/meta:keyword">
-      <cp:keywords
-          xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+      <cp:keywords xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
         <xsl:for-each select="/office:document-meta/office:meta/meta:keyword">
           <xsl:if test="not(position() = 1)">
             <xsl:text> </xsl:text>
           </xsl:if>
-          <xsl:value-of select="."/>
+          <xsl:value-of select="." />
         </xsl:for-each>
       </cp:keywords>
     </xsl:if>
@@ -144,25 +138,23 @@
   <xsl:template match="dc:language" mode="core">
     <!-- @Description: Language -->
     <dc:language xmlns:dc="http://purl.org/dc/elements/1.1/">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </dc:language>
   </xsl:template>
 
   <!-- last modification author -->
   <xsl:template match="dc:creator" mode="core">
     <!-- @Description: Author/Creator -->
-    <cp:lastModifiedBy
-        xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-      <xsl:value-of select="."/>
+    <cp:lastModifiedBy xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+      <xsl:value-of select="." />
     </cp:lastModifiedBy>
   </xsl:template>
 
   <!-- last printing -->
   <xsl:template match="meta:printed-date" mode="core">
     <!-- @Description: Print date -->
-    <cp:lastPrinted
-        xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-      <xsl:value-of select="."/>
+    <cp:lastPrinted xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+      <xsl:value-of select="." />
     </cp:lastPrinted>
   </xsl:template>
 
@@ -171,18 +163,15 @@
     <!-- @Description: Last modification date -->
     <xsl:variable name="dateIsValid">
       <xsl:call-template name="validateDate">
-        <xsl:with-param name="date">
-          <xsl:value-of select="."/>
-        </xsl:with-param>
+        <xsl:with-param name="date" select="." />
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$dateIsValid != 'false' ">
-        <dcterms:modified xmlns:dcterms="http://purl.org/dc/terms/"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
-			<!--<xsl:value-of select="$dateIsValid"/>-->
+        <dcterms:modified xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
+			<!--<xsl:value-of select="$dateIsValid" />-->
 			<!-- date is parsed again in post-processor -->
-			<xsl:value-of select="."/>
+			<xsl:value-of select="." />
         </dcterms:modified>
       </xsl:when>
       <xsl:otherwise>
@@ -194,9 +183,8 @@
   <!-- number of times it was saved -->
   <xsl:template match="meta:editing-cycles" mode="core">
     <!-- @Description: Number of times the document was saved (Editing cycles) -->
-    <cp:revision
-        xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-      <xsl:value-of select="."/>
+    <cp:revision xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+      <xsl:value-of select="." />
     </cp:revision>
   </xsl:template>
 
@@ -204,7 +192,7 @@
   <xsl:template match="dc:subject" mode="core">
     <!-- @Description: Topic/Subject -->
     <dc:subject xmlns:dc="http://purl.org/dc/elements/1.1/">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </dc:subject>
   </xsl:template>
 
@@ -212,23 +200,21 @@
   <xsl:template match="dc:title" mode="core">
     <!-- @Description: Title -->
     <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </dc:title>
   </xsl:template>
 
   <xsl:template match="meta:user-defined[@meta:name = 'Category']" mode="core">
     <!-- @Description: Category -->
-    <cp:category
-            xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-      <xsl:value-of select="."/>
+    <cp:category xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+      <xsl:value-of select="." />
     </cp:category>
   </xsl:template>
 
   <xsl:template match="meta:user-defined[@meta:name = 'Content Status']" mode="core">
     <!-- @Description: Content Status -->
-    <cp:contentStatus
-            xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-      <xsl:value-of select="."/>
+    <cp:contentStatus xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+      <xsl:value-of select="." />
     </cp:contentStatus>
   </xsl:template>
 
@@ -263,15 +249,15 @@
           xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
         <xsl:attribute name="fmtid">{D5CDD505-2E9C-101B-9397-08002B2CF9AE}</xsl:attribute>
         <xsl:attribute name="pid">
-          <xsl:value-of select="position() + 1"/>
+          <xsl:value-of select="position() + 1" />
         </xsl:attribute>
         <xsl:attribute name="name">
-          <xsl:value-of select="@meta:name"/>
+          <xsl:value-of select="@meta:name" />
         </xsl:attribute>
         <xsl:choose>
           <xsl:when test="@meta:value-type='boolean'">
             <vt:bool>
-              <xsl:value-of select="text()"/>
+              <xsl:value-of select="text()" />
             </vt:bool>
           </xsl:when>
           <xsl:when test="@meta:value-type='date' 
@@ -288,18 +274,18 @@
 						  and number(substring(text(), 18, 2)) != 'NaN'">
             <!-- filetime values must be in the format yyyy-mm-ddThh:mm:ss -->
             <vt:filetime>
-              <xsl:value-of select="text()"/>
+              <xsl:value-of select="text()" />
             </vt:filetime>
           </xsl:when>
           <xsl:when test="@meta:value-type='float'">
             <!-- 8byte real values are created for any number -->
             <vt:r8>
-              <xsl:value-of select="text()"/>
+              <xsl:value-of select="text()" />
             </vt:r8>
           </xsl:when>
           <xsl:otherwise>
             <vt:lpwstr>
-              <xsl:value-of select="text()"/>
+              <xsl:value-of select="text()" />
             </vt:lpwstr>
           </xsl:otherwise>
         </xsl:choose>
@@ -311,7 +297,7 @@
   <xsl:template match="@meta:page-count">
     <!-- @Description: Page statistics -->
     <Pages xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </Pages>
   </xsl:template>
 
@@ -319,7 +305,7 @@
   <xsl:template match="@meta:word-count">
     <!-- @Description: Word statistics -->
     <Words xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </Words>
   </xsl:template>
 
@@ -330,7 +316,7 @@
     <xsl:param name="generator" />
     <Application
         xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-      <xsl:value-of select="$generator"/>
+      <xsl:value-of select="$generator" />
     </Application>
   </xsl:template>
 
@@ -348,7 +334,7 @@
     <!-- @Description: Paragraph statistics -->
     <Paragraphs
         xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-      <xsl:value-of select="."/>
+      <xsl:value-of select="." />
     </Paragraphs>
   </xsl:template>
 
@@ -359,7 +345,7 @@
     <xsl:variable name="hours">
       <xsl:choose>
         <xsl:when test="contains(., 'H')">
-          <xsl:value-of select="substring-before(substring-after(., 'T'), 'H')"/>
+          <xsl:value-of select="substring-before(substring-after(., 'T'), 'H')" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
@@ -367,10 +353,10 @@
     <xsl:variable name="minutes">
       <xsl:choose>
         <xsl:when test="contains(., 'H')">
-          <xsl:value-of select="substring-before(substring-after(., 'H'), 'M')"/>
+          <xsl:value-of select="substring-before(substring-after(., 'H'), 'M')" />
         </xsl:when>
         <xsl:when test="contains(., 'M')">
-          <xsl:value-of select="substring-before(substring-after(., 'T'), 'M')"/>
+          <xsl:value-of select="substring-before(substring-after(., 'T'), 'M')" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
@@ -378,22 +364,21 @@
     <xsl:variable name="seconds">
       <xsl:choose>
         <xsl:when test="contains(., 'M')">
-          <xsl:value-of select="substring-before(substring-after(., 'M'), 'S')"/>
+          <xsl:value-of select="substring-before(substring-after(., 'M'), 'S')" />
         </xsl:when>
         <xsl:when test="contains(., 'S')">
-          <xsl:value-of select="substring-before(substring-after(., 'T'), 'S')"/>
+          <xsl:value-of select="substring-before(substring-after(., 'T'), 'S')" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <TotalTime
-        xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
+    <TotalTime xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
       <xsl:choose>
         <xsl:when test="number($seconds) &gt; 30">
-          <xsl:value-of select="60 * number($hours) + number($minutes) + 1"/>
+          <xsl:value-of select="60 * number($hours) + number($minutes) + 1" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="60 * number($hours) + number($minutes)"/>
+          <xsl:value-of select="60 * number($hours) + number($minutes)" />
         </xsl:otherwise>
       </xsl:choose>
     </TotalTime>
@@ -403,18 +388,16 @@
   <!-- characters with spaces statistics -->
   <xsl:template match="@meta:character-count">
     <!-- @Description: Characters statistics -->
-    <CharactersWithSpaces
-        xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-      <xsl:value-of select="."/>
+    <CharactersWithSpaces xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
+      <xsl:value-of select="." />
     </CharactersWithSpaces>
   </xsl:template>
 
   <!-- non whitespace character count statistics -->
   <xsl:template match="@meta:non-whitespace-character-count">
     <!-- @Description: Non whitespace characters statistics -->
-    <Characters
-        xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-      <xsl:value-of select="meta:document-statistic/@meta:non-whitespace-character-count"/>
+    <Characters xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
+      <xsl:value-of select="." />
     </Characters>
   </xsl:template>
 
@@ -423,60 +406,59 @@
   <xsl:template name="validateDate">
     <!-- @Description: W3C date format validation-->
     <!-- @Context: Any date (meta:creation-date, dc:date) -->
-    <xsl:param name="date"/>
+    <xsl:param name="date" />
     <!-- date parameter -->
     <!-- year -->
     <xsl:variable name="Y">
       <xsl:choose>
         <xsl:when test="contains($date, '-')">
-          <xsl:value-of select="substring-before($date, '-')"/>
+          <xsl:value-of select="substring-before($date, '-')" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$date"/>
+          <xsl:value-of select="$date" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <!-- month -->
     <xsl:variable name="M">
-      <xsl:variable name="date_Y" select="substring-after($date, concat($Y, '-'))"/>
+      <xsl:variable name="date_Y" select="substring-after($date, concat($Y, '-'))" />
       <xsl:choose>
         <xsl:when test="contains($date_Y, '-')">
-          <xsl:value-of select="substring-before($date_Y, '-')"/>
+          <xsl:value-of select="substring-before($date_Y, '-')" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$date_Y"/>
+          <xsl:value-of select="$date_Y" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <!-- day -->
     <xsl:variable name="D">
-      <xsl:variable name="date_Y_m" select="substring-after($date, concat($Y, '-', $M, '-'))"/>
+      <xsl:variable name="date_Y_m" select="substring-after($date, concat($Y, '-', $M, '-'))" />
       <xsl:choose>
         <xsl:when test="contains($date_Y_m, 'T')">
-          <xsl:value-of select="substring-before($date_Y_m, 'T')"/>
+          <xsl:value-of select="substring-before($date_Y_m, 'T')" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$date_Y_m"/>
+          <xsl:value-of select="$date_Y_m" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <!-- hour -->
     <xsl:variable name="h">
       <xsl:if test="contains($date, 'T')">
-        <xsl:value-of select="substring-before(substring-after($date, 'T'), ':')"/>
+        <xsl:value-of select="substring-before(substring-after($date, 'T'), ':')" />
       </xsl:if>
     </xsl:variable>
     <!-- minutes -->
     <xsl:variable name="m">
       <xsl:if test="contains($date, 'T')">
-        <xsl:variable name="time_h"
-            select="substring-after(substring-after($date, 'T'), ':')"/>
+        <xsl:variable name="time_h" select="substring-after(substring-after($date, 'T'), ':')" />
         <xsl:choose>
           <xsl:when test="contains($time_h, ':')">
-            <xsl:value-of select="substring-before($time_h, ':')"/>
+            <xsl:value-of select="substring-before($time_h, ':')" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$time_h"/>
+            <xsl:value-of select="$time_h" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
@@ -485,19 +467,19 @@
     <xsl:variable name="s">
       <xsl:if test="contains($date, 'T')">
         <xsl:variable name="time_h_m"
-            select="substring-after(substring-after($date, 'T'), concat($h, ':', $m, ':'))"/>
+            select="substring-after(substring-after($date, 'T'), concat($h, ':', $m, ':'))" />
         <xsl:choose>
           <xsl:when test="contains($time_h_m, 'Z')">
-            <xsl:value-of select="substring-before($time_h_m, 'Z')"/>
+            <xsl:value-of select="substring-before($time_h_m, 'Z')" />
           </xsl:when>
           <xsl:when test="contains($time_h_m, '+')">
-            <xsl:value-of select="substring-before($time_h_m, '+')"/>
+            <xsl:value-of select="substring-before($time_h_m, '+')" />
           </xsl:when>
 		  <xsl:when test="contains($time_h_m, '-')">
-			<xsl:value-of select="substring-before($time_h_m, '-')"/>
+			<xsl:value-of select="substring-before($time_h_m, '-')" />
 		  </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$time_h_m"/>
+            <xsl:value-of select="$time_h_m" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
@@ -523,10 +505,10 @@
       <xsl:when test="$s != '' and number($s) &gt; 60">false</xsl:when>
       <xsl:when test="$s != '' and number($s) &lt; 0">false</xsl:when>
       <xsl:when test="contains($date, 'T') and not(contains($date, 'Z') or contains($date, '+'))">
-        <xsl:value-of select="concat($date, 'Z')"/>
+        <xsl:value-of select="concat($date, 'Z')" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$date"/>
+        <xsl:value-of select="$date" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
