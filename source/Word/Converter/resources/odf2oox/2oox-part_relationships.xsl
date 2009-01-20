@@ -38,7 +38,8 @@
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-  exclude-result-prefixes="w r xlink office draw text style manifest v config">
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="w r xlink office draw text style manifest v config ooc">
 
   <xsl:template name="InsertPartRelationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -126,7 +127,7 @@
                     <xsl:with-param name="occurrence" select="'/'" />
                   </xsl:call-template>
                 </xsl:variable>
-                
+
                 <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media/', $imageName)}" />
 
                 <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
@@ -152,18 +153,29 @@
 
     <xsl:for-each select="$oleObjects">
       <xsl:variable name="oleFile">
-      <xsl:call-template name="substring-after-last">
-        <xsl:with-param name="string" select="@xlink:href" />
-        <xsl:with-param name="occurrence" select="'./'" />
-      </xsl:call-template>
-    </xsl:variable>
+        <!-- MS Office writes links to internal ODF document with a trailing slash -->
+        <xsl:choose>
+          <xsl:when test="substring(@xlink:href, string-length(@xlink:href)) = '/'">
+            <xsl:call-template name="substring-after-last">
+              <xsl:with-param name="string" select="substring(@xlink:href, 1, string-length(@xlink:href) - 1)" />
+              <xsl:with-param name="occurrence" select="'./'" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="substring-after-last">
+              <xsl:with-param name="string" select="@xlink:href" />
+              <xsl:with-param name="occurrence" select="'./'" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:variable name="oleId" select="generate-id(.)" />
       <xsl:variable name="olePicture">
         <xsl:call-template name="substring-after-last">
           <xsl:with-param name="string" select="../draw:image[1]/@xlink:href" />
           <xsl:with-param name="occurrence" select="'./'" />
         </xsl:call-template>
-      </xsl:variable> 
+      </xsl:variable>
       <xsl:variable name="olePictureId" select="generate-id(../draw:image[1])" />
       <xsl:variable name="olePictureType">
         <xsl:call-template name="GetOLEPictureType">
@@ -198,7 +210,7 @@
             application/vnd.oasis.opendocument.spreadsheet
           -->
           <xsl:choose>
-            <xsl:when test="$oleType='application/vnd.sun.star.oleobject' or $oleType='application/octet-stream'">
+            <xsl:when test="$oleType='application/vnd.sun.star.oleobject'">
               <pzip:copy pzip:source="{$oleFile}" pzip:target="{concat('word/embeddings/', $oleId, '.bin')}" />
               <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                             Id="{$oleId}"
@@ -232,7 +244,7 @@
           </xsl:call-template>
 
         </xsl:when>
-        
+
       </xsl:choose>
 
     </xsl:for-each>
@@ -249,7 +261,7 @@
     <xsl:param name="olePictureType" />
 
     <xsl:choose>
-      <xsl:when test="not($olePictureType='')">
+      <xsl:when test="not($olePictureType='') and not($olePictureId='')">
         <!-- copy picture -->
         <pzip:copy pzip:source="{$olePicture}" pzip:target="{concat('word/media/', $olePictureId, '.', $olePictureType)}" />
         <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
@@ -258,7 +270,7 @@
                       Target="{concat('media/', $olePictureId, '.', $olePictureType)}" />
 
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="not($olePictureId='')">
         <!-- copy placeholder picture -->
         <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#" pzip:target="{concat('word/media/', $olePictureId, '.png')}" />
         <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
@@ -266,7 +278,7 @@
                       Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                       Target="{concat('media/', $olePictureId, '.png')}" />
 
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
 
   </xsl:template>
@@ -345,7 +357,7 @@
                             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
                             TargetMode="External"
                             Target="{ancestor::draw:a/@xlink:href}" />
-            </xsl:if>            
+            </xsl:if>
           </xsl:when>
           <!-- Internal image -->
           <xsl:otherwise>
@@ -356,7 +368,7 @@
                 <xsl:with-param name="occurrence" select="'/'" />
               </xsl:call-template>
             </xsl:variable>
-                          
+
             <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media/', $imageName)}" />
             <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                           Id="{generate-id(.)}"
@@ -429,8 +441,11 @@
                     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
                     TargetMode="External">
         <xsl:attribute name="Target">
-          <!-- having Target empty makes Word Beta 2007 crash -->
           <xsl:choose>
+            <xsl:when test="not(ooc:IsUriValid(@xlink:href))">
+              <!-- document with invalid URIs won't open so we replace the invalid URI with one that works -->
+              <xsl:text>/</xsl:text>
+            </xsl:when>
             <xsl:when test="contains(@xlink:href, './')">
               <xsl:variable name="substring" select="substring-after(@xlink:href, '../')" />
               <xsl:choose>

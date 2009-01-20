@@ -330,12 +330,6 @@
 
       <!-- Parent style name -->
       <xsl:choose>
-        <!--xsl:when test="@style:parent-style-name = 'Addressee' ">
-          <w:basedOn w:val="EnvelopeAddress"/>
-        </xsl:when>
-        <xsl:when test="@style:parent-style-name = 'Sender' ">
-          <w:basedOn w:val="EnvelopeReturn"/>
-        </xsl:when-->
         <xsl:when test="@style:parent-style-name">
           <w:basedOn w:val="{@style:parent-style-name}"/>
         </xsl:when>

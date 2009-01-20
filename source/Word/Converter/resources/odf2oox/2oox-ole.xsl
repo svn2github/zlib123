@@ -66,6 +66,17 @@
 
         <xsl:choose>
           <!-- 
+          Insert linked object but not embedded ODF object.
+          (embedded ODF objects are also draw:object elements)
+          -->
+          <xsl:when test="draw:object and (contains(draw:object/@xlink:href, ':')) or (starts-with(draw:object/@xlink:href, '/'))">
+            <xsl:call-template name="InsertExternalObject">
+              <xsl:with-param name="shapeId" select="$shapeId" />
+              <xsl:with-param name="object" select="draw:object" />
+              <xsl:with-param name="olePictureType" select="$olePictureType" />
+            </xsl:call-template>
+          </xsl:when>
+          <!-- 
           Insert embedded binary objects 
           -->
           <xsl:when test="draw:object-ole">
@@ -75,17 +86,7 @@
               <xsl:with-param name="olePictureType" select="$olePictureType" />
             </xsl:call-template>
           </xsl:when>
-          <!-- 
-          Insert linked object but not embedded ODF object.
-          (embedded ODF objects are also draw:object elements)
-          -->
-          <xsl:when test="draw:object and not(starts-with(draw:object/@xlink:href, './'))">
-            <xsl:call-template name="InsertExternalObject">
-              <xsl:with-param name="shapeId" select="$shapeId" />
-              <xsl:with-param name="object" select="draw:object" />
-              <xsl:with-param name="olePictureType" select="$olePictureType" />
-            </xsl:call-template>
-          </xsl:when>
+          
         </xsl:choose>
 
       </w:object>
@@ -128,7 +129,10 @@
       <xsl:call-template name="FrameToShapeWrap">
         <xsl:with-param name="frameStyle" select="$frameStyle"/>
       </xsl:call-template>
-      <xsl:call-template name="InsertObjectPreview" />
+
+      <xsl:if test="draw:image">
+        <v:imagedata o:title="" r:id="{generate-id(draw:image)}" />
+      </xsl:if>
       
     </v:shape>
   </xsl:template>
@@ -144,11 +148,11 @@
     <xsl:param name="olePictureType" />
     
     <o:OLEObject Type="Link" ProgID="Package" UpdateMode="Always">
-      <!-- sttribute ShapeID -->
+      
       <xsl:attribute name="ShapeID">
         <xsl:value-of select="$shapeId"/>
       </xsl:attribute>
-      <!-- attribute DrawAspect -->
+      
       <xsl:attribute name="DrawAspect">
         <xsl:choose>
           <xsl:when test="$olePictureType=''">
@@ -159,7 +163,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      <!-- attribute r:id -->
+      
       <xsl:attribute name="r:id">
         <xsl:value-of select="generate-id(draw:object)"/>
       </xsl:attribute>
@@ -202,7 +206,7 @@
     application/vnd.oasis.opendocument.spreadsheet
     -->
     <xsl:choose>
-      <xsl:when test="$oleType='application/vnd.sun.star.oleobject' or $oleType='application/octet-stream'">
+      <xsl:when test="$oleType='application/vnd.sun.star.oleobject'">
         <o:OLEObject Type="Embed" ProgID="Package" ObjectID="_1256106730" >
           <!-- shape id -->
           <xsl:attribute name="ShapeID">
@@ -230,21 +234,6 @@
       </xsl:otherwise>
     </xsl:choose>
 
-  </xsl:template>
-
-  <!--
-  Summary: Inserts the preview for the object
-  Author: makz (DIaLOGIKa)
-  Date: 8.11.2007
-  -->
-  <xsl:template name="InsertObjectPreview">
-    <xsl:variable name="myId" select="generate-id(draw:image)" />
-    
-    <v:imagedata o:title="">
-      <xsl:attribute name="r:id">
-        <xsl:value-of select="$myId"/>
-      </xsl:attribute>
-    </v:imagedata>
   </xsl:template>
   
 </xsl:stylesheet>

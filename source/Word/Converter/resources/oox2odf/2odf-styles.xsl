@@ -41,7 +41,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
-  xmlns:ooc="urn:odf-converter"              
+  xmlns:ooc="urn:odf-converter"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="w r wp xlink v oox ooc rels">
@@ -1079,8 +1079,7 @@
 
   <!-- compute default paragraph props. Use default style, then docDefaults. -->
   <xsl:template name="InsertDefaultParagraphStyle">
-    <xsl:if
-		  test="w:styles/w:docDefaults[w:pPrDefault or w:rPrDefault] or key('default-styles', 'paragraph')">
+    <xsl:if test="w:styles/w:docDefaults[w:pPrDefault or w:rPrDefault] or key('default-styles', 'paragraph')">
       <style:default-style style:family="paragraph">
         <style:paragraph-properties>
           <xsl:call-template name="InsertDefaultTabStop"/>
@@ -1177,18 +1176,15 @@
             <xsl:variable name="elementName" select="name()"/>
             <xsl:choose>
               <!-- insert attribute using template name -->
-              <xsl:when
-							  test="self::w:dstrike or self::w:strike and not(key('default-styles', 'character')[last()]/w:rPr[w:dstrike or w:strike])">
+              <xsl:when test="self::w:dstrike or self::w:strike and not(key('default-styles', 'character')[last()]/w:rPr[w:dstrike or w:strike])">
                 <xsl:call-template name="InsertTextStrikeLine"/>
               </xsl:when>
-              <xsl:when
-							  test="self::w:vertAlign or self::w:position and not(key('default-styles', 'character')[last()]/w:rPr[w:vertAlign or w:position])">
+              <xsl:when test="self::w:vertAlign or self::w:position and not(key('default-styles', 'character')[last()]/w:rPr[w:vertAlign or w:position])">
                 <xsl:call-template name="InsertTextPosition"/>
               </xsl:when>
               <xsl:otherwise>
                 <!-- insert attributes using match -->
-                <xsl:if
-								  test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
+                <xsl:if test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="rPrChildren"/>
                   <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
                 </xsl:if>
@@ -1200,17 +1196,13 @@
             <xsl:variable name="elementName" select="name()"/>
             <xsl:choose>
               <!-- insert attribute using template name -->
-              <xsl:when
-							  test="self::w:dstrike or self::w:strike and not(key('default-styles', 'character')[last()]/w:rPr[w:dstrike or w:strike])">
-                <xsl:if
-								  test="not(key('default-styles', 'paragraph')[last()]/w:rPr[w:dstrike or w:strike])">
+              <xsl:when test="self::w:dstrike or self::w:strike and not(key('default-styles', 'character')[last()]/w:rPr[w:dstrike or w:strike])">
+                <xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr[w:dstrike or w:strike])">
                   <xsl:call-template name="InsertTextStrikeLine"/>
                 </xsl:if>
               </xsl:when>
-              <xsl:when
-							  test="self::w:vertAlign or self::w:position and not(key('default-styles', 'character')[last()]/w:rPr[w:vertAlign or w:position])">
-                <xsl:if
-								  test="not(key('default-styles', 'paragraph')[last()]/w:rPr[w:dstrike or w:strike])">
+              <xsl:when test="self::w:vertAlign or self::w:position and not(key('default-styles', 'character')[last()]/w:rPr[w:vertAlign or w:position])">
+                <xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr[w:dstrike or w:strike])">
                   <xsl:call-template name="InsertTextPosition"/>
                 </xsl:if>
               </xsl:when>
@@ -1240,13 +1232,11 @@
   <xsl:template name="EnforceDefaultProperties">
     <xsl:param name="type"/>
     <!-- font size -->
-    <xsl:if
-		  test="not(key('default-styles', $type)//w:rPr/w:sz) and not(w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz)">
+    <xsl:if test="not(key('default-styles', $type)//w:rPr/w:sz) and not(w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz)">
       <xsl:attribute name="fo:font-size">10pt</xsl:attribute>
     </xsl:if>
     <!-- font size asian and complex-->
-    <xsl:if
-		  test="not(key('default-styles', $type)//w:rPr/w:szCs) and not(w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:szCs)">
+    <xsl:if test="not(key('default-styles', $type)//w:rPr/w:szCs) and not(w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:szCs)">
       <xsl:attribute name="style:font-size-complex">10pt</xsl:attribute>
       <xsl:attribute name="style:font-size-asian">10pt</xsl:attribute>
     </xsl:if>
@@ -1455,8 +1445,7 @@
     </xsl:for-each>
 
     <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-      <xsl:if
-			  test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
+      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
         or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
         or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient
         or key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
@@ -1864,15 +1853,15 @@
     <xsl:variable name="relwidth">
       <xsl:variable name="pageWidthStr" select="ooc:CmFromTwips(w:pgSz/@w:w)" />
       <xsl:variable name="pageWidth" select="substring-before($pageWidthStr, 'cm')" />
-      
+
       <xsl:variable name="marLeftStr" select="ooc:CmFromTwips(w:pgMar/@w:left)" />
       <xsl:variable name="marLeft" select="substring-before($marLeftStr, 'cm')" />
-      
+
       <xsl:variable name="marRightStr" select="ooc:CmFromTwips(w:pgMar/@w:right)" />
       <xsl:variable name="marRight" select="substring-before($marRightStr, 'cm')" />
-      
+
       <xsl:variable name="areaWidth" select="$pageWidth - $marLeft - $marRight" />
-      
+
       <xsl:variable name="wordSepWidth" select="'5.1'" />
 
       <xsl:value-of select="($wordSepWidth * 100) div $areaWidth"/>
@@ -2018,7 +2007,7 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:variable name="sz" select="ooc:CmFromTwips(w:pgBorders/w:bottom/@w:sz)" />
-            
+
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="w:pgBorders/w:bottom/@w:color != 'auto'">
@@ -2710,9 +2699,7 @@
         <xsl:variable name="prevStyle" select="$prevP/w:pPr/w:pStyle/@w:val"/>
         <!-- The previous paragraph's style  -->
         <!-- ... and the previous pararaph has the same style -->
-        <xsl:if
-				  test="w:pStyle/@w:val = $prevStyle or
-          (boolean(w:pStyle/@w:val) = false() and boolean($prevStyle) = false())">
+        <xsl:if test="w:pStyle/@w:val = $prevStyle or (boolean(w:pStyle/@w:val) = false() and boolean($prevStyle) = false())">
           <xsl:value-of select="'true'"/>
         </xsl:if>
       </xsl:if>
@@ -2725,9 +2712,7 @@
         <xsl:variable name="nextStyle" select="$nextP/w:pPr/w:pStyle/@w:val"/>
         <!-- The next paragraph's style  -->
         <!-- ... and the next paragraph has the same style  -->
-        <xsl:if
-				  test="w:pStyle/@w:val = $nextStyle or 
-          (boolean(w:pStyle/@w:val) = false() and boolean($nextStyle) = false())">
+        <xsl:if test="w:pStyle/@w:val = $nextStyle or (boolean(w:pStyle/@w:val) = false() and boolean($nextStyle) = false())">
           <xsl:value-of select="'true'"/>
         </xsl:if>
       </xsl:if>
@@ -2735,16 +2720,13 @@
 
     <xsl:variable name="bCtxIsApplied">
       <xsl:choose>
-        <xsl:when
-				  test="$isContextualSpacing='true' and ($topContextualApplied='true' or $BottomContextualApplied='true')">
+        <xsl:when test="$isContextualSpacing='true' and ($topContextualApplied='true' or $BottomContextualApplied='true')">
           <xsl:value-of select="'true'"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="'false'"/>
         </xsl:otherwise>
-
       </xsl:choose>
-
     </xsl:variable>
 
     <xsl:value-of select="$bCtxIsApplied"/>
@@ -3997,9 +3979,7 @@
       <!-- The previous paragraph's style  -->
 
       <!-- ... and the previous pararaph has the same style -->
-      <xsl:if
-			  test="w:pStyle/@w:val = $prevStyle or
-          (boolean(w:pStyle/@w:val) = false() and boolean($prevStyle) = false())">
+      <xsl:if test="w:pStyle/@w:val = $prevStyle or (boolean(w:pStyle/@w:val) = false() and boolean($prevStyle) = false())">
         <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
       </xsl:if>
     </xsl:if>
@@ -4011,9 +3991,7 @@
       <!-- The next paragraph's style  -->
 
       <!-- ... and the next paragraph has the same style  -->
-      <xsl:if
-			  test="w:pStyle/@w:val = $nextStyle or 
-          (boolean(w:pStyle/@w:val) = false() and boolean($nextStyle) = false())">
+      <xsl:if test="w:pStyle/@w:val = $nextStyle or (boolean(w:pStyle/@w:val) = false() and boolean($nextStyle) = false())">
         <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
       </xsl:if>
     </xsl:if>
@@ -4171,12 +4149,10 @@
           </xsl:if>
           <xsl:attribute name="fo:break-before">
             <xsl:choose>
-              <xsl:when
-                test="w:pageBreakBefore/@w:val='off' or w:pageBreakBefore/@w:val='false' or w:pageBreakBefore/@w:val=0">
+              <xsl:when test="w:pageBreakBefore/@w:val='off' or w:pageBreakBefore/@w:val='false' or w:pageBreakBefore/@w:val=0">
                 <xsl:value-of select="'auto'"/>
               </xsl:when>
-              <xsl:when
-                test="w:pageBreakBefore/@w:val='on' or w:pageBreakBefore/@w:val='true' or w:pageBreakBefore/@w:val=1">
+              <xsl:when test="w:pageBreakBefore/@w:val='on' or w:pageBreakBefore/@w:val='true' or w:pageBreakBefore/@w:val=1">
                 <xsl:value-of select="'page'"/>
               </xsl:when>
               <xsl:otherwise>
@@ -4843,8 +4819,7 @@
       <xsl:value-of select="key('StyleId', $parentStyleId)/w:basedOn/@w:val" />
     </xsl:variable>
     <!-- divo: seems this won't work for parent's parent's parent styles etc -->
-    <xsl:if
-		  test="w:tabs or key('StyleId', $parentStyleId)/w:pPr/w:tabs or key('StyleId', $parentParentStyleId)/w:pPr/w:tabs">
+    <xsl:if test="w:tabs or key('StyleId', $parentStyleId)/w:pPr/w:tabs or key('StyleId', $parentParentStyleId)/w:pPr/w:tabs">
       <style:tab-stops>
         <xsl:variable name="me" select="w:tabs" />
         <xsl:for-each select="w:tabs/w:tab">
@@ -4858,9 +4833,8 @@
           <xsl:variable name="existingParentPos" select="key('ParagraphsByStyleId', $parentStyleId)[@w:pos=$currentPos][@w:val!='clear']" />
           <xsl:if test="not($existingParentPos)">
             <!--test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos)">-->
-            <xsl:variable name="pos">
-              <xsl:value-of select="./@w:pos"/>
-            </xsl:variable>
+            <xsl:variable name="pos" select="./@w:pos"/>
+            
             <!--clam, dialogika: bugfix 1839626-->
             <xsl:if test="not($me/w:tab[@w:pos=$pos][@w:val='clear'])">
               <xsl:call-template name="InsertTabs">
@@ -4871,9 +4845,7 @@
         </xsl:for-each>
 
         <xsl:for-each select="key('StyleId', $parentParentStyleId)/w:pPr/w:tabs/w:tab">
-          <xsl:if
-					  test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos) 
-					and not(key('StyleId',$parentStyleId)/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
+          <xsl:if test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos) and not(key('StyleId',$parentStyleId)/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
             <xsl:call-template name="InsertTabs">
               <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
             </xsl:call-template>
@@ -5272,9 +5244,8 @@
             </xsl:choose>
           </xsl:attribute>
         </xsl:if>
-        <!--        leader text  -->
-        <xsl:if
-				  test="./@w:leader and ./@w:leader!='' and ./@w:leader!='heavy' and ./@w:leader!='middleDot' and ./@w:leader!='none'">
+        <!-- leader text  -->
+        <xsl:if test="./@w:leader and ./@w:leader!='' and ./@w:leader!='heavy' and ./@w:leader!='middleDot' and ./@w:leader!='none'">
           <xsl:attribute name="style:leader-text">
             <xsl:choose>
               <xsl:when test="./@w:leader='dot'">.</xsl:when>
@@ -5856,13 +5827,10 @@
 
   <!--// Writing attributes -->
   <xsl:template name="getMarginTopForParagraph">
-
     <xsl:param name="StyleParagraphId"/>
-    <xsl:param name="documentParagraphWBefore"
-		  select="key('StyleId', $StyleParagraphId)/w:pPr/w:spacing/@w:before"/>
+    <xsl:param name="documentParagraphWBefore" select="key('StyleId', $StyleParagraphId)/w:pPr/w:spacing/@w:before"/>
 
-    <xsl:variable name="parentStyleId"
-		  select="key('StyleId', $StyleParagraphId)/w:basedOn[1]/@w:val"/>
+    <xsl:variable name="parentStyleId" select="key('StyleId', $StyleParagraphId)/w:basedOn[1]/@w:val"/>
 
     <xsl:variable name="bStop">
 
@@ -5871,14 +5839,12 @@
         <xsl:value-of select="1"/>
       </xsl:if>
 
-      <xsl:if
-			  test="count($documentParagraphWBefore)=0 and count($parentStyleId)>0 and $StyleParagraphId!=''">
+      <xsl:if test="count($documentParagraphWBefore)=0 and count($parentStyleId)>0 and $StyleParagraphId!=''">
         <!-- we dont have values for margin but we have a parent-->
         <xsl:value-of select="0"/>
       </xsl:if>
 
-      <xsl:if
-			  test="count($documentParagraphWBefore)=0 and count($parentStyleId)=0 and $StyleParagraphId!=''">
+      <xsl:if test="count($documentParagraphWBefore)=0 and count($parentStyleId)=0 and $StyleParagraphId!=''">
         <!-- We are at the top of the tree without any values -->
         <xsl:value-of select="2"/>
       </xsl:if>
@@ -5888,14 +5854,13 @@
         <xsl:value-of select="3"/>
       </xsl:if>
 
-
     </xsl:variable>
 
     <xsl:choose>
 
       <!--Stop Condition-->
       <xsl:when test="$bStop='1'">
-        <!--Return founded margins-->
+        <!--Return found margin -->
         <xsl:value-of select="$documentParagraphWBefore"/>
       </xsl:when>
 
@@ -5969,7 +5934,7 @@
       <!--Stop Condition-->
 
       <xsl:when test="$bStop='1'">
-        <!--Return founded margins-->
+        <!--Return found margins-->
         <xsl:value-of select="$documentParagraphWAfter"/>
       </xsl:when>
 

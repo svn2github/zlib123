@@ -44,7 +44,8 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="config svg office number text table style fo draw xlink">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="config svg office number text table style fo draw xlink ooc">
 
   <xsl:import href="2oox-tables.xsl"/>
   <xsl:import href="2oox-indexes.xsl"/>

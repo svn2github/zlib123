@@ -1177,7 +1177,12 @@
         <xsl:when test="$cellProp/@fo:border">
 
           <!-- insert the all-around-border to each side -->
-
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="border" select="$cellProp/@fo:border" />
+            <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
+            <xsl:with-param name="side" select="string('top')" />
+          </xsl:call-template>
+          
           <xsl:call-template name="InsertCellBorder">
             <xsl:with-param name="border" select="$cellProp/@fo:border" />
             <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
@@ -1187,7 +1192,7 @@
           <xsl:call-template name="InsertCellBorder">
             <xsl:with-param name="border" select="$cellProp/@fo:border" />
             <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
-            <xsl:with-param name="side" select="string('top')" />
+            <xsl:with-param name="side" select="string('bottom')" />
           </xsl:call-template>
 
           <xsl:call-template name="InsertCellBorder">
@@ -1196,25 +1201,10 @@
             <xsl:with-param name="side" select="string('right')" />
           </xsl:call-template>
 
-          <xsl:call-template name="InsertCellBorder">
-            <xsl:with-param name="border" select="$cellProp/@fo:border" />
-            <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
-            <xsl:with-param name="side" select="string('bottom')" />
-          </xsl:call-template>
-
         </xsl:when>
         <xsl:otherwise>
 
           <!-- insert the single borders -->
-
-          <xsl:if test="$cellProp/@fo:border-left">
-            <xsl:call-template name="InsertCellBorder">
-              <xsl:with-param name="border" select="$cellProp/@fo:border-left" />
-              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-left" />
-              <xsl:with-param name="side" select="string('left')" />
-            </xsl:call-template>
-          </xsl:if>
-
           <xsl:if test="$cellProp/@fo:border-top">
             <xsl:call-template name="InsertCellBorder">
               <xsl:with-param name="border" select="$cellProp/@fo:border-top" />
@@ -1222,12 +1212,12 @@
               <xsl:with-param name="side" select="string('top')" />
             </xsl:call-template>
           </xsl:if>
-
-          <xsl:if test="$cellProp/@fo:border-right">
+          
+          <xsl:if test="$cellProp/@fo:border-left">
             <xsl:call-template name="InsertCellBorder">
-              <xsl:with-param name="border" select="$cellProp/@fo:border-right" />
-              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-right" />
-              <xsl:with-param name="side" select="string('right')" />
+              <xsl:with-param name="border" select="$cellProp/@fo:border-left" />
+              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-left" />
+              <xsl:with-param name="side" select="string('left')" />
             </xsl:call-template>
           </xsl:if>
 
@@ -1238,56 +1228,17 @@
               <xsl:with-param name="side" select="string('bottom')" />
             </xsl:call-template>
           </xsl:if>
+          
+          <xsl:if test="$cellProp/@fo:border-right">
+            <xsl:call-template name="InsertCellBorder">
+              <xsl:with-param name="border" select="$cellProp/@fo:border-right" />
+              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-right" />
+              <xsl:with-param name="side" select="string('right')" />
+            </xsl:call-template>
+          </xsl:if>
 
         </xsl:otherwise>
-
       </xsl:choose>
-
-      <!--
-      makz: old clever age stuff
-      <xsl:choose>
-        -->
-      <!-- if subCell, do not put border on the outer cells of the subtable it belongs -->
-      <!--
-        <xsl:when test="ancestor::table:table[@table:is-sub-table='true']">
-          <xsl:call-template name="GetSubCellBorders">
-            <xsl:with-param name="colsNumber" select="$colsNumber"/>
-            <xsl:with-param name="cellProp" select="$cellProp"/>
-          </xsl:call-template>
-        </xsl:when>
-        -->
-      <!-- if subtable, get the border from subcells -->
-      <!--
-        <xsl:when test="table:table[@table:is-sub-table='true']">
-          <xsl:call-template name="GetBordersFromSubCells">
-            <xsl:with-param name="colsNumber" select="$colsNumber"/>
-          </xsl:call-template>
-        </xsl:when>
-        -->
-      <!-- other cases : compute borders -->
-      <!--
-        <xsl:when test="$cellProp[@fo:border and @fo:border!='none' ]">
-          <xsl:call-template name="InsertBorders">
-            <xsl:with-param name="allSides">true</xsl:with-param>
-            <xsl:with-param name="node" select="$cellProp"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:when
-          test="$cellProp[@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right]">
-          <xsl:call-template name="InsertBorders">
-            <xsl:with-param name="allSides">false</xsl:with-param>
-            <xsl:with-param name="node" select="$cellProp"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="InsertEmptyBorders">
-            <xsl:with-param name="node" select="$cellProp"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:call-template name="InsertCellDiagonals">
-        <xsl:with-param name="cellProp" select="$cellProp"/>
-      </xsl:call-template>-->
 
     </w:tcBorders>
   </xsl:template>
