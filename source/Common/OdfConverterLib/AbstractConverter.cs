@@ -271,7 +271,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             get
             {
                 // Enable xslt 'document()' function
-                return new XsltSettings(true, false);
+                return new XsltSettings(true, true);
             }
         }
 
