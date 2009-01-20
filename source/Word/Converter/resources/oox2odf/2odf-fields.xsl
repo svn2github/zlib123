@@ -42,7 +42,8 @@
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w wp r rels b oox">
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="w wp r rels b oox ooc">
 
   <xsl:key name="fieldRunsByFieldId" match="w:r" use="@oox:fid" />
 
@@ -134,13 +135,15 @@
 
   </xsl:template>
 
-  <xsl:template name="left-trim">
+  <!--<xsl:template name="left-trim">
     <xsl:param name="string" />
     <xsl:choose>
       <xsl:when test="string-length(normalize-space($string)) = 0">
         <xsl:value-of select="''" />
       </xsl:when>
-      <!-- normalize-space is used to check for any kind of white space or newline characters -->
+      -->
+  <!-- normalize-space is used to check for any kind of white space or newline characters -->
+  <!--
       <xsl:when test="normalize-space(substring($string, 1, 1)) = ''">
         <xsl:call-template name="left-trim">
           <xsl:with-param name="string" select="substring($string, 2)" />
@@ -158,7 +161,9 @@
       <xsl:when test="string-length(normalize-space($string)) = 0">
         <xsl:value-of select="''" />
       </xsl:when>
-      <!-- normalize-space is used to check for any kind of white space or newline characters -->
+      -->
+  <!-- normalize-space is used to check for any kind of white space or newline characters -->
+  <!--
       <xsl:when test="normalize-space(substring($string, string-length($string))) = ''">
         <xsl:call-template name="right-trim">
           <xsl:with-param name="string" select="substring($string, 1, string-length($string) - 1)" />
@@ -179,20 +184,20 @@
         </xsl:call-template>
       </xsl:with-param>
     </xsl:call-template>
-  </xsl:template>
+  </xsl:template>-->
 
   <xsl:template match="w:instrText" mode="automaticstyles">
-    
+
     <xsl:variable name="fieldCode">
       <xsl:call-template name="BuildFieldCode" />
     </xsl:variable>
-    
+
     <xsl:variable name="fieldType">
       <xsl:call-template name="ParseFieldTypeFromFieldCode">
         <xsl:with-param name="fieldCode" select="$fieldCode" />
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
       <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
       <xsl:when test="$fieldType = 'CREATEDATE' or $fieldType = 'DATE' 
@@ -232,7 +237,7 @@
           <xsl:with-param name="fieldCode" select="$fieldCode" />
           <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByFieldId', @oox:fid)[parent::node() = $runParent]" />
         </xsl:call-template>
-        
+
       </text:span>
     </xsl:if>
   </xsl:template>
@@ -269,35 +274,28 @@
   <xsl:template match="w:fldSimple" mode="automaticstyles">
     <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles" />
   </xsl:template>
-  
+
   <xsl:template name="BuildFieldCode">
     <xsl:param name="ooxFieldId" select="@oox:fid | parent::*/@oox:fid" />
-    
-    <xsl:call-template name="trim">
-      <xsl:with-param name="string">
-        <xsl:choose>
-          <!-- simple field -->
-          <xsl:when test="@w:instr">
-            <xsl:value-of select="@w:instr" />
-          </xsl:when>
-          <!-- complex field -->
-          <xsl:otherwise>
-            <xsl:value-of select="string(key('fieldRunsByFieldId', $ooxFieldId)//w:instrText)" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:with-param>
-    </xsl:call-template>
+
+    <xsl:choose>
+      <!-- simple field -->
+      <xsl:when test="@w:instr">
+        <xsl:value-of select="ooc:Trim(@w:instr)" />
+      </xsl:when>
+      <!-- complex field -->
+      <xsl:otherwise>
+        <xsl:value-of select="ooc:Trim(key('fieldRunsByFieldId', $ooxFieldId)//w:instrText)" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- returns the field type from the field code in uppercase letters -->
   <xsl:template name="ParseFieldTypeFromFieldCode">
     <xsl:param name="fieldCode" />
     <!-- field can start with space, but first none-space text is field code -->
-    <xsl:variable name="trimmedFieldCode">
-      <xsl:call-template name="trim">
-        <xsl:with-param name="string" select="$fieldCode" />
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="trimmedFieldCode" select="ooc:Trim($fieldCode)" />
+
     <xsl:choose>
       <xsl:when test="starts-with($trimmedFieldCode, '=')">
         <!-- formula fields start with '=' and don't require a space character as separator-->
@@ -317,19 +315,14 @@
   <xsl:template name="ParseFieldInstructionFromFieldCode">
     <xsl:param name="fieldCode" />
     <!-- field can start with space, but first none-space text is field code -->
-    <xsl:variable name="trimmedFieldCode">
-      <xsl:call-template name="trim">
-        <xsl:with-param name="string" select="$fieldCode" />
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="trimmedFieldCode" select="ooc:Trim($fieldCode)" />
+
     <xsl:choose>
       <xsl:when test="starts-with($trimmedFieldCode, '=')">
-        <xsl:call-template name="trim">
-          <xsl:with-param name="string" select="substring($trimmedFieldCode, 2)" />
-        </xsl:call-template>
+        <xsl:value-of select="ooc:Trim(substring($trimmedFieldCode, 2))" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="substring-after($trimmedFieldCode, ' ')" />
+        <xsl:value-of select="ooc:Trim(substring-after($trimmedFieldCode, ' '))" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -343,11 +336,8 @@
     <xsl:param name="fieldCode" />
     <xsl:param name="fieldType" />
 
-    <xsl:variable name="fieldInstruction">
-      <xsl:call-template name="trim">
-        <xsl:with-param name="string" select="substring-after($fieldCode, $fieldType)" />
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="fieldInstruction" select="ooc:Trim(substring-after($fieldCode, $fieldType))" />
+
     <xsl:variable name="fieldName">
       <xsl:choose>
         <xsl:when test="contains($fieldInstruction, ' ')">
@@ -374,37 +364,31 @@
 
   <xsl:template name="ParseFieldArgumentFromFieldInstruction">
     <xsl:param name="fieldInstruction" />
-    <xsl:choose>
-      <!-- strip field switches from the beginning -->
-      <xsl:when test="starts-with($fieldInstruction, '\')">
-        <xsl:call-template name="trim">
-          <xsl:with-param name="string">
-            <xsl:call-template name="ParseFieldArgumentFromFieldInstruction">
-              <xsl:with-param name="fieldInstruction" select="substring-after($fieldInstruction, ' ')" />
-            </xsl:call-template>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <!-- strip field switches from the end -->
-      <xsl:when test="contains= '\'">
-        <xsl:call-template name="trim">
-          <xsl:with-param name="string">
-            <xsl:call-template name="ParseFieldArgumentFromFieldInstruction">
-              <xsl:with-param name="fieldInstruction" select="substring-before($fieldInstruction, '\')" />
-            </xsl:call-template>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <!-- strip quotes -->
-      <xsl:when test="contains($fieldInstruction, '&quot;')">
-        <xsl:value-of select="substring-before(substring-after($fieldInstruction, '&quot;'), '&quot;')" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="trim">
-          <xsl:with-param name="string" select="$fieldInstruction" />
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
+
+    <xsl:variable name="fieldArgument">
+      <xsl:choose>
+        <!-- strip field switches from the beginning -->
+        <xsl:when test="starts-with($fieldInstruction, '\')">
+          <xsl:call-template name="ParseFieldArgumentFromFieldInstruction">
+            <xsl:with-param name="fieldInstruction" select="substring-after($fieldInstruction, ' ')" />
+          </xsl:call-template>
+        </xsl:when>
+        <!-- strip field switches from the end -->
+        <xsl:when test="contains= '\'">
+          <xsl:call-template name="ParseFieldArgumentFromFieldInstruction">
+            <xsl:with-param name="fieldInstruction" select="substring-before($fieldInstruction, '\')" />
+          </xsl:call-template>
+        </xsl:when>
+        <!-- strip quotes -->
+        <xsl:when test="contains($fieldInstruction, '&quot;')">
+          <xsl:value-of select="substring-before(substring-after($fieldInstruction, '&quot;'), '&quot;')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$fieldInstruction" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="ooc:Trim($fieldArgument)" />
   </xsl:template>
 
   <!--
@@ -417,11 +401,8 @@
     <xsl:param name="fieldName" />
     <xsl:param name="fieldType" />
 
-    <xsl:variable name="trimmedFieldCode">
-      <xsl:call-template name="left-trim">
-        <xsl:with-param name="string" select="substring-after(substring-after($fieldCode, $fieldType), $fieldName)" />
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="trimmedFieldCode" select="ooc:Trim(substring-after(substring-after($fieldCode, $fieldType), $fieldName))" />
+
     <xsl:choose>
       <xsl:when test="substring($trimmedFieldCode, 1,1) = &apos;&quot;&apos;">
         <xsl:value-of select="substring-before(substring-after($trimmedFieldCode, &apos;&quot;&apos;), &apos;&quot;&apos;)" />
@@ -625,9 +606,7 @@
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'MACROBUTTON'">
-        <xsl:call-template name="trim">
-          <xsl:with-param name="string" select="substring-after($fieldInstruction,' ')" />
-        </xsl:call-template>
+        <xsl:value-of select="ooc:Trim(substring-after($fieldInstruction,' '))" />
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text: COMPARE, DOCVARIABLE, GOTOBUTTON, IF, PRINT-->
@@ -991,14 +970,10 @@
             <!--clam, dialogika: trim inserted because of bug 1839938-->
             <xsl:choose>
               <xsl:when test="contains($fieldCode, ' \')">
-                <xsl:call-template name="trim">
-                  <xsl:with-param name="string" select="substring-before(substring-after($fieldCode, 'REF '), ' \')" />
-                </xsl:call-template>
+                <xsl:value-of select="ooc:Trim(substring-before(substring-after($fieldCode, 'REF '), ' \'))" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:call-template name="trim">
-                  <xsl:with-param name="string" select="substring-after($fieldCode, 'REF ')" />
-                </xsl:call-template>
+                <xsl:value-of select="ooc:Trim(substring-after($fieldCode, 'REF '))" />
               </xsl:otherwise>
             </xsl:choose>
 

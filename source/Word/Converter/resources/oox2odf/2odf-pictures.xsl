@@ -45,8 +45,9 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
+  xmlns:ooc="urn:odf-converter"                
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w uri a pic r rels o wp w xlink oox rels">
+  exclude-result-prefixes="w uri a pic r rels o wp w xlink oox ooc rels">
 
   <!--
   *************************************************************************
@@ -376,22 +377,8 @@
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="wp:positionV/@relativeFrom = 'bottomMargin'">
-          <xsl:variable name="pgH">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="/w:document/w:body/w:sectPr/w:pgSz/@w:h"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="botMar">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="/w:document/w:body/w:sectPr/w:pgMar/@w:bottom"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
+          <xsl:variable name="pgH" select="ooc:CmFromTwips(/w:document/w:body/w:sectPr/w:pgSz/@w:h)" />
+          <xsl:variable name="botMar" select="ooc:CmFromTwips(/w:document/w:body/w:sectPr/w:pgMar/@w:bottom)" />
           <xsl:variable name="Pos">
             <xsl:call-template name="ConvertEmu">
               <xsl:with-param name="length">

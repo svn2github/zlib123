@@ -39,6 +39,7 @@
   <xsl:import href="measures.xsl" />
   <xsl:import href="common-meta.xsl" />
   <xsl:import href="utils.xsl" />
+  <xsl:import href="2odf-scripts.xsl" />
   <xsl:import href="2odf-common.xsl" />
   <xsl:import href="2odf-content.xsl" />
   <xsl:import href="2odf-pictures.xsl" />

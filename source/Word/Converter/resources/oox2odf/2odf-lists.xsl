@@ -39,7 +39,8 @@
 				xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 				xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 				xmlns:oox="urn:oox"
-				exclude-result-prefixes="w v r oox">
+        xmlns:ooc="urn:odf-converter"
+				exclude-result-prefixes="w v r oox ooc">
 
 	<!-- a key on all numberings defined in numbering.xml -->
 	<xsl:key name="numId" match="w:num" use="@w:numId"/>
@@ -594,18 +595,12 @@
 
 		<!--text:space-before-->
 		<xsl:attribute name="text:space-before">
-			<xsl:call-template name="ConvertTwips">
-				<xsl:with-param name="length" select="$Left - $SpaceToNextTab"/>
-				<xsl:with-param name="unit">cm</xsl:with-param>
-			</xsl:call-template>
+      <xsl:value-of select="ooc:CmFromTwips($Left - $SpaceToNextTab)" />
 		</xsl:attribute>
 
 		<!--text:min-label-width-->
 		<xsl:attribute name="text:min-label-width">
-			<xsl:call-template name="ConvertTwips">
-				<xsl:with-param name="length" select="$SpaceToNextTab"/>
-				<xsl:with-param name="unit">cm</xsl:with-param>
-			</xsl:call-template>
+      <xsl:value-of select="ooc:CmFromTwips($SpaceToNextTab)" />
 		</xsl:attribute>
 
 		<!--math, dialogika: changed for correct indentation calculation END -->

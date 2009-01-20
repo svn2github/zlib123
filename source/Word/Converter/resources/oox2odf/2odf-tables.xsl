@@ -34,9 +34,10 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:oox="urn:oox"
+  xmlns:ooc="urn:odf-converter"                
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  exclude-result-prefixes="w oox">
+  exclude-result-prefixes="w oox ooc">
 
   <!-- 
   *************************************************************************
@@ -363,10 +364,7 @@
       <xsl:when test="$tblPr/w:tblW/@w:type='dxa'">
         <!-- absolute width -->
         <xsl:attribute name="svg:width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="$tblPr/w:tblW/@w:w" />
-            <xsl:with-param name="unit" select="'cm'" />
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips($tblPr/w:tblW/@w:w)" />
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
@@ -400,19 +398,13 @@
 
     <xsl:if test="$tblPr/w:tblpPr/@w:tblpX != ''">
       <xsl:attribute name="svg:x">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpX" />
-          <xsl:with-param name="unit" select="'cm'" />
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromTwips($tblPr/w:tblpPr/@w:tblpX)" />
       </xsl:attribute>
     </xsl:if>
 
     <xsl:if test="$tblPr/w:tblpPr/@w:tblpY != ''">
       <xsl:attribute name="svg:y">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpY" />
-          <xsl:with-param name="unit" select="'cm'" />
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromTwips($tblPr/w:tblpPr/@w:tblpY)" />
       </xsl:attribute>
     </xsl:if>
 
@@ -627,12 +619,7 @@
         </xsl:when>
         <xsl:when test="w:tblW/@w:type='dxa'">
           <xsl:attribute name="style:width">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="w:tblW/@w:w"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromTwips(w:tblW/@w:w)"/>
           </xsl:attribute>
           <xsl:attribute name="table:align">
             <xsl:call-template name="InsertTableAlign"/>
@@ -640,12 +627,7 @@
         </xsl:when>
         <xsl:when test="w:tblW/@w:type='auto'">
           <xsl:attribute name="style:width">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="sum(ancestor::w:tbl[1]/w:tblGrid/w:gridCol/@w:w)"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromTwips(sum(ancestor::w:tbl[1]/w:tblGrid/w:gridCol/@w:w))"/>
           </xsl:attribute>
           <xsl:attribute name="table:align">
             <xsl:call-template name="InsertTableAlign"/>
@@ -687,21 +669,9 @@
       </xsl:if>
 
       <xsl:if test="$Default='StyleTableProperties'">
-        <xsl:choose>
-          <xsl:when test="w:tblpPr/@w:bottomFromText">
-            <xsl:attribute name="fo:margin-bottom">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:tblpPr/@w:bottomFromText"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:attribute name="fo:margin-bottom">
+          <xsl:value-of select="ooc:CmFromTwips(w:tblpPr/@w:bottomFromText)"/>
+        </xsl:attribute>
       </xsl:if>
 
     </style:table-properties>
@@ -741,12 +711,7 @@
       <xsl:otherwise>
         <!-- use absolute value -->
         <xsl:attribute name="style:column-width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$gridCol/@w:w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips($gridCol/@w:w)"/>
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
@@ -776,12 +741,7 @@
     </xsl:variable>
 
     <xsl:attribute name="fo:margin-left">
-      <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length">
-          <xsl:value-of select="$tableIndent - $cellMargin"/>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
+      <xsl:value-of select="ooc:CmFromTwips($tableIndent - $cellMargin)"/>
     </xsl:attribute>
   </xsl:template>
 
@@ -917,32 +877,17 @@
     <xsl:choose>
       <xsl:when test="$tcMar">
         <xsl:attribute name="{$attribute}">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$tcMar/@w:w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips($tcMar/@w:w)" />
         </xsl:attribute>
       </xsl:when>
       <xsl:when test="$tblMar">
         <xsl:attribute name="{$attribute}">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$tblMar/@w:w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips($tblMar/@w:w)" />
         </xsl:attribute>
       </xsl:when>
       <xsl:when test="$tblDefMar">
         <xsl:attribute name="{$attribute}">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$tblDefMar/@w:w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips($tblDefMar/@w:w)" />
         </xsl:attribute>
       </xsl:when>
     </xsl:choose>
@@ -1475,22 +1420,12 @@
     <xsl:choose>
       <xsl:when test="w:trHeight/@w:hRule='exact'">
         <xsl:attribute name="style:row-height">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:trHeight/@w:val"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(w:trHeight/@w:val)" />
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="style:min-row-height">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:trHeight/@w:val"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(w:trHeight/@w:val)" />
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>

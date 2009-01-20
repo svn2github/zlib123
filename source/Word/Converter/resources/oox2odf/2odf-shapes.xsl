@@ -44,8 +44,9 @@
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:oox="urn:oox"
+  xmlns:ooc="urn:odf-converter"                
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w r wp xlink v w10 o oox pic a rels">
+  exclude-result-prefixes="w r wp xlink v w10 o oox ooc pic a rels">
 
   <!--
   *************************************************************************
@@ -3895,12 +3896,7 @@
                     <xsl:choose>
                       <!-- Sona: #2149141 changes because mirror margins was lost-->
                       <xsl:when test ="$relH='right-margin-area'">
-                        <xsl:variable name="horWidth">
-                          <xsl:call-template name="ConvertTwips">
-                            <xsl:with-param name="length" select="$HorizontalWidth"></xsl:with-param>
-                            <xsl:with-param name="unit" select="'cm'"></xsl:with-param>
-                          </xsl:call-template>
-                        </xsl:variable>
+                        <xsl:variable name="horWidth" select="ooc:CmFromTwips($HorizontalWidth)" />
                         <!-- concat((substring-before($horWidth,'cm')+substring-before($marginLeft,'cm')),'cm')-->
                         <xsl:value-of select="$marginLeft" />
                       </xsl:when>
@@ -3941,12 +3937,7 @@
                 <xsl:choose>
                   <!-- Sona: #2149141 changes because mirror margins was lost-->
                   <xsl:when test ="$relH='right-margin-area'">
-                    <xsl:variable name="horWidth">
-                      <xsl:call-template name="ConvertTwips">
-                        <xsl:with-param name="length" select="$HorizontalWidth"></xsl:with-param>
-                        <xsl:with-param name="unit" select="'cm'"></xsl:with-param>
-                      </xsl:call-template>
-                    </xsl:variable>
+                    <xsl:variable name="horWidth" select="ooc:CmFromTwips($HorizontalWidth)" />
                     <xsl:value-of select="$marginLeft"/>
                   </xsl:when>
                   <xsl:otherwise>
@@ -4019,12 +4010,7 @@
                       <!--end here-->
                       <!-- or $relV='inner-margin-area'-->
                       <xsl:when test ="$relV='bottom-margin-area'">
-                        <xsl:variable name="vertHeight">
-                          <xsl:call-template name="ConvertTwips">
-                            <xsl:with-param name="length" select="$VerticalHeight"></xsl:with-param>
-                            <xsl:with-param name="unit" select="'cm'"></xsl:with-param>
-                          </xsl:call-template>
-                        </xsl:variable>
+                        <xsl:variable name="vertHeight" select="ooc:CmFromTwips($VerticalHeight)" />
                         <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
                       </xsl:when>
                       <!--changed for below of line-->
@@ -4100,12 +4086,7 @@
                   <!--end here-->
                   <!--or $relV='inner-margin-area'-->
                   <xsl:when test ="$relV='bottom-margin-area'">
-                    <xsl:variable name="vertHeight">
-                      <xsl:call-template name="ConvertTwips">
-                        <xsl:with-param name="length" select="$VerticalHeight"></xsl:with-param>
-                        <xsl:with-param name="unit" select="'cm'"></xsl:with-param>
-                      </xsl:call-template>
-                    </xsl:variable>
+                    <xsl:variable name="vertHeight" select="ooc:CmFromTwips($VerticalHeight)" />
                     <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
                   </xsl:when>
                   <!--chnaged for below of line-->
@@ -4703,17 +4684,10 @@
           <xsl:attribute name="svg:width">
             <xsl:choose>
               <xsl:when test="$width = 0 and $shape//@o:hr='t'">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length"
-									  select="following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1]"/>
-                  <xsl:with-param name="unit" select="'cm'"/>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:CmFromTwips(following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1])" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:call-template name="ConvertMeasure">
-                  <xsl:with-param name="length" select="$width"/>
-                  <xsl:with-param name="destUnit" select="'cm'"/>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:CmFromTwips($width)" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>

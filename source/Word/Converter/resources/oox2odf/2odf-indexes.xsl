@@ -37,7 +37,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w b r oox">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="w b r oox ooc">
 
   <xsl:key name="tocBookmark" match="w:bookmarkStart" use="@w:name" />
   <xsl:key name="OutlineLevel" match="w:outlineLvl" use="''" />
@@ -1333,10 +1334,8 @@
               </xsl:choose>
             </xsl:variable>
 
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length" select="$position" />
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromTwips($position)" />
+            
           </xsl:attribute>
         </xsl:if>
         <xsl:if test="$leaderChar and $leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">
@@ -1416,10 +1415,7 @@
                     <xsl:with-param name="maxtabCount" select="$tabCount" />
                   </xsl:call-template>
                 </xsl:variable>
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length" select="$position" />
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:CmFromTwips($position)" />
               </xsl:attribute>
             </xsl:if>
             <xsl:if test="$leaderChar and $leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">

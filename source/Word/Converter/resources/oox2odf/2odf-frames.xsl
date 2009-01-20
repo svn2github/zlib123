@@ -17,8 +17,9 @@
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:oox="urn:oox"
+  xmlns:ooc="urn:odf-converter"                
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w r wp xlink v w10 o oox">
+  exclude-result-prefixes="w r wp xlink v w10 o oox ooc">
 
   <!-- 
   *************************************************************************
@@ -443,34 +444,10 @@
     <xsl:param name="framePr" />
 
     <!-- vertical margin -->
-    <xsl:variable name="vertMargin">
-      <xsl:choose>
-        <xsl:when test="$framePr/@w:vSpace">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="$framePr/@w:vSpace" />
-            <xsl:with-param name="unit" select="'cm'" />
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0cm</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="vertMargin" select="ooc:CmFromTwips($framePr/@w:vSpace)" />
 
     <!-- horizontal margin -->
-    <xsl:variable name="horzMargin">
-      <xsl:choose>
-        <xsl:when test="$framePr/@w:hSpace">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="$framePr/@w:hSpace" />
-            <xsl:with-param name="unit" select="'cm'" />
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0cm</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="horzMargin" select="ooc:CmFromTwips($framePr/@w:hSpace)" />
     
     <xsl:attribute name="fo:margin-bottom">
       <xsl:value-of select="$vertMargin"/>

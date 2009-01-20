@@ -5,7 +5,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w oox">
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="w oox ooc">
 
   <xsl:key name="elementsByOoxSectionId" match="w:body/*" use="@oox:s"/>
 
@@ -89,12 +90,7 @@
             <xsl:when test="w:cols/@w:equalWidth = '0'"> </xsl:when>
             <xsl:otherwise>
               <xsl:attribute name="fo:column-gap">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="w:cols/@w:space"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:CmFromTwips(w:cols/@w:space)"/>
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
@@ -106,21 +102,16 @@
           <xsl:for-each select="w:cols/w:col">
             <style:column>
               <xsl:attribute name="style:rel-width">
-                <xsl:variable name="width">
-                  <xsl:value-of select="./@w:w"/>
-                </xsl:variable>
+                <xsl:variable name="width" select="./@w:w"/>
                 <xsl:choose>
                   <xsl:when test="preceding-sibling::w:col[1]/@w:space">
                     <xsl:variable name="space">
-                      <xsl:value-of
-                        select="round(number(preceding-sibling::w:col[1]/@w:space) div 2)"/>
+                      <xsl:value-of select="round(number(preceding-sibling::w:col[1]/@w:space) div 2)"/>
                     </xsl:variable>
                     <xsl:value-of select="concat($width + $space,'*')"/>
                   </xsl:when>
                   <xsl:when test="./@w:space">
-                    <xsl:variable name="space">
-                      <xsl:value-of select="round(number(./@w:space) div 2)"/>
-                    </xsl:variable>
+                    <xsl:variable name="space" select="round(number(./@w:space) div 2)"/>
                     <xsl:value-of select="concat($width + $space,'*')"/>
                   </xsl:when>
                   <xsl:otherwise>
@@ -128,32 +119,12 @@
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
+
               <xsl:attribute name="fo:start-indent">
-                <xsl:choose>
-                  <xsl:when test="preceding-sibling::w:col/@w:space">
-                    <xsl:call-template name="ConvertTwips">
-                      <xsl:with-param name="length">
-                        <xsl:value-of
-                          select="format-number(preceding-sibling::w:col/@w:space div 2, '#.###')"/>
-                      </xsl:with-param>
-                      <xsl:with-param name="unit">cm</xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:when>
-                  <xsl:otherwise>0cm</xsl:otherwise>
-                </xsl:choose>
+                <xsl:value-of select="ooc:CmFromTwips(format-number(preceding-sibling::w:col/@w:space div 2, '#.###'))" />
               </xsl:attribute>
               <xsl:attribute name="fo:end-indent">
-                <xsl:choose>
-                  <xsl:when test="./@w:space">
-                    <xsl:call-template name="ConvertTwips">
-                      <xsl:with-param name="length">
-                        <xsl:value-of select="format-number(./@w:space div 2, '#.###')"/>
-                      </xsl:with-param>
-                      <xsl:with-param name="unit">cm</xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:when>
-                  <xsl:otherwise>0cm</xsl:otherwise>
-                </xsl:choose>
+                <xsl:value-of select="ooc:CmFromTwips(format-number(./@w:space div 2, '#.###'))" />
               </xsl:attribute>
             </style:column>
           </xsl:for-each>

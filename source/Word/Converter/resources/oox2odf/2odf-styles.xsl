@@ -41,9 +41,10 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
+  xmlns:ooc="urn:odf-converter"              
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
-  exclude-result-prefixes="w r wp xlink v oox rels">
+  exclude-result-prefixes="w r wp xlink v oox ooc rels">
 
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
@@ -205,22 +206,12 @@
       <xsl:choose>
         <xsl:when test="@w:lineRule='atLeast'">
           <xsl:attribute name="style:line-height-at-least">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="@w:line"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromTwips(@w:line)" />
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:lineRule='exact'">
           <xsl:attribute name="fo:line-height">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="@w:line"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromTwips(@w:line)" />
           </xsl:attribute>
         </xsl:when>
         <xsl:otherwise>
@@ -495,10 +486,7 @@
         <xsl:when test="ancestor::w:r/w:instrText or ancestor::w:r/parent::w:fldSimple"/>
         <xsl:when test="@w:val=0 or not(@w:val)">normal</xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="@w:val"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(@w:val)" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
@@ -1166,10 +1154,7 @@
   <xsl:template name="InsertDefaultTabStop">
     <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val">
       <xsl:attribute name="style:tab-stop-distance">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="number(key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val)"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val)"/>
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
@@ -1769,16 +1754,10 @@
     <!-- page size -->
     <xsl:if test="w:pgSz">
       <xsl:attribute name="fo:page-width">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="w:pgSz/@w:w"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of  select="ooc:CmFromTwips(w:pgSz/@w:w)" />
       </xsl:attribute>
       <xsl:attribute name="fo:page-height">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="w:pgSz/@w:h"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromTwips(w:pgSz/@w:h)" />
       </xsl:attribute>
       <xsl:if test="w:pgSz/@w:orient">
         <xsl:attribute name="style:print-orientation">
@@ -1794,10 +1773,7 @@
       </xsl:attribute>-->
       <xsl:if test="w:docGrid[@w:type='lines' or @w:type='linesAndChars']/@w:linePitch">
         <xsl:attribute name="style:layout-grid-base-height">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="w:docGrid/@w:linePitch"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(w:docGrid/@w:linePitch)" />
         </xsl:attribute>
         <xsl:attribute name="style:layout-grid-mode">
           <xsl:text>line</xsl:text>
@@ -1863,20 +1839,10 @@
     <xsl:variable name="spaceBefore">
       <xsl:choose>
         <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before)" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before)" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -1885,20 +1851,10 @@
     <xsl:variable name="spaceAfter">
       <xsl:choose>
         <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after)" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after)" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -1906,37 +1862,18 @@
     <!-- create default value for relwidth and width -->
     <xsl:variable name="width">0.005cm</xsl:variable>
     <xsl:variable name="relwidth">
-      <xsl:variable name="pageWidthStr">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:pgSz/@w:w"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
+      <xsl:variable name="pageWidthStr" select="ooc:CmFromTwips(w:pgSz/@w:w)" />
       <xsl:variable name="pageWidth" select="substring-before($pageWidthStr, 'cm')" />
-      <xsl:variable name="marLeftStr">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:pgMar/@w:left"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
+      
+      <xsl:variable name="marLeftStr" select="ooc:CmFromTwips(w:pgMar/@w:left)" />
       <xsl:variable name="marLeft" select="substring-before($marLeftStr, 'cm')" />
-      <xsl:variable name="marRightStr">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:pgMar/@w:right"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
+      
+      <xsl:variable name="marRightStr" select="ooc:CmFromTwips(w:pgMar/@w:right)" />
       <xsl:variable name="marRight" select="substring-before($marRightStr, 'cm')" />
+      
       <xsl:variable name="areaWidth" select="$pageWidth - $marLeft - $marRight" />
-      <xsl:variable name="wordSepWidth">
-        <xsl:text>5.1</xsl:text>
-      </xsl:variable>
+      
+      <xsl:variable name="wordSepWidth" select="'5.1'" />
 
       <xsl:value-of select="($wordSepWidth * 100) div $areaWidth"/>
 
@@ -1978,14 +1915,8 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:top/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
+        <xsl:variable name="sz" select="ooc:CmFromTwips(w:pgBorders/w:top/@w:sz)"/>
+
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="w:pgBorders/w:top/@w:color != 'auto'">
@@ -2018,14 +1949,8 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:left/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
+        <xsl:variable name="sz" select="ooc:CmFromTwips(w:pgBorders/w:left/@w:sz)" />
+
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="w:pgBorders/w:left/@w:color != 'auto'">
@@ -2058,14 +1983,8 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:right/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
+        <xsl:variable name="sz" select="ooc:CmFromTwips(w:pgBorders/w:right/@w:sz)" />
+
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="w:pgBorders/w:right/@w:color != 'auto'">
@@ -2098,14 +2017,8 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:bottom/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
+        <xsl:variable name="sz" select="ooc:CmFromTwips(w:pgBorders/w:bottom/@w:sz)" />
+            
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="w:pgBorders/w:bottom/@w:color != 'auto'">
@@ -2134,14 +2047,7 @@
       <xsl:attribute name="fo:padding-top">
         <xsl:choose>
           <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
-            <xsl:variable name="marg">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pgMar/@w:top"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
+            <xsl:variable name="marg" select="ooc:CmFromTwips(w:pgMar/@w:top)" />
             <xsl:variable name="space">
               <xsl:call-template name="ConvertPoints">
                 <xsl:with-param name="length">
@@ -2168,14 +2074,8 @@
       <xsl:attribute name="fo:padding-left">
         <xsl:choose>
           <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
-            <xsl:variable name="marg">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pgMar/@w:left"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
+            <xsl:variable name="marg" select="ooc:CmFromTwips(w:pgMar/@w:left)" />
+
             <xsl:variable name="space">
               <xsl:call-template name="ConvertPoints">
                 <xsl:with-param name="length">
@@ -2201,14 +2101,8 @@
       <xsl:attribute name="fo:padding-right">
         <xsl:choose>
           <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
-            <xsl:variable name="marg">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pgMar/@w:right"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
+            <xsl:variable name="marg" select="ooc:CmFromTwips(w:pgMar/@w:right)" />
+
             <xsl:variable name="space">
               <xsl:call-template name="ConvertPoints">
                 <xsl:with-param name="length">
@@ -2235,14 +2129,8 @@
       <xsl:attribute name="fo:padding-bottom">
         <xsl:choose>
           <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
-            <xsl:variable name="marg">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pgMar/@w:bottom"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
+            <xsl:variable name="marg" select="ooc:CmFromTwips(w:pgMar/@w:bottom)" />
+
             <xsl:variable name="space">
               <xsl:call-template name="ConvertPoints">
                 <xsl:with-param name="length">
@@ -2430,12 +2318,8 @@
     </xsl:attribute>
 
     <xsl:attribute name="fo:margin-right">
-      <xsl:variable name="marg">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="w:pgMar/@w:right"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
+      <xsl:variable name="marg" select="ooc:CmFromTwips(w:pgMar/@w:right)" />
+
       <xsl:choose>
         <xsl:when test="w:pgBorders/w:right">
           <xsl:variable name="space">
@@ -2737,22 +2621,12 @@
             <xsl:choose>
               <xsl:when test="$DefaultLineRule='atLeast'">
                 <xsl:attribute name="style:line-height-at-least">
-                  <xsl:call-template name="ConvertTwips">
-                    <xsl:with-param name="length">
-                      <xsl:value-of select="$DefaultLineHeight"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="unit">cm</xsl:with-param>
-                  </xsl:call-template>
+                  <xsl:value-of select="ooc:CmFromTwips($DefaultLineHeight)" />
                 </xsl:attribute>
               </xsl:when>
               <xsl:when test="$DefaultLineRule='exact'">
                 <xsl:attribute name="fo:line-height">
-                  <xsl:call-template name="ConvertTwips">
-                    <xsl:with-param name="length">
-                      <xsl:value-of select="$DefaultLineHeight"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="unit">cm</xsl:with-param>
-                  </xsl:call-template>
+                  <xsl:value-of select="ooc:CmFromTwips($DefaultLineHeight)" />
                 </xsl:attribute>
               </xsl:when>
               <xsl:otherwise>
@@ -2780,52 +2654,22 @@
           <!--get indent from default properties-->
 
           <xsl:attribute name="fo:margin-left">
-            <xsl:choose>
-              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>0cm</xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left)" />
           </xsl:attribute>
 
           <xsl:attribute name="fo:margin-right">
-            <xsl:choose>
-              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>0cm</xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right)" />
           </xsl:attribute>
 
           <xsl:attribute name="fo:text-indent">
             <xsl:choose>
 
               <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging != ''">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="-key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:CmFromTwips(-key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging)" />
               </xsl:when>
 
               <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:firstLine != ''">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:firstLine"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:firstLine)" />
               </xsl:when>
 
               <xsl:otherwise>0cm</xsl:otherwise>
@@ -2924,10 +2768,7 @@
         </xsl:attribute>
         <xsl:if test="$dropcap-properties/@w:hSpace">
           <xsl:attribute name="style:distance">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length" select="$dropcap-properties/@w:hSpace"/>
-              <xsl:with-param name="unit" select="'cm'"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromTwips($dropcap-properties/@w:hSpace)" />
           </xsl:attribute>
         </xsl:if>
       </style:drop-cap>
@@ -4809,12 +4650,7 @@
                 <!--text-indent with hanging-->
 
                 <xsl:attribute name="fo:text-indent">
-                  <xsl:call-template name="ConvertTwips">
-                    <xsl:with-param name="length">
-                      <xsl:value-of select="$SpaceToNextTab - $Hanging"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="unit">cm</xsl:with-param>
-                  </xsl:call-template>
+                  <xsl:value-of select="ooc:CmFromTwips($SpaceToNextTab - $Hanging)"/>
                 </xsl:attribute>
 
               </xsl:when>
@@ -4860,12 +4696,7 @@
                 </xsl:variable>-->
 
                 <xsl:attribute name="fo:text-indent">
-                  <xsl:call-template name="ConvertTwips">
-                    <xsl:with-param name="length">
-                      <xsl:value-of select="$FirstLine + $SpaceToNextTab"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="unit">cm</xsl:with-param>
-                  </xsl:call-template>
+                  <xsl:value-of select="ooc:CmFromTwips($FirstLine + $SpaceToNextTab)"/>
                 </xsl:attribute>
 
               </xsl:otherwise>
@@ -4883,17 +4714,7 @@
         <!-- margin left -->
 
         <xsl:attribute name="fo:margin-left">
-          <xsl:choose>
-            <xsl:when test="$MarginLeft != '' and $MarginLeft != 'NaN' and $MarginLeft != 0">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="$MarginLeft"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>0cm</xsl:otherwise>
-          </xsl:choose>
+          <xsl:value-of select="ooc:CmFromTwips($MarginLeft)" />
         </xsl:attribute>
 
         <!-- text indent -->
@@ -4924,12 +4745,7 @@
 
         <xsl:if test="$TextIndent != ''">
           <xsl:attribute name="fo:text-indent">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$TextIndent"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromTwips($TextIndent)"/>
           </xsl:attribute>
         </xsl:if>
       </xsl:otherwise>
@@ -4974,17 +4790,7 @@
 
     <!--math, dialogika bugfix #1744208 and #1645291 BEGIN-->
     <xsl:attribute name="fo:margin-right">
-      <xsl:choose>
-        <xsl:when test="$MarginRight != '' and $MarginRight != 'NaN' and $MarginRight != 0">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$MarginRight"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>0cm</xsl:otherwise>
-      </xsl:choose>
+      <xsl:value-of select="ooc:CmFromTwips($MarginRight)"/>
     </xsl:attribute>
 
     <!--math, dialogika bugfix #1744208 and #1645291 END-->
@@ -6032,12 +5838,7 @@
 
     <xsl:if test="$setParagraphWBefore!=''">
       <xsl:attribute name="fo:margin-top">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$setParagraphWBefore"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromTwips($setParagraphWBefore)"/>
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
@@ -6048,12 +5849,7 @@
 
     <xsl:if test="$setParagraphWAfter!=''">
       <xsl:attribute name="fo:margin-bottom">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$setParagraphWAfter"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromTwips($setParagraphWAfter)"/>
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
