@@ -19,8 +19,8 @@
 	</ItemGroup>
 
 	<Target Name="Bootstrapper">
-		<GenerateBootstrapper ApplicationFile="OdfAddinForOfficeSetup.msi" Culture="de-DE" ApplicationName="ODF Add-in für Microsoft Office" OutputPath="$(WindowsSDKPath)" />
-		<GenerateBootstrapper ApplicationFile="OdfAddinForOfficeSetup.msi" Culture="en-US" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(WindowsSDKPath)" />
+		<GenerateBootstrapper ApplicationFile="OdfAddinForOfficeSetup.msi" Culture="de-DE" ApplicationName="ODF Add-in für Microsoft Office" OutputPath="$(OutDir)\de-DE" BootstrapperItems="@(BootstrapperFile)" Path="$(WindowsSDKPath)" />
+		<GenerateBootstrapper ApplicationFile="OdfAddinForOfficeSetup.msi" Culture="en-US" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(OutDir)\en-US" BootstrapperItems="@(BootstrapperFile)" Path="$(WindowsSDKPath)" />
 		<GenerateBootstrapper ApplicationFile="OdfAddinForOfficeSetup.msi" Culture="fr-FR" ApplicationName="Add-in ODF pour Microsoft Office" OutputPath="$(OutDir)\fr-FR" BootstrapperItems="@(BootstrapperFile)" Path="$(WindowsSDKPath)" />
 		<GenerateBootstrapper ApplicationFile="OdfAddinForOfficeSetup.msi" Culture="ja-JP" ApplicationName="Microsoft Office 用 ODF アドイン" OutputPath="$(OutDir)\ja-JP" BootstrapperItems="@(BootstrapperFile)" Path="$(WindowsSDKPath)" />
 		<GenerateBootstrapper ApplicationFile="OdfAddinForOfficeSetup.msi" Culture="nl-NL" ApplicationName="ODF Add-in voor Microsoft Office" OutputPath="$(OutDir)\nl-NL" BootstrapperItems="@(BootstrapperFile)" Path="$(WindowsSDKPath)" />
