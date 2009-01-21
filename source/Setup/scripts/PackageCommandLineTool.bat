@@ -24,6 +24,7 @@ cd %1..\..\..\Shell\OdfConverter\bin\%2\
 %1\..\..\scripts\minizip.exe -a CommandLineTool.zip relaxngDatatype.dll
 %1\..\..\scripts\minizip.exe -a CommandLineTool.zip tenuto.core.dll
 %1\..\..\scripts\minizip.exe -a CommandLineTool.zip zlibwapi.dll
+%1\..\..\scripts\minizip.exe -a CommandLineTool.zip libzlibwapi.so
 %1\..\..\scripts\minizip.exe -a CommandLineTool.zip Readme.txt
 %1\..\..\scripts\minizip.exe -a CommandLineTool.zip License.txt
 
