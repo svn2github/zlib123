@@ -61,6 +61,10 @@
     <Compile Include="OoxValidator.cs" />
     <Compile Include="OdfConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="..\..\..\lib\libzlibwapi.so">
+      <Link>libzlibwapi.so</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="README.TXT">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
