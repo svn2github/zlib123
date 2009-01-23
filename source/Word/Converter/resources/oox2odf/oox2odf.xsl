@@ -26,14 +26,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:oox="urn:oox"                
   exclude-result-prefixes="oox o rels r v w">
 
   <xsl:import href="measures.xsl" />
@@ -64,6 +65,7 @@
   <xsl:output method="xml" encoding="UTF-8" />
 
   <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name" />
+  <xsl:key name="PartsByType" match="/oox:package/oox:part" use="@oox:type" />
 
   <!-- packages relationships -->
   <!--
@@ -107,6 +109,7 @@
 
     <pzip:archive pzip:target="{$outputFile}">
 
+      <!-- mimetype -->
       <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.text" />
 
       <!-- Manifest -->
@@ -129,15 +132,8 @@
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml" />
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml" />
 
-          <!-- copy relationships from document -->
-          <xsl:for-each select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
-            <xsl:call-template name="InsertManifestFileEntry" />
-          </xsl:for-each>
-          <!-- divo TODO: does this work for more than one footer/header (i.e. if we have footer2.xml.rel etc) ??? -->
-          <xsl:for-each select="key('Part', 'word/_rels/footer1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
-            <xsl:call-template name="InsertManifestFileEntry" />
-          </xsl:for-each>
-          <xsl:for-each select="key('Part', 'word/_rels/header1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
+          <!-- add entries for all images and embedded objects in the package by going through all relationship parts -->
+          <xsl:for-each select="key('PartsByType', 'http://schemas.openxmlformats.org/package/2006/relationships')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
             <xsl:call-template name="InsertManifestFileEntry" />
           </xsl:for-each>
         </manifest:manifest>
