@@ -2,15 +2,15 @@
 <?xml-stylesheet href="xsl2html.xsl" type="text/xsl" media="screen"?>
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
-    xmlns:cust-p="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
     xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
     xmlns:ex="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
     xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
-    exclude-result-prefixes="vt cust-p cp">
+    xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
+    xmlns:cust-p="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
+    exclude-result-prefixes="vt cust-p cp ex">
 
   <!-- @Filename: common-meta.xsl -->
   <!-- @Description: This stylesheet is used to perform reverse conversion on document metadata -->

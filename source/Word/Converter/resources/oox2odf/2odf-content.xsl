@@ -48,7 +48,8 @@
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w r rels xlink number wp v o oox">
+  xmlns:ooc="urn:odf-converter"               
+  exclude-result-prefixes="w r rels pcut wp v o oox ooc">
 
   <xsl:import href="2odf-tables.xsl" />
   <xsl:import href="2odf-lists.xsl" />
@@ -90,7 +91,7 @@
         <!--
 					makz: paragraph style for additional paragraph that should not be visible
 				-->
-        <style:style style:name="HiddenParagraph" style:family="paragraph" style:parent-style-name="Standard">
+        <style:style style:name="{ooc:NCNameFromString('HiddenParagraph')}" style:family="paragraph" style:parent-style-name="Standard">
           <style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt" />
         </style:style>
       </office:automatic-styles>
@@ -194,13 +195,13 @@
 
           <xsl:choose>
             <xsl:when test="$isDefaultTOCStyle='true'">
-              <xsl:value-of select="concat('Contents_20_',substring-after(w:pStyle/@w:val,'TOC'))" />
+              <xsl:value-of select="ooc:NCNameFromString(concat('Contents ',substring-after(w:pStyle/@w:val,'TOC')))" />
             </xsl:when>
             <xsl:when test="w:pStyle/@w:val='FootnoteText'">
-              <xsl:text>Footnote_20_Symbol</xsl:text>
+              <xsl:value-of select="ooc:NCNameFromString('Footnote Symbol')" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="w:pStyle/@w:val" />
+              <xsl:value-of select="ooc:NCNameFromString(w:pStyle/@w:val)" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
@@ -287,7 +288,7 @@
           <xsl:choose>
             <xsl:when test="ancestor::w:r[contains(w:instrText,'TOC')] and w:rStyle/@w:val='Hyperlink'">X3AS7TOCHyperlink</xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="w:rStyle/@w:val" />
+              <xsl:value-of select="ooc:NCNameFromString(w:rStyle/@w:val)" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
@@ -1121,10 +1122,14 @@
             <xsl:otherwise>
               <xsl:choose>
                 <xsl:when test="$mainSectPr/w:titlePg">
-                  <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
+                  <xsl:attribute name="style:master-page-name">
+                    <xsl:value-of select="ooc:NCNameFromString('First Page')" />
+                  </xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+                  <xsl:attribute name="style:master-page-name">
+                    <xsl:value-of select="ooc:NCNameFromString('Standard')" />
+                  </xsl:attribute>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
@@ -1166,12 +1171,16 @@
                   <xsl:otherwise>
                     <xsl:choose>
                       <xsl:when test="$mainSectPr/w:titlePg">
-                        <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
+                        <xsl:attribute name="style:master-page-name">
+                          <xsl:value-of select="ooc:NCNameFromString('First Page')" />
+                        </xsl:attribute>
                       </xsl:when>
                       <xsl:otherwise>
                         <xsl:choose>
                           <xsl:when test="following-sibling::w:r/w:lastRenderedPageBreak and $precSectPr/w:type/@w:val = 'continuous' and generate-id(..) = generate-id($precSectPr/following::w:p[1])">
-                            <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+                            <xsl:attribute name="style:master-page-name">
+                              <xsl:value-of select="ooc:NCNameFromString('Standard')" />
+                            </xsl:attribute>
                           </xsl:when>
                           <xsl:when test="$precSectPr and $mainSectPr/w:type/@w:val = 'continuous' ">
                             <!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
@@ -1188,7 +1197,9 @@
                             </xsl:if>
                           </xsl:when>
                           <xsl:otherwise>
-                            <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+                            <xsl:attribute name="style:master-page-name">
+                              <xsl:value-of select="ooc:NCNameFromString('Standard')" />
+                            </xsl:attribute>
                           </xsl:otherwise>
                         </xsl:choose>
                       </xsl:otherwise>

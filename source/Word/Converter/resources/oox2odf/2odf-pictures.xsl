@@ -71,8 +71,7 @@
     <style:style style:name="{generate-id(.)}" style:family="graphic">
       <!--in Word there are no parent style for image - make default Graphics in OO -->
       <xsl:attribute name="style:parent-style-name">
-        <xsl:text>Graphics</xsl:text>
-        <xsl:value-of select="w:tblStyle/@w:val"/>
+        <xsl:value-of select="ooc:NCNameFromString(concat('Graphics', w:tblStyle/@w:val))"/>
       </xsl:attribute>
 
       <style:graphic-properties>
@@ -338,16 +337,22 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="svg:height">
+          <xsl:variable name="tmp">
           <xsl:call-template name="ConvertEmu">
             <xsl:with-param name="length" select="wp:extent/@cy"/>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$tmp" />
         </xsl:attribute>
         <xsl:attribute name="svg:width">
+          <xsl:variable name="tmp">
           <xsl:call-template name="ConvertEmu">
             <xsl:with-param name="length" select="wp:extent/@cx"/>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$tmp" />
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>

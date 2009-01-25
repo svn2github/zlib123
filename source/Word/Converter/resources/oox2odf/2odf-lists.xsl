@@ -67,13 +67,13 @@
 
 					<!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
 					<xsl:when test="key('numId',$id)/w:lvlOverride">
-						<xsl:value-of select="concat('LO',$id)"/>
+						<xsl:value-of select="ooc:NCNameFromString(concat('LO',$id))"/>
 					</xsl:when>
 
 					<!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles BEGIN-->
 					<xsl:otherwise>
 						<!--<xsl:value-of select="concat('L',@w:abstractNumId)"/>-->
-						<xsl:value-of select="concat('L',$id)"/>
+						<xsl:value-of select="ooc:NCNameFromString(concat('L',$id))"/>
 					</xsl:otherwise>
 					<!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles END-->
 
@@ -137,14 +137,11 @@
 				</xsl:variable>
 
 				<xsl:variable name="rId">
-					<xsl:value-of
-					  select="key('numPicBullet', $lvlPicBulletId)/w:pict/v:shape/v:imagedata/@r:id"/>
+					<xsl:value-of select="key('numPicBullet', $lvlPicBulletId)/w:pict/v:shape/v:imagedata/@r:id"/>
 				</xsl:variable>
 
 				<xsl:variable name="XlinkHref">
-					<xsl:variable name="pzipsource">
-						<xsl:value-of select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship'][@Id=$rId]/@Target" />
-					</xsl:variable>
+					<xsl:variable name="pzipsource" select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship'][@Id=$rId]/@Target" />
 					<xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'/'))"/>
 				</xsl:variable>
 
@@ -182,7 +179,7 @@
 					<xsl:choose>
 						<xsl:when test="w:rPr/w:rStyle">
 							<xsl:attribute name="text:style-name">
-								<xsl:value-of select="w:rPr/w:rStyle"/>
+								<xsl:value-of select="ooc:NCNameFromString(w:rPr/w:rStyle)"/>
 							</xsl:attribute>
 						</xsl:when>
 						<!--clam: special style for bullets with symbol font (bug #1806059)-->
@@ -217,7 +214,7 @@
 					</xsl:attribute>
 					<xsl:if test="w:rPr/w:rStyle">
 						<xsl:attribute name="text:style-name">
-							<xsl:value-of select="w:rPr/w:rStyle"/>
+							<xsl:value-of select="ooc:NCNameFromString(w:rPr/w:rStyle)"/>
 						</xsl:attribute>
 					</xsl:if>
 					<xsl:if test="not(number(substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))))">
@@ -820,7 +817,7 @@
 						</xsl:choose>
 					</xsl:variable>
 
-					<text:list text:style-name="{$listNumStyle}">
+					<text:list text:style-name="{ooc:NCNameFromString($listNumStyle)}">
 
 						<!--  TODO - continue numbering-->
 						<xsl:attribute name="text:continue-numbering">true</xsl:attribute>
@@ -1056,8 +1053,7 @@
 		<xsl:param name="numId"/>
 
 		<!-- list style with empty num format must be referred to numId, because there is no abstractNumId -->
-		<xsl:variable name="listName" select="concat('LO',$numId)"/>
-		<text:list-style style:name="{$listName}">
+		<text:list-style style:name="{ooc:NCNameFromString(concat('LO',$numId))}">
 			<xsl:call-template name="InsertDefaultLevelProperties">
 				<xsl:with-param name="levelNum" select="'1'"/>
 			</xsl:call-template>

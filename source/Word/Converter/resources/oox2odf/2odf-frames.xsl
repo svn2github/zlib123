@@ -19,7 +19,7 @@
   xmlns:oox="urn:oox"
   xmlns:ooc="urn:odf-converter"                
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w r wp xlink v w10 o oox ooc">
+  exclude-result-prefixes="w r wp v w10 o oox ooc">
 
   <!-- 
   *************************************************************************
@@ -83,7 +83,7 @@
                 <xsl:attribute name="text:style-name">
                   <xsl:choose>
                     <xsl:when test="w:pPr/w:pStyle/@w:val">
-                      <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+                      <xsl:value-of select="ooc:NCNameFromString(w:pPr/w:pStyle/@w:val)"/>
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="generate-id()"/>
@@ -479,7 +479,7 @@
       <xsl:attribute name="text:style-name">
         <xsl:choose>
           <xsl:when test="$paragraph/w:pPr/w:pStyle/@w:val">
-            <xsl:value-of select="$paragraph/w:pPr/w:pStyle/@w:val"/>
+            <xsl:value-of select="ooc:NCNameFromString($paragraph/w:pPr/w:pStyle/@w:val)"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="generate-id($paragraph)"/>

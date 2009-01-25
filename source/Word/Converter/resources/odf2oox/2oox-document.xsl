@@ -232,8 +232,7 @@
             <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
             <xsl:variable name="wrapping">
               <xsl:call-template name="GetGraphicProperties">
-                <xsl:with-param name="shapeStyle"
-                  select="key('styles', draw:frame/@draw:style-name)"/>
+                <xsl:with-param name="shapeStyle" select="key('styles', draw:frame/@draw:style-name)"/>
                 <xsl:with-param name="attribName">style:wrap</xsl:with-param>
               </xsl:call-template>
             </xsl:variable>

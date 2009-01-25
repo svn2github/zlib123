@@ -44,7 +44,7 @@
   xmlns:ooc="urn:odf-converter"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
-  exclude-result-prefixes="w r wp xlink v oox ooc rels">
+  exclude-result-prefixes="w r wp xlink v pcut oox ooc rels">
 
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
@@ -629,7 +629,7 @@
     <!--math: Added for bugfix #1934315 END-->
 
     <xsl:choose>
-      <!-- do not add anchor and symbol styles if there are there allready-->
+      <!-- do not add anchor and symbol styles if they are there already-->
       <xsl:when
 			  test="(
         ($currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference')
@@ -639,48 +639,11 @@
         and key('StyleId', concat(substring-before($currentStyleId,'Text'),'_20_Symbol')) )" />
 
 
-      <!--
-      makz: I commented this out because I could not find any reason for renaming the Endnote/Foonote Styles.
-            Renaming these styles caused problems if a paragraph referenced the original style (e.g. Footenotetext).
-            In this case The style could not be found and the properties could not be applied to the paragraph/run.
-            See bug #2101970
-            
-            Note: For making this working I had to change the Footenotes-Configuration in 2odf-footnotes.xsl because
-            the configurationr reference these styles.
-      
-      <xsl:when test="$currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference'">
-        <style:style
-          style:name="{concat(substring-before($currentStyleId,'Reference'),'_20_anchor')}"
-          style:display-name="{concat(substring-before(self::node()/w:name/@w:val,'reference'),'anchor')}">
-          <xsl:call-template name="InsertStyleFamily"/>
-          <xsl:if test="w:basedOn">
-            <xsl:attribute name="style:parent-style-name">
-              <xsl:value-of select="w:basedOn/@w:val"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:call-template name="InsertStyleProperties"/>
-        </style:style>
-      </xsl:when>
-      
-      <xsl:when test="$currentStyleId='FootnoteText' or $currentStyleId='EndnoteText'">
-        <style:style style:name="{concat(substring-before($currentStyleId,'Text'),'_20_Symbol')}"
-          style:display-name="{concat(substring-before(self::node()/w:name/@w:val,'text'),'symbol')}">
-          <xsl:call-template name="InsertStyleFamily"/>
-          <xsl:if test="w:basedOn">
-            <xsl:attribute name="style:parent-style-name">
-              <xsl:value-of select="w:basedOn/@w:val"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:call-template name="InsertStyleProperties"/>
-        </style:style>
-      </xsl:when>
-      -->
-
       <!--math: bugfix #1934315 START-->
       <!--<xsl:when test="contains($currentStyleId,'TOC')">-->
       <xsl:when test="$isDefaultTOCStyle = 'true'">
-        <style:style style:name="{concat('Contents_20_',substring-after($currentStyleId,'TOC'))}"
-					style:display-name="{concat('Contents',substring-after(self::node()/w:name/@w:val,'toc'))}">
+        <style:style style:name="{ooc:NCNameFromString(concat('Contents ',substring-after($currentStyleId,'TOC')))}"
+                     style:display-name="{concat('Contents ',substring-after(self::node()/w:name/@w:val,'toc'))}">
 
           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
@@ -708,10 +671,8 @@
         </style:style>
       </xsl:when>
       <xsl:otherwise>
-        <style:style>
-          <xsl:attribute name="style:name">
-            <xsl:value-of select="$currentStyleId"/>
-          </xsl:attribute>
+        <style:style style:name="{ooc:NCNameFromString($currentStyleId)}">
+
           <xsl:if test="w:name/@w:val != '' ">
             <xsl:attribute name="style:display-name">
               <xsl:choose>
@@ -728,12 +689,12 @@
           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn/@w:val != '' ">
             <xsl:attribute name="style:parent-style-name">
-              <xsl:value-of select="w:basedOn/@w:val"/>
+              <xsl:value-of select="ooc:NCNameFromString(w:basedOn/@w:val)"/>
             </xsl:attribute>
           </xsl:if>
           <xsl:if test="w:next/@w:val != '' ">
             <xsl:attribute name="style:next-style-name">
-              <xsl:value-of select="w:next/@w:val"/>
+              <xsl:value-of select="ooc:NCNameFromString(w:next/@w:val)"/>
             </xsl:attribute>
           </xsl:if>
 
@@ -1004,14 +965,14 @@
 
         <!--clam: special hyperlink style for toc (bug #1806204)-->
         <xsl:if test="not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='X3AS7TOCHyperlink'])">
-          <style:style style:name="X3AS7TOCHyperlink" style:display-name="X3AS7TOCHyperlink" style:family="text" style:parent-style-name="DefaultParagraphFont">
+          <style:style style:name="{ooc:NCNameFromString('X3AS7TOCHyperlink')}" style:display-name="X3AS7TOCHyperlink" style:family="text" style:parent-style-name="DefaultParagraphFont">
             <style:text-properties fo:color="#000000" style:text-underline-style="none" />
           </style:style>
         </xsl:if>
 
         <!--clam: special style for tabs in footer (bug #1803097)-->
         <xsl:if test="not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='X3AS7TABSTYLE'])">
-          <style:style style:name="X3AS7TABSTYLE" style:family="paragraph" style:parent-style-name="Footer">
+          <style:style style:name="{ooc:NCNameFromString('X3AS7TABSTYLE')}" style:family="paragraph" style:parent-style-name="Footer">
             <style:paragraph-properties>
               <style:tab-stops>
                 <style:tab-stop style:type="right" style:position="25cm" />
@@ -1022,7 +983,7 @@
 
         <!--clam: special style for bullets with symbol font (bug #1806059)-->
         <xsl:if test="not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='BulletSymbol'])">
-          <style:style style:family="text" style:name="BulletSymbol">
+          <style:style style:family="text" style:name="{ooc:NCNameFromString('BulletSymbol')}">
             <style:text-properties style:font-name="Symbol" />
           </style:style>
         </xsl:if>
@@ -1047,7 +1008,7 @@
         <!--
         makz: paragraph style for additional paragraph that should not be visible
         -->
-        <style:style style:name="HiddenParagraph" style:family="paragraph" style:parent-style-name="Standard">
+        <style:style style:name="{ooc:NCNameFromString('HiddenParagraph')}" style:family="paragraph" style:parent-style-name="Standard">
           <style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
         </style:style>
       </office:automatic-styles>
@@ -1385,15 +1346,15 @@
     <!-- default master page : -->
     <!-- actually, this assumption is false : w:body/w:sectPr does not carry any default section properties
         it is simply the last section of the document. There are no default section properties in an OOX document -->
-    <style:master-page style:name="Standard" style:page-layout-name="{$pm1}">
+    <style:master-page style:name="{ooc:NCNameFromString('Standard')}" style:page-layout-name="{ooc:NCNameFromString($pm1)}">
       <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:call-template name="HeaderFooter"/>
       </xsl:for-each>
     </style:master-page>
     <!-- first page default master page -->
     <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
-      <style:master-page style:name="First_Page" style:page-layout-name="{$pm1}"
-			  style:next-style-name="Standard" style:display-name="First Page">
+      <style:master-page style:name="{ooc:NCNameFromString('First Page')}" style:page-layout-name="{ooc:NCNameFromString($pm1)}"
+			  style:next-style-name="{ooc:NCNameFromString('Standard')}" style:display-name="First Page">
         <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="HeaderFooterFirst"/>
         </xsl:for-each>
@@ -1403,22 +1364,12 @@
     <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <!-- create first-page of section master page -->
       <xsl:if test="w:titlePg or key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
-        <style:master-page>
-          <xsl:attribute name="style:name">
-            <xsl:value-of select="concat('First_H_',generate-id(.))"/>
-          </xsl:attribute>
-          <xsl:attribute name="style:next-style-name">
-            <xsl:value-of select="concat('H_',generate-id(.))"/>
-          </xsl:attribute>
-          <xsl:attribute name="style:page-layout-name">
-            <xsl:value-of select="concat('PAGE', generate-id(.))"/>
-          </xsl:attribute>
-          <xsl:attribute name="style:display-name">
-            <xsl:value-of select="concat('First_H_',generate-id(.))"/>
-          </xsl:attribute>
+        <style:master-page style:name="{ooc:NCNameFromString(concat('First_H_',generate-id(.)))}"
+                           style:next-style-name="{ooc:NCNameFromString(concat('H_',generate-id(.)))}"
+                           style:page-layout-name="{concat('PAGE', generate-id(.))}"
+                           style:display-name="{concat('First_H_',generate-id(.))}">
           <xsl:choose>
-            <xsl:when
-						  test="w:headerReference/@w:type = 'first' or w:footerReference/@w:type = 'first'">
+            <xsl:when test="w:headerReference/@w:type = 'first' or w:footerReference/@w:type = 'first'">
               <xsl:call-template name="HeaderFooterFirst"/>
             </xsl:when>
             <xsl:otherwise>
@@ -1430,16 +1381,9 @@
         </style:master-page>
       </xsl:if>
       <!-- insert master page of current section -->
-      <style:master-page>
-        <xsl:attribute name="style:name">
-          <xsl:value-of select="concat('H_',generate-id(.))"/>
-        </xsl:attribute>
-        <xsl:attribute name="style:page-layout-name">
-          <xsl:value-of select="concat('PAGE', generate-id(.))"/>
-        </xsl:attribute>
-        <xsl:attribute name="style:display-name">
-          <xsl:value-of select="concat('H_',generate-id(.))"/>
-        </xsl:attribute>
+      <style:master-page style:name="{ooc:NCNameFromString(concat('H_',generate-id(.)))}"
+                         style:page-layout-name="{concat('PAGE', generate-id(.))}"
+                         style:display-name="{concat('H_',generate-id(.))}">
         <xsl:call-template name="HeaderFooter"/>
       </style:master-page>
     </xsl:for-each>
@@ -1453,7 +1397,7 @@
         or key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
         <style:master-page>
           <xsl:attribute name="style:name">
-            <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
+            <xsl:value-of select="ooc:NCNameFromString(concat('PAGE_',generate-id(.)))"/>
           </xsl:attribute>
           <xsl:attribute name="style:page-layout-name">
             <xsl:value-of select="concat('PAGE',generate-id(.))"/>
@@ -1674,7 +1618,7 @@
 
   <!-- handle default page layout -->
   <xsl:template name="InsertDefaultPageLayout">
-    <style:page-layout style:name="{$pm1}">
+    <style:page-layout style:name="{ooc:NCNameFromString($pm1)}">
       <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:mirrorMargins">
         <xsl:attribute name="style:page-usage">
           <xsl:text>mirrored</xsl:text>
@@ -1713,7 +1657,7 @@
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="style:name">
-          <xsl:value-of select="concat('PAGE', generate-id(.))"/>
+          <xsl:value-of select="ooc:NCNameFromString(concat('PAGE', generate-id(.)))"/>
         </xsl:attribute>
         <style:page-layout-properties>
           <xsl:call-template name="InsertPageLayoutProperties"/>
@@ -5620,11 +5564,14 @@
   <!-- Insert line numbering. If numbering not applied to a section, retrieve property in paragraphs -->
   <xsl:template name="InsertLineNumbering">
     <xsl:if test="$lines-are-numbered = 'true' ">
-      <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
-			  style:family="text"/>
+      <style:style style:name="{ooc:NCNameFromString('Line numbering')}" 
+                   style:display-name="Line numbering"
+                   style:family="text"/>
       <xsl:for-each select="key('Part', 'word/document.xml')">
-        <text:linenumbering-configuration text:style-name="Line_20_numbering" style:num-format="1"
-				  text:count-empty-lines="false" text:number-position="left">
+        <text:linenumbering-configuration text:style-name="{ooc:NCNameFromString('Line numbering')}" 
+                                          style:num-format="1"
+                                          text:count-empty-lines="false" 
+                                          text:number-position="left">
           <!-- if no section is set to continuous, restart on every page -->
           <xsl:if test="not(key('sectPr', '')/w:lnNumType/@w:restart = 'continuous')">
             <xsl:attribute name="text:restart-on-page">true</xsl:attribute>
@@ -5659,10 +5606,7 @@
   <!-- Insert List Style Properties -->
   <xsl:template name="ListStyleProperties">
     <xsl:for-each select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum">
-      <style:style style:family="text">
-        <xsl:attribute name="style:name">
-          <xsl:value-of select="generate-id()"/>
-        </xsl:attribute>
+      <style:style style:family="text" style:name="{generate-id()}">
         <style:text-properties>
           <xsl:for-each select="w:lvl/w:rPr">
             <xsl:call-template name="InsertTextProperties"/>

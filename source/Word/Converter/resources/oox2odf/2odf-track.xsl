@@ -12,7 +12,8 @@
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w r xlink number wp oox">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="w r xlink wp oox ooc">
 
   <xsl:key name="track-changes" match="w:ins|w:del|w:pPrChange|w:rPrChange" use="''" />
 
@@ -157,7 +158,7 @@
               <xsl:attribute name="text:style-name">
                 <xsl:choose>
                   <xsl:when test="key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle">
-                    <xsl:value-of select="key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val" />
+                    <xsl:value-of select="ooc:NCNameFromString(key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val)" />
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="generate-id(key('p', @oox:id+1))" />
@@ -235,22 +236,11 @@
   </xsl:template>
 
   <xsl:template name="TrackChangesInsertMade">
-    <text:change-start>
-      <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)" />
-      </xsl:attribute>
-    </text:change-start>
-    <text:span>
-      <xsl:attribute name="text:style-name">
-        <xsl:value-of select="generate-id(.)" />
-      </xsl:attribute>
+    <text:change-start text:change-id="{generate-id(.)}" />
+    <text:span text:style-name="{generate-id(.)}">
       <xsl:apply-templates />
     </text:span>
-    <text:change-end>
-      <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)" />
-      </xsl:attribute>
-    </text:change-end>
+    <text:change-end text:change-id="{generate-id(.)}" />
   </xsl:template>
 
   <xsl:template name="TrackChangesDeleteMade">
@@ -258,32 +248,17 @@
       <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del" />
       <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />
       <xsl:otherwise>
-        <text:change>
-          <xsl:attribute name="text:change-id">
-            <xsl:value-of select="generate-id(.)" />
-          </xsl:attribute>
-        </text:change>
+        <text:change text:change-id="{generate-id(.)}" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <xsl:template name="TrackChangesChangesMade">
-    <text:change-start>
-      <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)" />
-      </xsl:attribute>
-    </text:change-start>
-    <text:span>
-      <xsl:attribute name="text:style-name">
-        <xsl:value-of select="generate-id(.)" />
-      </xsl:attribute>
+    <text:change-start text:change-id="{generate-id(.)}" />
+    <text:span text:style-name="{generate-id(.)}">
       <xsl:value-of select="descendant::text()" />
     </text:span>
-    <text:change-end>
-      <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)" />
-      </xsl:attribute>
-    </text:change-end>
+    <text:change-end text:change-id="{generate-id(.)}" />
   </xsl:template>
 
   <xsl:template match="w:t" mode="trackchanges" />

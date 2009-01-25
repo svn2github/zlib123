@@ -288,7 +288,7 @@
           <xsl:attribute name="text:style-name">
             <xsl:choose>
               <xsl:when test="w:pPr/w:pStyle/@w:val">
-                <xsl:value-of select="w:pPr/w:pStyle/@w:val" />
+                <xsl:value-of select="ooc:NCNameFromString(w:pPr/w:pStyle/@w:val)" />
               </xsl:when>
               <xsl:otherwise>Normal</xsl:otherwise>
             </xsl:choose>
@@ -306,15 +306,12 @@
   <!--take content from multiple w:instrText elements -->
   <xsl:template match="w:instrText" mode="textContent">
     <xsl:param name="textContent" />
-    <xsl:variable name="text">
-      <xsl:value-of select="." />
-    </xsl:variable>
+    <xsl:variable name="text" select="." />
+
     <xsl:choose>
       <xsl:when test="following-sibling::w:instrText">
         <xsl:apply-templates select="following-sibling::w:instrText[1]" mode="textContent">
-          <xsl:with-param name="textContent">
-            <xsl:value-of select="concat($textContent,$text)" />
-          </xsl:with-param>
+          <xsl:with-param name="textContent" select="concat($textContent,$text)" />
         </xsl:apply-templates>
       </xsl:when>
       <xsl:otherwise>
@@ -349,7 +346,7 @@
         <xsl:variable name="num">
           <xsl:choose>
             <xsl:when test="number($firstNum) &gt; number($otherNum)">
-              <xsl:value-of select ="$firstNum" />
+              <xsl:value-of select="$firstNum" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$otherNum" />
@@ -400,7 +397,7 @@
         <xsl:variable name="num">
           <xsl:choose>
             <xsl:when test="number($firstNum) &lt; number($otherNum)">
-              <xsl:value-of select ="$firstNum" />
+              <xsl:value-of select="$firstNum" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$otherNum" />
@@ -520,9 +517,7 @@
               <xsl:for-each select="key('Part', 'word/document.xml')">
                 <xsl:call-template name="GetOutlineLevelMax">
                   <xsl:with-param name="value">0</xsl:with-param>
-                  <xsl:with-param name="count">
-                    <xsl:value-of select="$CountOutlineLevel" />
-                  </xsl:with-param>
+                  <xsl:with-param name="count" select="$CountOutlineLevel" />
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -530,9 +525,7 @@
               <xsl:for-each select="key('Part', 'word/styles.xml')">
                 <xsl:call-template name="GetOutlineLevelMax">
                   <xsl:with-param name="value">0</xsl:with-param>
-                  <xsl:with-param name="count">
-                    <xsl:value-of select="$CountStyleOutlineLevel" />
-                  </xsl:with-param>
+                  <xsl:with-param name="count" select="$CountStyleOutlineLevel" />
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -568,7 +561,7 @@
 
           <xsl:attribute name="text:use-index-source-styles">true</xsl:attribute>
           <xsl:call-template name="InsertContentOfIndexProperties">
-            <xsl:with-param name="styleName">Contents_20_Heading</xsl:with-param>
+            <xsl:with-param name="styleName" select="ooc:NCNameFromString('Contents Heading')" />
             <xsl:with-param name="maxLevel" select="$maxLevel" />
             <xsl:with-param name="instrTextContent" select="$instrTextContent" />
             <xsl:with-param name="type" select="$type" />
@@ -581,7 +574,7 @@
             <xsl:attribute name="text:alphabetical-separators">true</xsl:attribute>
           </xsl:if>
           <xsl:call-template name="InsertContentOfIndexProperties">
-            <xsl:with-param name="styleName">Index_20_Heading</xsl:with-param>
+            <xsl:with-param name="styleName" select="ooc:NCNameFromString('Index Heading')" />
             <xsl:with-param name="maxLevel" select="$maxLevel" />
             <xsl:with-param name="instrTextContent" select="$instrTextContent" />
             <xsl:with-param name="type" select="$type" />
@@ -597,7 +590,7 @@
             </xsl:choose>
           </xsl:attribute>
           <xsl:call-template name="InsertContentOfIndexProperties">
-            <xsl:with-param name="styleName">Table_20_index_20_heading</xsl:with-param>
+            <xsl:with-param name="styleName" select="ooc:NCNameFromString('Table index heading')" />
             <xsl:with-param name="maxLevel" select="$maxLevel" />
             <xsl:with-param name="instrTextContent" select="$instrTextContent" />
           </xsl:call-template>
@@ -612,7 +605,7 @@
     <xsl:param name="instrTextContent" />
     <xsl:param name="type" />
     <xsl:if test="$maxLevel = 0" />
-    <text:index-title-template text:style-name="{$styleName}" />
+    <text:index-title-template text:style-name="{ooc:NCNameFromString($styleName)}" />
     <xsl:variable name="level">
       <xsl:choose>
         <xsl:when test="$type='INDEXA'">0</xsl:when>
@@ -649,14 +642,11 @@
       <!-- create string of index source styles included in TOC -->
       <!--math, dialogika: Added for bugfix #1841783-->
       <xsl:variable name="stylesWithLevelIncludedViaOptionT">
-        <xsl:call-template name ="FormatStyleList">
-          <xsl:with-param name ="string">
-            <xsl:call-template name ="ExtractOptionTFromTOCDefinition">
-              <xsl:with-param name ="string">
-                <xsl:value-of select="$instrTextContent" />
-              </xsl:with-param>
+        <xsl:call-template name="FormatStyleList">
+          <xsl:with-param name="string">
+            <xsl:call-template name="ExtractOptionTFromTOCDefinition">
+              <xsl:with-param name="string" select="$instrTextContent" />
             </xsl:call-template>
-            <!--<xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')" />-->
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
@@ -665,17 +655,7 @@
       <xsl:variable name="stylesOfTOC">
         <xsl:apply-templates select="." mode="stylesOfTOC">
           <xsl:with-param name="stylesWithLevel">
-            <!--<xsl:call-template name="StringReplace">
-              <xsl:with-param name ="string">-->
             <xsl:value-of select="$stylesWithLevelIncludedViaOptionT" />
-            <!--</xsl:with-param>
-              <xsl:with-param name="substring1">
-                <xsl:text> </xsl:text>
-              </xsl:with-param>
-              <xsl:with-param name="substring2">
-                <xsl:text>_20_</xsl:text>                
-              </xsl:with-param>
-            </xsl:call-template>-->
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:variable>
@@ -690,16 +670,14 @@
 
 
   <!--math, dialogika: Added for bugfix #1841783-->
-  <!--Append several \t in TOC definition into one stringAppend several \t in TOC definition into one string-->
+  <!--Append several \t in TOC definition into one string -->
   <xsl:template name="ExtractOptionTFromTOCDefinition">
-    <xsl:param name ="string" />
-    <xsl:param name ="result" />
+    <xsl:param name="string" />
+    <xsl:param name="result" />
     <xsl:choose>
       <xsl:when test="contains($string,'\t')">
         <xsl:call-template name="ExtractOptionTFromTOCDefinition">
-          <xsl:with-param name="string">
-            <xsl:value-of select="substring-after($string,'\t')" />
-          </xsl:with-param>
+          <xsl:with-param name="string" select="substring-after($string,'\t')" />
           <xsl:with-param name="result">
             <xsl:variable name="quot">"</xsl:variable>
             <xsl:value-of select="concat($result,substring-before(substring-after(substring-after($string,'\t'),$quot),$quot))" />
@@ -713,36 +691,11 @@
   </xsl:template>
 
 
-  <!--math, dialogika: Replace occurrences of substring1 in string with substring2-->
-  <xsl:template name="StringReplace">
-    <xsl:param name ="string" />
-    <xsl:param name ="substring1" />
-    <xsl:param name ="substring2" />
-    <xsl:choose>
-      <xsl:when test ="contains($string,$substring1)">
-        <xsl:call-template name="StringReplace">
-          <xsl:with-param name="string">
-            <xsl:value-of select="concat(substring-before($string,$substring1),$substring2,substring-after($string,$substring1))" />
-          </xsl:with-param>
-          <xsl:with-param name="substring1">
-            <xsl:value-of select="$substring1" />
-          </xsl:with-param>
-          <xsl:with-param name="substring2">
-            <xsl:value-of select="$substring2" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$string" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
   <!--math, dialogika: Added for bugfix #1841783-->
   <!--Format string list for the post processor (StyleId:Level.StyleId:Level. ...)-->
   <xsl:template name="FormatStyleList">
-    <xsl:param name ="string" />
-    <xsl:param name ="result" />
+    <xsl:param name="string" />
+    <xsl:param name="result" />
 
     <xsl:choose>
       <xsl:when test="$string != ''">
@@ -757,7 +710,7 @@
               </xsl:variable>
               <xsl:choose>
                 <xsl:when test="key('StyleId', $styleName)" >
-                  <xsl:value-of select ="$styleName" />
+                  <xsl:value-of select="$styleName" />
                 </xsl:when>
                 <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[w:name/@w:val=$styleName]">
                   <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[w:name/@w:val=$styleName]/@w:styleId" />
@@ -875,15 +828,15 @@
         <xsl:when test="$level=0">
           <xsl:call-template name="TocToContent">
             <xsl:with-param name="styleValue">
-              <xsl:value-of select="w:pPr/w:pStyle/@w:val" />
+              <xsl:value-of select="ooc:NCNameFromString(w:pPr/w:pStyle/@w:val)" />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="contains($instrTextContent,'\t')">
-          <xsl:value-of select="concat('Contents_20_',$levelForStyle)" />
+          <xsl:value-of select="ooc:NCNameFromString(concat('Contents ',$levelForStyle))" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="concat('Contents_20_',$level)" />
+          <xsl:value-of select="ooc:NCNameFromString(concat('Contents ',$level))" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
@@ -898,7 +851,7 @@
 
 
   <!--math: Added for bugfix #1934315 START-->
-  <xsl:template name ="CheckDefaultTOCStyle">
+  <xsl:template name="CheckDefaultTOCStyle">
     <xsl:param name="name" />
     <xsl:choose>
       <xsl:when test="$name = 'TOCHeading' 
@@ -934,10 +887,10 @@
     <xsl:choose>
       <!--<xsl:when test="contains($styleValue,'TOC')">-->
       <xsl:when test="$isDefaultTOCStyle = 'true'">
-        <xsl:value-of select="concat('Contents_20_',substring-after($styleValue,'TOC'))" />
+        <xsl:value-of select="ooc:NCNameFromString(concat('Contents ',substring-after($styleValue,'TOC')))" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$styleValue" />
+        <xsl:value-of select="ooc:NCNameFromString($styleValue)" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1163,7 +1116,7 @@
         <xsl:choose>
           <xsl:when test="w:hyperlink/w:r/w:rPr/w:rStyle/@w:val = 'Hyperlink'">X3AS7TOCHyperlink</xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="w:hyperlink/w:r/w:rPr/w:rStyle/@w:val" />
+            <xsl:value-of select="ooc:NCNameFromString(w:hyperlink/w:r/w:rPr/w:rStyle/@w:val)" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>

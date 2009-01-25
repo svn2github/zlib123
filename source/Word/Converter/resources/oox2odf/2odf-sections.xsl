@@ -39,13 +39,8 @@
           <xsl:apply-templates select="key('elementsByOoxSectionId', number(@oox:s))" />
       </xsl:when>
       <xsl:otherwise>
-        <text:section>
-          <xsl:attribute name="text:style-name">
-            <xsl:value-of select="$id2"/>
-          </xsl:attribute>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="concat('S_',$id2)"/>
-          </xsl:attribute>
+        <text:section text:style-name="{ooc:NCNameFromString($id2)}"
+                      text:name="{concat('S_',$id2)}">
 			      <!-- select all top-level body elements which are in the current section -->
             <!--xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(key('sectPr', number(@oox:s)))) = $id2]"/-->
 			      <xsl:apply-templates select="key('elementsByOoxSectionId', number(@oox:s))"/>

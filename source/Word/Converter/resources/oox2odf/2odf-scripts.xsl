@@ -5,6 +5,9 @@
     exclude-result-prefixes="msxsl ooc">
 
   <msxsl:script language="C#" implements-prefix="ooc">
+    <msxsl:assembly name="WordprocessingConverter" />
+    <msxsl:using namespace="OdfConverter.Wordprocessing" />
+    
     <![CDATA[
       public string ToUpper(string input)
       {
@@ -36,6 +39,37 @@
           }
 
           return "0cm";
+      }
+      
+      /// <summary>
+      /// Removes all invalid characters from a style name and - if the name is not yet unique - 
+      /// appends a counter to make the name unique
+      /// </summary>
+      public string NCNameFromString(string name)
+      {
+          return OdfStyleNameGenerator.Instance.NCNameFromString(name); 
+      }
+      
+      /// <summary>
+      /// Get a value from a semicolon-separated list of key-value pairs.
+      /// The pairs are separated by colon as in CSS-like strings.
+      /// </summary>
+      public static string ParseValueFromList(string input, string key)
+      {
+          string value = String.Empty;
+
+          string[] keyValuePairs = input.Split(';');
+          for (int i = keyValuePairs.Length - 1; i >= 0; i--)
+          {
+              if (keyValuePairs[i].StartsWith(key + ":"))
+              {
+                  string[] keyValuePair = keyValuePairs[i].Split(':');
+                  value = keyValuePair[keyValuePair.Length - 1];
+                  break;
+              }
+          }
+
+          return value;
       }
     ]]>
 

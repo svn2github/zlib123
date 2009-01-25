@@ -124,7 +124,7 @@
     <style:style style:name="{generate-id(parent::w:tbl)}" style:family="table">
       <xsl:if test="w:tblStyle">
         <xsl:attribute name="style:parent-style-name">
-          <xsl:value-of select="w:tblStyle/@w:val"/>
+          <xsl:value-of select="ooc:NCNameFromString(w:tblStyle/@w:val)"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:call-template name="MasterPageName"/>
@@ -172,11 +172,7 @@
 
   <xsl:template match="w:tblGrid">
     <xsl:for-each select="w:gridCol">
-      <table:table-column>
-        <xsl:attribute name="table:style-name">
-          <xsl:value-of select="generate-id(self::w:gridCol)"/>
-        </xsl:attribute>
-      </table:table-column>
+      <table:table-column table:style-name="{generate-id(self::w:gridCol)}" />
     </xsl:for-each>
   </xsl:template>
 
@@ -310,7 +306,7 @@
     <style:style style:name="{generate-id(parent::w:tc)}" style:family="table-cell">
       <xsl:if test="w:tcStyle">
         <xsl:attribute name="style:parent-style-name">
-          <xsl:value-of select="w:tcStyle/@w:val"/>
+          <xsl:value-of select="ooc:NCNameFromString(w:tcStyle/@w:val)"/>
         </xsl:attribute>
       </xsl:if>
       <style:table-cell-properties>

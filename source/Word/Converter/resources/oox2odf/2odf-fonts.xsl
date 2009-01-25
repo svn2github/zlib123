@@ -38,10 +38,11 @@
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w dc oox">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="w dc oox ooc">
 
   <xsl:template match="w:font">
-    <style:font-face style:name="{@w:name}"
+    <style:font-face style:name="{ooc:NCNameFromString(@w:name)}"
                      svg:font-family="{@w:name}">
       
       <xsl:if test="w:charset/@w:val='02'">

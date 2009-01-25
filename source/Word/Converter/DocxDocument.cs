@@ -1,3 +1,32 @@
+/* 
+ * Copyright (c) 2006-2009 DIaLOGIKa
+ *
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright 
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright 
+ *       notice, this list of conditions and the following disclaimer in the 
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of copyright holders, nor the names of its contributors 
+ *       may be used to endorse or promote products derived from this software 
+ *       without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,7 +69,7 @@ namespace OdfConverter.Wordprocessing
             List<RelationShip> rels = new List<RelationShip>();
 
             XmlDocument xmlDocument = new XmlDocument();
-            XmlNode bookmarkEnd = null;
+            XmlNode bookmarkNode = null;
 
             RelationShip rel = new RelationShip();
 
@@ -66,18 +95,19 @@ namespace OdfConverter.Wordprocessing
                             rel = new RelationShip();
                         }
 
-                        if (xtr.Name.Equals("w:bookmarkEnd") && xtr.Depth == 2)
+                        if ((xtr.Name.Equals("w:bookmarkEnd") || xtr.Name.Equals("w:bookmarkStart")) 
+                            && (xtr.Depth == 1 || (ns.Equals("http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument") && xtr.Depth == 2)))
                         {
-                            // closing bookmark tags below w:body will be moved inside the following w:p tag
-                            // because in ODF bookmarks can only be closed in paragraph-content
-                            bookmarkEnd = xmlDocument.CreateElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
+                            // opening and closing bookmark tags below w:body (or below w:hdr, w:ftr, w:footnotes etc) will be moved inside the following w:p tag
+                            // because in ODF bookmarks can only be opened and closed in paragraph-content
+                            bookmarkNode = xmlDocument.CreateElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
                             if (xtr.HasAttributes)
                             {
                                 while (xtr.MoveToNextAttribute())
                                 {
                                     XmlAttribute xmlAttribute = xmlDocument.CreateAttribute(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
                                     xmlAttribute.Value = xtr.Value;
-                                    bookmarkEnd.Attributes.Append(xmlAttribute);
+                                    bookmarkNode.Attributes.Append(xmlAttribute);
                                 }
                             }
                         }
@@ -144,16 +174,16 @@ namespace OdfConverter.Wordprocessing
                                     xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
                                     _paraId++;
 
-                                    if (bookmarkEnd != null)
+                                    if (bookmarkNode != null)
                                     {
-                                        xtw.WriteStartElement(bookmarkEnd.Prefix, bookmarkEnd.LocalName, bookmarkEnd.NamespaceURI);
+                                        xtw.WriteStartElement(bookmarkNode.Prefix, bookmarkNode.LocalName, bookmarkNode.NamespaceURI);
 
-                                        foreach (XmlAttribute attrib in bookmarkEnd.Attributes)
+                                        foreach (XmlAttribute attrib in bookmarkNode.Attributes)
                                         {
                                             xtw.WriteAttributeString(attrib.Prefix, attrib.LocalName, attrib.NamespaceURI, attrib.Value);
                                         }
                                         xtw.WriteEndElement();
-                                        bookmarkEnd = null;
+                                        bookmarkNode = null;
                                     }
 
                                     break;
