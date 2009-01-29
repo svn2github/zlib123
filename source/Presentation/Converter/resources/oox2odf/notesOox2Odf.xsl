@@ -89,7 +89,8 @@ exclude-result-prefixes="p a r xlink rels xmlns">
             <xsl:attribute name ="style:name">
               <xsl:value-of  select ="concat($NotesNumber,'pr',position())"/>
             </xsl:attribute>
-            <style:graphic-properties draw-stroke="none">
+            <!--modified by chhavi for conformance1.1 info-->
+            <style:graphic-properties>
               <xsl:call-template name="tmpSlideGrahicProp"/>
             </style:graphic-properties>
             <style:paragraph-properties>
@@ -355,13 +356,14 @@ exclude-result-prefixes="p a r xlink rels xmlns">
         <xsl:value-of select ="'Notesdp'"/>
       </xsl:attribute>
     <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'notesSlides')]">
+      <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
       <xsl:variable name ="NotesNumber">
         <xsl:value-of  select ="substring-before(substring-after(.,'../notesSlides/'),'.xml')" />
       </xsl:variable>
       <xsl:variable name ="NotesFile">
         <xsl:value-of  select ="concat('ppt',substring-after(.,'..'))" />
       </xsl:variable>
-        <xsl:attribute name ="presentation:use-header-name">
+        <!--<xsl:attribute name ="presentation:use-header-name">
           <xsl:value-of select ="concat($NotesNumber,'hdr')"/>
         </xsl:attribute>
         <xsl:attribute name ="presentation:use-footer-name">
@@ -369,8 +371,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
         </xsl:attribute>
         <xsl:attribute name ="presentation:use-date-time-name">
           <xsl:value-of select ="concat($NotesNumber,'dtd')"/>
-        </xsl:attribute>
-        <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
+        </xsl:attribute>-->
         <xsl:for-each select ="document($NotesFile)/p:notes/p:cSld/p:spTree/p:sp">
           <xsl:variable name ="spType">
             <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">
@@ -415,7 +416,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                   </xsl:if>
                   <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum) and not(a:pPr/a:buBlip)">
                     <text:p>
-                      <xsl:attribute name ="style:name">
+                      <xsl:attribute name ="text:style-name">
                         <xsl:value-of select ="concat($ParaId,position())"/>
                       </xsl:attribute >
                       <xsl:for-each select ="node()">

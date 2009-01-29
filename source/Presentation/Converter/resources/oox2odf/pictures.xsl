@@ -49,6 +49,7 @@ xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
 xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
+xmlns:msxsl="urn:schemas-microsoft-com:xslt"
 exclude-result-prefixes="p a r xlink rels">  
   <xsl:template name="InsertPicture">
     <xsl:param name ="slideRel"/>
@@ -256,13 +257,15 @@ exclude-result-prefixes="p a r xlink rels">
           <draw:param draw:name="Loop" draw:value="false"/>
           <draw:param draw:name="Mute" draw:value="false"/>
           <draw:param draw:name="VolumeDB" draw:value="0"/>
+        </draw:plugin>
+        <!--ODF1.1 Conformance-->
           <draw:image  xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
             <xsl:attribute name ="xlink:href"  >
               <xsl:value-of select ="concat('Pictures/',$targetFile)"/>
             </xsl:attribute>
             <text:p />
           </draw:image>
-        </draw:plugin>
+        
         <!--<xsl:if test="p:blipFill/a:blip/@r:embed != ''">
           <draw:image  xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
             --><!--xlink:href="Pictures/100000000000032000000258B0234CE5.jpg"--><!--
@@ -288,10 +291,12 @@ exclude-result-prefixes="p a r xlink rels">
         <draw:image  xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
           <xsl:attribute name ="xlink:href"  >
             <xsl:value-of select ="concat('Pictures/',$targetFile)"/>
-          </xsl:attribute>
-          <xsl:copy-of select="$varHyperLinksForPic" />
+          </xsl:attribute>         
           <text:p />
         </draw:image>
+          <xsl:if test="msxsl:node-set($varHyperLinksForPic)//presentation:event-listener">
+            <xsl:copy-of select="$varHyperLinksForPic" />
+          </xsl:if>      
       </xsl:if>
     </draw:frame>
     </xsl:if>

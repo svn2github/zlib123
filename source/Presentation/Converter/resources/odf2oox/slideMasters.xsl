@@ -69,7 +69,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:bgPr>
                   <a:blipFill dpi="0" rotWithShape="1">
                     <xsl:call-template name="tmpInsertBackImage">
-                      <xsl:with-param name="FileName" select="$slideMasterName" />
+                      <xsl:with-param name="FileName" select="concat('slideMaster',$vmlPageNo)" />
                       <xsl:with-param name="imageName" select="@draw:fill-image-name" />
                     </xsl:call-template>
                     <xsl:if test="@style:repeat='stretch'">
@@ -213,7 +213,7 @@ Copyright (c) 2007, Sonata Software Limited
             or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
                             <xsl:if test="not(./@xlink:href[contains(.,'../')])">
                               <xsl:call-template name ="InsertPicture">
-                                <xsl:with-param name ="imageNo" select ="$slideMasterName"/>
+                                <xsl:with-param name ="imageNo" select ="concat('slideMaster',$vmlPageNo)"/>
                                 <xsl:with-param name ="master" select ="'1'"/>
                                 <xsl:with-param name="picNo" select="$var_pos" />
                                 <xsl:with-param name ="fileName" select ="'styles.xml'"/>
@@ -436,10 +436,12 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:variable>
                   <xsl:call-template name="tmpGroping">
                     <xsl:with-param name="startPos" select="'1'"/>
-                    <xsl:with-param name="pageNo" select="$slideMasterName"/>
+                    <xsl:with-param name="pageNo" select="$vmlPageNo"/>
                     <xsl:with-param name="pos" select="$var_pos"/>
                     <xsl:with-param name="fileName" select="'styles.xml'"/>
                     <xsl:with-param name ="master" select="'1'" />
+                    <!--Fixed defect 1994866 PPTX-OLE- Grouped Embedded OLE objects are missing in Master -->
+                    <xsl:with-param name ="vmlPageNo" select="$vmlPageNo" />
                   </xsl:call-template>
                 </xsl:when>
               </xsl:choose>
@@ -5343,7 +5345,12 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]">
         <xsl:if test=".//draw:object or .//draw:object-ole">
           <xsl:choose>
+            <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
+                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
+            
+            </xsl:when>
             <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+            <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>
             <xsl:otherwise>
               <Relationship Id="vmldrawing" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing">
                 <xsl:attribute name="Target">
@@ -5366,7 +5373,14 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:choose>
                   <xsl:when test="./draw:object or ./draw:object-ole">
                     <xsl:choose>
+                      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
+                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
+                        <xsl:call-template name="tmpOLEObjectsRel">
+                          <xsl:with-param name="slideNo" select="$vmlPageNo"/>
+                        </xsl:call-template>
+                      </xsl:when>
                       <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+                      <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>
                       <xsl:otherwise>
                         <xsl:call-template name="tmpOLEObjectsRel">
                           <xsl:with-param name="slideNo" select="$vmlPageNo"/>
@@ -5387,7 +5401,7 @@ Copyright (c) 2007, Sonata Software Limited
                         <xsl:if test="not(./@xlink:href[contains(.,'../')])">
                           <Relationship>
                             <xsl:attribute name="Id">
-                              <xsl:value-of select="concat('sl',$slideNo,'Image',$var_pos)" />
+                              <xsl:value-of select="concat('sl','slideMaster',$vmlPageNo,'Image',$var_pos)" />
                             </xsl:attribute>
                             <xsl:attribute name="Type">
                               <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
@@ -7085,7 +7099,7 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:call-template>
               </xsl:variable>
               <xsl:call-template name="tmpGroupingRelation">
-                <xsl:with-param name="slideNo" select="$slideNo"/>
+                <xsl:with-param name="slideNo" select="concat('slideMaster',$vmlPageNo)"/>
                 <xsl:with-param name="pos" select="$var_pos"/>
                 <xsl:with-param name="startPos" select="'1'"/>
                 <xsl:with-param name="FileName" select="'styles.xml'"/>
@@ -7112,7 +7126,7 @@ Copyright (c) 2007, Sonata Software Limited
             or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
               <Relationship>
                 <xsl:attribute name="Id">
-                  <xsl:value-of select="concat($slideMasterName,'BackImg')" />
+                  <xsl:value-of select="concat('slideMaster',$vmlPageNo,'BackImg')" />
                 </xsl:attribute>
                 <xsl:attribute name="Type">
                   <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />

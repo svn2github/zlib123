@@ -46,7 +46,8 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
   xmlns:dcterms="http://purl.org/dc/terms/"
   xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0"
-  exclude-result-prefixes="p a r dc xlink draw rels">
+  xmlns:msxsl="urn:schemas-microsoft-com:xslt"
+  exclude-result-prefixes="p a r dc xlink draw rels dr3d">
     <!-- Shape constants-->
 	<!-- Arrow size -->
 	<xsl:variable name="sm-sm">
@@ -85,6 +86,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="var_pos" />
     <xsl:param name="grpBln" />
     <xsl:param name ="grpCordinates"/>
+    <!-- parameter added by chhavi:for ODF1.1 conformance-->
+    <xsl:param name ="layId"/>
     <!-- Extra parameter "slideId" added by lohith,requierd for template AddTextHyperlinks -->
     <xsl:param name="slideId" />
     <xsl:variable name="varHyperLinksForShapes">
@@ -111,7 +114,8 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:variable>
 
     <xsl:choose>
-
+      <xsl:when test="p:spPr/a:prstGeom/@prst">
+        <xsl:choose>
       <!-- Basic shapes start-->
 
       <!--Custom shape - Rectangle -->
@@ -120,7 +124,11 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:when test="p:style">
           <draw:custom-shape draw:layer="layout" >
             <xsl:call-template name ="CreateShape">
+                    <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                    <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
               <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                    <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                    <xsl:with-param name ="layId" select ="$layId"/>
               <xsl:with-param name="sldId" select="$slideId" />
               <xsl:with-param name="grID" select ="$GraphicId"/>
               <xsl:with-param name ="prID" select="$ParaId" />
@@ -137,15 +145,18 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:call-template name="tmpFlip"/>
              
             </draw:enhanced-geometry>
-            <xsl:copy-of select="$varHyperLinksForShapes" />
+                  <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
           </draw:custom-shape>
         </xsl:when>
         <xsl:otherwise>
           <draw:frame draw:layer="layout">
 
             <xsl:call-template name ="CreateShape">
-
+                    <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                    <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
               <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                    <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                    <xsl:with-param name ="layId" select="$layId"/>
               <xsl:with-param name="flagTextBox" select="'true'" />
               <xsl:with-param name="sldId" select="$slideId" />
               <xsl:with-param name="grID" select ="$GraphicId"/>
@@ -157,7 +168,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
               <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             </xsl:call-template>
-            <xsl:copy-of select="$varHyperLinksForShapes" />
+                  <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
           </draw:frame>
         </xsl:otherwise>
       </xsl:choose>
@@ -167,7 +178,10 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -184,7 +198,7 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
 	  </xsl:when>
 
@@ -192,7 +206,10 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(not(p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')]) or (p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')])) and (p:spPr/a:prstGeom/@prst='ellipse')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -209,7 +226,7 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!--End of Code-->
@@ -218,6 +235,8 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test = "(p:spPr/a:prstGeom/@prst='rightArrow')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -247,13 +266,16 @@ Copyright (c) 2007, Sonata Software Limited
 						  draw:handle-range-y-minimum="0" 
 						  draw:handle-range-y-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!--Up Arrow (Added by A.Mathi as on 2/07/2007) -->
       <xsl:when test = "(p:spPr/a:prstGeom/@prst='upArrow')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select="$GraphicId" />
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -283,13 +305,16 @@ Copyright (c) 2007, Sonata Software Limited
 						  draw:handle-range-y-minimum="0" 
 						  draw:handle-range-y-maximum="21600"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes"/>
+              <!--<xsl:copy-of select="$varHyperLinksForShapes"/>-->
         </draw:custom-shape>
       </xsl:when>
       <!--Left Arrow (Added by A.Mathi as on 2/07/2007) -->
       <xsl:when test = "(p:spPr/a:prstGeom/@prst='leftArrow')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select="$GraphicId" />
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -320,13 +345,16 @@ Copyright (c) 2007, Sonata Software Limited
 						  draw:handle-range-y-minimum="0" 
 						  draw:handle-range-y-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes"/>
+              <!--<xsl:copy-of select="$varHyperLinksForShapes"/>-->
         </draw:custom-shape>
       </xsl:when>
       <!--Down Arrow (Added by A.Mathi as on 2/07/2007) -->
       <xsl:when test = "(p:spPr/a:prstGeom/@prst='downArrow')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -357,13 +385,16 @@ Copyright (c) 2007, Sonata Software Limited
 						  draw:handle-range-y-minimum="0" 
 						  draw:handle-range-y-maximum="21600"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes"/>
+              <!--<xsl:copy-of select="$varHyperLinksForShapes"/>-->
         </draw:custom-shape>
       </xsl:when>
       <!--LeftRight Arrow (Added by A.Mathi as on 3/07/2007) -->
       <xsl:when test = "(p:spPr/a:prstGeom/@prst='leftRightArrow')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			  <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -396,13 +427,16 @@ Copyright (c) 2007, Sonata Software Limited
 						  draw:handle-range-y-minimum="0" 
 						  draw:handle-range-y-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes"/>
+              <!--<xsl:copy-of select="$varHyperLinksForShapes"/>-->
         </draw:custom-shape>
       </xsl:when>
       <!-- UpDown Arrow (Added by A.Mathi as on 4/07/2007) -->
       <xsl:when test = "(p:spPr/a:prstGeom/@prst='upDownArrow')" >
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -435,14 +469,17 @@ Copyright (c) 2007, Sonata Software Limited
 						  draw:handle-range-y-minimum="0" 
 						  draw:handle-range-y-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes"/>
+              <!--<xsl:copy-of select="$varHyperLinksForShapes"/>-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Isosceles Triangle -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='triangle')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -471,14 +508,17 @@ Copyright (c) 2007, Sonata Software Limited
 									 draw:handle-range-x-minimum="0" 
 									 draw:handle-range-x-maximum="21600"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Right Triangle -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='rtTriangle')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -496,14 +536,17 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:enhanced-path="M 0 0 L 21600 21600 0 21600 0 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Parallelogram -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='parallelogram')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -538,14 +581,17 @@ Copyright (c) 2007, Sonata Software Limited
 									 draw:handle-range-x-minimum="0" 
 									 draw:handle-range-x-maximum="21600"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Trapezoid (Added by A.Mathi as on 24/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='trapezoid')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -564,14 +610,17 @@ Copyright (c) 2007, Sonata Software Limited
           draw:enhanced-path="M 0 1216152 L 228600 0 L 685800 0 L 914400 1216152 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Diamond   -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='diamond')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -589,7 +638,7 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:enhanced-path="M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
 
       </xsl:when>
@@ -597,7 +646,10 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='pentagon')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -615,14 +667,17 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:enhanced-path="M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Hexagon -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='hexagon')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -648,13 +703,16 @@ Copyright (c) 2007, Sonata Software Limited
                    draw:handle-range-x-minimum="0" 
                    draw:handle-range-x-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Octagon -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='octagon')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -684,7 +742,7 @@ Copyright (c) 2007, Sonata Software Limited
 									 draw:handle-range-x-minimum="0"
 									 draw:handle-range-x-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
 
@@ -694,6 +752,9 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:message terminate="no">translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow</xsl:message>
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -832,7 +893,7 @@ Copyright (c) 2007, Sonata Software Limited
               <draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
             </draw:enhanced-geometry>
           </xsl:if>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       
@@ -840,6 +901,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="p:spPr/a:prstGeom/@prst='leftUpArrow'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -868,7 +932,7 @@ Copyright (c) 2007, Sonata Software Limited
             <draw:handle draw:handle-position="$1 $2" draw:handle-range-x-minimum="?f5" draw:handle-range-x-maximum="21600" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="$0"/>
             <draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="$2" draw:handle-range-x-maximum="?f9"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       
@@ -877,6 +941,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test="(p:nvSpPr/p:cNvPr/@name[contains(., 'bentUpArrow ')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'Bent-Up Arrow ')]) and (p:spPr/a:prstGeom/@prst='bentUpArrow')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -893,7 +960,7 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="non-primitive" 
             draw:enhanced-path="M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N">
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!--End of bug fix code-->
@@ -901,6 +968,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="p:spPr/a:prstGeom/@prst='bentUpArrow'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			 <xsl:with-param name="sldId" select="$slideId" /> 
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -918,7 +988,7 @@ Copyright (c) 2007, Sonata Software Limited
               draw:enhanced-path="M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       
@@ -926,7 +996,10 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='cube')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -961,14 +1034,17 @@ Copyright (c) 2007, Sonata Software Limited
 									 draw:handle-range-y-minimum="0" 
 									 draw:handle-range-y-maximum="21600"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Can -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='can')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -994,13 +1070,16 @@ Copyright (c) 2007, Sonata Software Limited
             <draw:equation draw:name="f7" draw:formula="44" />
             <draw:handle draw:handle-position="?f7 $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800" />
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Cross (Added by A.Mathi as on 19/07/2007)-->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='plus')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1029,13 +1108,16 @@ Copyright (c) 2007, Sonata Software Limited
               draw:handle-range-x-minimum="0" 
               draw:handle-range-x-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- "No" Symbol (Added by A.Mathi as on 19/07/2007)-->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='noSmoking')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1074,13 +1156,16 @@ Copyright (c) 2007, Sonata Software Limited
               draw:handle-range-x-minimum="0" 
               draw:handle-range-x-maximum="7200"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!--  Folded Corner (Added by A.Mathi as on 19/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='foldedCorner')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1114,13 +1199,16 @@ Copyright (c) 2007, Sonata Software Limited
               draw:handle-range-x-minimum="10800" 
               draw:handle-range-x-maximum="21600"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!--  Lightning Bolt (Added by A.Mathi as on 20/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='lightningBolt')">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1137,13 +1225,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:enhanced-path="M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
 		<!--  Explosion 1 (Modified by A.Mathi) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='irregularSeal1')">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1161,7 +1252,7 @@ Copyright (c) 2007, Sonata Software Limited
 										draw:enhanced-path="M 10901 5905 L 8458 2399 7417 6425 476 2399 4732 7722 106 8718 3828 11880 243 14689 5772 14041 4868 17719 7819 15730 8590 21600 10637 15038 13349 19840 14125 14561 18248 18195 16938 13044 21600 13393 17710 10579 21198 8242 16806 7417 18482 4560 14257 5429 14623 106 10901 5905 Z N">
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
       <!-- Chord (Added by A.Mathi as on 20/07/2007)-->
@@ -1170,6 +1261,9 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:message terminate="no">translation.oox2odf.shapesTypeChord</xsl:message>
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1187,13 +1281,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="mso-spt100" draw:enhanced-path="M 780489 780489 W 0 0 914400 914400 780489 780489 457200 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Left Bracket (Added by A.Mathi as on 20/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='leftBracket')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1214,13 +1311,16 @@ Copyright (c) 2007, Sonata Software Limited
             <draw:equation draw:name="f4" draw:formula="bottom-?f0 "/>
             <draw:handle draw:handle-position="left $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Right Bracket (Added by A.Mathi as on 20/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBracket')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1241,13 +1341,16 @@ Copyright (c) 2007, Sonata Software Limited
             <draw:equation draw:name="f4" draw:formula="bottom-?f0 "/>
             <draw:handle draw:handle-position="right $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Left Brace (Added by A.Mathi as on 20/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='leftBrace')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			  <xsl:with-param name="sldId" select="$slideId" />
 			  <xsl:with-param name ="grID" select ="$GraphicId" />
 			  <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1275,13 +1378,16 @@ Copyright (c) 2007, Sonata Software Limited
 			  <draw:handle draw:handle-position="10800 $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="5400"/>
 			  <draw:handle draw:handle-position="left $1" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="21600"/>
 		  </draw:enhanced-geometry>
-		  <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 	  </draw:custom-shape>
   </xsl:when>
       <!-- Right Brace (Added by A.Mathi as on 23/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBrace')">
 	  <draw:custom-shape draw:layer="layout" >
 		  <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1313,13 +1419,16 @@ Copyright (c) 2007, Sonata Software Limited
             <draw:handle draw:handle-position="10800 $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="5400"/>
             <draw:handle draw:handle-position="right $1" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="21600"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
 		<!-- Rectangular Callout (modified by A.Mathi) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeRectCallout')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1383,13 +1492,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f41" draw:formula="$1 "/>
 					<draw:handle draw:handle-position="$0 $1"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Rounded Rectangular Callout (modified by A.Mathi) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeRoundRectCallout')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1452,13 +1564,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f41" draw:formula="$1 "/>
 					<draw:handle draw:handle-position="$0 $1"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Oval Callout (modified by A.Mathi) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeEllipseCallout')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1504,13 +1619,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
 					<draw:handle draw:handle-position="$0 $1"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Cloud Callout (modified by A.Mathi) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='cloudCallout')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1552,13 +1670,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f20" draw:formula="?f12 +?f6 "/>
 					<draw:handle draw:handle-position="$0 $1"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Line Callout 1) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout1')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1588,13 +1709,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:handle draw:handle-position="$0 $1"/>
 					<draw:handle draw:handle-position="$2 $3"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Line Callout 2) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout2')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1625,13 +1749,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:handle draw:handle-position="$2 $3"/>
 					<draw:handle draw:handle-position="$4 $5"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Line Callout 3) -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout3')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1662,7 +1789,7 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:handle draw:handle-position="$4 $5"/>
 					<draw:handle draw:handle-position="$6 $7"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		
@@ -1672,6 +1799,9 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:message terminate="no">translation.oox2odf.shapesTypeBentArrow</xsl:message>
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1688,7 +1818,7 @@ Copyright (c) 2007, Sonata Software Limited
             draw:enhanced-path="M 0 868680 L 0 457772 W 0 101727 712090 813817 0 457772 356046 101727 L 610362 101727 L 610362 0 L 813816 203454 L 610362 406908 L 610362 305181 L 356045 305181 A 203454 305181 508636 610363 356045 305181 203454 457772 L 203454 868680 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- U-Turn Arrow (Added by A.Mathi as on 23/07/2007) -->
@@ -1697,6 +1827,9 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:message terminate="no">translation.oox2odf.shapesTypeUTurnArrow</xsl:message>
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 			<xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
@@ -1713,13 +1846,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="mso-spt100" draw:enhanced-path="M 0 877824 L 0 384048 W 0 0 768096 768096 0 384048 384049 0 L 393192 0 W 9144 0 777240 768096 393192 0 777240 384049 L 777240 438912 L 886968 438912 L 667512 658368 L 448056 438912 L 557784 438912 L 557784 384048 A 228600 219456 557784 548640 557784 384048 393192 219456 L 384048 219456 A 219456 219456 548640 548640 384048 219456 219456 384048 L 219456 877824 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
 		<!-- Quad Arrow -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='quadArrow')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1745,13 +1881,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:handle draw:handle-position="$1 $2" draw:handle-range-x-minimum="$0" draw:handle-range-x-maximum="10800" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="$0"/>
 					<draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="$2" draw:handle-range-x-maximum="$1"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Block Arc -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='blockArc')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1778,13 +1917,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f8" draw:formula="?f5 *sin($0 *(pi/180))"/>
 					<draw:handle draw:handle-position="$1 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Notched Right Arrow -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='notchedRightArrow')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1809,13 +1951,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f5" draw:formula="?f3 *?f4 /10800"/>
 					<draw:handle draw:handle-position="$0 $1" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Pentagon -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='homePlate')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1835,13 +1980,16 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f0" draw:formula="$0 "/>
 					<draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Chevron -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='chevron')">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1862,7 +2010,7 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f1" draw:formula="21600-?f0 "/>
 					<draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 
@@ -1871,6 +2019,9 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathEqual'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1891,13 +2042,16 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!--Not Equal-->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathNotEqual'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1918,13 +2072,16 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!--Plus-->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathPlus'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1945,13 +2102,16 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!--Minus-->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathMinus'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -1972,13 +2132,16 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!--Multiply-->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathMultiply'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -2000,13 +2163,16 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!--Division-->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathDivide'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -2028,7 +2194,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
      
@@ -2038,6 +2204,8 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="p:spPr/a:prstGeom/@prst = 'line'">
         <draw:line draw:layer="layout">
           <xsl:call-template name ="DrawLine">
+                <!--added by chhavi:for ODF1.1 conformance-->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
@@ -2050,6 +2218,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'straightConnector')]">
         <draw:line draw:layer="layout">
           <xsl:call-template name ="DrawLine">
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
@@ -2062,24 +2231,34 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'bentConnector')]">
         <draw:connector draw:layer="layout">
           <xsl:call-template name ="DrawLine">
+                <!--added by chhavi:for ODF1.1 conformance-->
+                <xsl:with-param name ="layId" select="$layId"/>
+                <xsl:with-param name="varShapeName" select="'connector'"/>
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
           </xsl:call-template>
+
+              <xsl:if test="msxsl:node-set($varHyperLinksForConnectors)//presentation:event-listener">
           <xsl:copy-of select="$varHyperLinksForConnectors" />
+              </xsl:if>
         </draw:connector >
       </xsl:when>
       <!--Curved Connector-->
       <xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'curvedConnector')]">
         <draw:connector draw:layer="layout" draw:type="curve">
           <xsl:call-template name ="DrawLine">
+                <xsl:with-param name ="layId" select="$layId"/>
+                <xsl:with-param name="varShapeName" select="'connector'"/>
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
           </xsl:call-template>
+              <xsl:if test="msxsl:node-set($varHyperLinksForConnectors)//presentation:event-listener">
           <xsl:copy-of select="$varHyperLinksForConnectors" />
+              </xsl:if>
         </draw:connector >
       </xsl:when>
       <!-- Custom shapes: -->
@@ -2087,7 +2266,10 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="p:spPr/a:prstGeom/@prst='roundRect'">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter inserted by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2119,7 +2301,7 @@ Copyright (c) 2007, Sonata Software Limited
                    draw:handle-range-x-minimum="0"
                    draw:handle-range-x-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Snip Single Corner Rectangle -->
@@ -2128,7 +2310,10 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:message terminate="no">translation.oox2odf.shapesTypeSnipSingleCornerRectangle</xsl:message>
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter inserted by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2146,7 +2331,7 @@ Copyright (c) 2007, Sonata Software Limited
 						draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape> 
       </xsl:when>
 
@@ -2154,6 +2339,9 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2SameRect'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -2175,13 +2363,16 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Snip Diagonal Corner Rectangle -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2DiagRect'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -2202,13 +2393,16 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Snip and Round Single Corner Rectangle -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='snipRoundRect'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name ="grID" select ="$GraphicId" />
 					<xsl:with-param name ="prID" select ="$ParaId" />
@@ -2229,14 +2423,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Round Single Corner Rectangle -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='round1Rect'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2258,14 +2455,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Round Same Side Corner Rectangle -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='round2SameRect'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2287,14 +2487,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Round Diagonal Corner Rectangle -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='round2DiagRect'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2316,14 +2519,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Explosion 2 -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='irregularSeal2'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2340,7 +2546,7 @@ Copyright (c) 2007, Sonata Software Limited
                                         draw:enhanced-path="M 11464 4340 L 9722 1887 8548 6383 4503 3626 5373 7816 1174 8270 3934 11592 0 12875 3329 15372 1283 17824 4804 18239 4918 21600 7525 18125 8698 19712 9871 17371 11614 18844 12178 15937 14943 17371 14640 14348 18878 15632 16382 12311 18270 11292 16986 9404 21600 6646 16382 6533 18005 3172 14524 5778 14789 0 11464 4340 Z N">
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 
@@ -2348,7 +2554,10 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='heptagon'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2370,14 +2579,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Decagon -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='decagon'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2398,14 +2610,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Dodecagon -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='dodecagon'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2426,14 +2641,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Pie -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='pie'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2459,14 +2677,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
 					<draw:handle draw:handle-position="10800 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Frame -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='frame'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2500,14 +2721,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f7" draw:formula="bottom-$0"/>
 					<draw:handle draw:handle-position="left $0" draw:handle-switched="true" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Half Frame -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='halfFrame'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2529,14 +2753,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- L-Shape -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='corner'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2558,14 +2785,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Diagonal Stripe -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='diagStripe'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2587,14 +2817,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Plaque -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='plaque'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2630,14 +2863,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f15" draw:formula="bottom+?f5 "/>
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Bevel -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='bevel'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2660,14 +2896,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f2" draw:formula="bottom-?f0 "/>
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Donut -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='donut'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2688,14 +2927,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f1" draw:formula="10800-$0 "/>
 					<draw:handle draw:handle-position="$0 10800" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Teardrop -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='teardrop'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -2717,7 +2959,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
           <xsl:call-template name="tmpFlip"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 
@@ -2727,7 +2969,10 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartProcess'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2741,13 +2986,16 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:type="flowchart-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- Flowchart: Alternate Process -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartAlternateProcess'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2770,14 +3018,17 @@ Copyright (c) 2007, Sonata Software Limited
             <draw:equation draw:name="f10" draw:formula="right-$0 "/>
             <draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Decision -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDecision'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2791,14 +3042,18 @@ Copyright (c) 2007, Sonata Software Limited
             draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 0 10800 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Data -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInputOutput'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
+
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2811,14 +3066,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="12960 0 10800 0 2160 10800 8600 21600 10800 21600 19400 10800" draw:text-areas="4230 0 17370 21600" draw:type="flowchart-data" draw:enhanced-path="M 4230 0 L 21600 0 17370 21600 0 21600 4230 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Predefined Process-->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2831,14 +3089,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="2540 0 19060 21600" draw:type="flowchart-predefined-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 2540 0 L 2540 21600 N M 19060 0 L 19060 21600 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Internal Storage -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInternalStorage'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2851,14 +3112,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="4230 4230 21600 21600" draw:type="flowchart-internal-storage" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 4230 0 L 4230 21600 N M 0 4230 L 21600 4230 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Document -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDocument'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2871,14 +3135,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 20320 21600 10800" draw:text-areas="0 0 21600 17360" draw:type="flowchart-document" draw:enhanced-path="M 0 0 L 21600 0 21600 17360 C 13050 17220 13340 20770 5620 21600 2860 21100 1850 20700 0 20120 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Multi document -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMultidocument'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2891,14 +3158,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 19890 21600 10800" draw:text-areas="0 3600 18600 18009" draw:type="flowchart-multidocument" draw:enhanced-path="M 0 3600 L 1500 3600 1500 1800 3000 1800 3000 0 21600 0 21600 14409 20100 14409 20100 16209 18600 16209 18600 18009 C 11610 17893 11472 20839 4833 21528 2450 21113 1591 20781 0 20300 Z N M 1500 3600 F L 18600 3600 18600 16209 N M 3000 1800 F L 20100 1800 20100 14409 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Terminator -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartTerminator'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2911,14 +3181,18 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="1060 3180 20540 18420" draw:type="flowchart-terminator" draw:enhanced-path="M 3470 21600 X 0 10800 3470 0 L 18130 0 X 21600 10800 18130 21600 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Preparation -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPreparation'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2931,14 +3205,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-preparation" draw:enhanced-path="M 4350 0 L 17250 0 21600 10800 17250 21600 4350 21600 0 10800 4350 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Manual Input -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualInput'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2951,14 +3228,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2150 0 10800 10800 19890 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-manual-input" draw:enhanced-path="M 0 4300 L 21600 0 21600 21600 0 21600 0 4300 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Manual Operation -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualOperation'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2971,14 +3251,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 2160 10800 10800 21600 19440 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-manual-operation" draw:enhanced-path="M 0 0 L 21600 0 17250 21600 4350 21600 0 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Connector -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartConnector'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2991,14 +3274,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3180 3180 18420 18420" draw:type="flowchart-connector" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Off-page Connector -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOffpageConnector'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3011,14 +3297,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 0 21600 17150" draw:type="flowchart-off-page-connector" draw:enhanced-path="M 0 0 L 21600 0 21600 17150 10800 21600 0 17150 0 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Card -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedCard'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3031,14 +3320,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-card" draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Punched Tape -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedTape'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3051,14 +3343,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2020 0 10800 10800 19320 21600 10800" draw:text-areas="0 4360 21600 17240" draw:type="flowchart-punched-tape" draw:enhanced-path="M 0 2230 C 820 3990 3410 3980 5370 4360 7430 4030 10110 3890 10690 2270 11440 300 14200 160 16150 0 18670 170 20690 390 21600 2230 L 21600 19420 C 20640 17510 18320 17490 16140 17240 14710 17370 11310 17510 10770 19430 10150 21150 7380 21290 5290 21600 3220 21250 610 21130 0 19420 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Summing Junction -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSummingJunction'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3071,14 +3366,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-summing-junction" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 3100 3100 L 18500 18500 N M 3100 18500 L 18500 3100 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Or -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOr'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3091,14 +3389,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-or" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 0 10800 L 21600 10800 N M 10800 0 L 10800 21600 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Collate -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartCollate'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3111,14 +3412,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 10800 10800 10800 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-collate" draw:enhanced-path="M 0 0 L 21600 21600 0 21600 21600 0 0 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Sort -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSort'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3131,14 +3435,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-sort" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 Z N M 0 10800 L 21600 10800 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Extract -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartExtract'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3151,14 +3458,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 10800 16200 21600" draw:type="flowchart-extract" draw:enhanced-path="M 10800 0 L 21600 21600 0 21600 10800 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Merge-->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMerge'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3171,14 +3481,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 0 16200 10800" draw:type="flowchart-merge" draw:enhanced-path="M 0 0 L 21600 0 10800 21600 0 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Stored Data -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOnlineStorage'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3191,14 +3504,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 18000 10800" draw:text-areas="3600 0 18000 21600" draw:type="flowchart-stored-data" draw:enhanced-path="M 3600 21600 X 0 10800 3600 0 L 21600 0 X 18000 10800 21600 21600 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Delay -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDelay'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3211,14 +3527,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 3100 18500 18500" draw:type="flowchart-delay" draw:enhanced-path="M 10800 0 X 21600 10800 10800 21600 L 0 21600 0 0 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Sequential Access Storage -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticTape'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3231,14 +3550,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-sequential-access" draw:enhanced-path="M 20980 18150 L 20980 21600 10670 21600 C 4770 21540 0 16720 0 10800 0 4840 4840 0 10800 0 16740 0 21600 4840 21600 10800 21600 13520 20550 16160 18670 18170 Z N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Direct Access Storage -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDrum'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3251,14 +3573,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 14800 10800 21600 10800" draw:text-areas="3400 0 14800 21600" draw:type="flowchart-direct-access-storage" draw:enhanced-path="M 18200 0 X 21600 10800 18200 21600 L 3400 21600 X 0 10800 3400 0 Z N M 18200 0 X 14800 10800 18200 21600 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Magnetic Disk-->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDisk'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3271,14 +3596,17 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 6800 10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 6800 21600 18200" draw:type="flowchart-magnetic-disk" draw:enhanced-path="M 0 3400 Y 10800 0 21600 3400 L 21600 18200 Y 10800 21600 0 18200 Z N M 0 3400 Y 10800 6800 21600 3400 N">
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Display-->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDisplay'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
             <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
             <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -3291,7 +3619,7 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3600 0 17800 21600" draw:type="flowchart-display" draw:enhanced-path="M 3600 0 L 17800 0 X 21600 10800 17800 21600 L 3600 21600 0 10800 Z N">
              <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
         </draw:custom-shape>
       </xsl:when>
 
@@ -3300,7 +3628,10 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonBackPrevious'">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -3337,14 +3668,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f16" draw:formula="?f15 +?f8" />
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="5400" />
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape >
 		</xsl:when>
 		<!-- Action Buttons Forward or Next -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonForwardNext'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -3381,14 +3715,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f16" draw:formula="?f15 +?f8" />
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="5400" />
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape >
 		</xsl:when>
 		<!-- Action Buttons Beginning -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonBeginning'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -3433,14 +3770,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f24" draw:formula="?f23 +?f7" />
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="5400" />
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape >
 		</xsl:when>
 		<!-- Action Buttons end -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonEnd'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -3485,14 +3825,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f24" draw:formula="?f23 +?f7" />
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="5400" />
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape >
 		</xsl:when>
 		<!-- Action Buttons Home -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonHome'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -3549,14 +3892,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f36" draw:formula="?f35 +?f8" />
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="5400" />
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape >
 		</xsl:when>
 		<!-- Action Buttons Information -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonInformation'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -3619,14 +3965,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f42" draw:formula="?f41 +?f8 "/>
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="5400"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 		<!-- Action Buttons Return -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonReturn'">
 			<draw:custom-shape draw:layer="layout">
 				<xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
 					<!--Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks-->
+                <xsl:with-param name ="layId" select="$layId"/>
 					<xsl:with-param name="sldId" select="$slideId" />
 					<xsl:with-param name="grID" select ="$GraphicId"/>
 					<xsl:with-param name ="prID" select="$ParaId" />
@@ -3691,10 +4040,13 @@ Copyright (c) 2007, Sonata Software Limited
 					<draw:equation draw:name="f44" draw:formula="?f43 +?f7 "/>
 					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="5400"/>
 				</draw:enhanced-geometry>
-				<xsl:copy-of select="$varHyperLinksForShapes" />
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
 			</draw:custom-shape>
 		</xsl:when>
 
+
+        </xsl:choose>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
   <xsl:template name="tmpHyperLinkForShapesPic">
@@ -3813,7 +4165,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:value-of select ="'simple'"/>
           </xsl:attribute>
           <xsl:attribute name ="xlink:show">
-            <xsl:value-of select ="'new'"/>
+            <xsl:value-of select ="'embed'"/>
           </xsl:attribute>
           <xsl:attribute name ="xlink:actuate">
             <xsl:value-of select ="'onRequest'"/>
@@ -3880,7 +4232,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:otherwise>
         <xsl:if test="a:hlinkClick/@r:id">
           <presentation:event-listener script:event-name="dom:click" presentation:action="show"
-                                xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                                xlink:type="simple" xlink:show="embed" xlink:actuate="onRequest">
             <xsl:variable name="RelationId">
               <xsl:value-of select="a:hlinkClick/@r:id"/>
             </xsl:variable>
@@ -3924,6 +4276,8 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <!-- Draw Shape reading values from pptx p:spPr-->
   <xsl:template name ="CreateShape">
+	  <!--parameter added by yeswanth: ODF1.1 conformance-->
+	  <xsl:param name="varHyperLinksForShapes" select="''"/>
     <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
     <xsl:param name ="sldId" />
     <xsl:param name ="grID" />
@@ -3934,6 +4288,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="grpCordinates"/>
     <xsl:param name ="blnTable"/>
     <xsl:param name ="rowPosition"/>
+    <!-- parameter added by chhavi:for ODF1.1 conformance-->
+    <xsl:param name ="layId"/>
     
     <!-- Addition of a parameter,by Vijayets ,for bullets and numbering in shapes-->
     <xsl:param name="SlideRelationId"/>
@@ -3941,15 +4297,37 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:attribute name ="draw:style-name">
       <xsl:value-of select ="$grID"/>
     </xsl:attribute>
+    <xsl:if test="$blnTable!='true'">
     <xsl:attribute name ="draw:text-style-name">
       <xsl:value-of select ="$prID"/>
     </xsl:attribute>
+    </xsl:if>
 	  <!-- animation Id-->
+    <xsl:choose>
+		<xsl:when test="$grpBln='true'">
+			<xsl:variable name="varDrawIdGrp">
+				<xsl:call-template name="tmpConnected">
+					<xsl:with-param name="paramId" select="./p:nvSpPr/p:cNvPr/@id"/>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:if test="contains($varDrawIdGrp,'true')">
 	  <xsl:attribute name ="draw:id">
 		  <xsl:value-of select ="concat('sldraw',$sldId,'an',p:nvSpPr/p:cNvPr/@id)"/>
 	  </xsl:attribute>
-    <!-- For the Grouping of Shapes Bug Fixing -->
-    <xsl:choose>
+			</xsl:if>
+		</xsl:when>
+      <xsl:when test="$blnTable='true'"/>
+      <!-- added by chhavi:for ODF1.1 conformance-->
+      <xsl:when test="$layId='true'"/>
+      <xsl:otherwise>
+          <xsl:attribute name ="draw:id">
+            <xsl:value-of select ="concat('sldraw',$sldId,'an',p:nvSpPr/p:cNvPr/@id)"/>
+          </xsl:attribute>
+      
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    <!-- For the Grouping of Shapes Bug Fixing --><xsl:choose>
       <xsl:when test="$blnTable='true'">
         <xsl:call-template name="tmpTableCordinates">
           <xsl:with-param name="rowPosition" select ="$rowPosition" />
@@ -3981,8 +4359,18 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="blnTable" select="$blnTable"/>
           </xsl:call-template>
         </draw:text-box>
+			  <!--added by yeswanth:ODF1.1 conformance-->
+			  <xsl:if test="msxsl:node-set($varHyperLinksForShapes)//presentation:event-listener">
+				  <xsl:copy-of select="$varHyperLinksForShapes"/>
+			  </xsl:if>
+			  <!--end-->
       </xsl:when>
       <xsl:otherwise>
+			  <!--added by yeswanth:ODF1.1 conformance-->
+			  <xsl:if test="msxsl:node-set($varHyperLinksForShapes)//presentation:event-listener">
+				  <xsl:copy-of select="$varHyperLinksForShapes"/>
+			  </xsl:if>
+			  <!--end-->
         <xsl:call-template name ="AddShapeText">
           <xsl:with-param name ="prID" select ="$prID" />
           <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
@@ -4111,13 +4499,21 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <!-- Draw line -->
   <xsl:template name ="DrawLine">
+    <xsl:param name="varShapeName"/>
     <xsl:param name ="grID" />
     <xsl:param name ="grpBln" />
     <xsl:param name="sldId" />
     <xsl:param name ="grpCordinates" />
+    <!-- parameter added by chhavi:for ODF1.1 conformance-->
+    <xsl:param name ="layId"/>
     <xsl:attribute name ="draw:style-name">
       <xsl:value-of select ="$grID"/>
     </xsl:attribute>
+    <xsl:choose>
+      <xsl:when test="$grpBln='true'"/>
+      <!-- added by chhavi:for ODF1.1 conformance-->
+      <xsl:when test="$layId='true'"/>
+      <xsl:otherwise>
 	  <xsl:attribute name ="draw:id">
 		  <xsl:choose>
 			  <xsl:when test="p:nvCxnSpPr/p:cNvPr/@id">
@@ -4131,6 +4527,10 @@ Copyright (c) 2007, Sonata Software Limited
 			  <!--End-->
 		  </xsl:choose>
 	  </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>    
+     
+	
     <xsl:choose>
       <xsl:when test="$grpBln ='true'">
         <xsl:call-template name="tmpGropingWriteCordinates">
@@ -4236,10 +4636,30 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:variable name="endGluePoint">
       <xsl:value-of select="p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@idx"/>
     </xsl:variable>
-	  <xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn)">
+	  <!--<xsl:variable name="varConnectorId" select="p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id"/>
+	  <xsl:variable name="varPresetType">
+		  <xsl:for-each select="//p:sp">
+			  <xsl:if test="$varConnectorId = p:nvSpPr/p:cNvPr/@id">
+				  <xsl:value-of select="p:spPr/a:prstGeom/@prst"/>
+			  </xsl:if>
+		  </xsl:for-each>
+	  </xsl:variable>-->
+	  <xsl:variable name="varPossiblePresetStrt">
+		  <xsl:call-template name="tmpImpPresetType">
+			  <xsl:with-param name="varCxnId" select="p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id"/>
+		  </xsl:call-template>
+	  </xsl:variable>
+	  <xsl:variable name="varPossiblePresetEnd">
+		  <xsl:call-template name="tmpImpPresetType">
+			  <xsl:with-param name="varCxnId" select="p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@id"/>
+		  </xsl:call-template>
+	  </xsl:variable>
+    <!--modified  by vipul:for ODF1.1 conformance for draw:start-shape -->
+	  <xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id &gt; 2) and contains($varPossiblePresetStrt,'true') and $varShapeName = 'connector'">
 		  <xsl:attribute name ="draw:start-shape">
 			  <xsl:value-of select ="concat('sldraw',$sldId,'an', p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id)"/>
 		  </xsl:attribute>
+      <xsl:if test="$varShapeName = 'connector'">
 		  <xsl:attribute name ="draw:start-glue-point">
 			  	  <xsl:choose>
           <xsl:when test="$maxstartSpgluePointCount &gt;4 ">
@@ -4280,7 +4700,10 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:choose>
 		  </xsl:attribute>
 		  </xsl:if>
-		<xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn)">
+		  </xsl:if>
+		<xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@id &gt; 2)">
+      <!--modified  by chhavi:for ODF1.1 conformance for draw:end-glue-point -->
+      <xsl:if test="$varShapeName = 'connector'">
 			  <xsl:attribute name ="draw:end-glue-point">
 			  <xsl:choose>
           <xsl:when test="$maxendSpgluePointCount &gt;4 ">
@@ -4321,9 +4744,14 @@ Copyright (c) 2007, Sonata Software Limited
 			  </xsl:choose>
 
 		  </xsl:attribute>
+      
+      <xsl:if test="contains($varPossiblePresetEnd,'true')">
 		  <xsl:attribute name ="draw:end-shape">
 			  <xsl:value-of select ="concat('sldraw',$sldId,'an', p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@id)"/>
 		  </xsl:attribute>
+	  </xsl:if>
+      </xsl:if>
+    
 	  </xsl:if>
   </xsl:template>
   <xsl:template name="tmpgetpresetgm">
@@ -4397,9 +4825,11 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:attribute name ="text:id">
 			   <xsl:value-of select ="concat('slText',$sldID,'an',./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id, position())"/>
 			</xsl:attribute>
+            <xsl:if test="$prID!=''">
             <xsl:attribute name ="text:style-name">
               <xsl:value-of select ="concat($prID,position())"/>
             </xsl:attribute>
+            </xsl:if>
             <xsl:for-each select ="node()">
               <xsl:if test ="name()='a:r'">
                 <text:span>
@@ -4412,14 +4842,15 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:variable>
                   <!-- Added by lohith.ar - Code for text Hyperlinks -->
                   <xsl:if test="node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd)">
-                    <text:a>
-                      <xsl:call-template name="AddTextHyperlinks">
+                    <!--commented by chhavi:for ODF1.1 conformance -->
+                    <!--<text:a>-->
+                      <!--<xsl:call-template name="AddTextHyperlinks">
                         <xsl:with-param name="nodeAColonR" select="node()" />
                         <xsl:with-param name="slideRelationId" select="$SlideRelationId" />
                         <xsl:with-param name="slideId" select="$sldID" />
-                      </xsl:call-template>
+                      </xsl:call-template>-->
                       <xsl:copy-of select="$nodeTextSpan"/>
-                    </text:a>
+                    <!--</text:a>-->
                   </xsl:if>
                   <xsl:if test="not(node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd))">
                     <xsl:copy-of select="$nodeTextSpan"/>
@@ -5176,4 +5607,451 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
+	<xsl:template name="tmpConnected">
+		<xsl:param name="paramId"/>
+		<xsl:for-each select="//p:cxnSp">
+			<xsl:if test="($paramId = ./p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id) or ($paramId = ./p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@id)">
+				<xsl:value-of  select="'true'"/>
+			</xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+	<xsl:template name="tmpImpPresetType">
+		<xsl:param name="varCxnId"/>
+		<xsl:for-each select="//p:sp/p:nvSpPr/p:cNvPr[@id=$varCxnId]">
+      <xsl:for-each select="../..">
+				<xsl:choose>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='rect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(not(p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')]) or (p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')])) and (p:spPr/a:prstGeom/@prst='ellipse')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test = "(p:spPr/a:prstGeom/@prst='rightArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test = "(p:spPr/a:prstGeom/@prst='upArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test = "(p:spPr/a:prstGeom/@prst='leftArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test = "(p:spPr/a:prstGeom/@prst='downArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test = "(p:spPr/a:prstGeom/@prst='leftRightArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test = "(p:spPr/a:prstGeom/@prst='upDownArrow')" >
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='triangle')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='rtTriangle')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='parallelogram')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='trapezoid')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='diamond')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='pentagon')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='hexagon')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='octagon')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='circularArrow' or p:spPr/a:prstGeom/@prst='curvedRightArrow' or p:spPr/a:prstGeom/@prst='curvedLeftArrow' or p:spPr/a:prstGeom/@prst='curvedDownArrow' or p:spPr/a:prstGeom/@prst='curvedUpArrow'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='leftUpArrow'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test="(p:nvSpPr/p:cNvPr/@name[contains(., 'bentUpArrow ')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'Bent-Up Arrow ')]) and (p:spPr/a:prstGeom/@prst='bentUpArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='bentUpArrow'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='cube')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='can')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='plus')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='noSmoking')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='foldedCorner')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='lightningBolt')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!--  Explosion 1 (Modified by A.Mathi) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='irregularSeal1')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Chord (Added by A.Mathi as on 20/07/2007)-->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='chord')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Left Bracket (Added by A.Mathi as on 20/07/2007) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='leftBracket')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Right Bracket (Added by A.Mathi as on 20/07/2007) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBracket')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Left Brace (Added by A.Mathi as on 20/07/2007) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='leftBrace')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Right Brace (Added by A.Mathi as on 23/07/2007) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBrace')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Rectangular Callout (modified by A.Mathi) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeRectCallout')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Rounded Rectangular Callout (modified by A.Mathi) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeRoundRectCallout')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Oval Callout (modified by A.Mathi) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeEllipseCallout')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Cloud Callout (modified by A.Mathi) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='cloudCallout')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Line Callout 1) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout1')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Line Callout 2) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout2')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Line Callout 3) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout3')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+
+					<!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='bentArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- U-Turn Arrow (Added by A.Mathi as on 23/07/2007) -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='uturnArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Quad Arrow -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='quadArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Block Arc -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='blockArc')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Notched Right Arrow -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='notchedRightArrow')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Pentagon -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='homePlate')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Chevron -->
+					<xsl:when test ="(p:spPr/a:prstGeom/@prst='chevron')">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+
+					<!--Equation Shapes-->
+					<!--Equal-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='mathEqual'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!--Not Equal-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='mathNotEqual'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!--Plus-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='mathPlus'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!--Minus-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='mathMinus'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!--Multiply-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='mathMultiply'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!--Division-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='mathDivide'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+
+					<xsl:when test ="p:spPr/a:prstGeom/@prst = 'line'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Straight Connector-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'straightConnector')]">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Elbow Connector-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'bentConnector')]">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!--Curved Connector-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'curvedConnector')]">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Custom shapes: -->
+					<!-- Rounded  Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='roundRect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Snip Single Corner Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='snip1Rect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+
+					<!-- Snip Same Side Corner Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2SameRect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Snip Diagonal Corner Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2DiagRect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Snip and Round Single Corner Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='snipRoundRect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Round Single Corner Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='round1Rect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Round Same Side Corner Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='round2SameRect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Round Diagonal Corner Rectangle -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='round2DiagRect'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Explosion 2 -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='irregularSeal2'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+
+					<!-- Heptagon -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='heptagon'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Decagon -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='decagon'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Dodecagon -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='dodecagon'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Pie -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='pie'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Frame -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='frame'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Half Frame -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='halfFrame'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- L-Shape -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='corner'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Diagonal Stripe -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='diagStripe'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Plaque -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='plaque'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Bevel -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='bevel'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Donut -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='donut'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Teardrop -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='teardrop'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+
+					<!-- Flow chart shapes -->
+
+					<!-- Flowchart: Process -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartProcess'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- Flowchart: Alternate Process -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartAlternateProcess'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Decision -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDecision'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Data -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInputOutput'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Predefined Process-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Internal Storage -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInternalStorage'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Document -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDocument'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Multi document -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMultidocument'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Terminator -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartTerminator'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Preparation -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPreparation'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Manual Input -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualInput'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Manual Operation -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualOperation'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Connector -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartConnector'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Off-page Connector -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOffpageConnector'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Card -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedCard'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Punched Tape -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedTape'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Summing Junction -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSummingJunction'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Or -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOr'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Collate -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartCollate'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Sort -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSort'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Extract -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartExtract'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Merge-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMerge'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Stored Data -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOnlineStorage'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Delay -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDelay'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Sequential Access Storage -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticTape'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Direct Access Storage -->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDrum'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Magnetic Disk-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDisk'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<!-- FlowChart: Display-->
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDisplay'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonBackPrevious'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonForwardNext'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonBeginning'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonEnd'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonHome'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonInformation'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:when test ="p:spPr/a:prstGeom/@prst='actionButtonReturn'">
+						<xsl:value-of select="'true'"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="'false'"/>
+					</xsl:otherwise>
+				</xsl:choose>
+      </xsl:for-each>
+		</xsl:for-each>
+	</xsl:template>
 </xsl:stylesheet >

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -30,6 +30,8 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+  xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
+
   exclude-result-prefixes="oox rels">
 
 	<xsl:import href="content.xsl"/>
@@ -80,12 +82,18 @@ Copyright (c) 2007, Sonata Software Limited
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Thumbnails/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Thumbnails/thumbnail.png"/>
 					<manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
+                                         <!--Conformance Test-->
+                                         <manifest:file-entry manifest:media-type="" manifest:full-path="mimetype"/>
 					<xsl:for-each
 					  select="document('ppt/presentation.xml')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
 						<xsl:call-template name="InsertManifestFileEntry"/>
 					</xsl:for-each >
+                                      <xsl:call-template name="tmpMenifestEntryForOLEobject" />
 				</manifest:manifest>
 			</pzip:entry>
+                                 <!--Conformance Test-->
+      <pzip:copy pzip:source="#CER#PresentationConverter.dll#Sonata.OdfConverter.Presentation.resources.mimetype#"
+             pzip:target="mimetype"/>
 			<pzip:entry pzip:target="content.xml">
 				<xsl:call-template name="content" />
 			</pzip:entry >

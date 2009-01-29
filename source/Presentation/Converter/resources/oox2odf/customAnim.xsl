@@ -58,20 +58,30 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 		<xsl:param name ="slideNo"/>
 		<xsl:param name="pageid"/>
 		<xsl:param name="FolderNameGUID"/>
+    <!-- ODF conformance 1.1 Avoid creation of Warning anim:xxx-->
+    <xsl:for-each select="document($slideId)">
+    <xsl:if test="p:sld/p:transition | p:sld/p:timing/p:tnLst/p:par/p:cTn/p:childTnLst/p:seq/p:cTn/p:childTnLst/p:par">
 		<anim:par smil:dur="indefinite" smil:restart="never" presentation:node-type="timing-root">
-			<xsl:if test="document($slideId)//p:transition">
+        <xsl:if test="p:sld/p:transition">
 				<anim:par>
 					<xsl:attribute name="smil:begin">
 						<xsl:value-of select="concat($pageid,'.begin')"/>
 					</xsl:attribute>
 					<!--<xsl:copy-of select="document($slideId)"/>-->
+					<!--Code added by yeswanth : To retain sound when only sound is applied in slide transition-->
+					<xsl:variable name="varSTSmilType">
+						<xsl:call-template name="SmilTypeForOnlySound">
+							<xsl:with-param name="slidenum" select="p:sld/p:transition"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:if test="$varSTSmilType != ''">
 					<anim:transitionFilter>
 						<xsl:variable name="tranSpeed">
 							<xsl:choose>
-								<xsl:when test="document($slideId)/p:sld/p:transition/@spd='slow'">
+                  <xsl:when test="p:sld/p:transition/@spd='slow'">
 									<xsl:value-of select="'3s'"/>
 								</xsl:when>
-								<xsl:when test="document($slideId)/p:sld/p:transition/@spd='med'">
+                  <xsl:when test="p:sld/p:transition/@spd='med'">
 							<xsl:value-of select="'2s'"/>
 								</xsl:when>
 								<xsl:otherwise>
@@ -83,10 +93,12 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:value-of select="$tranSpeed"/>
 						</xsl:attribute>
 						<xsl:call-template name="SlideTransSmilType">
-							<xsl:with-param name="slidenum" select="document($slideId)/p:sld/p:transition/child::node()"/>
+                <xsl:with-param name="slidenum" select="p:sld/p:transition/child::node()"/>
 						</xsl:call-template>
 					</anim:transitionFilter>
-					<xsl:if test="document($slideId)//p:transition/p:sndAc/p:stSnd">
+					</xsl:if>
+					
+            <xsl:if test="p:sld/p:transition/p:sndAc/p:stSnd">
 						<anim:audio>
 							<!--for xlink:href-->
 							<xsl:variable name ="relSlideNumber">
@@ -95,7 +107,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 								</xsl:call-template>
 							</xsl:variable>
 							<xsl:variable name="hyperlinkrid">
-								<xsl:value-of select="document($slideId)/p:sld/p:transition/p:sndAc/p:stSnd/p:snd/@r:embed"/>
+                  <xsl:value-of select="p:sld/p:transition/p:sndAc/p:stSnd/p:snd/@r:embed"/>
 							</xsl:variable>
 							<xsl:variable name="pageRelation">
 								<xsl:value-of select="concat('ppt/slides/_rels/',$relSlideNumber,'.rels')"/>
@@ -118,7 +130,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 								<xsl:value-of select="$TransFOlderName"/>
 								<xsl:value-of select="concat('/',$soundfilename)"/>
 							</xsl:attribute>
-							<xsl:if test="document($slideId)//p:transition/p:sndAc/p:stSnd/@loop=1">
+                <xsl:if test="p:sld/p:transition/p:sndAc/p:stSnd/@loop=1">
 								<xsl:attribute name="smil:repeatCount">
 									<xsl:value-of select="'indefinite'"/>
 								</xsl:attribute>
@@ -127,9 +139,9 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 					</xsl:if>
 				</anim:par>
 			</xsl:if>
-
+        <xsl:if test="p:sld/p:timing/p:tnLst/p:par/p:cTn/p:childTnLst/p:seq/p:cTn/p:childTnLst/p:par">
 			<anim:seq presentation:node-type="main-sequence">
-				<xsl:for-each select ="document($slideId)//p:timing/p:tnLst/p:par/p:cTn/p:childTnLst/p:seq/p:cTn/p:childTnLst/p:par">
+            <xsl:for-each select ="p:sld/p:timing/p:tnLst/p:par/p:cTn/p:childTnLst/p:seq/p:cTn/p:childTnLst/p:par">
                                     <xsl:if test="./p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par/p:cTn/@presetClass != 'mediacall'">
 					<xsl:variable name ="animType">
 						<xsl:value-of select ="p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par/p:cTn/@presetID"/>
@@ -140,8 +152,12 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 					</xsl:call-template>					
                                     </xsl:if>
 				</xsl:for-each >
+
 			</anim:seq>
+        </xsl:if>
 		</anim:par>
+    </xsl:if>
+    </xsl:for-each>
 	</xsl:template>
 	<xsl:template name ="animProcess">
 		<xsl:param name ="animType"/>

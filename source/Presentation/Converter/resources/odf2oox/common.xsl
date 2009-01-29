@@ -3451,6 +3451,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="fileName"/>
     <xsl:param name="master"/>
     <xsl:param name="UniqueId"/>
+    <xsl:param name="vmlPageNo"/>
     
     <p:grpSp>
       <p:nvGrpSpPr>
@@ -3508,7 +3509,16 @@ Copyright (c) 2007, Sonata Software Limited
             or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
                     <xsl:if test="not(./@xlink:href[contains(.,'../')])">
                       <xsl:call-template name="InsertPicture">
-                        <xsl:with-param name="imageNo" select="$pageNo" />
+                        <xsl:with-param name="imageNo">
+                          <xsl:choose>
+                            <xsl:when test="$vmlPageNo !=''">
+                              <xsl:value-of select="concat('slideMaster',$vmlPageNo)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$pageNo"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
                         <xsl:with-param name="picNo" select ="$NvPrId"/>
                         <xsl:with-param name="fileName">
                           <xsl:choose>
@@ -3577,6 +3587,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="InnerGrp" select ="'InnerGroup'"/>
                 <xsl:with-param name="fileName" select="$fileName"/>
                 <xsl:with-param name="master" select="$master"/>
+                <xsl:with-param name="vmlPageNo" select="$vmlPageNo"/>
               </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
@@ -3609,7 +3620,15 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:choose>
                <xsl:when test="./draw:object or ./draw:object-ole">
                     <xsl:choose>
+                      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
+                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
+                        <xsl:call-template name="tmpOLEObjectsRel">
+                          <xsl:with-param name="slideNo" select="$slideNo"/>
+                          <xsl:with-param name ="grpBln" select ="'true'"/>
+                        </xsl:call-template>
+                      </xsl:when>
                   <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+                   <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>
                   <xsl:otherwise>
                     <xsl:call-template name="tmpOLEObjectsRel">
                       <xsl:with-param name="slideNo" select="$slideNo"/>
@@ -3643,6 +3662,109 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:value-of select="concat('../media/',substring-after(@xlink:href,'/'))" />
                         </xsl:attribute>
                       </Relationship>
+                      <!--added by chhavi for picture hyperlink relationship-->
+                      <xsl:if test="./following-sibling::node()[name() = 'office:event-listeners']">
+                        <xsl:for-each select ="./parent::node()/office:event-listeners/presentation:event-listener">
+                          <xsl:if test="@xlink:href">
+                            <xsl:choose>
+                              <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
+                                <xsl:variable name="pageID">
+                                  <xsl:call-template name="getThePageId">
+                                    <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
+                                  </xsl:call-template>
+                                </xsl:variable>
+                                <xsl:if test="$pageID > 0">
+                                  <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships" >
+                                    <xsl:attribute name="Id">
+                                      <xsl:value-of select="concat('picture',generate-id())"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
+                                    </xsl:attribute>
+                                  </Relationship>
+                                </xsl:if>
+                              </xsl:when>
+                              <xsl:when test="@xlink:href">
+                                <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships" >
+                                  <xsl:attribute name="Id">
+                                    <xsl:value-of select="concat('picture',generate-id())"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:choose>
+                                      <xsl:when test="@xlink:href[ contains(.,'./')]">
+                                        <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                          <xsl:value-of select="/"/>
+                                        </xsl:if>
+                                        <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                          <!--links Absolute Path-->
+                                          <xsl:variable name ="xlinkPath" >
+                                            <xsl:value-of select ="@xlink:href"/>
+                                          </xsl:variable>
+                                          <xsl:value-of select ="concat('hyperlink-path:',$xlinkPath)"/>
+                                        </xsl:if>
+                                      </xsl:when>
+                                      <xsl:when test="@xlink:href[ contains(.,'http')] or @xlink:href[ contains(.,'mailto:')]">
+                                        <xsl:value-of select="@xlink:href"/>
+                                      </xsl:when>
+                                      <xsl:when test="not(@xlink:href[ contains(.,'./')]) and not(@xlink:href[ contains(.,'http')])
+                                                       and  not(@xlink:href[ contains(.,'mailto:')]) ">
+                                        <xsl:value-of select="concat('file://',@xlink:href)"/>
+                                      </xsl:when>
+                                    </xsl:choose>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </Relationship>
+                              </xsl:when>
+                            </xsl:choose>
+                          </xsl:if>
+                          <xsl:if test="presentation:sound">
+                            <xsl:variable name="varblnDuplicateRelation">
+                              <xsl:call-template name="GetUniqueRelationIdForWavFile">
+                                <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
+                                <xsl:with-param name="ShapePosition" select="generate-id()" />
+                                <xsl:with-param name="ShapeType" select="'FRAME'" />
+                                <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:if test="$varblnDuplicateRelation != 1">
+                              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships" >
+                                <xsl:variable name="varMediaFilePath">
+                                  <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                                    <xsl:value-of select="presentation:sound/@xlink:href" />
+                                  </xsl:if>
+                                  <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                                    <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                                  </xsl:if>
+                                </xsl:variable>
+                                <xsl:variable name="varFileRelId">
+                                  <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                                </xsl:variable>
+                                <xsl:attribute name="Id">
+                                  <xsl:value-of select="$varFileRelId"/>
+                                </xsl:attribute>
+                                <!--<xsl:attribute name="Id">
+                                       <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
+                                         </xsl:attribute>-->
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
+                                </xsl:attribute>
+                              </Relationship>
+                            </xsl:if>
+                          </xsl:if>
+                        </xsl:for-each>
+                      </xsl:if>
+                      <!--end here-->
                     </xsl:if>
                   </xsl:if>
                 </xsl:for-each>
@@ -3835,6 +3957,22 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select="'External'"/>
             </xsl:attribute>
           </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="target">
+              <xsl:choose>
+                <xsl:when test="$extension!=''">
+                  <xsl:value-of select="concat('../embeddings/',translate(@xlink:href,' ',''))"/>
+                </xsl:when>
+                <xsl:when test="$extension=''">
+                  <xsl:value-of select="concat('../embeddings/',translate(translate(@xlink:href,' ',''),'/',''),'.bin')"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:attribute name="Target">
+              <xsl:value-of select="$target"/>
+              <!--<xsl:value-of select="concat('../embeddings/','oleObject_',generate-id(),$extension)"/-->
+            </xsl:attribute>
+          </xsl:otherwise>
         </xsl:choose>
       </Relationship>
       </xsl:if>
@@ -5706,8 +5844,39 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="grpFlag" />
     <xsl:param name ="UniqueId" />
     <xsl:choose>
-      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
+                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
+        <xsl:call-template name="tmpOLE">
+          <xsl:with-param name ="pageNo" select="$pageNo" />
+          <xsl:with-param name ="shapeCount" select="$shapeCount" />
+          <xsl:with-param name ="grpFlag" select="$grpFlag" />
+          <xsl:with-param name ="UniqueId" select="$UniqueId" />
+          <xsl:with-param name ="OLEasXML" select="'true'" />
+        </xsl:call-template>
+      </xsl:when>
+      <!--<xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+      <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>-->
       <xsl:otherwise>
+        <xsl:call-template name="tmpOLE">
+          <xsl:with-param name ="pageNo" select="$pageNo" />
+          <xsl:with-param name ="shapeCount" select="$shapeCount" />
+          <xsl:with-param name ="grpFlag" select="$grpFlag" />
+          <xsl:with-param name ="UniqueId" select="$UniqueId" />
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="tmpOLE">
+    <xsl:param name ="pageNo" />
+    <xsl:param name ="shapeCount" />
+    <xsl:param name ="grpFlag" />
+    <xsl:param name ="UniqueId" />
+    <xsl:param name ="OLEasXML" />
+    <xsl:variable name="OLEasXMLImage">
+      <xsl:value-of select="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
+                           /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image/@xlink:href"/>
+    </xsl:variable>
+    
         <xsl:for-each select="./child::node()[1]">
           <xsl:if test="@xlink:href !=''">
           <p:graphicFrame>
@@ -5778,6 +5947,9 @@ Copyright (c) 2007, Sonata Software Limited
                                             or starts-with(@xlink:href,'file:///')">
                       <p:link/>
                     </xsl:when>
+                  <xsl:otherwise>
+                    <p:embed/>
+                  </xsl:otherwise>
                   </xsl:choose>
                 </p:oleObj>
               </a:graphicData>
@@ -5812,10 +5984,22 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:when>
                 </xsl:choose>
               </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$OLEasXML='true'">
+                <pzip:copy pzip:source="{concat(substring-after(@xlink:href,'./'),'/',$OLEasXMLImage)}" pzip:target="{$target}" />
+                
+              </xsl:when>
+              <xsl:otherwise>
               <pzip:copy pzip:source="{substring-after(@xlink:href,'./')}" pzip:target="{$target}" />
+              </xsl:otherwise>
+            </xsl:choose>
+            
             </xsl:when>
             <xsl:when test="starts-with(@xlink:href,'/')"></xsl:when>
             <xsl:when test="starts-with(@xlink:href,'\\') or starts-with(@xlink:href,'//')"></xsl:when>
+          <xsl:otherwise>
+            <pzip:copy pzip:source="{translate(@xlink:href,'/','')}" pzip:target="{concat('ppt/embeddings/',translate(translate(@xlink:href,' ',''),'/',''),'.bin')}" />
+          </xsl:otherwise>
           </xsl:choose>
           <xsl:if test="./parent::node()/draw:image/@xlink:href">
             <xsl:choose>
@@ -5837,13 +6021,14 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:choose>
 
               </xsl:when>
+            <xsl:otherwise>
+              <pzip:copy   pzip:source="{./parent::node()/draw:image/@xlink:href}"
+                  pzip:target="{concat('ppt/media/','oleObjectImage_',generate-id(),'.png')}" />
+            </xsl:otherwise>
             </xsl:choose>
           </xsl:if>
           </xsl:if>
-        </xsl:for-each>
-        
-      </xsl:otherwise>
-    </xsl:choose>
+        </xsl:for-each>      
   </xsl:template>
   <xsl:template name="GetOLEPictureType">
     <xsl:param name="olePicture" />

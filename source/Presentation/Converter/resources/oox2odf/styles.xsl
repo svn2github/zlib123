@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -73,10 +73,7 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:template name="styles">
     <xsl:message terminate="no">progress:a:p</xsl:message>
 		<office:document-styles>
-			<office:font-face-decls>
-			</office:font-face-decls>
-			<xsl:text>document styles</xsl:text>
-			<office:styles>
+		<office:styles>
         <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
           <xsl:variable name ="pageSlide">
             <xsl:value-of select ="concat(concat('ppt/slides/slide',position()),'.xml')"/>

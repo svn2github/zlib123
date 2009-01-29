@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -35,9 +35,9 @@ Copyright (c) 2007, Sonata Software Limited
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
-    xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0"
+    xmlns:ooo="http://openoffice.org/2004/office" 
     xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
-    xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
+    xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes" office:version="1.1"
 	exclude-result-prefixes="xlink">
   <xsl:template name="meta">
     

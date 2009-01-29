@@ -32,9 +32,11 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 		<xsl:param name="slideId" />
 		<xsl:variable name ="textSpanNode">
 			<text:p >
+        <xsl:if test="$ParaId!=''">
 				<xsl:attribute name ="text:style-name">
 					<xsl:value-of select ="concat($ParaId,position())"/>
 				</xsl:attribute>
+        </xsl:if>
 				<xsl:attribute name ="text:id" >
 					<xsl:if test ="contains($slideId,'slide')">
 						<xsl:value-of  select ="concat('slText',substring-after($slideId,'slide'),'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
@@ -272,11 +274,15 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                               </xsl:call-template>
                             </xsl:for-each >
                           </xsl:variable>
+                          <xsl:if test="$levelColor !=''">
+                            <xsl:attribute name ="fo:color">
                           <xsl:call-template name ="getColorCode">
                             <xsl:with-param name ="color">
                               <xsl:value-of select="$levelColor"/>
                             </xsl:with-param>
                           </xsl:call-template >
+                            </xsl:attribute>
+                          </xsl:if>
                         </xsl:if>
 											</xsl:if>
 											<!-- Code added by vijayeta, bug fix 1746350-->
@@ -521,11 +527,15 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                               </xsl:call-template>
                             </xsl:for-each >
                           </xsl:variable>
+                          <xsl:if test="$levelColor !=''">
+                            <xsl:attribute name ="fo:color">
                           <xsl:call-template name ="getColorCode">
                             <xsl:with-param name ="color">
                               <xsl:value-of select="$levelColor"/>
                             </xsl:with-param>
                           </xsl:call-template >
+                            </xsl:attribute>
+                          </xsl:if>
                         </xsl:if>
 											</xsl:if>
 											<xsl:if test ="not(a:pPr/a:buClr)">
@@ -848,11 +858,17 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                             </xsl:call-template>
                           </xsl:for-each >
                         </xsl:variable>
+                        <xsl:if test="$levelColor !=''">
+                          <xsl:if test="$levelColor !=''">
+                            <xsl:attribute name ="fo:color">
                         <xsl:call-template name ="getColorCode">
                           <xsl:with-param name ="color">
                             <xsl:value-of select="$levelColor"/>
                           </xsl:with-param>
                         </xsl:call-template >
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:if>
                       </xsl:if>
                     </xsl:if >
 										<!-- Code added by vijayeta, bug fix 1746350-->

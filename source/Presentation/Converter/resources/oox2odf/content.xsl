@@ -432,7 +432,7 @@ exclude-result-prefixes="p a r xlink rels">
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:call-template name="TransSound">
-				<xsl:with-param name="slidenum" select="document($pageSlide)"/>
+				<xsl:with-param name="slidenum" select="$pageSlide"/>
 				<xsl:with-param name="pageSlide" select="concat('ppt/slides/_rels/',$relSlideNumber,'.rels')"/>
 				<xsl:with-param name="FolderNameGUID" select="$FolderNameGUID"/>
 			</xsl:call-template>
@@ -534,6 +534,9 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="slideId"/>
 <xsl:param name ="SlideFile"/>
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+      <xsl:variable name="slidePos">
+        <xsl:value-of select="position()"/>
+      </xsl:variable>
       <draw:page>
         <xsl:message terminate="no">progress:a:p</xsl:message>
         <!--added by vipul to link each slides with slide Master-->
@@ -608,13 +611,7 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:variable name ="slideRel">
         <xsl:value-of select ="concat(concat('ppt/slides/_rels/',$SlideFile),'.rels')"/>
       </xsl:variable>
-      <!-- added by vipul to draw Frame for notes-->
-      <!--start-->
-      <xsl:call-template name="tmpNotesDrawFrames">
-        <xsl:with-param name="slideRel" select="$slideRel"/>
-        <xsl:with-param name="SlidePos" select="$SlidePos"/>
-      </xsl:call-template>
-      <!--End-->
+      
       <xsl:variable name ="SlideID">
         <xsl:value-of select ="concat('slide',$SlidePos)"/>
       </xsl:variable>
@@ -667,6 +664,8 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:value-of select ="concat('SL',$SlidePos,'LYT','PARA',$var_pos)"/>
                  </xsl:variable>
                  <xsl:call-template name ="shapes">
+                   <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                   <xsl:with-param name ="layId" select="'true'"/>
                 <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                 <xsl:with-param name ="ParaId" select="$ParaId" />
                  <xsl:with-param name ="TypeId" select="concat('SL',$SlidePos)" />
@@ -688,6 +687,7 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:value-of select ="concat('SL',$SlidePos,'LYT','PARA',$var_pos)"/>
                 </xsl:variable>
                 <xsl:call-template name ="shapes">
+                  <xsl:with-param name ="layId" select="'true'"/>
                   <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                   <xsl:with-param name ="ParaId" select="$ParaId" />
                   <xsl:with-param name ="TypeId" select="concat('SL',$SlidePos)" />
@@ -713,6 +713,8 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:with-param name ="drawAnimId"  select ="$drawAnimId" />
                 <xsl:with-param name ="SlideRelationId" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
                 <xsl:with-param name ="grpCordinates" select ="$TopLevelgrpCordinates" />
+                <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                <xsl:with-param name ="layId" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
           </xsl:choose>
@@ -1211,6 +1213,7 @@ exclude-result-prefixes="p a r xlink rels">
                           <!--End-->
                           
                           <!-- Added by lohith.ar - Start - Mouse click hyperlinks -->
+							<xsl:variable name="varEventListener">
                           <office:event-listeners>
                             <xsl:for-each select ="p:txBody/a:p">
                               <xsl:choose>
@@ -1327,7 +1330,7 @@ exclude-result-prefixes="p a r xlink rels">
                                       <xsl:value-of select ="'simple'"/>
                                     </xsl:attribute>
                                     <xsl:attribute name ="xlink:show">
-                                      <xsl:value-of select ="'new'"/>
+                                      <xsl:value-of select ="'embed'"/>
                                     </xsl:attribute>
                                     <xsl:attribute name ="xlink:actuate">
                                       <xsl:value-of select ="'onRequest'"/>
@@ -1398,6 +1401,11 @@ exclude-result-prefixes="p a r xlink rels">
                               </xsl:choose>
                             </xsl:for-each>
                           </office:event-listeners>
+							</xsl:variable>
+							<xsl:if test="msxsl:node-set($varEventListener)//presentation:event-listener">
+								<xsl:copy-of select="$varEventListener"/>
+							</xsl:if>
+                          
                           <!-- End - Mouse click hyperlinks-->
                         </draw:frame >
                       </xsl:when>
@@ -1543,7 +1551,7 @@ exclude-result-prefixes="p a r xlink rels">
                                       <xsl:value-of select ="'simple'"/>
                                     </xsl:attribute>
                                     <xsl:attribute name ="xlink:show">
-                                      <xsl:value-of select ="'new'"/>
+                                      <xsl:value-of select ="'embed'"/>
                                     </xsl:attribute>
                                     <xsl:attribute name ="xlink:actuate">
                                       <xsl:value-of select ="'onRequest'"/>
@@ -1684,15 +1692,18 @@ exclude-result-prefixes="p a r xlink rels">
                                     <!--End-->
                                     
                                     <!-- Added by lohith.ar -->
+									  <xsl:if test="msxsl:node-set($EventListnerNode)//presentation:event-listener">
                                     <xsl:copy-of select ="$EventListnerNode"/>
+									  </xsl:if>
                                   </draw:frame >
 
                                 </xsl:otherwise>
                               </xsl:choose>
                             </xsl:when >
-                            <xsl:when test ="not((p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)] or 
+                            <!--  modified by vipul:for ODF1.1 conformance-->
+                            <xsl:when test ="(p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)] or 
 											p:nvSpPr/p:nvPr/p:ph/@idx[contains(.,$FrameIdx)])
-											and p:spPr/a:xfrm/a:off)">
+											and not(p:spPr/a:xfrm/a:off)">
                               <xsl:variable name ="LayoutRels">
                                 <xsl:for-each select ="document(concat(concat('ppt/slideLayouts/_rels',substring($LayoutFileNo,17)),'.rels'))
 													//node()/@Target[contains(.,'slideMasters')]">
@@ -1756,7 +1767,9 @@ exclude-result-prefixes="p a r xlink rels">
                                       <xsl:copy-of select ="$var_textNode"/>
                                       <!--End-->                                     
                                       <!-- Added by lohith.ar -->
+										<xsl:if test="msxsl:node-set($EventListnerNode)//presentation:event-listener">
                                       <xsl:copy-of select ="$EventListnerNode"/>
+										</xsl:if>
                                     </draw:frame >
                                   </xsl:when>
                                 </xsl:choose>
@@ -1824,6 +1837,14 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:choose>
         </xsl:for-each>
       </xsl:for-each>
+        <!--Conformance Test-->
+        <!-- added by vipul to draw Frame for notes-->
+        <!--start-->
+        <xsl:call-template name="tmpNotesDrawFrames">
+          <xsl:with-param name="slideRel" select="$slideRel"/>
+          <xsl:with-param name="SlidePos" select="$SlidePos"/>
+        </xsl:call-template>
+        <!--End-->
     </xsl:for-each>
   </xsl:template>
   <xsl:template name ="tmpOLEObjects">
@@ -1847,7 +1868,8 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:value-of select="./a:graphic/a:graphicData/p:oleObj/@spid"/>
     </xsl:variable>
     <xsl:variable name="OleImageRel">
-      <xsl:for-each select="document(concat('ppt',substring-after($vmldrawing,'..')))/node()/v:shape[@id=$spid]/v:imagedata">
+      <!-- Defect Fix:1992999	 PPTX - Roundtrip: OLE files/links lost -->
+      <xsl:for-each select="document(concat('ppt',substring-after($vmldrawing,'..')))/node()/v:shape[@id=$spid or @o:spid=$spid]/v:imagedata">
         <xsl:value-of  select="@o:relid"/>
       </xsl:for-each>
     </xsl:variable>
@@ -2019,10 +2041,17 @@ exclude-result-prefixes="p a r xlink rels">
    <xsl:param name ="SlidePos" />
    <xsl:param name ="drawAnimId" />
    <xsl:param name ="grpCordinates"/>
+   <xsl:param name ="multiple" select="'0'"/>
+   <!-- parameter added by chhavi:for ODF1.1 conformance-->
+   <xsl:param name ="layId"/>
    <draw:g>
+
+     <xsl:if test="$multiple='0'">
           <xsl:attribute name ="draw:id" >
 				<xsl:value-of  select ="$drawAnimId"/>
 			  </xsl:attribute>
+            </xsl:if>
+        
           <xsl:for-each select="node()">
             <xsl:message terminate="no">progress:a:p</xsl:message>
            <xsl:choose>
@@ -2062,6 +2091,9 @@ exclude-result-prefixes="p a r xlink rels">
                        <xsl:with-param name="grpBln" select="'true'"/>
                     <xsl:with-param name="groupPrefix" select="'Slidegroup'"/>
                    <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                        <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                        <xsl:with-param name ="layId" select="$layId"/>
+<xsl:with-param name ="slideId"  select ="$SlidePos"/>
                       </xsl:call-template>
                   </xsl:when>
                 </xsl:choose>
@@ -2083,6 +2115,7 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
                 <xsl:with-param name="grpBln" select="'true'"/>
                 <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+				  <xsl:with-param name ="slideId"  select ="$SlidePos"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -2107,6 +2140,8 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:with-param name ="drawAnimId"  select ="$drawAnimId" />
                 <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
                 <xsl:with-param name ="grpCordinates" select ="concat($grpCordinates,$InnerLevelgrpCordinates)" />
+                  <xsl:with-param name ="multiple" select ="'1'" />
+            <xsl:with-param name ="layId" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
           </xsl:choose>
@@ -6013,6 +6048,76 @@ exclude-result-prefixes="p a r xlink rels">
 		</xsl:choose>
 	</xsl:template>
 
+	<!--For only sound in slide transition : added by yeswanth.s-->
+	<xsl:template name="SmilTypeForOnlySound">
+		<xsl:param name="slidenum"/>
+		<xsl:for-each select="$slidenum/child::node()">
+			<xsl:choose>
+				<xsl:when test="name()='p:dissolve'">
+					<xsl:value-of select="'dissolve'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:wipe'">
+					<xsl:value-of select="'barWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:wheel'">
+					<xsl:value-of select="'pinWheelWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:pull'">
+					<xsl:value-of select="'slideWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:randomBar'">
+					<xsl:value-of select="'randomBarWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:checker'">
+					<xsl:value-of select="'checkerBoardWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:plus'">
+					<xsl:value-of select="'fourBoxWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:circle'">
+					<xsl:value-of select="'ellipseWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:diamond'">
+					<xsl:value-of select="'irisWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:wedge'">
+					<xsl:value-of select="'fanWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:blinds'">
+					<xsl:value-of select="'blindsWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:fade'">
+					<xsl:value-of select="'fade'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:cover'">
+					<xsl:value-of select="'slideWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:random'">
+					<xsl:value-of select="'random'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:push'">
+					<xsl:value-of select="'pushWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:split'">
+					<xsl:value-of select="'barnDoorWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:strips'">
+					<xsl:value-of select="'waterfallWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:zoom'">
+					<xsl:value-of select="'irisWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:newsflash'">
+					<xsl:value-of select="'fourBoxWipe'"/>
+				</xsl:when>
+				<xsl:when test="name()='p:comb'">
+					<xsl:value-of select="'pushWipe'"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:for-each>
+	</xsl:template>
+	<!--end-->
+
 	<xsl:template name="PresDuration">
 		<xsl:param name="TmVal"/>
 		<xsl:variable name="Hours">
@@ -6051,10 +6156,10 @@ exclude-result-prefixes="p a r xlink rels">
 		<xsl:param name="slidenum"/>
 		<xsl:param name="pageSlide"/>
 		<xsl:param name="FolderNameGUID"/>
-		<xsl:if test="msxsl:node-set($slidenum)/p:sld/p:transition/p:sndAc/p:stSnd">			
+		<xsl:if test="document($slidenum)/p:sld/p:transition/p:sndAc/p:stSnd">			
 			<presentation:sound xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
 				<xsl:variable name="hyperlinkrid">
-					<xsl:value-of select="msxsl:node-set($slidenum)/p:sld/p:transition/p:sndAc/p:stSnd/p:snd/@r:embed"/>
+					<xsl:value-of select="document($slidenum)/p:sld/p:transition/p:sndAc/p:stSnd/p:snd/@r:embed"/>
 				</xsl:variable>				
 				
 				<xsl:variable name="soundfilename">

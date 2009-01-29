@@ -164,7 +164,12 @@ Copyright (c) 2007, Sonata Software Limited
 
          <xsl:if test=".//draw:object or .//draw:object-ole">
            <xsl:choose>
+             <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
+                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
+               
+             </xsl:when>
              <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+             <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>
              <xsl:otherwise>
              
                <pzip:entry pzip:target="{concat('ppt/drawings/vmlDrawing',$CountSlide + position(),'.vml')}">
@@ -236,7 +241,12 @@ Copyright (c) 2007, Sonata Software Limited
 				</pzip:entry>
         <xsl:if test=".//draw:object or .//draw:object-ole">
           <xsl:choose>
+            <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
+                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
+              
+            </xsl:when>
             <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+            <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>
             <xsl:otherwise>
               <pzip:entry pzip:target="{concat('ppt/drawings/vmlDrawing',position(),'.vml')}">
                 <xsl:call-template name="CreateVmlDrawing">

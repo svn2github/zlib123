@@ -29,6 +29,7 @@ Copyright (c) 2007, Sonata Software Limited
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
 xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
 xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
 xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
@@ -3558,7 +3559,7 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:choose>
       <xsl:when test ="a:rPr/a:latin/@typeface"/>
       <xsl:when test ="a:rPr/a:ea/@typeface and a:rPr/@lang!='en-US'"/>
-      <xsl:when test ="parent::node()/parent::node()/parent::node()/parent::node()/p:style/a:fontRef/@idx"/>
+      <xsl:when test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/@idx"/>
       <xsl:when test ="a:rPr/a:sym/@typeface and a:rPr/@lang!='en-US'"/>
       <xsl:when test ="a:rPr/a:cs/@typeface and a:rPr/@lang!='en-US'"/>
       <xsl:otherwise>
@@ -4041,6 +4042,26 @@ exclude-result-prefixes="p a r xlink ">
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
+  </xsl:template>
+  <xsl:template name="tmpMenifestEntryForOLEobject">
+    <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+      <xsl:variable name ="pageSlide">
+        <xsl:value-of select ="concat(concat('ppt/slides/slide',position()),'.xml')"/>
+      </xsl:variable>
+      <xsl:for-each select ="document($pageSlide)/p:sld/p:cSld/p:spTree">
+        <xsl:for-each select="node()">
+          <xsl:if test="name()='p:graphicFrame'">
+            <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+              <manifest:file-entry manifest:media-type="application/vnd.sun.star.oleobject">
+                <xsl:attribute name="manifest:full-path">
+                  <xsl:value-of select="concat('Oleobject',generate-id())"/>
+                </xsl:attribute>
+              </manifest:file-entry>
+            </xsl:if>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:for-each>
   </xsl:template>
   <!--End-->
 </xsl:stylesheet>

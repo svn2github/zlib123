@@ -337,9 +337,20 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:choose>
                 </xsl:if >
     <xsl:if test ="@marL">
+      <!--added by chhvai for conformance 1.1-->
+      <xsl:choose>
+        <xsl:when test ="@indent">
                   <xsl:attribute name ="text:space-before">
         <xsl:value-of select="concat(format-number( (@marL + @indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
+      </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name ="text:space-before">
+            <xsl:value-of select="concat(format-number( @marL  div 360000, '#.##'), 'cm')"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+                 
                 </xsl:if>
   </xsl:template>
   <xsl:template name ="tmpSMListLevelStyle">
@@ -876,6 +887,8 @@ Copyright (c) 2007, Sonata Software Limited
                        <xsl:call-template name="InsertPicture">
                          <xsl:with-param name ="slideRel" select ="concat('ppt/slideMasters/_rels/',$slideMasterPath,'.rels')"/>
                          <xsl:with-param name="audio" select="'audio'"/>
+                           <!--Conformance Test-->
+                         <xsl:with-param name="slideId" select="$slideMasterName"/>
                        </xsl:call-template>
                      </xsl:if>
                      <xsl:if test="not(p:nvPicPr/p:nvPr/a:audioFile or p:nvPicPr/p:nvPr/a:wavAudioFile or p:nvPicPr/p:nvPr/a:videoFile)">
@@ -884,6 +897,8 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name="PicPosition" select="$var_pos"/>
                           <xsl:with-param name="MasterId" select="$slideMasterName"/>
                          <xsl:with-param name="srcName" select="'styles'"/>
+                         <!--Conformance Test-->
+                         <xsl:with-param name="slideId" select="$slideMasterName"/>
                        </xsl:call-template>
                      </xsl:if>
                   </xsl:for-each>
@@ -953,14 +968,13 @@ Copyright (c) 2007, Sonata Software Limited
                                         <xsl:if test ="name()='a:r'">
                                           <xsl:choose>
                                             <xsl:when test="$flagFooter !='1'">
-                                          <text:span>
+                                                <!--Conformance Test-->
+                                          <!--<text:span>-->
                                             <xsl:attribute name="text:style-name">
                                               <xsl:value-of select="concat($slideMasterName,generate-id())"/>
                                             </xsl:attribute>
-                                                <presentation:footer>
-                                                <xsl:call-template name="tmpFooterText"/>
-                                              </presentation:footer>
-                                              </text:span>
+                                                <presentation:footer/>
+                                              <!--</text:span>-->
                                                     </xsl:when>
                                             <xsl:when test="$flagFooter ='1'">
                                               <text:span>
@@ -1056,6 +1070,8 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select ="concat($slideMasterName,'PARA',$var_pos,generate-id())"/>
                   </xsl:variable>
                   <xsl:call-template name ="shapes">
+                    <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                    <xsl:with-param name ="layId" select="'true'"/>
                     <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                     <xsl:with-param name ="ParaId" select="$ParaId" />
                     <xsl:with-param name ="TypeId" select="$slideMasterName" />
@@ -1074,6 +1090,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select ="concat($slideMasterName,concat('PARA',$var_pos))"/>
                 </xsl:variable>
                 <xsl:call-template name ="shapes">
+                  <xsl:with-param name ="layId" select="'true'"/>
                   <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                   <xsl:with-param name ="ParaId" select="$ParaId" />
                   <xsl:with-param name ="TypeId" select="$slideMasterName" />
@@ -1118,7 +1135,8 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Code By Vijayeta
            Feature: HandoutMaster
            Date: 30th July '07-->
-      <style:handout-master>
+<!--Conformance Test-->
+      <style:handout-master style:page-layout-name="PMhandOut">
         <!-- warn orientation in Handout -->
         <xsl:message terminate="no">translation.oox2odf.handOutMasterTypeOrientation</xsl:message>
         <xsl:for-each select="document('ppt/presentation.xml')//p:handoutMasterIdLst/p:handoutMasterId">
@@ -1131,10 +1149,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:variable>
           <xsl:attribute name ="presentation:presentation-page-layout-name">
             <xsl:value-of select ="'AL0T26'"/>
-          </xsl:attribute>
-          <xsl:attribute name ="style:page-layout-name">
-            <xsl:value-of select ="'PMhandOut'"/>
-          </xsl:attribute>
+          </xsl:attribute>          
           <xsl:attribute name ="draw:style-name">
             <xsl:value-of select ="concat('dpHandout',$curPos)"/>
           </xsl:attribute>
@@ -5951,13 +5966,16 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
                 </xsl:call-template>
                   </xsl:if>
-               
-                <!--<xsl:call-template name="InsertPicture">
-                  <xsl:with-param name ="slideRel" select ="$SlideRelationId"/>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="name()='p:graphicFrame'">
+              <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+                <xsl:call-template name="tmpOLEObjects">
+                  <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
                 <xsl:with-param name="grpBln" select="'true'"/>
                   <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-                </xsl:call-template>-->
-              </xsl:for-each>
+                </xsl:call-template>
+              </xsl:if>
             </xsl:when>
             <xsl:when test="name()='p:sp'">
               <xsl:variable name="var_pos" select="position()"/>
@@ -5971,6 +5989,8 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:value-of select ="concat('SMgrp',$SlidePos,'PARA',$pos,'-', $var_pos)"/>
                       </xsl:variable>
                       <xsl:call-template name ="shapes">
+                        <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                        <xsl:with-param name ="layId" select="'true'"/>
                         <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                         <xsl:with-param name ="ParaId" select="$ParaId" />
                         <xsl:with-param name ="TypeId" select="$SlideID" />
@@ -5993,6 +6013,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="concat('SMgrp',$SlidePos,'PARA',$pos,'-', $var_pos)"/>
               </xsl:variable>
               <xsl:call-template name ="shapes">
+                    <!-- parameter added by chhavi:for ODF1.1 conformance-->
+                    <xsl:with-param name ="layId" select="'true'"/>
                 <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                 <xsl:with-param name ="ParaId" select="$ParaId" />
                 <xsl:with-param name ="TypeId" select="$SlideID" />
@@ -6217,6 +6239,10 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:when test="a:path">
                 <xsl:value-of select="'path'"/>
                       </xsl:when>
+<!--Conformance Test-->
+                      <xsl:otherwise>
+                        <xsl:value-of select="'linear'"/>
+                      </xsl:otherwise>
                     </xsl:choose>
           </xsl:variable>
           <xsl:for-each select="a:gsLst/a:gs">
@@ -6225,6 +6251,10 @@ Copyright (c) 2007, Sonata Software Limited
                <xsl:with-param name="SMName" select="$SMName"/>
                                     </xsl:call-template>
                                   </xsl:for-each>
+<!--Conformance Test-->
+     <!--modified by chhavi-->
+     <xsl:choose>
+       <xsl:when test ="a:lin">
            <xsl:for-each select="a:lin">
                   <xsl:if test="@ang">
                     <xsl:attribute name="draw:angle">
@@ -6245,6 +6275,8 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select="'linear'"/>
                   </xsl:attribute>
                 </xsl:for-each>
+       </xsl:when>
+       <xsl:when test ="./a:path">
           <xsl:for-each select="./a:path">
                   <xsl:choose>
                     <xsl:when test="@path='circle'">
@@ -6334,6 +6366,15 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:choose>
                   </xsl:for-each>
                 </xsl:for-each>
+       </xsl:when>
+       <xsl:otherwise>
+         <xsl:attribute name="draw:style">
+           <xsl:value-of select="'linear'"/>
+         </xsl:attribute>
+       </xsl:otherwise>
+     </xsl:choose>
+
+
               </xsl:template>
 <xsl:template name="tmpGradientStop">
     <xsl:param name="gradType"/>
