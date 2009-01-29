@@ -280,11 +280,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             // To get the input file name to be attached to the folder for transition sound.
             // for Commandline tool
-            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
-            {
-                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
-                    returnInputFilePath = Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[i + 1]);
-            }
+            //for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            //{
+            //    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+            //        returnInputFilePath = Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[i + 1]);
+            //}
 
             // To get the temporary file name to be attached to the folder for transition sound.
             //for addins
@@ -294,8 +294,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
 
             return returnInputFilePath;
-
-
 
         }
 
@@ -435,7 +433,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             hexGreen = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:x}", intGreen);
             hexBlue = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:x}", intBlue);
 
-            return ('#' + hexRed.ToUpper() + hexGreen.ToUpper() + hexBlue.ToUpper());
+
+                //modified by chhavi:for ODF1.1 conformance
+            return ('#' + hexRed.ToUpper().ToString().PadLeft(2, '0') + hexGreen.ToUpper().ToString().PadLeft(2, '0') + hexBlue.ToUpper().ToString().PadLeft(2, '0'));
 
         }
 

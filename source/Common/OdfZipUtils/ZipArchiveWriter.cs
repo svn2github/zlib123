@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006-2008 Clever Age
  * Copyright (c) 2006-2009 DIaLOGIKa
  *
@@ -1031,13 +1031,22 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             // TODO: refactor this terribly ugly part of code. It doesn't work anyway.       
             string returnOutputFilePath = "";
             string tempOutputFilePath = "";
+            bool varBatch = false;
 
             for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
             {
                 if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
-                    tempOutputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                    tempOutputFilePath = Environment.GetCommandLineArgs()[i + 1];
                 if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/O")
-                    returnOutputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                    returnOutputFilePath = Environment.GetCommandLineArgs()[i + 1];
+                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper().Contains("BATCH"))
+                    varBatch = true;
+
+            }
+            // for addins
+            if (returnOutputFilePath == "" && tempOutputFilePath == "")
+            {
+                return Environment.CurrentDirectory;
             }
 
             // if /O is not specified /I will remain the pool to copy output file
@@ -1045,14 +1054,21 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             {
                 returnOutputFilePath = tempOutputFilePath;
             }
-
-            //For addins
-            else
+            // if /O is specified /O will be the pool to copy output file
+            if (returnOutputFilePath != "")
             {
-                returnOutputFilePath = Environment.CurrentDirectory;
+
             }
 
+            
+            if (varBatch == true)
+            {
             return returnOutputFilePath;
+        }
+            else
+            {
+                return returnOutputFilePath.Substring(0, returnOutputFilePath.LastIndexOf("\\"));
+            }
         }
 
         #endregion
