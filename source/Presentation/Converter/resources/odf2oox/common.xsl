@@ -6039,6 +6039,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test="contains($type,'application/x-openoffice-gdimetafile')">
         <xsl:text>GDIMetaFile</xsl:text>
       </xsl:when>
+      <xsl:when test="$type=''">
+        <xsl:text>GDIMetaFile</xsl:text>
+      </xsl:when>
       <!-- picture is a WMF -->
       <xsl:when test="$type='application/x-openoffice-wmf;windows_formatname=&quot;Image WMF&quot;'">
         <xsl:text>wmf</xsl:text>
