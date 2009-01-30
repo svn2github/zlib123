@@ -276,6 +276,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         //To create the folder for the transition sound
         private string EvaltransFileName(string text)
         {
+              string[] arrVal =text.Split(':');
+
             string returnInputFilePath = "";
 
             // To get the input file name to be attached to the folder for transition sound.
@@ -291,6 +293,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (returnInputFilePath == "")
             {
                 returnInputFilePath = System.IO.Path.GetFileNameWithoutExtension(OdfConverter.OdfConverterLib.AbstractConverter.inputTempFileName);
+                returnInputFilePath = arrVal[1] + returnInputFilePath + arrVal[2];
             }
 
             return returnInputFilePath;
