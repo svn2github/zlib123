@@ -452,6 +452,10 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     _delegateWriter.WriteEndAttribute();
                 }
             }
+            else
+            {
+                _currentPzipAttribute = null;
+            }
         }
 
         // TODO: throw an exception if "target" attribute not set
@@ -623,9 +627,10 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             {
                 if (_currentPzipAttribute != null)
                 {
-                    // store attribute value
-                    _currentPzipAttribute.Value = text;
-                    _currentPzipAttribute = null;
+                    // store attribute value (concatenation is needed because attribute value may consist of 
+                    // more than one node when using XSL attribute value templates (i.e. curly braces {})
+                    _currentPzipAttribute.Value += text;
+                    //
                 }
             }
         }
