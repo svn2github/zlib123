@@ -152,20 +152,78 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <!--percentage style -->
           <xsl:when test="contains(substring-before(@formatCode,';'),'%')">
             <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:variable name="numTxtNodes">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
                   <xsl:value-of select="substring-before(@formatCode,';')"/>
                 </xsl:with-param>
               </xsl:call-template>
               <number:text>%</number:text>
+              </xsl:variable>
+              <xsl:if test="$numTxtNodes">
+                <xsl:for-each select="msxsl:node-set($numTxtNodes)/child::node()">
+                  <xsl:variable name="intPos" select="position()"/>
+                  <xsl:choose>
+                    <xsl:when test="name()='number:text'">
+                      <xsl:choose>
+                        <xsl:when test="../child::node()[$intPos - 1][name()='number:text']"/>
+                        <xsl:when test="../child::node()[$intPos + 1][name()='number:text']">
+                          <number:text>
+                            <xsl:call-template name="tmpNumTxtNode">
+                              <xsl:with-param name="NumTxtnode" select="$numTxtNodes"/>
+                              <xsl:with-param name="intPos" select="$intPos"/>
+                              <xsl:with-param name="numTxtVal" select="./node()"/>
+                            </xsl:call-template>
+                          </number:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
+              </xsl:if>
             </number:percentage-style>
             <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:variable name="numTxtNodes">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
                   <xsl:value-of select="substring-after(@formatCode,';')"/>
                 </xsl:with-param>
               </xsl:call-template>
               <number:text>%</number:text>
+              </xsl:variable>
+              <xsl:if test="$numTxtNodes">
+                <xsl:for-each select="msxsl:node-set($numTxtNodes)/child::node()">
+                  <xsl:variable name="intPos" select="position()"/>
+                  <xsl:choose>
+                    <xsl:when test="name()='number:text'">
+                      <xsl:choose>
+                        <xsl:when test="../child::node()[$intPos - 1][name()='number:text']"/>
+                        <xsl:when test="../child::node()[$intPos + 1][name()='number:text']">
+                          <number:text>
+                            <xsl:call-template name="tmpNumTxtNode">
+                              <xsl:with-param name="NumTxtnode" select="$numTxtNodes"/>
+                              <xsl:with-param name="intPos" select="$intPos"/>
+                              <xsl:with-param name="numTxtVal" select="./node()"/>
+                            </xsl:call-template>
+                          </number:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
+              </xsl:if>
               <style:map style:condition="value()&gt;=0"
                 style:apply-style-name="{concat(generate-id(.),'P0')}"/>
             </number:percentage-style>
@@ -451,12 +509,41 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <!--percentage style -->
           <xsl:when test="contains(@formatCode,'%')">
             <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:variable name="numTxtNodes">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
                   <xsl:value-of select="@formatCode"/>
                 </xsl:with-param>
               </xsl:call-template>
               <number:text>%</number:text>
+              </xsl:variable>
+              <xsl:if test="$numTxtNodes">
+                <xsl:for-each select="msxsl:node-set($numTxtNodes)/child::node()">
+                  <xsl:variable name="intPos" select="position()"/>
+                  <xsl:choose>
+                    <xsl:when test="name()='number:text'">
+                      <xsl:choose>
+                        <xsl:when test="../child::node()[$intPos - 1][name()='number:text']"/>
+                        <xsl:when test="../child::node()[$intPos + 1][name()='number:text']">
+                          <number:text>
+                            <xsl:call-template name="tmpNumTxtNode">
+                              <xsl:with-param name="NumTxtnode" select="$numTxtNodes"/>
+                              <xsl:with-param name="intPos" select="$intPos"/>
+                              <xsl:with-param name="numTxtVal" select="./node()"/>
+                            </xsl:call-template>
+                          </number:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
+              </xsl:if>
             </number:percentage-style>
           </xsl:when>
 
