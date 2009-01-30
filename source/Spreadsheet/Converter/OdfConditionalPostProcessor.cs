@@ -30,6 +30,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 08-sep-2008 Sandeep S     New feature   Changes for formula implementation.
+RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named range 'C' and 'R' with _C and _R.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 */
 
@@ -387,6 +388,18 @@ namespace CleverAge.OdfConverter.Spreadsheet
             strOdfFormula = strOdfFormula.Replace('!', ' ');
             //replace &apos; with ' operator
             strOdfFormula = strOdfFormula.Replace("&apos;", "'");
+            //Start of RefNo-2
+            //replace c with _c
+            strOdfFormula = Regex.Replace(strOdfFormula, @"\b[C|c]\b", "_C");
+            strOdfFormula = strOdfFormula.Replace("$_C$", "$C$");
+            strOdfFormula = strOdfFormula.Replace("$_C", "$C");
+            strOdfFormula = strOdfFormula.Replace("_C$", "C$");
+            //replace r with _r
+            strOdfFormula = Regex.Replace(strOdfFormula, @"\b[R|r]\b", "_R");
+            strOdfFormula = strOdfFormula.Replace("$_R$", "$R$");
+            strOdfFormula = strOdfFormula.Replace("$_R", "$R");
+            strOdfFormula = strOdfFormula.Replace("_R$", "R$");
+            //End of RefNo-2
             /*The functions whose names end with _ADD return the same results as the corresponding Microsoft Excel functions. Use the functions without _ADD to get results based on international standards. For example, the WEEKNUM function calculates the week number of a given date based on international standard ISO 6801, while WEEKNUM_ADD returns the same week number as Microsoft Excel.
              XML representation contains the namespace com.sun.star.sheet.addin.Analysis.getWeeknum(*/
             strOdfFormula = strOdfFormula.Replace("com.sun.star.sheet.addin.Analysis.get", "");

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -25,6 +25,13 @@
   * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -467,7 +474,6 @@
         </xsl:for-each>
 
         <!-- Insert next Table -->
-
         <xsl:apply-templates select="following-sibling::e:sheet[1]" mode="Validation">
             <xsl:with-param name="number">
                 <xsl:value-of select="$number + 1"/>
@@ -491,7 +497,7 @@
     <xsl:template name="InsertValidationProperties">
         <xsl:param name="sheet"/>
 		<xsl:param name="sheetName"/>
-        <table:content-validations>
+      <!--RefNo-1:ODF1.1:Commented and moved to calling template:to avoid repetition<table:content-validations>-->
             <xsl:call-template name="InsertValidation">
                 <xsl:with-param name="sheet">
                     <xsl:value-of select="$sheet"/>
@@ -500,14 +506,16 @@
 					<xsl:value-of select="$sheetName"/>
 				</xsl:with-param>
             </xsl:call-template>
-        </table:content-validations>
+        <!--</table:content-validations>-->
     </xsl:template>
 
     <!-- Insert Data Validation -->
     <xsl:template name="InsertValidation">
         <xsl:param name="sheet"/>
 		<xsl:param name="sheetName"/>
-
+		<xsl:variable name ="apos">
+			<xsl:text>&apos;</xsl:text>
+		</xsl:variable>
         <xsl:for-each select="e:dataValidation">
             <xsl:sort select="@priority"/>
             <table:content-validation>
@@ -515,10 +523,8 @@
                     <xsl:value-of select="concat('val', $sheet) "/>
                     <xsl:number/>
                 </xsl:attribute>
-
                 <!-- Criteria Data -->
                 <xsl:attribute name="table:condition">
-
                     <xsl:variable name="valuue">
                         <xsl:value-of select="e:formula1"/>
                     </xsl:variable>
@@ -538,8 +544,6 @@
                             </xsl:choose>
                         </xsl:if>
                     </xsl:variable>
-
-
                     <xsl:choose>
                         <xsl:when test="contains(@type, 'whole')">
                             <xsl:text>oooc:cell-content-is-whole-number()</xsl:text>
@@ -554,7 +558,6 @@
                             <xsl:text>oooc:cell-content-is-time()</xsl:text>
                         </xsl:when>
                     </xsl:choose>
-
                     <xsl:choose>
                         <xsl:when
                             test="contains(@type, 'textLength') and contains(@operator, 'lessThanOrEqual')">
@@ -591,7 +594,6 @@
                         <xsl:when test="contains(@type, 'textLength') and e:formula2">
                             <xsl:value-of select="$chooseeBetween"/>
                         </xsl:when>
-
                         <xsl:otherwise>
                             <xsl:variable name="valuee">
                                 <xsl:value-of select="e:formula1"/>
@@ -613,7 +615,6 @@
                                     </xsl:choose>
                                 </xsl:if>
                             </xsl:variable>
-
                             <xsl:choose>
                                 <xsl:when test="contains(@operator, 'lessThanOrEqual')">
                                     <xsl:value-of
@@ -644,7 +645,6 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
-
                 <xsl:if test="contains(@type, 'list')">
                     <xsl:choose>
                         <xsl:when test="contains(@type, 'list')">
@@ -714,12 +714,36 @@
                     </xsl:attribute>
 					
 		    <!--Code Added By Sateesh-->
+			<!--ODF1.1 Conformance 
+				   'table:base-cell-address' shd contain sheetx.cell, for ex sheet1.c11 and not sheet1.c11 d33 f44
+			-->
 		    <xsl:attribute name="table:base-cell-address">
-			<xsl:value-of select="concat($sheetName,'.',@sqref)"/>
+				<xsl:if test ="@sqref and (substring-after(@sqref,' ')!='')">
+					<!--<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(@sqref,' '))"/>-->
+					<xsl:choose>
+						<xsl:when test ="contains(@sqref,':')" >
+							<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(substring-before(@sqref,':'),' '))"/>
+						</xsl:when>
+						<xsl:when test ="not(contains(@sqref,':'))" >
+							<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(@sqref,' '))"/>
+						</xsl:when>
+					</xsl:choose>					
+				</xsl:if>
+				<xsl:if test ="@sqref and (substring-after(@sqref,' ')='')">
+					<!--<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',@sqref)"/>-->
+					<xsl:choose>
+						<xsl:when test ="contains(@sqref,':')" >
+							<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(@sqref,':'))"/>							
+						</xsl:when>
+						<xsl:when test ="not(contains(@sqref,':'))" >
+							<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',@sqref)"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:if>
+				<!--<xsl:value-of select="concat($sheetName,'.',@sqref)"/>-->
 		    </xsl:attribute>
 		    <!--End-->
                 </xsl:if>
-
                 <!-- Criteria Allow Blank Cells -->
                 <xsl:attribute name="table:allow-empty-cell">
                     <xsl:choose>
@@ -729,7 +753,6 @@
                         <xsl:otherwise>false</xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
-
 
 	    <xsl:if test="@promptTitle != '' and @prompt !=''">
                 <table:help-message>

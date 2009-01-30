@@ -100,6 +100,10 @@
           <xsl:call-template name="InsertChartEntries"/>
         </manifest:manifest>
       </pzip:entry>
+      <!--mimeType -->
+      <pzip:copy pzip:source="#CER#SpreadsheetConverter.dll#CleverAge.OdfConverter.Spreadsheet.resources.mimetype#" pzip:target="mimetype"/>
+      <!-- mime -->
+      <!--<pzip:copy pzip:source="#CER#SpreadsheetConverter.dll#CleverAge.OdfConverter.Spreadsheet.resources.mimetype#" pzip:target="mimetype" />-->
 
       <!-- main content -->
       <pzip:entry pzip:target="content.xml">

@@ -161,7 +161,6 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   <!-- insert column styles from selected sheet -->
   <xsl:template name="InsertSheetColumnStyles">
     <xsl:param name="sheet"/>
-
     <xsl:variable name="ManualColBreaks">
       <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
         <xsl:value-of select="concat(@id,';')"/>
@@ -1388,6 +1387,9 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </xsl:for-each>
   </xsl:template>
 
+	<!-- ODF1.1 Conformance
+			   style:name has a value Normal 2/Heading 1 etc.. replaced as Normal to match the type NCName
+    -->
   <xsl:template match="e:xf" mode="stylesandformating">
     <xsl:variable name="Xfid">
       <xsl:value-of select="@xfId"/>
@@ -1396,7 +1398,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
       test="$Xfid != '0' and not(preceding-sibling::e:xf/@xfId = $Xfid) and key('CellStylesId', @xfId)/@name != 'Default'">
       <style:style>
         <xsl:attribute name="style:name">
-          <xsl:value-of select="key('CellStylesId', @xfId)/@name"/>
+					<xsl:value-of select="translate(translate(key('CellStylesId', @xfId)/@name,' ',''),'0123456789%!-$#():,.+','')"/>
         </xsl:attribute>
         <xsl:attribute name="style:family">
           <xsl:text>table-cell</xsl:text>

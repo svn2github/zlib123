@@ -32,6 +32,7 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content missing and 1832335 New line inserted in note content after roundtrip conversions                                              
 RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
+RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance  
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -78,6 +79,7 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
     <xsl:param name="rowNum"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="rSheredStrings"/>
+    <xsl:param name ="CheckIfNote"/>
 
     <xsl:variable name="partId" select="ancestor::e:worksheet/@oox:part" />
 	  <xsl:variable name="extLink">
@@ -178,6 +180,21 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
           <xsl:value-of select="e:v"/> 
         </xsl:variable>-->
         <!--end-->
+        <!--Start of RefNo-3:ODF1.1:Added office:annotation abv text node-->
+        <xsl:if test="$CheckIfNote = 'true'">
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <!--End of RefNo-3-->
         <text:p>
           <xsl:choose>
             <xsl:when test="key('ref',@r)[@oox:part = $partId]">
@@ -259,6 +276,21 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
         <xsl:attribute name="office:value-type">
           <xsl:text>string</xsl:text>
         </xsl:attribute>
+        <!--Start of RefNo-3:ODF1.1:Added office:annotation abv text node-->
+        <xsl:if test="$CheckIfNote = 'true'">
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <!--End of RefNo-3-->
         <text:p>
           <xsl:value-of select="e:v"/>
         </text:p>
@@ -274,6 +306,27 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
+        <!--RefNo-3:Added office:value attribute in case of folat.-->
+        <xsl:if test="number(e:v)">
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="number(e:v)"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!--Start of RefNo-3:ODF1.1:Added office:annotation abv text node-->
+        <xsl:if test="$CheckIfNote = 'true'">
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <!--End of RefNo-3-->
         <text:p>
           <xsl:choose>
             <xsl:when test="number(e:v)">
@@ -299,6 +352,21 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
         <xsl:attribute name="office:value">
           <xsl:value-of select="e:v"/>
         </xsl:attribute>
+        <!--Start of RefNo-3:ODF1.1:Added office:annotation abv text node-->
+        <xsl:if test="$CheckIfNote = 'true'">
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <!--End of RefNo-3-->
         <text:p>
           <xsl:call-template name="FormatNumber">
             <xsl:with-param name="value">
@@ -328,6 +396,21 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
             </xsl:otherwise>            
           </xsl:choose>
         </xsl:attribute>
+        <!--Start of RefNo-3:ODF1.1:Added office:annotation abv text node-->
+        <xsl:if test="$CheckIfNote = 'true'">
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <!--End of RefNo-3-->
         <text:p>
           <xsl:choose>
             <xsl:when test="e:v = '0'">
@@ -358,7 +441,8 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
           </xsl:call-template>
         </xsl:variable>
 
-        <xsl:attribute name="office:value-type">
+        <!--Start of RefNo-3:ODF1.1:used variable to store value type-->
+        <xsl:variable name="valueType">
           <xsl:choose>
             <xsl:when
               test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
@@ -397,8 +481,12 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
               <xsl:text>float</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:attribute>
+        </xsl:variable>
 
+        <xsl:attribute name="office:value-type">
+          <xsl:value-of select="$valueType"/>
+        </xsl:attribute>
+        <!--End of RefNo-3-->
         <xsl:choose>
           <xsl:when
             test="((contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)) and not(contains($numStyle, '[$$-409]') or contains($numStyle, '[$Sk-41B]') or contains($numStyle, '[$Din.-81A]') or contains($numStyle, '[$€-180C]') or contains($numStyle, '[$€-1007]'))">
@@ -431,11 +519,29 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
+            <!--RefNo-3:ODF1.1: Avoid office value if value type is string-->
+             <xsl:if test="$valueType != 'string'">
             <xsl:attribute name="office:value">
               <xsl:value-of select="e:v"/>
             </xsl:attribute>
+            </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
+        <!--Start of RefNo-3:ODF1.1:Added office:annotation abv text node-->
+        <xsl:if test="$CheckIfNote = 'true'">
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <!--End of RefNo-3-->
         <text:p>
           <xsl:choose>
 

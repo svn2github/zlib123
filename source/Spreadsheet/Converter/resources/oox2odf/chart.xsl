@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -253,6 +260,14 @@
             <!-- Sonata: Data lableNumber format-->
             <xsl:apply-templates select="c:numFmt"/>
           </xsl:for-each>
+
+          <!--<xsl:for-each select="key('numPoints', @oox:part)//c:numRef/c:numCache">-->
+          <!--changed by sonata for bug no:2107193-->
+          <xsl:for-each select="key('numPoints', c:chartSpace/@oox:part)/descendant::c:numRef/c:numCache">
+            <xsl:apply-templates select="c:formatCode"/>
+          </xsl:for-each>
+          <!--end-->
+
 
           <xsl:choose>
             <!-- for stock chart type 3 and 4 -->
@@ -713,12 +728,67 @@
     <xsl:call-template name="InsertSeriesData">
       <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
     </xsl:call-template>
-
-    <xsl:for-each select="preceding-sibling::c:ser[1]">
+<!--commented by sonata for bug no:2107193-->
+    <!--<xsl:for-each select="preceding-sibling::c:ser[1]">
       <xsl:call-template name="InsertSeriesReversed">
         <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
       </xsl:call-template>
-    </xsl:for-each>
+    </xsl:for-each>-->
+<!--end-->
+    
+  </xsl:template>
+   
+  <xsl:template name="ConvertCellRange">
+    <xsl:param name="cellRange"/>
+    <xsl:param name="finalChrtRng" select="''"/>
+    <xsl:variable name="rngToCnv">
+      <xsl:choose>
+        <xsl:when test="(starts-with($cellRange, '(') or contains(substring($cellRange,string-length($cellRange)-1),')')) and contains($cellRange,',')">
+          <xsl:value-of select="substring(substring-before($cellRange,','),1)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="contains($cellRange,')')">
+              <xsl:value-of select="substring($cellRange,0,string-length($cellRange))"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$cellRange"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="sheetname">
+      <xsl:choose>
+        <xsl:when test="starts-with(substring-before($rngToCnv,'!'), '(')">
+          <xsl:value-of select="substring(substring-before($rngToCnv,'!'),1)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-before($rngToCnv,'!')"/>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:variable>
+    <xsl:variable name="range">
+      <xsl:value-of select="substring-after($rngToCnv,'!')"/>
+    </xsl:variable>
+    <xsl:variable name="rangeFrm">
+      <xsl:value-of select="substring-before($range,':')"/>
+    </xsl:variable>
+    <xsl:variable name="rangeTo">
+      <xsl:value-of select="substring-after($range,':')"/>
+    </xsl:variable>
+    <xsl:variable name="chartRange">
+      <xsl:choose>
+        <xsl:when test="contains($range,':')">
+          <xsl:value-of select="concat($sheetname,'.',$rangeFrm,':',$sheetname,'.',$rangeTo)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat($sheetname,'.',$range)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$chartRange"/>
   </xsl:template>
 
   <xsl:template name="InsertSeriesData">
@@ -734,9 +804,51 @@
     </xsl:variable>
 
     <chart:series chart:style-name="{concat('series',$seriesNumber)}">
+      <!--added by sonata for bug no:2107116-->
+      <!--reference to the series value-->
+      <xsl:if test="c:val//c:f">
+       <xsl:variable name="cellRange">
+        <xsl:value-of select="c:val//c:f"/>
+        </xsl:variable>
+
+
+
+        <xsl:variable name="rangeVal">
+          <xsl:call-template name="ConvertCellRange">
+            <xsl:with-param name="cellRange" select="$cellRange"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="not(contains($cellRange,'#REF!'))">
+          <xsl:attribute name="chart:values-cell-range-address">
+            <xsl:value-of select="translate($rangeVal,'(','')"/>
+          </xsl:attribute>
+        </xsl:if> 
+          </xsl:if>
+      <!--end-->
       <xsl:if
         test="(key('plotArea', @oox:part)/c:scatterChart or key('plotArea', @oox:part)/c:bubbleChart) and position() = 1">
-        <chart:domain/>
+        <chart:domain>
+          <!--added for filename:c1 f1 miseryindexrev.xlsx-->
+          
+          <xsl:if test="key('xNumPoints', @oox:part)//c:f">
+          <xsl:variable name="cellRange">
+              <xsl:value-of select="key('xNumPoints', @oox:part)//c:f"/>
+            </xsl:variable>
+            
+            <xsl:variable name="rangeVal">
+              <xsl:call-template name="ConvertCellRange">
+                <xsl:with-param name="cellRange" select="$cellRange"/>
+              </xsl:call-template>
+            </xsl:variable>            
+          
+            <xsl:if test="not(contains($cellRange,'#REF!'))">
+              <xsl:attribute name="table:cell-range-address">
+                <xsl:value-of select="$rangeVal"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+          <!--end-->
+        </chart:domain>
       </xsl:if>
       <!-- for stock chart type 3 and type 4 -->
       <xsl:if test="key('plotArea', @oox:part)/c:stockChart and key('plotArea', @oox:part)/c:barChart">
@@ -1070,9 +1182,13 @@
               <table:table-cell>
                 <text:p/>
               </table:table-cell>
-              <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()/c:ser[last()]">
+              <!--changed by sonata for bug no:2107193-->
+              <!--<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()/c:ser[last()]">-->
+              <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()/c:ser">
                 <xsl:call-template name="InsertHeaderRowsReverse"/>
               </xsl:for-each>
+              <!--end-->
+
             </table:table-row>
           </xsl:when>
 
@@ -1101,6 +1217,8 @@
           <xsl:with-param name="categories" select="key('categories', c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
           <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
           <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+          <!--changed by sonata for bug no:2107193-->
+          <xsl:with-param name="pointIndex" select="'-1'"/>
         </xsl:call-template>
       </table:table-rows>
 
@@ -1160,14 +1278,15 @@
         </xsl:choose>
       </text:p>
     </table:table-cell>
-
-    <xsl:if test="preceding-sibling::c:ser">
+    <!--changed by sonata for bug no:2107193-->
+    <!--<xsl:if test="preceding-sibling::c:ser">
       <xsl:for-each select="preceding-sibling::c:ser[1]">
         <xsl:call-template name="InsertHeaderRowsReverse">
           <xsl:with-param name="count" select="$count + 1"/>
         </xsl:call-template>
       </xsl:for-each>
-    </xsl:if>
+    </xsl:if>-->
+    <!--end-->
   </xsl:template>
 
   <xsl:template name="InsertDataRows">
@@ -1182,6 +1301,8 @@
     <!-- (number) loop counter -->
     <xsl:param name="reverseCategories"/>
     <xsl:param name="reverseSeries"/>
+    <!--changed by sonata for bug no:2107193-->
+    <xsl:param name="pointIndex"/>
 
     <xsl:variable name="categoryNumber">
       <xsl:choose>
@@ -1207,7 +1328,8 @@
                 <xsl:when test="$count &lt; $categories">
                   <!--changed by sonata for bug no:2152759-->
                   <xsl:choose>
-                    <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:barChart/c:barDir/@ val='bar' or key('plotArea', c:chartSpace/@oox:part)/c:bar3DChart">
+                    <!--condition is modified for the file Pie_Chart_Legend.xlsx-->
+                    <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:barChart/c:barDir/@ val='bar' or key('plotArea', c:chartSpace/@oox:part)/c:bar3DChart or key('plotArea', c:chartSpace/@oox:part)/c:pieChart">
                       <xsl:value-of
                                         select="key('categories', c:chartSpace/@oox:part)/descendant::c:pt[@idx= $count]"/>
                     </xsl:when>
@@ -1229,22 +1351,67 @@
             <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[position() = 1]">
               <xsl:choose>
                 <xsl:when test="c:xVal">
-                  <table:table-cell office:value-type="float"
-                    office:value="{c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v}">
+                  <table:table-cell>
+                    <!--Start of RefNo-1: ODF1.1 Changes to avoid office:value when office:value-type="string"-->
+                    <!--office:value-type="float"
+                    office:value="{c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v}">-->
                     <!--Sonata: fix for defect 2168527 XLSX-roundtrip: Data contend of all charts lost-->
-                    <xsl:attribute name="office:value-type">
+                    <xsl:variable name="value" select="c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v"/>                      
                       <xsl:choose>
                         <xsl:when test="c:xVal/c:strRef">
+                          <xsl:attribute name="office:value-type">
                           <xsl:value-of select="'string'"/>
+                          </xsl:attribute>                         
                         </xsl:when>
                         <xsl:when test="c:xVal/c:numRef">
+                          <xsl:attribute name="office:value-type">
                           <xsl:value-of select="'float'"/>
+                          </xsl:attribute>                          
+                          <xsl:attribute name="office:value">
+                            <xsl:choose>
+                              <xsl:when test="$value != ''">
+                                <xsl:value-of select="$value"/>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="'0'"/>
+                              </xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:attribute>
                         </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:attribute name="office:value-type">
+                          <xsl:value-of select="'float'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="office:value">
+                            <xsl:choose>
+                              <xsl:when test="$value != ''">
+                                <xsl:value-of select="$value"/>
+                        </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="'0'"/>
+                              </xsl:otherwise>
                       </xsl:choose>
                     </xsl:attribute>
+                        </xsl:otherwise>
+                      </xsl:choose>                    
                     <text:p>
-                      <xsl:value-of select="c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v"/>
+                      <xsl:choose>
+                        <xsl:when test="c:xVal/c:strRef">
+                          <xsl:value-of select="$value"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:choose>
+                            <xsl:when test="$value != ''">
+                              <xsl:value-of select="$value"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="'0'"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </text:p>
+                    <!--End of RefNo-1-->
                   </table:table-cell>
                 </xsl:when>
                 <xsl:otherwise>
@@ -1263,6 +1430,9 @@
             <xsl:when test="$reverseSeries = 'true' ">
               <xsl:call-template name="InsertValuesReverse">
                 <xsl:with-param name="point" select="$categoryNumber"/>
+                <!--changed by sonata for bug no:2107193-->
+                <xsl:with-param name="pointIndex" select="$pointIndex+1"/>
+
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -1278,6 +1448,9 @@
           <xsl:with-param name="points" select="$points"/>
           <xsl:with-param name="categories" select="$categories"/>
           <xsl:with-param name="count" select="$count + 1"/>
+          <!--changed by sonata for bug no:2107193-->
+          <xsl:with-param name="pointIndex" select="$pointIndex+1"/>
+
           <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
           <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
         </xsl:call-template>
@@ -1312,11 +1485,13 @@
             </text:p>
           </table:table-cell>
         </xsl:when>
-        <xsl:otherwise>
+        <!--<xsl:otherwise>
+          Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN"
           <table:table-cell office:value-type="float" office:value="1.#NAN">
             <text:p>1.#NAN</text:p>
-          </table:table-cell>
-        </xsl:otherwise>
+          </table:table-cell>-->          
+          <!--End of RefNo-1
+        </xsl:otherwise>-->
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
@@ -1327,30 +1502,45 @@
 
     <xsl:param name="point"/>
     <!-- (number) series number -->
-    <xsl:param name="count" select="0"/>
+    <xsl:param name="count" select="1"/>
+<xsl:param name="pointIndex"/>
 
-    <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[last() - $count]">
+    <xsl:variable name="noOfSeries">
+      <xsl:value-of select="count(key('dataSeries', c:chartSpace/@oox:part))"/>
+    </xsl:variable>
+
+
+    <!--changed by sonata for bug no:2107193-->
+    <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[position() = $count]">   
       <xsl:choose>
-        <xsl:when test="c:val/descendant::c:pt[@idx = $point]">
+        <xsl:when test="c:val/descendant::c:pt[@idx = $pointIndex]">
           <table:table-cell office:value-type="float"
-            office:value="{c:val/descendant::c:pt[@idx = $point]/c:v}">
+            office:value="{c:val/descendant::c:pt[@idx = $pointIndex]/c:v}">
             <text:p>
-              <xsl:value-of select="c:val/descendant::c:pt[@idx = $point]/c:v"/>
+              <xsl:value-of select="c:val/descendant::c:pt[@idx = $pointIndex]/c:v"/>
             </text:p>
           </table:table-cell>
         </xsl:when>
-        <xsl:otherwise>
+        <!--<xsl:otherwise>
+          Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN"
           <table:table-cell office:value-type="float" office:value="1.#NAN">
             <text:p>1.#NAN</text:p>
-          </table:table-cell>
-        </xsl:otherwise>
+          </table:table-cell>-->
+          <!--End of RefNo-1
+        </xsl:otherwise>-->
       </xsl:choose>
     </xsl:for-each>
+    <!--end-->
 
-    <xsl:if test="key('dataSeries', c:chartSpace/@oox:part)[last() - $count - 1]">
-      <xsl:call-template name="InsertValuesReverse">
+
+    <xsl:if test="$count + 1 &lt;= $noOfSeries">
+      <!--<xsl:if test="key('dataSeries', c:chartSpace/@oox:part)[$count+1]">-->
+
+    <xsl:call-template name="InsertValuesReverse">
         <xsl:with-param name="point" select="$point"/>
         <xsl:with-param name="count" select="$count + 1"/>
+        <!--changed by sonata for bug no:2107193-->
+        <xsl:with-param name="pointIndex" select="$pointIndex"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
@@ -1487,14 +1677,7 @@
           </chart:title>
         </xsl:when>
       </xsl:choose>
-
-      <xsl:if test="c:majorGridlines">
-        <chart:grid chart:style-name="majorGridX" chart:class="major"/>
-      </xsl:if>
-      <xsl:if test="c:minorGridlines">
-        <chart:grid chart:style-name="minorGridX" chart:class="minor"/>
-      </xsl:if>
-
+      <!--start of RefNo-1: ODF1.1 :Moved chart chart:categories tag above chart:grid -->
       <xsl:variable name="points">
         <xsl:choose>
           <!-- for scatter chart -->
@@ -1512,6 +1695,13 @@
           <xsl:value-of select="concat('local-table.A2:.A',1 + $points)"/>
         </xsl:attribute>
       </chart:categories>
+      <!--End of RefNo-1-->
+      <xsl:if test="c:majorGridlines">
+        <chart:grid chart:style-name="majorGridX" chart:class="major"/>
+      </xsl:if>
+      <xsl:if test="c:minorGridlines">
+        <chart:grid chart:style-name="minorGridX" chart:class="minor"/>
+      </xsl:if>
     </chart:axis>
 
   </xsl:template>
@@ -1590,7 +1780,8 @@
     <chart:chart svg:width="13.066cm" svg:height="9.279cm" chart:class="chart:bar"
       chart:style-name="chart">
 
-      <xsl:attribute name="chart:class">
+      <!--RefNo-1:ODF1.1-->
+      <xsl:variable name="chartType">
         <xsl:choose>
           <!-- for Stock Chart type 3 and type 4-->
           <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:stockChart and key('plotArea', c:chartSpace/@oox:part)/c:barChart">
@@ -1637,13 +1828,17 @@
             <xsl:text>chart:bar</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:variable>
+      <xsl:attribute name="chart:class">
+        <xsl:value-of select="$chartType"/>
       </xsl:attribute>
 
       <xsl:call-template name="InsertTitle"/>
       <xsl:call-template name="InsertLegend"/>
 
-      <chart:plot-area chart:style-name="plot_area" chart:table-number-list="0" svg:x="0.26cm"
-        svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">
+      <!--RefNo-1:ODF1.1:removed chart:table-number-list-->
+      <!--<chart:plot-area chart:style-name="plot_area" chart:table-number-list="0" svg:x="0.26cm"  svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">-->
+      <chart:plot-area chart:style-name="plot_area" svg:x="0.26cm"  svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">
         <!-- Axes -->
         <xsl:choose>
           <!-- stock chart type 3 and stock chart type 4 -->
@@ -1765,7 +1960,9 @@
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[last()]">
+            <!--chnaged by sonata for bug no:2107193-->
+            <!--<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[last()]">-->
+            <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)">
               <xsl:call-template name="InsertSeriesReversed">
                 <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
               </xsl:call-template>
@@ -1775,9 +1972,8 @@
 
         <chart:wall chart:style-name="wall"/>
         <chart:floor chart:style-name="floor"/>
-
-        <chart:stock-range-line chart:style-name="stock-range"/> 
-        
+        <!--RefNo-1:ODF1.1:commented ellement chart:stock-range-line:chk for the bug fix:2015044-->
+        <!--<chart:stock-range-line chart:style-name="stock-range"/>-->
       </chart:plot-area>
 
       <xsl:call-template name="InsertChartTable"/>
@@ -2100,13 +2296,28 @@
           <xsl:choose>
             <!-- custom title -->
             <!-- sonata: defect#2154917  -->
-            <xsl:when test="c:legendEntry/c:tx">
+
+            <!--commented by sonata for bug no:2203898-->
+            <!--<xsl:when test="c:legendEntry/c:tx">
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:legendEntry/c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                 <xsl:with-param name="defRPr" select="c:legendEntry/c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
               </xsl:call-template>
+            </xsl:when>-->
+            <!--end-->
+
+            <!--added by sonata for bug no:2203898-->
+            <xsl:when test="c:legendEntry/c:txPr">
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:legendEntry/c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                <xsl:with-param name="defRPr" select="c:legendEntry/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              </xsl:call-template>
             </xsl:when>
+            <!--end-->
+
+
             <!-- default title -->
             <xsl:otherwise>
               <xsl:call-template name="TextBoxRunProperties">
@@ -2427,7 +2638,503 @@
         </xsl:choose>
       </style:text-properties>
     </style:style>
+<!--style added for file name:Pie_Chart_Legend.xlsx-->
+    <style:style style:name="secondary_axis-y" style:family="chart">
+      <!--code added by sonata for bug no:2107205-->
+      <xsl:choose>
+        <xsl:when test="$numberformat!=''">
+          <xsl:attribute name="style:data-style-name">
+            <xsl:value-of select="$dataStyleName"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="style:data-style-name">
+            <xsl:value-of select="N0"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      <!--end-->
+      <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
+        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="true"
+        text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
+        style:direction="ltr">
+
+        <xsl:call-template name="SetAxisChartProperties">
+          <xsl:with-param name="axisId" select="$axisXId"/>
+        </xsl:call-template>
+
+      </style:chart-properties>
+      <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
+        svg:stroke-color="#000000">
+        <xsl:for-each select="c:spPr">
+          <xsl:call-template name="InsertLineColor"/>
+          <xsl:call-template name="InsertLineStyle"/>
+        </xsl:for-each>
+      </style:graphic-properties>
+      <style:text-properties fo:font-family="Calibri"  style:font-family-generic="swiss"
+        style:font-pitch="variable" fo:font-size="10pt"
+        style:font-family-asian="&apos;MS Gothic&apos;"
+        style:font-family-generic-asian="system" style:font-pitch-asian="variable"
+        style:font-size-asian="10pt" style:font-family-complex="Tahoma"
+        style:font-family-generic-complex="system" style:font-pitch-complex="variable"
+        style:font-size-complex="10pt">
+        <xsl:choose>
+          <!-- custom title -->
+          <xsl:when test="c:tx">
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+              <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:when>
+          <!-- default title -->
+          <xsl:otherwise>
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </style:text-properties>
+    </style:style>
+    
+    <!--end-->
+
   </xsl:template>
+
+ 
+  <!--changed by sonata for bug no:2107193-->
+
+  <xsl:template match="c:formatCode">
+
+    <!-- @Descripition: inserts number format style -->
+    <!-- @Context: None -->
+
+    <xsl:variable name="formatingMarks">
+      <xsl:call-template name="StripText">
+        <xsl:with-param name="formatCode" select="."/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+
+      <!-- date style -->
+      <xsl:when
+        test="(contains($formatingMarks,'y') or (contains($formatingMarks,'m') and not(contains($formatingMarks,'h') or contains($formatingMarks,'s')))or (contains($formatingMarks,'d') and not(contains($formatingMarks,'Red'))))">
+        <number:date-style style:name="{generate-id(.)}">
+          <xsl:call-template name="ProcessFormat">
+            <xsl:with-param name="format">
+              <xsl:choose>
+                <xsl:when test="contains(.,']')">
+                  <xsl:value-of select="substring-after(.,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="."/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="processedFormat">
+              <xsl:choose>
+                <xsl:when test="contains(.,']')">
+                  <xsl:value-of select="substring-after(.,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="."/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </number:date-style>
+      </xsl:when>
+
+      <!-- time style -->
+      <!-- 'and' at the end is for latvian currency -->
+      <xsl:when
+        test="contains($formatingMarks,'h') or contains($formatingMarks,'s') and not(contains($formatingMarks, '$Ls-426' ))">
+        <number:time-style style:name="{generate-id(.)}">
+          <xsl:if test="contains($formatingMarks,'[h')">
+            <xsl:attribute name="number:truncate-on-overflow">false</xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="ProcessFormat">
+            <xsl:with-param name="format">
+              <xsl:choose>
+                <xsl:when test="contains(.,'[h')">
+                  <xsl:value-of select="translate(translate(.,'[h','h'),']','')"/>
+                </xsl:when>
+                <xsl:when test="contains(.,']')">
+                  <xsl:value-of select="substring-after(.,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="."/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="processedFormat">
+              <xsl:choose>
+                <xsl:when test="contains(.,'[h')">
+                  <xsl:value-of select="translate(translate(.,'[h','h'),']','')"/>
+                </xsl:when>
+                <xsl:when test="contains(.,']')">
+                  <xsl:value-of select="substring-after(.,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="."/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </number:time-style>
+      </xsl:when>
+
+      <!-- when there are different formats for positive and negative numbers -->
+      <xsl:when
+        test="contains(.,';') and not(contains(substring-after(.,';'),';'))">
+        <xsl:choose>
+
+          <!-- currency style -->
+          <xsl:when
+            test="contains(substring-before(.,';'),'$') or contains(substring-before(.,';'),'zł') or contains(substring-before(.,';'),'€') or contains(substring-before(.,';'),'£')">
+            <number:currency-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+            <number:currency-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:currency-style>
+          </xsl:when>
+
+          <!--percentage style -->
+          <xsl:when test="contains(substring-before(.,';'),'%')">
+            <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+            </number:percentage-style>
+            <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:percentage-style>
+          </xsl:when>
+
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+            <number:number-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:number-style>
+          </xsl:otherwise>
+
+        </xsl:choose>
+      </xsl:when>
+
+      <!-- when there are separate formats for positive numbers, negative numbers and zeros -->
+      <xsl:when test="contains(.,';') and contains(substring-after(.,';'),';')">
+        <xsl:choose>
+
+          <!-- currency style -->
+          <xsl:when
+            test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
+            <number:currency-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+            <number:currency-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(.,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(.,';'),';'),';')">
+                <number:currency-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(.,';'),';'),';')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:currency-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <xsl:variable name="text">
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(.,';'),';'),';')"
+                    />
+                  </xsl:variable>
+                  <xsl:choose>
+
+                    <!-- text content -->
+                    <xsl:when test="contains($text,'@')">
+                      <number:text>
+                        <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
+                      </number:text>
+                      <number:text-content/>
+                      <number:text>
+                        <xsl:value-of select="translate(substring-after($text,'@'),'_-',' ')"/>
+                      </number:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($text,'_-',' ')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:currency-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(.,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:currency-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+
+          <!-- percentage style -->
+          <xsl:when test="contains(substring-before(.,';'),'%')">
+            <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:percentage-style>
+            <number:percentage-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(.,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:percentage-style>
+
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(.,';'),';'),';')">
+                <number:percentage-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(.,';'),';'),';')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:percentage-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <xsl:variable name="text">
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(.,';'),';'),';')"
+                    />
+                  </xsl:variable>
+                  <xsl:choose>
+
+                    <!-- text content -->
+                    <xsl:when test="contains($text,'@')">
+                      <number:text>
+                        <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
+                      </number:text>
+                      <number:text-content/>
+                      <number:text>
+                        <xsl:value-of select="translate(substring-after($text,'@'),'_-',' ')"/>
+                      </number:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($text,'_-',' ')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:percentage-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(.,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:percentage-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(.,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+            <number:number-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(.,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
+                <number:number-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(.,';'),';'),';')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:number-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <xsl:variable name="text">
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(.,';'),';'),';')"
+                    />
+                  </xsl:variable>
+                  <xsl:choose>
+
+                    <!-- text content -->
+                    <xsl:when test="contains($text,'@')">
+                      <number:text>
+                        <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
+                      </number:text>
+                      <number:text-content/>
+                      <number:text>
+                        <xsl:value-of select="translate(substring-after($text,'@'),'_-',' ')"/>
+                      </number:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($text,'_-',' ')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:number-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(.,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:number-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:choose>
+
+          <!-- currency style -->
+          <xsl:when
+            test="contains(.,'$') or contains(.,'zł') or contains(.,'€') or contains(.,'£')">
+            <number:currency-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="."/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+          </xsl:when>
+
+          <!--percentage style -->
+          <xsl:when test="contains(.,'%')">
+            <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="."/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+            </number:percentage-style>
+          </xsl:when>
+
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode" select="."/>
+              </xsl:call-template>
+            </number:number-style>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+
+    </xsl:choose>
+
+  </xsl:template>
+
+  <!--end-->
+
+
+
+
+
 
  
   <xsl:template match="c:numFmt">
@@ -2634,7 +3341,10 @@
                       </number:text>
                     </xsl:when>
                     <xsl:otherwise>
+                      <!--RefNo-1:ODF1.1:Added <number:text> element to include the text value-->
+                      <number:text>
                       <xsl:value-of select="translate($text,'_-',' ')"/>
+                      </number:text>
                     </xsl:otherwise>
                   </xsl:choose>
                   <style:map style:condition="value()&gt;0"
@@ -2708,7 +3418,10 @@
                       </number:text>
                     </xsl:when>
                     <xsl:otherwise>
+                      <!--RefNo-1:ODF1.1:Added <number:text> element to include the text value-->
+                      <number:text>
                       <xsl:value-of select="translate($text,'_-',' ')"/>
+                      </number:text>
                     </xsl:otherwise>
                   </xsl:choose>
                   <style:map style:condition="value()&gt;0"
@@ -2782,7 +3495,10 @@
                       </number:text>
                     </xsl:when>
                     <xsl:otherwise>
+                      <!--RefNo-1:ODF1.1:Added <number:text> element to include the text value-->
+                      <number:text>
                       <xsl:value-of select="translate($text,'_-',' ')"/>
+                      </number:text>
                     </xsl:otherwise>
                   </xsl:choose>
                   <style:map style:condition="value()&gt;0"
@@ -2960,6 +3676,31 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:for-each>
+        <!--changed by sonata for bug no:2107193-->
+
+        <xsl:for-each select="c:val/c:numRef/c:numCache">
+
+          <xsl:variable name="formatcode">
+            <xsl:if test="c:formatCode">
+              <xsl:value-of select="."/>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="$formatcode!=''">
+              <xsl:attribute name="style:data-style-name">
+                <xsl:value-of select="generate-id(c:formatCode)"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="style:data-style-name">
+                <xsl:value-of select="N0"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:for-each>
+        <!--end-->
+
         
       
         <style:chart-properties>

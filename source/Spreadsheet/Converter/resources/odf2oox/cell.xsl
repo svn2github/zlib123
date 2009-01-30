@@ -127,8 +127,20 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         </xsl:if>
 
         <xsl:if test="@table:default-cell-style-name != 'Default' ">
+          
+          <!--added by sonata for bug no:2165930-->
+          <xsl:for-each select="key('style',@table:default-cell-style-name)">
+            <xsl:attribute name="style">
+              <xsl:value-of
+                select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
+            </xsl:attribute>
+          </xsl:for-each>
+          <!--end-->
+          
+          <!--commented by sonata for bug no:2165930-->
+          
           <!-- column style is when in all posible rows there is a cell in this column -->
-          <xsl:variable name="checkColumnStyle">
+          <!--<xsl:variable name="checkColumnStyle">
             <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
               <xsl:call-template name="CheckIfColumnStyle">
                 <xsl:with-param name="number" select="$colNumber"/>
@@ -144,7 +156,9 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                   select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:attribute>
             </xsl:for-each>
-          </xsl:if>
+          </xsl:if>-->
+          <!--end-->
+          
         </xsl:if>
       </col>
     </xsl:if>
@@ -594,6 +608,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
 
         <!-- insert row height -->
         <xsl:if test="$height">
+          <!--added condition by sonata for bug no:2107295-->
+        <xsl:if test="$height!=0">
           <xsl:attribute name="ht">
             <xsl:value-of select="$height"/>
           </xsl:attribute>
@@ -602,8 +618,28 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
             <xsl:attribute name="customHeight">1</xsl:attribute>
           </xsl:if>
         </xsl:if>
+        </xsl:if>
+        <!--changed by sonata for bug no:2165930-->
+        <xsl:if test="table:table-cell/@table:style-name">
+          <xsl:attribute name="customFormat">
+            <xsl:value-of select="1"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!--end-->
+        <!--changed by sonata for bug no:2165930--> 
+      
+          <xsl:variable name="stylerepeated">
+            <xsl:value-of select="table:table-cell[last()]/@table:style-name"/>
+          </xsl:variable>
+          <xsl:for-each select="key('style',$stylerepeated)">
+            <xsl:attribute name="s">
+              <xsl:value-of
+                select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
+            </xsl:attribute>
+          </xsl:for-each>
 
 
+        <!--end-->
         <!--get parent table:table-row id-->
         <xsl:variable name="rowId">
           <xsl:value-of select="generate-id(.)"/>

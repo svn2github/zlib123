@@ -141,6 +141,9 @@
     <Content Include="Converter.csproj" />
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\mimetype" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if exist "C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\xsltc.exe" (

@@ -26,14 +26,22 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="e"
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  xmlns:msxsl="urn:schemas-microsoft-com:xslt"
+  exclude-result-prefixes="e msxsl"
                  xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart">
  
-
   <xsl:template match="e:numFmt" mode="automaticstyles">
 
     <!-- @Descripition: inserts number format style -->
@@ -238,7 +246,10 @@
                       </number:text>
                     </xsl:when>
                     <xsl:otherwise>
+                      <!--RefNo-1:ODF1.1:Added <number:text> element to include the text value-->
+                      <number:text>
                       <xsl:value-of select="translate($text,'_-',' ')"/>
+                      </number:text>
                     </xsl:otherwise>
                   </xsl:choose>
                   <style:map style:condition="value()&gt;0"
@@ -312,7 +323,10 @@
                       </number:text>
                     </xsl:when>
                     <xsl:otherwise>
+                      <!--RefNo-1:ODF1.1:Added <number:text> element to include the text value-->
+                      <number:text>
                       <xsl:value-of select="translate($text,'_-',' ')"/>
+                      </number:text>
                     </xsl:otherwise>
                   </xsl:choose>
                   <style:map style:condition="value()&gt;0"
@@ -386,7 +400,10 @@
                       </number:text>
                     </xsl:when>
                     <xsl:otherwise>
+                      <!--RefNo-1:ODF1.1:Added <number:text> element to include the text value-->
+                      <number:text>
                       <xsl:value-of select="translate($text,'_-',' ')"/>
+                      </number:text>
                     </xsl:otherwise>
                   </xsl:choose>
                   <style:map style:condition="value()&gt;0"
@@ -483,17 +500,8 @@
         <xsl:with-param name="formatCode" select="$formatCode"/>
         <xsl:with-param name="preserveCurrency" select="'true'"/>
       </xsl:call-template>
-    </xsl:variable>
-    
-    <!-- adding '\' -->
-    <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
-      <xsl:call-template name="AddNumberText">
-        <xsl:with-param name="format">
-          <xsl:value-of select="$realFormatCode"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-
+    </xsl:variable> 
+   
     <!-- handle red numbers -->
     <xsl:if test="contains($strippedFormat,'Red')">
       <style:text-properties fo:color="#ff0000"/>
@@ -523,6 +531,23 @@
       <style:text-properties fo:color="#ffffff"/>
     </xsl:if>
 
+    <!--RefNo-1:ODF1.1:Moved node number:text after style:text-properties:Added node to a varaible to chk 
+    in the next step whether number:text is alrteady added.-->
+    <!-- adding '\' -->
+    <!--RefNo-1:ODF1.1:Added variable to chk <number:text> node repetition-->
+    <xsl:variable name="numTxtNodes">
+    <!--<xsl:variable name="numTxtNode">-->
+      <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
+        <xsl:call-template name="AddNumberText">
+          <xsl:with-param name="format">
+            <xsl:value-of select="$realFormatCode"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
+    <!--</xsl:variable>-->
+    <!--RefNo-1:ODF1.1:Adding the variable value-->
+    <!--<xsl:copy-of select="$numTxtNode"/>-->
+    
     <xsl:variable name="currencyFormat">
       <xsl:choose>
         <xsl:when test="contains($realFormatCode,'&quot;zł&quot;')">zł</xsl:when>
@@ -540,6 +565,9 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!--RefNo-1:ODF1.1:Added condition to chk variable $numTxtNode is already added.-->
+    <!--<xsl:if test="$numTxtNode=''">-->
+      
     <!-- add text at the beginning -->
     <xsl:if
       test="contains(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;') and not($currencyFormat and $currencyFormat != '' and contains(substring-before(substring-after(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;'),$currencyFormat))">
@@ -608,6 +636,7 @@
       test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#')) and contains(substring-before($realFormatCode,$currencyFormat),'-')">
       <number:text>-</number:text>
     </xsl:if>
+    <!--</xsl:if>-->
 
     <xsl:choose>
       <xsl:when test="contains($realFormatCode,'E+0')">
@@ -688,6 +717,67 @@
         <xsl:with-param name="realFormatCode" select="$realFormatCode"/>
       </xsl:call-template>
     </xsl:if>
+    </xsl:variable>
+    <xsl:if test="$numTxtNodes">
+      
+     
+      <xsl:for-each select="msxsl:node-set($numTxtNodes)/child::node()">
+        <xsl:variable name="intPos" select="position()"/>
+        <xsl:choose>
+          <xsl:when test="name()='number:text'">
+            <xsl:choose>
+              <xsl:when test="../child::node()[$intPos - 1][name()='number:text']"/>
+              <xsl:when test="../child::node()[$intPos + 1][name()='number:text']">
+                <!--<xsl:choose>
+                  <xsl:when test="./node() != ' '">
+                    <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos+1]"/>
+                  </xsl:otherwise>
+                </xsl:choose>-->
+                <number:text>
+                  <xsl:call-template name="tmpNumTxtNode">
+                    <xsl:with-param name="NumTxtnode" select="$numTxtNodes"/>
+                    <xsl:with-param name="intPos" select="$intPos"/>
+                    <xsl:with-param name="numTxtVal" select="./node()"/>
+                  </xsl:call-template>
+                </number:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:copy-of select="msxsl:node-set($numTxtNodes)/child::node()[$intPos]"/>
+          </xsl:otherwise>
+        </xsl:choose>       
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="tmpNumTxtNode">
+    <xsl:param name="NumTxtnode"/>
+    <xsl:param name="intPos"/>
+    <xsl:param name="numTxtVal"/>
+
+    <xsl:variable name="numTxtValVar">
+      <!--<xsl:value-of select="msxsl:node-set($NumTxtnode)/child::node()[$intPos]"/>-->
+      <xsl:value-of select="msxsl:node-set($NumTxtnode)/child::node()[$intPos+1]"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="msxsl:node-set($NumTxtnode)/child::node()[$intPos+2][name()='number:text']">
+        <xsl:call-template name="tmpNumTxtNode">
+          <xsl:with-param name="NumTxtnode" select="$NumTxtnode"/>
+          <xsl:with-param name="intPos" select="$intPos+1"/>
+          <xsl:with-param name="numTxtVal" select="concat($numTxtVal,$numTxtValVar)"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat($numTxtVal,$numTxtValVar)"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="CheckEndText">
@@ -1497,7 +1587,7 @@
         <xsl:choose>
 
           <!-- minutes -->
-          <xsl:when test="contains(substring-before($format,'m'),'h')">
+          <xsl:when test="contains(substring-before($format,'m'),'h') or contains(substring-after($format,'m'),'s')">
             <xsl:choose>
               <xsl:when test="starts-with(substring-after($processedFormat,'m'),'m')">
                 <number:minutes number:style="long"/>
@@ -1710,9 +1800,12 @@
       </xsl:when>
       <xsl:when test="string-length($processedFormat) = 0"/>
       <xsl:otherwise>
+        <!--RefNo-1:ODF1.1:Added Condition to avoid space in number:text:chk if seperator is space-->
+        <xsl:if test="not(substring($processedFormat,0,2)=' ')">
         <number:text>
           <xsl:value-of xml:space="preserve" select="substring($processedFormat,0,2)"/>
         </number:text>
+        </xsl:if>
         <xsl:call-template name="ProcessFormat">
           <xsl:with-param name="format" select="$format"/>
           <xsl:with-param name="processedFormat">

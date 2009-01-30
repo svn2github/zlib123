@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -490,6 +497,8 @@
 
   <!-- Insert Conditional -->
   <xsl:template name="InsertConditional">
+    <!--RefNO-1:ODF1.1:to aviod text-properties if alerady inserted-->
+    <xsl:param name="FrmCellFormat" select="'false'"/>
 
     <xsl:variable name="sqref">
       <xsl:value-of select="@sqref"/>
@@ -506,7 +515,9 @@
 		</xsl:choose>      	
     </xsl:variable>
     
-    <xsl:if test="$s != ''">
+    <!--RefNo-1:ODF1.1:Moved text-properties to follow map and added condition  and $FrmCellFormat = 'false' to chk if text-properties alerady inserted-->
+    
+    <xsl:if test="$s != '' and $FrmCellFormat = 'false'">
    
       <style:text-properties>
         <xsl:apply-templates select="key('Part', 'xl/styles.xml')/e:styleSheet/e:fonts/e:font[@oox:id = key('Xf', $s)/@fontId]"
@@ -616,14 +627,16 @@
 
   <xsl:template match="e:dxf">
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
-      <style:text-properties>
-        <xsl:apply-templates select="e:font[1]" mode="style"/>
-      </style:text-properties>
+      
       <style:table-cell-properties>
         <xsl:variable name="this" select="."/>
         <xsl:apply-templates select="e:fill" mode="style"/>
         <xsl:call-template name="InsertBorder"/>
       </style:table-cell-properties>
+      <!--RefNo-1:ODF1.1:Moved text-properties to follow table-cell-properties-->
+      <style:text-properties>
+        <xsl:apply-templates select="e:font[1]" mode="style"/>
+      </style:text-properties>
     </style:style>
   </xsl:template>
 
@@ -680,7 +693,10 @@
 
         <xsl:for-each
           select="key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')]">
-          <xsl:call-template name="InsertConditional"/>
+          <xsl:call-template name="InsertConditional">
+            <!--RefNO-1:ODF1.1:to aviod text-properties if alerady inserted-->
+            <xsl:with-param name="FrmCellFormat" select="'true'"/>
+          </xsl:call-template>
         </xsl:for-each>
       </style:style>
 
@@ -735,7 +751,10 @@
           </xsl:call-template>
           </xsl:for-each>
       
-      <xsl:call-template name="InsertConditional"/>
+        <xsl:call-template name="InsertConditional">
+          <!--RefNO-1:ODF1.1:to aviod text-properties if alerady inserted-->
+          <xsl:with-param name="FrmCellFormat" select="'true'"/>
+        </xsl:call-template>
       
       </style:style>
       

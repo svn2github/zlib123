@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
@@ -79,17 +86,22 @@
 
     <xsl:choose>
       <!-- when sheet is empty  -->
+      <!--RefNo-1:ODF1.1:Changed condition to chk for row index lessthan @r &lt; 65537]
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = '' and $NoteCell = '' and $ConditionalCell = '' and $ValidationCell = '' and $AllRowBreakes = '' ">
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = '' and $NoteCell = '' and $ConditionalCell = '' and $ValidationCell = '' and $AllRowBreakes = '' ">-->
+      <xsl:when
+        test="not(e:worksheet/e:sheetData/e:row[@r &lt; 65537]/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = '' and $NoteCell = '' and $ConditionalCell = '' and $ValidationCell = '' and $AllRowBreakes = '' ">
         <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
           table:number-rows-repeated="65536">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
       <!-- when there are only picture, conditional and note in sheet  -->
+      <!--RefNo-1:ODF1.1:Changed condition to chk for row index lessthan @r &lt; 65537]
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and ($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '' or $ValidationCell != '' or $AllRowBreakes != '')">
-
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and ($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '' or $ValidationCell != '' or $AllRowBreakes != '')">-->
+      <xsl:when
+              test="not(e:worksheet/e:sheetData/e:row[@r &lt; 65537]/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and ($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '' or $ValidationCell != '' or $AllRowBreakes != '')">
         <xsl:call-template name="InsertEmptySheetWithElements">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -146,7 +158,8 @@
         </xsl:call-template>
 
       </xsl:when>
-      <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row/e:c">
+      <!--RefNo-1:ODF1.1:Added condition [@r &lt; 65537]-->
+      <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row[@r &lt; 65537]/e:c">
         <table:table-row table:style-name="ro1">
           <table:covered-table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -530,6 +543,8 @@
               </table:table-cell>
             </xsl:when>
             <xsl:otherwise>
+              <!--RefNo-1:ODF1.1:Added empty cell to avoid uncompleted content model-->
+                <table:table-cell/>
               <xsl:message terminate="no">translation.oox2odf.ColNumber</xsl:message>
             </xsl:otherwise>
           </xsl:choose>
@@ -1135,6 +1150,9 @@
             </xsl:attribute>
           </xsl:if>
 
+          
+          
+          
           <xsl:if test="e:v">
             <xsl:call-template name="InsertText">
               <xsl:with-param name="position">
@@ -1210,8 +1228,8 @@
 			  </xsl:if>
 
           </xsl:if>
-
-          <xsl:if test="$CheckIfNote = 'true'">
+          <!--RefNo-1:ODF1.1:Moved Note node above the text node:For that code is moved to InsertText template-->
+          <!--<xsl:if test="$CheckIfNote = 'true'">
             <xsl:call-template name="InsertNoteInThisCell">
               <xsl:with-param name="rowNum">
                 <xsl:value-of select="$rowNum"/>
@@ -1223,7 +1241,7 @@
                 <xsl:value-of select="$sheetNr"/>
               </xsl:with-param>
             </xsl:call-template>
-          </xsl:if>
+          </xsl:if>-->
 
 
         </table:table-cell>
@@ -1272,9 +1290,12 @@
             </xsl:variable>
             <xsl:if test="$horizontal = 'centerContinuous' ">
               <table:covered-table-cell>
+                <!--RefNo-1:ODF1.1:Added condtion to chk if the value is greater than 0-->
+                <xsl:if test="$continuous - 1 &gt; 0">
                 <xsl:attribute name="table:number-columns-repeated">
                   <xsl:value-of select="$continuous - 1"/>
                 </xsl:attribute>
+                </xsl:if>
                 <xsl:attribute name="table:style-name">
                   <xsl:value-of select="generate-id(key('Xf', '0'))"/>
                 </xsl:attribute>

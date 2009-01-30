@@ -1976,9 +1976,15 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
                 <xsl:value-of select ="'Dash'"/>
             </xsl:when>
 
-            <xsl:when test="(a:prstDash/@val = 'dash' ) and (@cap = 'rnd' )">
+            <!--changed by sonata for bug no:2229924-->
+            <!--<xsl:when test="(a:prstDash/@val = 'dash' ) and (@cap = 'rnd' )">
                 <xsl:value-of select ="'dashRound'"/>
+            </xsl:when>-->
+            <xsl:when test="(a:prstDash/@val = 'dash' ) and (@cap = 'rnd' )">
+              <xsl:value-of select ="'Ultrafine_20_Dashed'"/>
             </xsl:when>
+            <!--end of change-->
+            
 
             <xsl:when test="a:prstDash/@val = 'dash' ">
                 <xsl:value-of select ="'Ultrafine_20_Dashed'"/>

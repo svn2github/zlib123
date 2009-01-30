@@ -46,11 +46,9 @@
 
 
   <xsl:template name="InsertPilotTables">
-
     <xsl:variable name="pivotSheets">
       <xsl:call-template name="PivotSheets"/>
     </xsl:variable>
-
     <xsl:if test="$pivotSheets !=''">
       <table:data-pilot-tables>
         <xsl:call-template name="CreatePilotTables">
@@ -58,7 +56,6 @@
         </xsl:call-template>
       </table:data-pilot-tables>
     </xsl:if>
-
   </xsl:template>
 
   <xsl:template name="PivotSheets">
@@ -93,7 +90,6 @@
 
   <xsl:template name="CreatePilotTables">
     <xsl:param name="pivotSheets"/>
-
     <xsl:if test="$pivotSheets != '' ">
       <xsl:call-template name="InsertSheetPilotTables">
         <xsl:with-param name="sheetNum" select="substring-before($pivotSheets,',')"/>
@@ -102,16 +98,13 @@
         <xsl:with-param name="pivotSheets" select="substring-after($pivotSheets,',')"/>
       </xsl:call-template>
     </xsl:if>
-
   </xsl:template>
 
   <!-- search  target Pivot file-->
   <xsl:template name="InsertSheetPilotTables">
     <xsl:param name="sheetNum"/>
-
     <xsl:for-each
       select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[position() = $sheetNum]">
-
       <xsl:variable name="sheetName">
         <xsl:call-template name="CheckSheetName">
           <xsl:with-param name="sheetNumber">
@@ -139,7 +132,6 @@
 
       <xsl:for-each
         select="key('Part', concat('xl/worksheets/_rels/',$fileName,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'pivotTable' )]">
-
         <xsl:variable name="TargetPilotFile">
           <xsl:value-of select="substring-after(@Target,'../')"/>
         </xsl:variable>
@@ -157,10 +149,19 @@
 				  </xsl:with-param>
 			  </xsl:call-template>
 		  </xsl:variable>
+				<xsl:variable name ="isNamedRange">
+					<xsl:choose>
+						<xsl:when test ="starts-with($OneMoreValidation,'true')">
+							<xsl:value-of select ="substring-after($OneMoreValidation,'true|')"/>
+						</xsl:when>
+						<xsl:when test ="starts-with($OneMoreValidation,'false')">
+							<xsl:value-of select ="''"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
 		  <!-- Vijayeta, 1803593,sales.xlsx-->
         <xsl:if test="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
           <xsl:for-each select="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
-
             <xsl:variable name="name">
               <xsl:value-of select="@name"/>
             </xsl:variable>
@@ -171,9 +172,9 @@
               </xsl:for-each>
             </xsl:variable>
 				  <!-- Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
-				  <xsl:if test ="$OneMoreValidation='true'">
+						<!--<xsl:if test ="$OneMoreValidation='true' and not(starts-with($isNamedRange,'OFFSET') or starts-with($isNamedRange,'offset'))">-->
+						<xsl:if test ="starts-with($OneMoreValidation,'true') and not(starts-with($isNamedRange,'OFFSET') or starts-with($isNamedRange,'offset') or contains($isNamedRange,'OFFSET') or contains($isNamedRange,'offset'))">
             <table:data-pilot-table table:name="{$name}">
-
               <xsl:for-each select="e:location">
 
                 <xsl:variable name="firstTargetAdress">
@@ -268,7 +269,6 @@
                 </xsl:attribute>
 
               </xsl:for-each>
-
               <!-- locate cache for this pivot table -->
 						  <!--<xsl:variable name="cacheFile">
                 <xsl:for-each
@@ -303,16 +303,16 @@
 								<xsl:value-of select ="@ref"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:variable name ="isNamedRange">
+														<!--<xsl:variable name ="isNamedRange">
 									<xsl:call-template name ="CheckIfNamedRange">
 										<xsl:with-param name ="name">
 											<xsl:value-of select ="@name"/>
 										</xsl:with-param>
 									</xsl:call-template>
-								</xsl:variable>
+														</xsl:variable>-->
 								<xsl:choose>
 									<xsl:when test ="$isNamedRange!=''">
-										<xsl:value-of select ="$isNamedRange"/>
+																<xsl:value-of select ="concat('true:',$isNamedRange)"/>
 									</xsl:when>
 									<xsl:otherwise>
 										<xsl:variable name ="tblSheetName">
@@ -322,7 +322,7 @@
 												</xsl:with-param>
 											</xsl:call-template>
 										</xsl:variable>
-										<xsl:value-of select ="$tblSheetName"/>
+																<xsl:value-of select ="concat('false:',$tblSheetName)"/>
 									</xsl:otherwise>
 								</xsl:choose>
 								<!--<xsl:variable name ="tableName">
@@ -332,13 +332,22 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
+											<!--ODF1.1 Conformance-->
                   <xsl:variable name="sheetSourceName">
 						<xsl:choose>
 							<xsl:when test ="$isSourceSimpleData='true'">
 								<xsl:value-of select ="@sheet"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select ="substring-after($sourceRange,'|')"/>
+														<xsl:choose>
+															<xsl:when test ="starts-with($sourceRange,'true:')">
+																<xsl:value-of select ="$sourceRange"/>
+															</xsl:when>
+															<xsl:when test ="starts-with($sourceRange,'false:')">
+																<xsl:value-of select ="translate(substring-after($sourceRange,'|'),$apos,'')"/>
+															</xsl:when>
+														</xsl:choose>
+
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
@@ -348,7 +357,14 @@
 								<xsl:value-of select="substring-before($sourceRange,':')"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="substring-before(substring-before($sourceRange,'|'),':')"/>
+														<xsl:choose>
+															<xsl:when test ="starts-with($sourceRange,'true:')">
+																<xsl:value-of select ="$sourceRange"/>
+															</xsl:when>
+															<xsl:when test ="starts-with($sourceRange,'false:')">
+																<xsl:value-of select="substring-before(substring-before(substring-after($sourceRange,'false:'),'|'),':')"/>
+															</xsl:when>
+														</xsl:choose>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
@@ -358,7 +374,15 @@
 								<xsl:value-of select="substring-after($sourceRange,':')"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="substring-after(substring-before($sourceRange,'|'),':')"/>
+														<xsl:choose>
+															<xsl:when test ="starts-with($sourceRange,'true:')">
+																<xsl:value-of select ="$sourceRange"/>
+															</xsl:when>
+															<xsl:when test ="starts-with($sourceRange,'false:')">
+																<xsl:value-of select="substring-after(substring-before(substring-after($sourceRange,'false:'),'|'),':')"/>
+															</xsl:when>
+														</xsl:choose>
+														<!--<xsl:value-of select="substring-after(substring-before($sourceRange,'|'),':')"/>-->
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
@@ -402,11 +426,20 @@
                     </xsl:if>
                   </xsl:variable>
                   <xsl:variable name ="rowNumFromCache">
+												<xsl:choose>
+													<xsl:when test ="starts-with($sourceRange,'true:')">
+														<xsl:value-of select ="$sourceRange"/>
+													</xsl:when>
+													<xsl:otherwise>
                     <xsl:call-template name="GetRowNum">
                       <xsl:with-param name="cell">
                         <xsl:value-of select="$lastSourceAdress"/>
                       </xsl:with-param>
                     </xsl:call-template>
+													</xsl:otherwise>
+
+												</xsl:choose>
+
                   </xsl:variable>
                   <!--
 										   * Defect Id       :1898488
@@ -432,6 +465,8 @@
                     </xsl:if>
                     <xsl:if test ="$rowNumFromSheet=''">
                       <xsl:attribute name="table:cell-range-address">
+																<!--<xsl:value-of
+																  select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"/>-->
                         <xsl:value-of
                           select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"/>
                       </xsl:attribute>
@@ -439,8 +474,21 @@
 						  </xsl:when>
 						  <xsl:otherwise>
 							  <xsl:attribute name="table:cell-range-address">
+															<!--<xsl:value-of
+															  select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"/>-->
+															<xsl:choose>
+																<xsl:when test ="starts-with($sourceRange,'true:')">
+																	<xsl:variable name ="FinalRange">
+																		<xsl:value-of select ="substring-after($sourceRange,'true:')"/>
+																	</xsl:variable>
+																	<xsl:value-of select ="concat(substring-before($FinalRange,':'),':.',substring-after($FinalRange,':'))"/>
+																</xsl:when>
+																<xsl:when test ="starts-with($sourceRange,'false:')">
 								  <xsl:value-of
 									select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"/>
+																</xsl:when>
+															</xsl:choose>
+
 							  </xsl:attribute>
 						  </xsl:otherwise>
 					  </xsl:choose>
@@ -473,8 +521,7 @@
                                 </xsl:for-each>
                               </xsl:when>
                               <xsl:when test="e:autoFilter/e:filterColumn/e:top10">
-                                <xsl:message terminate="no"
-                                >translation.oox2odf.PivotFilter</xsl:message>
+                                <xsl:message terminate="no">translation.oox2odf.PivotFilter</xsl:message>
                               </xsl:when>
                               <xsl:when test="count(e:filters/e:filter) &gt; 1">
                                 <table:filter-or>
@@ -532,7 +579,6 @@
                         </table:filter-or>
                       </table:filter>
                     </xsl:for-each>
-
                   </table:source-cell-range>
                 </xsl:for-each>
               </xsl:for-each>
@@ -783,8 +829,6 @@
 			</xsl:for-each>
 		  </xsl:if>
 		 </xsl:variable>
-
-
 		<!--Getting Values from PivotCacheDefinition-->
 		<xsl:variable name="cacheDataValues">
 			<xsl:for-each
@@ -797,24 +841,22 @@
 
 		<!--End-->
 
-
+			<!-- ODF1.1 Conformance
+			    1. Additional attributes added table:used-hierarchy set from 0 to -1
+				2. Add additional attribute table:selected-page
+				3. Tag 'table:data-pilot-level' sholud be the first child node of 'table:data-pilot-field'.
+		    -->
       <table:data-pilot-field>
-
         <xsl:for-each
           select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum + 1]">
-
           <xsl:attribute name="table:source-field-name">
-
             <xsl:choose>
               <xsl:when test="number(translate(@name, ',' , '.' ))">
-
                 <xsl:variable name="replaceDecimal">
                   <xsl:value-of select="format-number(translate(@name, ',' , '.' ),'0.##')"/>
                 </xsl:variable>
-
                 <xsl:value-of select="translate($replaceDecimal, '.' , ',' )"/>
               </xsl:when>
-
               <xsl:otherwise>
 				  <xsl:variable name="cacheDataName">
                 <xsl:value-of select="@name"/>
@@ -832,239 +874,100 @@
 				  <!--End-->
               </xsl:otherwise>
             </xsl:choose>
-
           </xsl:attribute>
         </xsl:for-each>
-
         <xsl:attribute name="table:used-hierarchy">
-          <xsl:text>0</xsl:text>
+					<xsl:text>-1</xsl:text>
         </xsl:attribute>
-
         <xsl:attribute name="table:orientation">
-
-          <xsl:value-of select="$orientation"/>
-          <!--xsl:for-each
-          select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position() = $fieldNum + 1]">
-          <xsl:choose>
-            <xsl:when test="@axis = 'axisPage' ">
-              <xsl:text>page</xsl:text>
-            </xsl:when>
-            <xsl:when test="@axis = 'axisRow' ">
-              <xsl:text>row</xsl:text>
-            </xsl:when>
-            <xsl:when test="@axis = 'axisCol' ">
-              <xsl:text>column</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>data</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each-->
+          <xsl:value-of select="$orientation"/>          
         </xsl:attribute>
-
+				<xsl:if test ="$orientation='page'">
+					<xsl:attribute name="table:selected-page">
+						<xsl:value-of select ="''"/>
+					</xsl:attribute>
+				</xsl:if>
         <xsl:attribute name="table:function">
-
           <xsl:choose>
             <xsl:when
               test="parent::node()[name() = 'pageFields' or name() = 'rowFields'  or name() = 'colFields']">
               <xsl:text>auto</xsl:text>
             </xsl:when>
-
             <xsl:otherwise>
               <xsl:choose>
-
                 <xsl:when test="@subtotal = 'count'">
                   <xsl:text>count</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'average'">
                   <xsl:text>average</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'max'">
                   <xsl:text>max</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'min'">
                   <xsl:text>min</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'product'">
                   <xsl:text>product</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'countNums'">
                   <xsl:text>countnums</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'stdDev'">
                   <xsl:text>stddev</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'stdDevp'">
                   <xsl:text>stddevp</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'varp'">
                   <xsl:text>varp</xsl:text>
                 </xsl:when>
-
                 <xsl:when test="@subtotal = 'var'">
                   <xsl:text>var</xsl:text>
                 </xsl:when>
-
                 <xsl:otherwise>
                   <xsl:text>sum</xsl:text>
                 </xsl:otherwise>
-
               </xsl:choose>
             </xsl:otherwise>
-
           </xsl:choose>
         </xsl:attribute>
 
-        <!-- if this field is a data field-->
-        <xsl:if test="parent::e:dataFields">
-
-          <xsl:variable name="base">
-            <xsl:value-of select="@baseField"/>
-          </xsl:variable>
-
-          <xsl:variable name="member">
-            <xsl:value-of select="@baseItem"/>
-          </xsl:variable>
-
-          <xsl:variable name="baseCacheNum">
-            <xsl:for-each
-              select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position()=$base + 1]/e:items">
-              <xsl:value-of select="child::node()[$member + 1]/@x"/>
-            </xsl:for-each>
-          </xsl:variable>
-
-          <xsl:variable name="baseCacheValue">
-            <xsl:for-each
-              select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $base + 1]/e:sharedItems">
-              <xsl:value-of select="child::node()[$baseCacheNum + 1]/@v"/>
-            </xsl:for-each>
-          </xsl:variable>
-
-          <xsl:if test="@showDataAs">
-
-            <table:data-pilot-field-reference>
-
-              <xsl:attribute name="table:type">
-                <xsl:choose>
-
-                  <xsl:when test="@showDataAs = 'difference' ">
-                    <xsl:text>member-difference</xsl:text>
-                  </xsl:when>
-
-                  <xsl:when test="@showDataAs = 'percent' ">
-                    <xsl:text>member-percentage</xsl:text>
-                  </xsl:when>
-
-                  <xsl:when test="@showDataAs = 'percentDiff' ">
-                    <xsl:text>member-percentage-difference</xsl:text>
-                  </xsl:when>
-
-                  <xsl:when test="@showDataAs = 'runTotal' ">
-                    <xsl:text>running-total</xsl:text>
-                  </xsl:when>
-
-                  <xsl:when test="@showDataAs = 'percentOfRow' ">
-                    <xsl:text>row-percentage</xsl:text>
-                  </xsl:when>
-
-                  <xsl:when test="@showDataAs = 'percentOfColumn' ">
-                    <xsl:text>column-percentage</xsl:text>
-                  </xsl:when>
-
-                  <xsl:when test="@showDataAs = 'percentOfTotal' ">
-                    <xsl:text>total-percentage</xsl:text>
-                  </xsl:when>
-
-                  <xsl:when test="@showDataAs = 'index' ">
-                    <xsl:text>index</xsl:text>
-                  </xsl:when>
-
-                </xsl:choose>
-              </xsl:attribute>
-
-              <xsl:for-each
-                select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[$base + 1]">
-
-                <xsl:attribute name="table:field-name">
-                  <xsl:value-of select="@name"/>
-                </xsl:attribute>
-
-                <xsl:for-each select="e:sharedItems">
-                  <xsl:attribute name="table:member-name">
-                    <xsl:value-of select="$baseCacheValue"/>
-                  </xsl:attribute>
-                </xsl:for-each>
-
-              </xsl:for-each>
-
-              <xsl:attribute name="table:member-type">
-                <xsl:text>named</xsl:text>
-              </xsl:attribute>
-
-            </table:data-pilot-field-reference>
-          </xsl:if>
-
-        </xsl:if>
+        
 
         <table:data-pilot-level>
-
           <xsl:attribute name="table:show-empty">
             <xsl:text>false</xsl:text>
           </xsl:attribute>
-
-
           <xsl:if test="e:items/child::node()/@h">
-
             <table:data-pilot-members>
-
               <xsl:for-each select="e:items/e:item[@x and @h='1']">
-
                 <xsl:variable name="hiddenFieldNum">
                   <xsl:value-of select="@x"/>
                 </xsl:variable>
-
                 <xsl:variable name="hiddenCacheValue">
                   <xsl:for-each
                     select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum]/e:sharedItems">
                     <xsl:value-of select="child::node()[position() = $hiddenFieldNum + 1]/@v"/>
                   </xsl:for-each>
                 </xsl:variable>
-
                 <table:data-pilot-member>
-
                   <xsl:attribute name="table:name">
                     <xsl:value-of select="$hiddenCacheValue"/>
                   </xsl:attribute>
-
                   <xsl:attribute name="table:display">
                     <xsl:text>false</xsl:text>
                   </xsl:attribute>
-
                   <xsl:attribute name="table:show-details">
                     <xsl:text>true</xsl:text>
                   </xsl:attribute>
-
                 </table:data-pilot-member>
-
               </xsl:for-each>
-
             </table:data-pilot-members>
-
           </xsl:if>
-
           <xsl:for-each
             select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position() = $fieldNum + 1][@axis and @sumSubtotal or @countSubtotal or @avgSubtotal or @maxSubtotal or @minSubtotal or @productSubtotal or @countSubtotal or @stdDevSubtotal or @stdDevPSubtotal or @varSubtotal or @varPSubtotal]">
-
             <table:data-pilot-subtotals>
-
               <xsl:if test="@sumSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1072,7 +975,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@countASubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1080,7 +982,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@avgSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1088,7 +989,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@maxSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1096,7 +996,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@minSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1104,7 +1003,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@productSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1112,7 +1010,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@countSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1120,7 +1017,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@stdDevSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1128,7 +1024,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@stdDevPSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1136,7 +1031,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@varSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1144,7 +1038,6 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
               <xsl:if test="@varPSubtotal">
                 <table:data-pilot-subtotal>
                   <xsl:attribute name="table:function">
@@ -1152,25 +1045,25 @@
                   </xsl:attribute>
                 </table:data-pilot-subtotal>
               </xsl:if>
-
             </table:data-pilot-subtotals>
-
           </xsl:for-each>
-
-          <table:data-pilot-display-info>
-
+					<!-- ODF1.1 Conformance
+							Additional attributes added 
+							table:data-field="" table:member-count="0"
+		            -->
+					<table:data-pilot-display-info table:data-field="" table:member-count="0">
             <xsl:attribute name="table:enabled">
               <xsl:text>false</xsl:text>
             </xsl:attribute>
-
             <xsl:attribute name="table:display-member-mode">
               <xsl:text>from-top</xsl:text>
             </xsl:attribute>
-
           </table:data-pilot-display-info>
-
           <table:data-pilot-sort-info>
-
+						<!-- ODF1.1 Conformance
+								Default value of this attribute changed from 'manual' to 'ascending',
+								as the attribute can have only 'ascending' and 'descending' as values.
+						-->
             <xsl:attribute name="table:order">
               <xsl:for-each
                 select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position() = $fieldNum + 1]">
@@ -1178,13 +1071,15 @@
                   <xsl:when test="@sortType">
                     <xsl:value-of select="@sortType"/>
                   </xsl:when>
-                  <xsl:otherwise>
+									<!--<xsl:otherwise>
                     <xsl:text>manual</xsl:text>
+									</xsl:otherwise>-->
+                  <xsl:otherwise>
+										<xsl:text>ascending</xsl:text>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:for-each>
             </xsl:attribute>
-
             <xsl:attribute name="table:sort-mode">
               <xsl:for-each
                 select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position() = $fieldNum + 1]">
@@ -1202,9 +1097,7 @@
               </xsl:for-each>
             </xsl:attribute>
           </table:data-pilot-sort-info>
-
           <table:data-pilot-layout-info>
-
             <xsl:attribute name="table:add-empty-lines">
               <xsl:choose>
                 <xsl:when
@@ -1218,7 +1111,6 @@
             </xsl:attribute>
 
             <xsl:attribute name="table:layout-mode">
-
               <xsl:choose>
                 <xsl:when
                   test="parent::node()/parent::node()/e:pivotFields/e:pivotField/@outline = '0' ">
@@ -1244,10 +1136,91 @@
           </table:data-pilot-layout-info>
 
         </table:data-pilot-level>
+				<!-- if this field is a data field-->
+				<xsl:if test="parent::e:dataFields">
+					<xsl:variable name="base">
+						<xsl:value-of select="@baseField"/>
+					</xsl:variable>
+					<xsl:variable name="member">
+						<xsl:value-of select="@baseItem"/>
+					</xsl:variable>
+					<xsl:variable name="baseCacheNum">
+						<xsl:for-each
+						  select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position()=$base + 1]/e:items">
+							<xsl:value-of select="child::node()[$member + 1]/@x"/>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:variable name="baseCacheValue">
+						<xsl:for-each
+						  select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $base + 1]/e:sharedItems">
+							<xsl:value-of select="child::node()[$baseCacheNum + 1]/@v"/>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:if test="@showDataAs">
+						<table:data-pilot-field-reference>
 
+							<xsl:attribute name="table:type">
+								<xsl:choose>
+
+									<xsl:when test="@showDataAs = 'difference' ">
+										<xsl:text>member-difference</xsl:text>
+									</xsl:when>
+
+									<xsl:when test="@showDataAs = 'percent' ">
+										<xsl:text>member-percentage</xsl:text>
+									</xsl:when>
+
+									<xsl:when test="@showDataAs = 'percentDiff' ">
+										<xsl:text>member-percentage-difference</xsl:text>
+									</xsl:when>
+
+									<xsl:when test="@showDataAs = 'runTotal' ">
+										<xsl:text>running-total</xsl:text>
+									</xsl:when>
+
+									<xsl:when test="@showDataAs = 'percentOfRow' ">
+										<xsl:text>row-percentage</xsl:text>
+									</xsl:when>
+
+									<xsl:when test="@showDataAs = 'percentOfColumn' ">
+										<xsl:text>column-percentage</xsl:text>
+									</xsl:when>
+
+									<xsl:when test="@showDataAs = 'percentOfTotal' ">
+										<xsl:text>total-percentage</xsl:text>
+									</xsl:when>
+
+									<xsl:when test="@showDataAs = 'index' ">
+										<xsl:text>index</xsl:text>
+									</xsl:when>
+
+								</xsl:choose>
+							</xsl:attribute>
+
+							<xsl:for-each
+							  select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[$base + 1]">
+
+								<xsl:attribute name="table:field-name">
+									<xsl:value-of select="@name"/>
+								</xsl:attribute>
+
+								<xsl:for-each select="e:sharedItems">
+									<xsl:attribute name="table:member-name">
+										<xsl:value-of select="$baseCacheValue"/>
+									</xsl:attribute>
+								</xsl:for-each>
+
+							</xsl:for-each>
+
+							<xsl:attribute name="table:member-type">
+								<xsl:text>named</xsl:text>
+							</xsl:attribute>
+
+						</table:data-pilot-field-reference>
+					</xsl:if>
+				</xsl:if>
       </table:data-pilot-field>
     </xsl:if>
-
     <!--xsl:if test="@countSubtotal">
       <table:data-pilot-field>
 
@@ -1263,50 +1236,37 @@
 
       </table:data-pilot-field>
     </xsl:if-->
-
   </xsl:template>
 
   <!-- put empty field after Row Label or Column Label-->
   <xsl:template name="InsertEmptyDataPilotField">
     <xsl:param name="orientation"/>
 
+		<!-- ODF1.1 Conformance
+			    Additional attributes added 
+				table:used-hierarchy set from 0 to -1
+				Add additional attribute table:selected-page
+		-->
     <table:data-pilot-field table:source-field-name="">
-
       <xsl:attribute name="table:is-data-layout-field">
         <xsl:text>true</xsl:text>
       </xsl:attribute>
-
       <xsl:attribute name="table:orientation">
-
-        <xsl:value-of select="$orientation"/>
-        <!--xsl:choose>
-
-          <xsl:when test="@axis = 'axisPage' ">
-            <xsl:text>row</xsl:text>
-          </xsl:when>
-
-          <xsl:when test="@axis = 'axisRow' ">
-            <xsl:text>row</xsl:text>
-          </xsl:when>
-
-          <xsl:when test="@axis = 'axisCol' ">
-            <xsl:text>column</xsl:text>
-          </xsl:when>
-
-        </xsl:choose-->
+        <xsl:value-of select="$orientation"/>        
       </xsl:attribute>
-
       <xsl:attribute name="table:used-hierarchy">
         <xsl:text>-1</xsl:text>
       </xsl:attribute>
-
+			<xsl:if test ="$orientation='page'">
+				<xsl:attribute name="table:selected-page">
+					<xsl:value-of select ="''"/>
+				</xsl:attribute>
+			</xsl:if>
       <xsl:attribute name="table:function">
         <xsl:text>auto</xsl:text>
       </xsl:attribute>
-
       <table:data-pilot-level table:show-empty="true"/>
     </table:data-pilot-field>
-
   </xsl:template>
 
 	<!--
@@ -1398,11 +1358,9 @@
 				<xsl:variable name="sheetSourceName">
 					<xsl:value-of select="@sheet"/>
 				</xsl:variable>
-
 				<xsl:variable name="firstSourceAdress">
 					<xsl:value-of select="substring-before(@ref,':')"/>
 				</xsl:variable>
-
 				<xsl:variable name="lastSourceAdress">
 					<xsl:value-of select="substring-after(@ref,':')"/>
 				</xsl:variable>
@@ -1411,23 +1369,30 @@
 				</xsl:if>
 						</xsl:when>
 						<xsl:when test ="@name">
-							<xsl:value-of select ="'true'"/>
+							<xsl:value-of select ="concat('true|',@name)"/>
 						</xsl:when>
 					</xsl:choose>
 			</xsl:for-each>
 		</xsl:for-each >
 	</xsl:variable>
-	<xsl:if test ="$validate='true'">
-		<xsl:value-of select ="'true'"/>
+		<xsl:variable name ="isNamedRange">
+			<xsl:call-template name ="CheckIfNamedRange">
+				<xsl:with-param name ="name">
+					<xsl:value-of select ="substring-after($validate,'true|')"/>
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:if test ="starts-with($validate,'true')">
+			<xsl:value-of select ="concat('true','|',$isNamedRange)"/>
 	</xsl:if>
-	<xsl:if test ="$validate !='true'">
+		<xsl:if test ="not(starts-with($validate,'true'))">
 		<xsl:value-of select ="'false'"/>
 	</xsl:if>
 </xsl:template>
 	<xsl:template name ="CheckIfNamedRange">
 		<xsl:param name ="name"/>
 		<xsl:for-each select="key('Part','xl/workbook.xml')//e:definedNames/e:definedName[@name=$name]">
-			<xsl:variable name ="range">
+			<!--<xsl:variable name ="range">
 				<xsl:value-of select ="."/>
 			</xsl:variable>
 			<xsl:variable name ="sheetName">
@@ -1456,7 +1421,14 @@
 					<xsl:otherwise>
 						<xsl:value-of select ="concat(translate(substring-after($range,'!'),'!-$#():,.+',''),'|',$sheetName)"/>
 					</xsl:otherwise>
-				</xsl:choose>					
+			</xsl:choose>-->
+			<xsl:call-template name="translate-expression">
+				<xsl:with-param name="isRangeAddress" select="true()"/>
+				<xsl:with-param name="cell-row-pos" select="0"/>
+				<xsl:with-param name="cell-column-pos" select="0"/>
+				<xsl:with-param name="expression" select="."/>
+				<xsl:with-param name="return-value" select="''"/>
+			</xsl:call-template>
 		</xsl:for-each>
 	</xsl:template>
 <!--End of Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->

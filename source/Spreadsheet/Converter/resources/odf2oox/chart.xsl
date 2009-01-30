@@ -1287,7 +1287,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               <xsl:value-of select="concat(@style:data-style-name,';',@style:data-style-name,'P0;',@style:data-style-name,'P1;',@style:data-style-name,'P2;')"/>
             </xsl:variable>
       <xsl:for-each select="key('style',@style:data-style-name)">
-        <xsl:apply-templates select="." mode="ChartnumFormat"/>
+        <xsl:apply-templates select="." mode="ChartnumFormat">
+          <!--changed by sonata for bug no:2107193-->
+          <xsl:with-param name="flag" select="0"/>
+          <!--end-->
+        </xsl:apply-templates>
             </xsl:for-each>
           </xsl:for-each>
 
@@ -1603,7 +1607,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <xsl:value-of select="concat(@style:data-style-name,';',@style:data-style-name,'P0;',@style:data-style-name,'P1;',@style:data-style-name,'P2;')"/>
         </xsl:variable>
         <xsl:for-each select="key('style',@style:data-style-name)">
-          <xsl:apply-templates select="." mode="ChartnumFormat"/>
+          <xsl:apply-templates select="." mode="ChartnumFormat">
+            <!--changed by sonata for bug no:2107193-->
+            <xsl:with-param name="flag" select="0"/>
+            <!--end-->
+          </xsl:apply-templates>
         </xsl:for-each>
       </xsl:for-each>
       <!--<xsl:variable name="dataStyleName" select=" key('style',@chart:style-name)/@style:data-style-name"/>
@@ -1886,7 +1894,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:variable name="number">
       <xsl:choose>
         <xsl:when test="$reverseSeries = 'true' ">
-          <xsl:value-of select="$numSeries - $count + $primarySeries"/>
+          <!--changed by sonata for bug no:2107193-->
+          <!--<xsl:value-of select="$numSeries - $count + $primarySeries"/>-->
+          <xsl:value-of select="$count + 1 + $primarySeries"/>
+          <!--end-->
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$count + 1 + $primarySeries"/>
@@ -2087,7 +2098,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               <xsl:variable name="dataStylename" select="../@style:data-style-name"/>
               <xsl:for-each select="parent::node()">
                 <xsl:for-each select="key('style',@style:data-style-name)[1]">
-                  <xsl:apply-templates select="." mode="ChartnumFormat"/>
+                  <xsl:apply-templates select="." mode="ChartnumFormat">
+                    <!--changed by sonata for bug no:2107193-->
+                    <xsl:with-param name="flag" select="0"/>
+                    <!--end-->
+                  </xsl:apply-templates>
                 </xsl:for-each>
             </xsl:for-each>
               <xsl:choose>
@@ -2669,6 +2684,13 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                           <xsl:with-param name="numCategories" select="$numPoints"/>
                         </xsl:call-template>
                       </xsl:when>
+                      <!--condition added for file name:Pie_Chart_Legend.xlsx-->
+                      <xsl:when test="$chartType = 'chart:circle' and key('style',ancestor::chart:chart/chart:plot-area/@chart:style-name )/style:chart-properties/@chart:vertical='false' ">
+                        <xsl:call-template name="InsertCategories">
+                          <xsl:with-param name="numCategories" select="$numPoints"/>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <!--end-->
                       <xsl:otherwise>
                     <xsl:call-template name="InsertCategoriesReverse">
                       <xsl:with-param name="numCategories" select="$numPoints"/>
@@ -2696,8 +2718,32 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             <c:numRef>
               <!-- TO DO: reference to sheet cell -->
               <!-- i.e. <c:f>Sheet1!$D$3:$D$4</c:f> -->
+              <!--added by sonata for bug no:2107116-->
+              <xsl:if test="key('series','')[position() = $number]/@chart:values-cell-range-address">
+              <c:f>
+                <!--changed for regression filename:Xls001.CONFIDENTIAL2007.xlsx-->
+                
+                <xsl:variable name="strNumRefFrml">
+                  <xsl:value-of select="translate(key('series','')[position() = $number]/@chart:values-cell-range-address, '.','!')"/>
+                </xsl:variable>
+                <xsl:variable name="rngFrom" select="substring-before($strNumRefFrml,':')"/>
+                <xsl:variable name="rngTo" select="substring-after($strNumRefFrml,':')"/>
+                <xsl:value-of select="concat(substring-before($rngFrom,'!'),'!' ,substring-after($rngFrom,'!'),':',substring-after($rngTo,'!'))"/>
+              </c:f>
+              <!--end-->
+              </xsl:if>
               <c:numCache>
-                <c:formatCode>General</c:formatCode>
+               <!--changed by sonata for bug no:2107193-->
+                <xsl:for-each select="key('style',$styleName)">
+                  <xsl:for-each select="key('style',@style:data-style-name)">
+                    <xsl:apply-templates select="." mode="ChartnumFormat">
+                      <xsl:with-param name="flag" select="1"/>
+                    </xsl:apply-templates>
+                  </xsl:for-each>
+                </xsl:for-each>
+                  <!--<c:formatCode>General</c:formatCode>-->
+                 <!--end-->
+                
                 <c:ptCount val="{$numPoints}"/>
 
                 <!-- number of this series -->
@@ -2705,7 +2751,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                   <xsl:choose>
                     <!-- when $reverseSeries = 'true' then count backwards -->
                     <xsl:when test="$reverseSeries = 'true' ">
-                      <xsl:value-of select="$numSeries - 1 - $count"/>
+                      <!--changed by sonata for bug no:2107193-->
+                      <!--<xsl:value-of select="$numSeries - 1 - $count"/>-->
+                      <xsl:value-of select="$count"/>
+                      <!--end-->
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="$count"/>
@@ -2719,6 +2768,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                       <xsl:call-template name="InsertPointsReverse">
                         <xsl:with-param name="series" select="$thisSeries + $primarySeries"/>
                         <xsl:with-param name="numCategories" select="$numPoints"/>
+                        <!--changed by sonata for bug no:2107193-->
+                        <xsl:with-param name="pointIndex" select="$numPoints"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
@@ -2802,10 +2853,24 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:param name="series"/>
     <xsl:param name="numCategories"/>
     <xsl:param name="count" select="0"/>
+<!--changed by sonata for bug no:2107193-->
+    <xsl:param name="pointIndex"/>
 
     <xsl:choose>
       <xsl:when test="$count &lt; $numCategories">
-        <xsl:for-each select="table:table-row[$numCategories - $count]">
+        <!--<xsl:for-each select="table:table-row[$numCategories - $count]">
+          <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
+            <c:pt idx="{$count}">
+              <c:v>
+                --><!-- $ series + 2 because position starts with 1 and we skip first cell --><!--
+                <xsl:value-of select="table:table-cell[$series + 2]/text:p"/>
+              </c:v>
+            </c:pt>
+          </xsl:if>
+        </xsl:for-each>-->
+        
+        <!--changed by sonata for bug no:2107193-->
+        <xsl:for-each select="table:table-row[$numCategories - $pointIndex + 1]">
           <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
             <c:pt idx="{$count}">
               <c:v>
@@ -2815,11 +2880,14 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             </c:pt>
           </xsl:if>
         </xsl:for-each>
+        <!--end-->
 
         <xsl:call-template name="InsertPointsReverse">
           <xsl:with-param name="series" select="$series"/>
           <xsl:with-param name="numCategories" select="$numCategories"/>
           <xsl:with-param name="count" select="$count + 1"/>
+          <!--changed by sonata for bug no:2107193-->
+          <xsl:with-param name="pointIndex" select="$pointIndex - 1"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -3162,7 +3230,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </c:txPr>
         <xsl:for-each select="key('style',$styleName)">
           <xsl:variable name="dataStylename" select="@style:data-style-name"/>
-          <xsl:apply-templates select="key('style',$dataStylename)" mode="ChartnumFormat"/>
+          <xsl:apply-templates select="key('style',$dataStylename)" mode="ChartnumFormat">
+            <!--changed by sonata for bug no:2107193-->
+            <xsl:with-param name="flag" select="0"/>
+            <!--end-->
+          </xsl:apply-templates>
           <!-- label content -->
           <xsl:for-each select="style:chart-properties">
             <xsl:choose>
@@ -3892,22 +3964,54 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 <!-- Sonata: Number style for Charts -->
   <xsl:template match="number:date-style" mode="ChartnumFormat">
     <xsl:param name="numId"/>
+    <!--changed by sonata for bug no:2107193-->
+    <xsl:param name="flag"/>
+    <xsl:choose>
+      <xsl:when test="$flag=1">
+        <c:formatCode>
+          <xsl:apply-templates mode="date"/>
+          <xsl:text>;@</xsl:text>
+        </c:formatCode>
+      </xsl:when>
+      <xsl:otherwise>
     <c:numFmt>
       <xsl:attribute name="formatCode">
         <xsl:apply-templates mode="date"/>
         <xsl:text>;@</xsl:text>
       </xsl:attribute>
     </c:numFmt>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--end-->
+    
+   
     </xsl:template>
 
   <xsl:template match="number:time-style" mode="ChartnumFormat">
     <xsl:param name="numId"/>
+    <!--changed by sonata for bug no:2107193-->
+    <xsl:param name="flag"/>
+    <xsl:choose>
+      <xsl:when test="$flag=1">
+        <c:formatCode>
+          <xsl:apply-templates mode="date"/>
+          <xsl:text>;@</xsl:text>
+        </c:formatCode>
+      </xsl:when>
+      <xsl:otherwise>
     <c:numFmt>
       <xsl:attribute name="formatCode">
         <xsl:apply-templates mode="date"/>
         <xsl:text>;@</xsl:text>
       </xsl:attribute>
     </c:numFmt>
+      </xsl:otherwise>
+
+    </xsl:choose>
+    <!--end-->
+
+
+
      </xsl:template>
 
   <!-- insert year format -->
@@ -4021,6 +4125,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <!--<xsl:param name="format"/>-->
     <!--(string) format code -->
     <xsl:param name="styleName"/>
+    <!--changed by sonata for bug no:2107193-->
+    <xsl:param name="flag"/>
+    <!--end-->
     <!--(string) style name -->
     <xsl:variable name ="numTextStyleName">
       <xsl:value-of select ="@style:name"/>
@@ -4052,6 +4159,21 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               </xsl:choose>
             </xsl:variable>
             <xsl:for-each select ="key('number',$styleToBeUsed)">
+              <!--changed by sonata for bug no:2107193-->
+              <xsl:choose>
+                <xsl:when test="$flag=1">
+                  <c:formatCode>
+                    <xsl:variable name="thisFormat">
+                      <xsl:call-template name="GetFormatCodeForText">
+                        <xsl:with-param name ="styleToBeUsed">
+                          <xsl:value-of select ="$styleToBeUsed"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:value-of select="$thisFormat"/>
+                  </c:formatCode>
+                </xsl:when>
+                <xsl:otherwise>
               <c:numFmt>
                 <xsl:attribute name="formatCode">
                   <xsl:variable name="thisFormat">
@@ -4064,6 +4186,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                   <xsl:value-of select="$thisFormat"/>
                 </xsl:attribute>
               </c:numFmt>
+                </xsl:otherwise>
+              </xsl:choose>
+              <!--end-->
+
+
             </xsl:for-each>
           </xsl:otherwise>
         </xsl:choose>
@@ -4075,6 +4202,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:with-param name="styleName">
           <xsl:value-of select="substring(@style:name,1,string-length(@style:name)-2)"/>
         </xsl:with-param>
+        <!--changed by sonata for bug no:2107193-->
+        <xsl:with-param name="flag" select="0"/>
+        <!--end-->
       </xsl:apply-templates>
     </xsl:if>
     <xsl:if test ="not(key('numtextStyle',$numTextStyleName))">
@@ -4083,6 +4213,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <xsl:value-of select="$numId + 1"/>
         </xsl:with-param>
         <xsl:with-param name="styleName"/>
+        <!--changed by sonata for bug no:2107193-->
+        <xsl:with-param name="flag" select="0"/>
+        <!--end-->
       </xsl:apply-templates>
     </xsl:if>
   </xsl:template>
@@ -4097,7 +4230,29 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:param name="format"/>
     <!--(string) format code -->
     <xsl:param name="styleName"/>
+    
+    <!--changed by sonata for bug no:2107193-->
+       <xsl:param name="flag"/>
     <!--(string) style name -->
+    <xsl:choose>
+      <xsl:when test="$flag=1">
+        <c:formatCode>
+          <xsl:variable name="thisFormat">
+            <xsl:call-template name="GetFormatCode"/>
+
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="@style:name = $styleName">
+              <xsl:value-of select="concat($format,$thisFormat,'%')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat($thisFormat,'%')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </c:formatCode>
+      </xsl:when>
+
+      <xsl:otherwise>
 
     <c:numFmt>
           <xsl:attribute name="formatCode">
@@ -4115,6 +4270,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             </xsl:choose>
           </xsl:attribute>
         </c:numFmt>
+      </xsl:otherwise>
+
+    </xsl:choose>
+    <!--end-->
+     
   </xsl:template>
 
   <xsl:template match="number:currency-style" mode="ChartnumFormat">
@@ -4127,6 +4287,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:param name="format"/>
     <!-- (string) format code -->
     <xsl:param name="styleName"/>
+    <!--changed by sonata for bug no:2107193-->
+    <xsl:param name="flag"/>
     <!-- (string) style name -->
 
     <xsl:variable name="currencySymbol">
@@ -4138,7 +4300,26 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:with-param name="country" select="number:currency-symbol/@number:country"/>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$flag=1">
+        <c:formatCode>
+          <xsl:variable name="thisFormat">
 
+            <xsl:call-template name="GetFormatCode">
+              <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="@style:name = $styleName">
+              <xsl:value-of select="concat($format,$thisFormat)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$thisFormat"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </c:formatCode>
+      </xsl:when>
+      <xsl:otherwise>
     <c:numFmt>
           <xsl:attribute name="formatCode">
             <xsl:variable name="thisFormat">
@@ -4157,6 +4338,13 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             </xsl:choose>
           </xsl:attribute>
         </c:numFmt>
+      </xsl:otherwise>
+        
+    </xsl:choose>
+    <!--end-->
+
+
+    
        </xsl:template>
 
   <xsl:template name="GetFormatCode">
@@ -4641,9 +4829,24 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           select="concat('&quot;',$startText,'&quot;',$valueWithCurrency,'&quot;',$endText,'&quot;')"
         />
       </xsl:when>
-      <xsl:when test="$startText != '' ">
+      <!--changed by sonata for bug no:2207517-->
+      <!--<xsl:when test="$startText != '' ">
         <xsl:value-of select="concat('&quot;',$startText,'&quot;',$valueWithCurrency)"/>
+             </xsl:when>-->
+      
+
+      <xsl:when test="$startText != '' ">
+        <xsl:choose>
+          <xsl:when test="number:number/number:embedded-text">
+            <xsl:value-of select="concat('#&quot;',' ','&quot;##',$valueWithCurrency,';&quot;',$startText,'&quot;#','&quot;',' ','&quot;##',$valueWithCurrency)"/>
+          </xsl:when>
+
+          <xsl:otherwise>
+        <xsl:value-of select="concat('&quot;',$startText,'&quot;',$valueWithCurrency)"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
+      <!--end-->
       <xsl:when test="$endText != '' ">
         <xsl:value-of select="concat($valueWithCurrency,'&quot;',$endText,'&quot;')"/>
       </xsl:when>
@@ -5502,14 +5705,33 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 
   <!--code added by sonata for fraction number format-->
   <xsl:template match="number:number-style" mode="ChartnumFormat">
+    <xsl:param name="flag"/>
     <xsl:choose>
 
       <xsl:when test="number:number/@number:min-integer-digits=5">
+        <!--changed by sonata for bug no:2107193-->
+        <xsl:choose>
+          <xsl:when test="$flag=1">
+            <c:formatCode>
+              <xsl:value-of select="'00000'"/>
+            </c:formatCode>
+          </xsl:when>
+          <xsl:otherwise>
         <c:numFmt>
           <xsl:attribute name="formatCode">
             <xsl:value-of select="'00000'"/>
           </xsl:attribute>
         </c:numFmt>
+          </xsl:otherwise>
+        </xsl:choose>
+        
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$flag=1">
+            <c:formatCode>
+              <xsl:call-template name="GetFormatCode"/>
+            </c:formatCode>
       </xsl:when>
       <xsl:otherwise>
         <c:numFmt>
@@ -5519,6 +5741,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </c:numFmt>
       </xsl:otherwise>
     </xsl:choose>
+
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--end-->
 
   </xsl:template>
 

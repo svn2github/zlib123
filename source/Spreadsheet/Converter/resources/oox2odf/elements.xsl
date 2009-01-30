@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -25,6 +25,13 @@
   * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 6-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -102,7 +109,10 @@
           <xsl:value-of select="$AllElementsRow"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$prevRow + 1"/>
+          <!--Start of RefNo-1:ODF1.1:rmoved increment to set the value to 0-->                   
+          <xsl:value-of select="$prevRow"/>
+          <!--<xsl:value-of select="$prevRow + 1"/>-->
+          <!--End of RefNo-1-->
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -323,8 +333,10 @@
         </xsl:call-template>
       </xsl:for-each>
     </xsl:variable>
-
-    <xsl:if test="$GetMinColWithElement != ''">
+    <!--Start of RefNo-1:ODF1.1:Added otherwise condition to include empty cell:To reslove uncompleted content model-->
+    <xsl:choose>
+      <xsl:when test="$GetMinColWithElement != ''">
+        <!--<xsl:if test="$GetMinColWithElement != ''">-->
 
       <table:table-cell>
 
@@ -454,7 +466,13 @@
           <xsl:value-of select="$ValidationCellStyle"/>
         </xsl:with-param>
       </xsl:call-template>
-    </xsl:if>
+        <!--</xsl:if>-->
+      </xsl:when>
+      <xsl:otherwise>
+        <table:table-cell/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--End of RefNo-1-->
 
   </xsl:template>
 

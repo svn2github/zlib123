@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -25,6 +25,13 @@
     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -226,7 +233,7 @@
     <xsl:param name="outlineLevel"/>
 
     <xsl:variable name="EndGroupRow">
-      <!--xsl:if test="(not(preceding-sibling::e:row[1]/@outlineLevel) or @r != preceding-sibling::e:row[1]/@r +1) or (@r = preceding-sibling::e:row[1]/@r +1 and @outlineLevel -  preceding-sibling::e:row[1]/@outlineLevel &gt; 0) and @outlineLevel != ''">
+      <!--<xsl:if test="(not(preceding-sibling::e:row[1]/@outlineLevel) or @r != preceding-sibling::e:row[1]/@r +1) or (@r = preceding-sibling::e:row[1]/@r +1 and @outlineLevel -  preceding-sibling::e:row[1]/@outlineLevel &gt; 0) and @outlineLevel != ''">
                 <xsl:call-template name="RepeatRow">
                     <xsl:with-param name="Value">
                         <xsl:value-of select="@r"/>
@@ -242,12 +249,15 @@
                         </xsl:choose>
                     </xsl:with-param>                    
                 </xsl:call-template>
-                </xsl:if-->
+                </xsl:if>-->
 
       <xsl:call-template name="RepeatRow">
         <xsl:with-param name="Value">
           <xsl:choose>
             <xsl:when test="@outlineLevel and not(following-sibling::e:row)">
+              <xsl:value-of select="@r"/>
+            </xsl:when>
+            <xsl:when test="@outlineLevel and not(following-sibling::e:row[2])">
               <xsl:value-of select="@r"/>
             </xsl:when>
             <xsl:otherwise>
@@ -258,16 +268,34 @@
         <xsl:with-param name="Repeat">
           <xsl:choose>
             <xsl:when test="preceding-sibling::e:row[1]/@outlineLevel &gt; @outlineLevel and @r = preceding-sibling::e:row[1]/@r + 1">
+              <xsl:choose>
+                <xsl:when test="not(following-sibling::e:row)">
+                  <xsl:value-of select="@outlineLevel"/>
+                </xsl:when>
+                <xsl:otherwise>
               <xsl:value-of select="preceding-sibling::e:row[1]/@outlineLevel - @outlineLevel"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              <!--<xsl:value-of select="preceding-sibling::e:row[1]/@outlineLevel - @outlineLevel"/>-->
             </xsl:when>
             <xsl:when test="(not(@outlineLevel) and preceding-sibling::e:row[1]/@outlineLevel) or ( @r &gt; preceding-sibling::e:row[1]/@r + 1 and preceding-sibling::e:row[1]/@outlineLevel)">
               <xsl:value-of select="preceding-sibling::e:row[1]/@outlineLevel"/>
             </xsl:when>
             <xsl:when test="@outlineLevel and not(following-sibling::e:row)">
+              <xsl:choose>                
+                <xsl:when test="(preceding-sibling::e:row[1]/@outlinelevel) and (@outlinelevel &gt; preceding-sibling::e:row[1]/@outlinelevel) and (@r = preceding-sibling::e:row[1]/@r + 1)" >
+                  <xsl:value-of select="@outlinelevel + 1"/>
+                </xsl:when>
+                <xsl:otherwise>
               <xsl:value-of select="@outlineLevel"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
+            <!--<xsl:value-of select="@outlineLevel"/>-->            
             <xsl:otherwise>
-
+              <xsl:if test="@outlineLevel and not(following-sibling::e:row[2]) and following-sibling::e:row[1]/@outlineLevel">
+                <xsl:value-of select="@outlineLevel - following-sibling::e:row[1]/@outlineLevel"/>
+              </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:with-param>
@@ -332,7 +360,8 @@
       <table:table-row-group-start/>
       <xsl:call-template name="InsertRowGroupStart">
         <xsl:with-param name="GroupCell">
-          <xsl:value-of select="concat(substring-after(concat(':', $GroupCell), concat(':', @r, ':')), substring-before(concat(':', $GroupCell), concat(':', @r, ':')))"/>
+          <!--RefNo-1:ODF1.1:Added ':' at the end-->
+          <xsl:value-of select="concat(substring-after(concat(':', $GroupCell), concat(':', @r, ':')), substring-before(concat(':', $GroupCell), concat(':', @r, ':')),':')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
@@ -344,9 +373,12 @@
 
     <xsl:if test="contains(concat(':', $GroupCell), concat(':', @r, ':'))">
       <table:table-row-group-end/>
-      <xsl:call-template name="InsertRowGroupStart">
+      <!--RefNo-1:ODF1.1:Changed the template name called.-->
+      <!--<xsl:call-template name="InsertRowGroupStart">-->
+      <xsl:call-template name="InsertRowGroupEnd">
         <xsl:with-param name="GroupCell">
-          <xsl:value-of select="concat(substring-after(concat(':', $GroupCell), concat(':', @r, ':')), substring-before(concat(':', $GroupCell), concat(':', @r, ':')))"/>
+          <!--RefNo-1:ODF1.1:Added ':' at the end-->
+          <xsl:value-of select="concat(substring-after(concat(':', $GroupCell), concat(':', @r, ':')), substring-before(concat(':', $GroupCell), concat(':', @r, ':')),':')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>

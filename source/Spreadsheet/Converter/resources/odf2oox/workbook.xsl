@@ -31,6 +31,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect(Configuraion details retrived using name, insted of possition)
+RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named range 'C' and 'R' with _C and _R. 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -418,7 +419,8 @@ RefNo-1 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 										<xsl:value-of select ="concat('_',position(),@table:name)"/>
 									</xsl:when>
 									<xsl:when test ="@table:name = 'C' or @table:name = 'c' or @table:name = 'R' or @table:name = 'r'">
-										<xsl:value-of select ="concat('_',position(),@table:name)"/>
+                    <!--RefNo-2:Removed possition() from string:To replace named range C n R with _C n _R-->
+                    <xsl:value-of select ="concat('_',@table:name)"/>
 									</xsl:when>
 									<xsl:otherwise>
 										<xsl:value-of select ="@table:name"/>
