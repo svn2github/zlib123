@@ -19,7 +19,7 @@
   xmlns:oox="urn:oox"
   xmlns:ooc="urn:odf-converter"                
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w r wp v w10 o oox ooc">
+  exclude-result-prefixes="a pic w r wp v w10 o rels oox ooc">
 
   <!-- 
   *************************************************************************

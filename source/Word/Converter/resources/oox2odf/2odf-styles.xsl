@@ -44,7 +44,7 @@
   xmlns:ooc="urn:odf-converter"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
-  exclude-result-prefixes="w r wp xlink v pcut oox ooc rels">
+  exclude-result-prefixes="w r wp v oox ooc rels">
 
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
@@ -1445,10 +1445,10 @@
       <xsl:otherwise>
         <xsl:if test="$headerId != ''">
           <style:header>
-            <xsl:variable name="headerXmlDocument"
-						  select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+            <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
             <!-- change context to get header content -->
             <xsl:for-each select="key('Part', $headerXmlDocument)">
+              <xsl:call-template name="TrackChanges" />
               <xsl:apply-templates/>
             </xsl:for-each>
           </style:header>
@@ -1479,6 +1479,7 @@
             <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)" />
             <!-- change context to get header content -->
             <xsl:for-each select="key('Part', $headerXmlDocument)">
+              <xsl:call-template name="TrackChanges" />
               <xsl:apply-templates/>
             </xsl:for-each>
           </style:header-left>
@@ -1504,10 +1505,10 @@
 
     <xsl:if test="$footerId != ''">
       <style:footer>
-        <xsl:variable name="footerXmlDocument"
-				  select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+        <xsl:variable name="footerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
         <!-- change context to get footer content -->
         <xsl:for-each select="key('Part', $footerXmlDocument)">
+          <xsl:call-template name="TrackChanges" />
           <xsl:apply-templates/>
         </xsl:for-each>
       </style:footer>
@@ -1531,10 +1532,10 @@
               </style:footer>
             </xsl:if>
             <style:footer-left>
-              <xsl:variable name="footerXmlDocument"
-                select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerIdEven]/@Target)"/>
+              <xsl:variable name="footerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerIdEven]/@Target)"/>
               <!-- change context to get footer content -->
               <xsl:for-each select="key('Part', $footerXmlDocument)">
+                <xsl:call-template name="TrackChanges" />
                 <xsl:apply-templates/>
               </xsl:for-each>
             </style:footer-left>
@@ -1575,10 +1576,10 @@
     <xsl:choose>
       <xsl:when test="$headerId != ''">
         <style:header>
-          <xsl:variable name="headerXmlDocument"
-					  select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
           <!-- change context to get header content -->
           <xsl:for-each select="key('Part', $headerXmlDocument)">
+            <xsl:call-template name="TrackChanges" />
             <xsl:apply-templates/>
           </xsl:for-each>
         </style:header>
@@ -1606,10 +1607,10 @@
     </xsl:variable>
     <xsl:if test="$footerId != ''">
       <style:footer>
-        <xsl:variable name="footerXmlDocument"
-				  select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+        <xsl:variable name="footerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
         <!-- change context to get footer content -->
         <xsl:for-each select="key('Part', $footerXmlDocument)">
+          <xsl:call-template name="TrackChanges" />
           <xsl:apply-templates/>
         </xsl:for-each>
       </style:footer>
@@ -2307,14 +2308,14 @@
             <xsl:otherwise/>
           </xsl:choose>
           <!-- start number -->
-          <xsl:choose>
-            <xsl:when test="w:pgNumType/@w:start">
-              <xsl:attribute name="style:num-format">
+          <xsl:attribute name="style:num-format">
+            <xsl:choose>
+              <xsl:when test="w:pgNumType/@w:start">
                 <xsl:value-of select="w:pgNumType/@w:start"/>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise>
-          </xsl:choose>
+              </xsl:when>
+              <xsl:otherwise>1</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
         </xsl:when>
         <xsl:when test="w:pgNumType/@w:fmt = 'lowerLetter' ">
           <xsl:attribute name="style:num-format">a</xsl:attribute>
@@ -4778,7 +4779,7 @@
           <xsl:if test="not($existingParentPos)">
             <!--test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos)">-->
             <xsl:variable name="pos" select="./@w:pos"/>
-            
+
             <!--clam, dialogika: bugfix 1839626-->
             <xsl:if test="not($me/w:tab[@w:pos=$pos][@w:val='clear'])">
               <xsl:call-template name="InsertTabs">
@@ -5531,12 +5532,10 @@
     <xsl:variable name="fontName">
       <xsl:choose>
         <xsl:when test="contains($fontTheme,'minor')">
-          <xsl:value-of select="$fontScheme/a:minorFont/child::node()[name() = $fontType]/@typeface"
-          />
+          <xsl:value-of select="$fontScheme/a:minorFont/child::node()[name() = $fontType]/@typeface" />
         </xsl:when>
         <xsl:when test="contains($fontTheme,'major')">
-          <xsl:value-of select="$fontScheme/a:majorFont/child::node()[name() = $fontType]/@typeface"
-          />
+          <xsl:value-of select="$fontScheme/a:majorFont/child::node()[name() = $fontType]/@typeface" />
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
@@ -5564,13 +5563,13 @@
   <!-- Insert line numbering. If numbering not applied to a section, retrieve property in paragraphs -->
   <xsl:template name="InsertLineNumbering">
     <xsl:if test="$lines-are-numbered = 'true' ">
-      <style:style style:name="{ooc:NCNameFromString('Line numbering')}" 
+      <style:style style:name="{ooc:NCNameFromString('Line numbering')}"
                    style:display-name="Line numbering"
                    style:family="text"/>
       <xsl:for-each select="key('Part', 'word/document.xml')">
-        <text:linenumbering-configuration text:style-name="{ooc:NCNameFromString('Line numbering')}" 
+        <text:linenumbering-configuration text:style-name="{ooc:NCNameFromString('Line numbering')}"
                                           style:num-format="1"
-                                          text:count-empty-lines="false" 
+                                          text:count-empty-lines="false"
                                           text:number-position="left">
           <!-- if no section is set to continuous, restart on every page -->
           <xsl:if test="not(key('sectPr', '')/w:lnNumType/@w:restart = 'continuous')">

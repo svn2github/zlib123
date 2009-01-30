@@ -42,7 +42,7 @@
   exclude-result-prefixes="w dc oox ooc">
 
   <xsl:template match="w:font">
-    <style:font-face style:name="{ooc:NCNameFromString(@w:name)}"
+    <style:font-face style:name="{@w:name}"
                      svg:font-family="{@w:name}">
       
       <xsl:if test="w:charset/@w:val='02'">

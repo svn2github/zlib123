@@ -33,159 +33,163 @@ using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using System.Text;
+using System.Collections.Generic;
 
 namespace OdfConverter.Wordprocessing
 {
-	/// <summary>
-	/// Postprocessor to handle paragraphs with too many characters.
-	/// </summary>
-	public class OdfParagraphPostProcessor : AbstractPostProcessor
-	{
-		private Stack currentParagraphNode;
-        private Stack currentStyleNode;
+    /// <summary>
+    /// Post-processor to handle paragraph formatting which is too complex to be done with XSLT.
+    /// </summary>
+    public class OdfParagraphPostProcessor : AbstractPostProcessor
+    {
+        private Stack<Element> currentParagraphNode;
+        private Stack<Element> currentStyleNode;
         private Stack context;
         private StringBuilder paragraphTextBuilder = new StringBuilder();
         private string styleText;
         private bool bIsDoneStyle = false;
-        private ArrayList tabStyleName = new ArrayList();
+        private List<string> tabStyleName = new List<string>();
 
         private const string PCUT_NAMESPACE = "urn:cleverage:xmlns:post-processings:pcut";
         private const string TEXT_NAMESPACE = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
         private const string STYLE_NAMESPACE = "urn:oasis:names:tc:opendocument:xmlns:style:1.0";
         private const string FO_NAMESPACE = "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0";
-        
+
         //Extension add to the style name for new styles created
         private const string EXTENSION_STYLE = "_CHILD";
 
-		public OdfParagraphPostProcessor(XmlWriter nextWriter):base(nextWriter)
-		{
-			this.currentParagraphNode = new Stack();
-            this.currentStyleNode = new Stack(); 
+        public OdfParagraphPostProcessor(XmlWriter nextWriter)
+            : base(nextWriter)
+        {
+            this.currentParagraphNode = new Stack<Element>();
+            this.currentStyleNode = new Stack<Element>();
             this.context = new Stack();
             this.context.Push("root");
-		}
+        }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
-        	Element currentElement = new Element(prefix,localName,ns);
+            Element currentElement = new Element(prefix, localName, ns);
 
             //if element is in paragraph or in style, than we push it into context stack
             if (IsInParagraph() || IsInStyle())
-            {                
+            {
+                this.context.Push(currentElement);
+            }
+            else if (localName.Equals("p"))
+            {
+                //if it's a paragraph element, then we start pushing nodes into context stack instead of writing them
+                this.currentParagraphNode.Push(currentElement);
+                this.context.Push(currentElement);
+            }
+            else if (localName.Equals("style"))
+            {
+                //if it's a style element, then we start pushing nodes into context stack instead of writing them
+                this.currentStyleNode.Push(currentElement);
                 this.context.Push(currentElement);
             }
             else
             {
-                //if it's a paragraph element, than we start pushing nodes into context stack instead of writing them
-                if (localName.Equals("p"))
+                this.nextWriter.WriteStartElement(prefix, localName, ns);
+            }
+        }
+
+        public override void WriteStartAttribute(string prefix, string localName, string ns)
+        {
+            //if attribute is in paragraph or in style we push it into context stack
+            if (IsInParagraph() || IsInStyle())
+            {
+                Attribute attribute = new Attribute(prefix, localName, ns);
+                this.context.Push(attribute);
+            }
+            else
+            {
+                this.nextWriter.WriteStartAttribute(prefix, localName, ns);
+            }
+        }
+
+        public override void WriteString(string text)
+        {
+            if (text != "" && (IsInParagraph() || IsInStyle()))
+            {
+                //if text element in paragraph or in style is not in attribute, it is added to paragraphText or styleText
+                if (IsInAttribute())
                 {
-                    this.currentParagraphNode.Push(currentElement);
-                    this.context.Push(currentElement);
+                    Attribute attribute = (Attribute)this.context.Pop();
+                    attribute.Value = text;
+                    this.context.Push(attribute);
                 }
                 else
                 {
-                    //if it's a style element, than we start pushing nodes into context stack instead of writing them
-                    if (localName.Equals("style"))
+                    if (IsInParagraph())
                     {
-                        this.currentStyleNode.Push(currentElement);
-                        this.context.Push(currentElement);
+                        this.paragraphTextBuilder.Append(text);
                     }
-                    else
+                    else if (IsInStyle())
                     {
-                        this.nextWriter.WriteStartElement(prefix, localName, ns);
+                        this.styleText = this.styleText + text;
                     }
+                    Element element = (Element)this.context.Peek();
+                    this.context.Pop();
+                    element.AddChild(text);
+                    this.context.Push(element); 
                 }
             }
+            else
+            {
+                this.nextWriter.WriteString(text);
+            }
         }
-        public override void WriteStartAttribute(string prefix, string localName, string ns)
-        {
-        	//if attribute is in paragraph or in style we push it into context stack
-            if (IsInParagraph() || IsInStyle())
-        	{
-        	   	Attribute attribute = new Attribute(prefix,localName,ns);
-        	   	this.context.Push(attribute);
-        	}
-        	else
-        	{
-        	   	this.nextWriter.WriteStartAttribute(prefix,localName,ns);
-        	}
-        }
-        public override void WriteString(string text)
-        {
-            if (text!="" && (IsInParagraph() || IsInStyle()))
-        	{
-        		//if text element in paragraph or in style is not in attribute, it is added to paragraphText or styleText
-        		if(IsNotInAttribute())
-        		{
-        			if(IsInParagraph()) this.paragraphTextBuilder.Append(text);
-                    else if(IsInStyle()) this.styleText = this.styleText + text;
-        			Element element = (Element)this.context.Peek();
-        			this.context.Pop();
-        			element.AddChild(text);
-        			this.context.Push(element);
-        		}
-        		else
-        		{
-        			Attribute attribute = (Attribute)this.context.Peek();
-        			this.context.Pop();
-        			attribute.Value = text;
-        			this.context.Push(attribute);
-        		}
-        	}
-        	else
-        	{
-        		this.nextWriter.WriteString(text);
-        	}
-        }
+
         public override void WriteEndAttribute()
         {
             if (IsInParagraph() || IsInStyle())
-        	{
-        		Attribute attribute = (Attribute)this.context.Peek();
-        		this.context.Pop();
-        		Element element = (Element)this.context.Peek();
-        		this.context.Pop();
-        		element.AddAttribute(attribute);
-        		this.context.Push(element);
-        	}
-        	else
-        	{
-        		this.nextWriter.WriteEndAttribute();
-        	}
+            {
+                Attribute attribute = (Attribute)this.context.Pop();
+                Element element = (Element)this.context.Peek();
+                this.context.Pop();
+                element.AddAttribute(attribute);
+                this.context.Push(element);
+            }
+            else
+            {
+                this.nextWriter.WriteEndAttribute();
+            }
         }
+
         public override void WriteEndElement()
         {
-        	if(IsInParagraph())
-        	{
-        		Element element = (Element)this.context.Peek();
-        		this.context.Pop();
-        		object rootElement = this.context.Peek();
-        		this.context.Push(element);
-        		//if it's the end of a main paragraph we write elements from context stack using WriteParagraph method
-        		if(element.Name.Equals("p") && IsRoot(rootElement))
-        		{
-        			// a new child element, which contains all the text in paragraph is created
-        			Element paragraphTextElement = new Element("text","paragraph",element.Ns);
-        			paragraphTextElement.AddChild(this.paragraphTextBuilder.ToString());
-        			element.AddChild(paragraphTextElement);
-        			//and then WriteParagraph method is used
-        			WriteParagraph(element, false);
-        			this.paragraphTextBuilder = new StringBuilder();
-        			this.currentParagraphNode.Pop();
-        			this.context.Pop();
-        		}
-        		//if it's the end of an element in paragraph, then it is popped from the context stack, and addaed as a child to parentElement
-        		else
-        		{
-        			this.context.Pop();
-        			Element parentElement = (Element)this.context.Peek();
-        			this.context.Pop();
-        			parentElement.AddChild(element);
-        			this.context.Push(parentElement);
-        		}
-        	}
-        	else
-        	{                
+            if (IsInParagraph())
+            {
+                Element element = (Element)this.context.Peek();
+                this.context.Pop();
+                object rootElement = this.context.Peek();
+                this.context.Push(element);
+                //if it's the end of a main paragraph we write elements from context stack using WriteParagraph method
+                if (element.Name.Equals("p") && IsRoot(rootElement))
+                {
+                    // a new child element, which contains all the text in paragraph is created
+                    Element paragraphTextElement = new Element("text", "paragraph", element.Ns);
+                    paragraphTextElement.AddChild(this.paragraphTextBuilder.ToString());
+                    element.AddChild(paragraphTextElement);
+                    //and then WriteParagraph method is used
+                    WriteParagraph(element, false);
+                    this.paragraphTextBuilder = new StringBuilder();
+                    this.currentParagraphNode.Pop();
+                    this.context.Pop();
+                }
+                //if it's the end of an element in paragraph, then it is popped from the context stack, and addaed as a child to parentElement
+                else
+                {
+                    this.context.Pop();
+                    Element parentElement = (Element)this.context.Peek();
+                    this.context.Pop();
+                    parentElement.AddChild(element);
+                    this.context.Push(parentElement);
+                }
+            }
+            else
+            {
                 if (IsInStyle())
                 {
                     Element element = (Element)this.context.Peek();
@@ -193,7 +197,7 @@ namespace OdfConverter.Wordprocessing
                     object rootElement = this.context.Peek();
                     this.context.Push(element);
                     if (element.Name.Equals("style") && IsRoot(rootElement))
-                    { 
+                    {
                         // a new child element, which contains all the text in paragraph is created
                         Element styleTextElement = new Element("style", "style", element.Ns);
                         styleTextElement.AddChild(this.styleText);
@@ -203,7 +207,7 @@ namespace OdfConverter.Wordprocessing
                         this.styleText = "";
                         this.currentStyleNode.Pop();
                         this.context.Pop();
-                    }                    
+                    }
                     else
                     {
                         this.context.Pop();
@@ -214,97 +218,69 @@ namespace OdfConverter.Wordprocessing
                     }
                 }
                 else this.nextWriter.WriteEndElement();
-        	}
+            }
         }
+        
         //method to check if we are in paragraph
         private bool IsInParagraph()
         {
-            try
+            if (this.currentParagraphNode.Count > 0 && this.currentParagraphNode.Peek().Name.Equals("p"))
             {
-                // prevent exception from being thrown
-                if (this.currentParagraphNode.Count > 0)
-                {
-                    Element element = (Element)this.currentParagraphNode.Peek();
-                    if (element.Name.Equals("p"))
-                    {
-                        return true;
-                    }
-                }
-                return false;
+                return true;
             }
-            catch (Exception)
-            {
-                return false;
-            }
+            return false;
         }
+        
         //method to check if we are in style definition
         private bool IsInStyle()
         {
-            try
+            if (this.currentStyleNode.Count > 0 && this.currentStyleNode.Peek().Name.Equals("style"))
             {
-                // prevent exception from being thrown
-                if (this.currentStyleNode.Count > 0)
-                {
-                    Element element = (Element)this.currentStyleNode.Peek();
-                    if (element.Name.Equals("style"))
-                    {
-                        return true;
-                    }
-                }
-                return false;
+                return true;
             }
-            catch (Exception)
-            {
-                return false;
-            }
+            return false;
         }
+
         //method to check if we are not in attribute
-        private bool IsNotInAttribute()
+        private bool IsInAttribute()
         {
-        	try
-        	{
-        		Object node = this.context.Peek();
-        		if(node is Element)
-        		{
-        			return true;
-        		}
-        		else
-        		{
-        			return false;
-        		}
-        	}
-        	catch(Exception)
-        	{
-        		return false;
-        	}
+            if (this.context.Count > 0 && this.context.Peek() is Attribute)
+            {
+                return true;
+            }
+            return false;
         }
+
         //method tocheck if element is root(if yes then we are ending paragraph)
         private bool IsRoot(object element)
         {
-        	if(element is string)
-        	{
-        		string text = (string)element;
-        		if("root".Equals(text))
-        		{
-        		   	return true;
-        		}
-        		return false;
-        	}
-        	return false;
+            if (element is string)
+            {
+                string text = (string)element;
+                if ("root".Equals(text))
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
-        
+
         private void WriteParagraph(Element element, bool bCutOneTime)
         {
-        	Element textParagraphElement = element.GetChild("paragraph",element.Ns);
-        	string textChild = textParagraphElement.GetTextChild();
-     		string childTextChild = "";
-        	ArrayList childTextChildren = new ArrayList();
+            Element textParagraphElement = element.GetChild("paragraph", element.Ns);
+            string textChild = textParagraphElement.GetTextChild();
+            string childTextChild = "";
+            ArrayList childTextChildren = new ArrayList();
 
             //True if the element flag PCUT_NAMESPACE exist in the paragraph (BUG 1583404)
-            if (bCheckPCut(element)) CutParagraph(element, bCutOneTime);
+            if (bCheckPCut(element))
+            {
+                CutParagraph(element, bCutOneTime);
+            }
             else
             {
-                //if text in paragraph has more than 65535 characters, than the paragraph must be cutted
+                //if text in paragraph has more than 65535 characters, then the paragraph must be split
                 if (textChild.Length > 65535)
                 {
                     Element nextElement = new Element(element.Prefix, element.Name, element.Ns);
@@ -423,6 +399,8 @@ namespace OdfConverter.Wordprocessing
                     //remove all created elements with paragraph text, which wasn't removed before
                     RemoveAllTextParagraphChildren(element);
                     element.Write(this.nextWriter);
+
+                    // OOo 2.x only supported max 2^16 characters per span.
                     textParagraphElement.Replace(textChild, textChild.Substring(65535));
                     nextElement.AddChild(textParagraphElement);
                     WriteParagraph(nextElement, false);
@@ -435,14 +413,15 @@ namespace OdfConverter.Wordprocessing
                 }
             }
         }
+
         private void RemoveAllTextParagraphChildren(Element element)
         {
-        	Element mysteryParagraphElement = element.GetChild("paragraph",element.Ns);
-        	while(mysteryParagraphElement!=null)
-        	{
-        		element.RemoveChild(mysteryParagraphElement);
-        		mysteryParagraphElement = element.GetChild("paragraph",element.Ns);
-        	}	
+            Element mysteryParagraphElement = element.GetChild("paragraph", element.Ns);
+            while (mysteryParagraphElement != null)
+            {
+                element.RemoveChild(mysteryParagraphElement);
+                mysteryParagraphElement = element.GetChild("paragraph", element.Ns);
+            }
         }
         private void RemoveAllTextStyleChildren(Element element)
         {
@@ -457,13 +436,13 @@ namespace OdfConverter.Wordprocessing
         //Check if there is the element flag PCUT_NAMESPACE to cut the paragraph in two parts
         private bool bCheckPCut(Element element)
         {
-            ArrayList children = (ArrayList)element.Children.Clone();
-            foreach (Object child in children)
+            //ArrayList children = element.Children.Clone();
+            foreach (object child in element.Children)
             {
-                if (child is Element)
+                Element childElement = child as Element;
+                if (childElement != null && childElement.Ns.Equals(PCUT_NAMESPACE))
                 {
-                    Element childElement = (Element)child;
-                    if (childElement.Ns == PCUT_NAMESPACE) return true;
+                    return true;
                 }
             }
             return false;
@@ -471,7 +450,7 @@ namespace OdfConverter.Wordprocessing
 
         //Cut the paragraph in two parts with the element flag PCUT_NAMESPACE
         private void CutParagraph(Element element, bool bCutOneTime)
-        {            
+        {
             Element textParagraphElement = element.GetChild("paragraph", element.Ns);
             Element nextElement = new Element(element.Prefix, element.Name, element.Ns);
             ArrayList children = (ArrayList)element.Children.Clone();
@@ -491,7 +470,7 @@ namespace OdfConverter.Wordprocessing
                     {
                         element.RemoveChild(child);
                         nextElement.AddChild(child);
-                    }                    
+                    }
                 }
                 else if (bMoveChild)
                 {
@@ -517,7 +496,7 @@ namespace OdfConverter.Wordprocessing
             nextElement.AddChild(textParagraphElement);
             WriteParagraph(nextElement, true);
         }
-        
+
         private void WriteStyle(Element element, bool bIsParentStyle)
         {
             ArrayList children = (ArrayList)element.Children.Clone();
@@ -539,37 +518,44 @@ namespace OdfConverter.Wordprocessing
                             if (attribute.Ns == PCUT_NAMESPACE)
                             {
                                 bHaveCutNameSpace = true;
-                                AttributeToDelete = (Attribute)attribute;                          
+                                AttributeToDelete = (Attribute)attribute;
                             }
                         }
-                        if(bHaveCutNameSpace)
+                        if (bHaveCutNameSpace)
+                        {
                             childElement.RemoveAttribute(AttributeToDelete);
-                    }                  
+                        }
+                    }
                 }
             }
 
-            //Check if style already write
+            //Check if style has already been written
             foreach (Attribute attribute in element.Attributes)
             {
                 if (attribute.Ns == STYLE_NAMESPACE && attribute.Name == "name")
                 {
-                    if(tabStyleName.Contains(attribute.Value)) bIsDoneStyle = true;
-                    else bIsDoneStyle = false;
+                    if (tabStyleName.Contains(attribute.Value))
+                    {
+                        bIsDoneStyle = true;
+                    }
+                    else
+                    {
+                        bIsDoneStyle = false;
+                    }
                 }
             }
 
             //If PCUT_NAMESPACE have been found in attributes
             if (bHaveCutNameSpace && !bIsDoneStyle)
             {
-               
                 foreach (Object child in children)
                 {
                     bool bnewChildElement = false;
                     if (child is Element)
-                    {                                                
+                    {
                         Element childElement = (Element)child;
                         if (childElement.Name == "paragraph-properties")
-                        {                            
+                        {
                             Attribute AttributeToDelete = new Attribute("fo", "break-before", FO_NAMESPACE);
                             string valueAttribute = "";
                             foreach (Attribute attribute in childElement.Attributes)
@@ -582,10 +568,10 @@ namespace OdfConverter.Wordprocessing
                             }
                             if (AttributeToDelete.Value != "")
                                 childElement.RemoveAttribute(AttributeToDelete);
-                            
+
                             //New element paragraph-properties
                             Element newChildElement = new Element(childElement.Prefix, childElement.Name, childElement.Ns);
-                            
+
                             //New Attribute for the element paragraph-properties
                             Attribute newAttributeForChildElement = new Attribute("fo", "break-before", FO_NAMESPACE);
                             newAttributeForChildElement.Value = valueAttribute;
@@ -598,10 +584,10 @@ namespace OdfConverter.Wordprocessing
                             nextElement.AddChild(newChildElement);
                             bnewChildElement = true;
                         }
-                        if(!bnewChildElement)
+                        if (!bnewChildElement)
                             nextElement.AddChild(child);
-                    }                    
-                }             
+                    }
+                }
 
                 //Copy all attributes to the next element
                 element.RemoveChild(textStyleElement);
@@ -612,7 +598,7 @@ namespace OdfConverter.Wordprocessing
                     if (attribute.Ns == STYLE_NAMESPACE && attribute.Name == "name")
                     {
                         Attribute newAttribute = new Attribute(attribute.Prefix, attribute.Name, attribute.Ns);
-                        nameStyle = attribute.Value;                        
+                        nameStyle = attribute.Value;
                         //Add style name in array
                         tabStyleName.Add(attribute.Value);
                         newAttribute.Value = attribute.Value + EXTENSION_STYLE;
@@ -626,7 +612,7 @@ namespace OdfConverter.Wordprocessing
                 RemoveAllTextStyleChildren(element);
                 element.Write(this.nextWriter);
                 nextElement.AddChild(textStyleElement);
-                WriteStyle(nextElement, false);                
+                WriteStyle(nextElement, false);
             }
             else
             {
@@ -640,5 +626,5 @@ namespace OdfConverter.Wordprocessing
                     element.Write(this.nextWriter);
             }
         }
-	}
+    }
 }

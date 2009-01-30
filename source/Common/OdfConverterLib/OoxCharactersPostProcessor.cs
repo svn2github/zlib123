@@ -1603,10 +1603,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             IEnumerator objEnum = stack.GetEnumerator();
             while (objEnum.MoveNext())
             {
-                Node node = (Node)objEnum.Current;
-                if (node is Element)
+                Element parent = objEnum.Current as Element;
+                if (parent != null)
                 {
-                    Element parent = (Element)node;
                     foreach (object child in parent.Children)
                     {
                         if (child == e) // object identity

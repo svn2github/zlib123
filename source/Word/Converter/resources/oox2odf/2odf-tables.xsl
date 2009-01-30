@@ -72,10 +72,29 @@
             <xsl:call-template name="InsertTableFramePosition">
               <xsl:with-param name="tblPr" select="w:tblPr" />
             </xsl:call-template>
-            <xsl:call-template name="InsertTableFrameWidth">
-              <xsl:with-param name="tblPr" select="w:tblPr" />
-            </xsl:call-template>
+
+            <xsl:choose>
+              <!-- relative width -->
+              <xsl:when test="w:tblPr/w:tblW/@w:type='pct'">
+                <xsl:attribute name="style:rel-width">
+                  <xsl:value-of select="concat(100 * w:tblPr/w:tblW/@w:w div 5000, '%')"/>
+                </xsl:attribute>
+              </xsl:when>
+              <!-- absolute width -->
+              <xsl:when test="w:tblPr/w:tblW/@w:type='dxa'">
+                <xsl:attribute name="svg:width">
+                  <xsl:value-of select="ooc:CmFromTwips(w:tblPr/w:tblW/@w:w)" />
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+            
             <draw:text-box>
+              <xsl:if test="not(w:tblPr/w:tblW/@w:type='pct') and not(w:tblPr/w:tblW/@w:type='dxa')">
+                <!--auto width-->
+                <xsl:attribute name="fo:min-width">
+                  <xsl:text>0cm</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
               <xsl:call-template name="InsertTable" />
             </draw:text-box>
           </draw:frame>
@@ -84,39 +103,6 @@
     </xsl:choose>
 
   </xsl:template>
-
-  <!--
-  Summary: Handles the conversion of positioned tables.
-  -->
-  <!--<xsl:template match="w:tbl[w:tblPr/w:tblpPr]">
-    <text:p text:style-name="HiddenParagraph">
-      <draw:frame>
-        <xsl:attribute name="draw:style-name">
-          <xsl:value-of select="generate-id(w:tblPr/w:tblpPr)"/>
-        </xsl:attribute>
-        <xsl:attribute name="draw:name">
-          <xsl:value-of select="concat('Frame', generate-id(w:tblPr/w:tblpPr))"/>
-        </xsl:attribute>
-        <xsl:call-template name="InsertTableFramePosition">
-          <xsl:with-param name="tblPr" select="w:tblPr" />
-        </xsl:call-template>
-        <xsl:call-template name="InsertTableFrameWidth">
-          <xsl:with-param name="tblPr" select="w:tblPr" />
-        </xsl:call-template>
-        <draw:text-box>
-          <table:table>
-            <xsl:attribute name="table:style-name">
-              <xsl:value-of select="generate-id(self::w:tbl)"/>
-            </xsl:attribute>
-            -->
-  <!--TODO: @table:style-name --><!--
-            <xsl:apply-templates select="w:tblGrid"/>
-            <xsl:apply-templates select="w:tr"/>
-          </table:table>
-        </draw:text-box>
-      </draw:frame>
-    </text:p>
-  </xsl:template>-->
 
   <xsl:template match="w:tblPr" mode="automaticstyles">
     <xsl:apply-templates select="w:tblpPr" mode="automaticstyles" />
@@ -339,37 +325,6 @@
       <xsl:apply-templates select="w:tblGrid"/>
       <xsl:apply-templates select="w:tr"/>
     </table:table>
-  </xsl:template>
-
-  <!--
-  Summary:  Converts the width of a positioned Word table to draw:frame properties
-  Author:   makz (DIaLOGIKa)
-  Params:   tblPr: The properties of the Word table
-  -->
-  <xsl:template name="InsertTableFrameWidth">
-    <xsl:param name="tblPr" />
-
-    <xsl:choose>
-      <xsl:when test="$tblPr/w:tblW/@w:type='pct'">
-        <!-- relative width -->
-        <xsl:variable name="pct" select="$tblPr/w:tblW/@w:w div 5000" />
-        <xsl:attribute name="style:rel-width">
-          <xsl:value-of select="concat(100 * $pct, '%')"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="$tblPr/w:tblW/@w:type='dxa'">
-        <!-- absolute width -->
-        <xsl:attribute name="svg:width">
-          <xsl:value-of select="ooc:CmFromTwips($tblPr/w:tblW/@w:w)" />
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <!--auto width-->
-        <xsl:attribute name="fo:min-width">
-          <xsl:text>0cm</xsl:text>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
 
 

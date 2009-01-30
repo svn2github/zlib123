@@ -609,7 +609,7 @@ namespace OdfConverter.Wordprocessing
             if (!IsInRunProperties() && "r".Equals(this.context.Peek()))
             {
                 string styleName = (string)this.currentParagraphStyleName.Peek();
-                if (!"".Equals(styleName) && IsAutomaticStyle(pStyles[styleName]))
+                if (!string.IsNullOrEmpty(styleName) && pStyles.ContainsKey(styleName) && IsAutomaticStyle(pStyles[styleName]))
                 {
                     Element rPr = new Element("w", "rPr", NAMESPACE);
                     AddRunStyleProperties(rPr, styleName, false);

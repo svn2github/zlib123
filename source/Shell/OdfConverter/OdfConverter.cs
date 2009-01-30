@@ -76,7 +76,7 @@ namespace OdfConverter.CommandLineTool
             {
                 ConversionOptions options = OdfConverter.ParseCommandLine(args);
                 // complete / correct conversion options
-                options.Generator = GENERATOR;
+                options.Generator = OdfConverter.GENERATOR;
                 if (string.IsNullOrEmpty(options.InputFullName))
                 {
                     throw new InvalidConversionOptionsException("Input is missing");
@@ -144,6 +144,11 @@ namespace OdfConverter.CommandLineTool
                 {
                     throw new InvalidConversionOptionsException("Input must be a directory for batch conversions.");
                 }
+
+                if (File.Exists(options.OutputFullName))
+                {
+                    throw new InvalidConversionOptionsException("Output must be a directory for batch conversions.");
+                }
                 this.checkBatch(options);
                 this.proceedBatch(options);
             }
@@ -152,6 +157,10 @@ namespace OdfConverter.CommandLineTool
                 if (Directory.Exists(options.InputFullName))
                 {
                     throw new InvalidConversionOptionsException("Input must be a file unless one of the batch option is specified.");
+                }
+                if (Directory.Exists(options.OutputFullName))
+                {
+                    options.OutputFullName = Path.Combine(options.OutputFullName, Path.GetFileNameWithoutExtension(options.InputFullName)) + getTargetExtension(options);
                 }
                 this.checkSingleFile(options);
                 this.proceedSingleFile(options);
@@ -659,6 +668,7 @@ namespace OdfConverter.CommandLineTool
                         options.ShowProgress = true;
                         break;
                     case "-DUMP":
+                        ++i; // expects one parameter
                         // do nothing here
                         break;
                     default:
@@ -787,7 +797,7 @@ namespace OdfConverter.CommandLineTool
             {
                 if (File.Exists(options.OutputFullName) && !options.ForceOverwrite)
                 {
-                    throw new InvalidConversionOptionsException("The specified output file already exists. Use /F to overwrite existing files.");
+                    throw new InvalidConversionOptionsException(string.Format("The specified output file \"{0}\" already exists. Use /F to overwrite existing files.", options.OutputFullName));
                 }
             }
         }
@@ -799,10 +809,10 @@ namespace OdfConverter.CommandLineTool
             {
                 targetExtension = ".xml";
             }
-            else if (!string.IsNullOrEmpty(options.OutputFullName))
-            {
-                targetExtension = Path.GetExtension(options.OutputFullName);
-            }
+            //else if (!string.IsNullOrEmpty(options.OutputFullName))
+            //{
+            //    targetExtension = Path.GetExtension(options.OutputFullName);
+            //}
             else
             {
                 switch (Path.GetExtension(options.InputFullName).ToLowerInvariant())

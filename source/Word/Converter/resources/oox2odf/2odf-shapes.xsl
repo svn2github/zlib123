@@ -94,8 +94,9 @@
 
       <xsl:apply-templates />
       <!-- some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
-      <!-- divo: don't see a reason to apply templates to the following sibling. This can have unwanted side-effects -->
-      <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame" />
+      <!-- divo: don't see a reason to apply templates to the following sibling. This can have unwanted side-effects, 
+           e.g by calling the built-in templates for that mode which causes e.g. content of o:FieldCode nodes to be written to the output document -->
+      <!--<xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame" />-->
     </draw:frame>
   </xsl:template>
 
@@ -197,9 +198,9 @@
         <draw:line draw:text-style-name="P1"
                    draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
           <xsl:call-template name="InsertAnchorTypeAttribute" />
-          <xsl:call-template name="InsertShapeWidth" />
-          <xsl:call-template name="InsertShapeHeight" />
-          <xsl:call-template name="InsertshapeAbsolutePos" />
+          <!--<xsl:call-template name="InsertShapeWidth" />-->
+          <!--<xsl:call-template name="InsertShapeHeight" />-->
+          <!--<xsl:call-template name="InsertshapeAbsolutePos" />-->
           <xsl:call-template name="InsertShapeZindexAttribute" />
           <xsl:call-template name="GetLineCoordinates" />
           <xsl:apply-templates select="v:textbox" >
@@ -3306,12 +3307,8 @@
   </xsl:template>
 
   <!--
-  Summary: 
-  -->
-
-  <!--
-  Summary: inserts the svg:x and svg:y attribute
-  Author: Clever Age
+    Summary: inserts the svg:x and svg:y attribute
+    Author: Clever Age
   -->
   <xsl:template name="InsertshapeAbsolutePos">
     <xsl:param name="shape" select="." />
@@ -3327,41 +3324,41 @@
     <xsl:variable name="currentSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
     <!-- added by chhavi to calulate top bottom left  and right margin and page height and width  in case of mirror margin-->
     <xsl:variable name="pageWidth">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPr =''" >
           <xsl:value-of select="($currentSectPr)/w:pgSz/@w:w" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="pageHeight">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPr =''" >
           <xsl:value-of select="($currentSectPr)/w:pgSz/@w:h" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="marTop">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPr =''" >
           <xsl:value-of select="($currentSectPr)/w:pgMar/@w:top" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:top" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="marBottom">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPr =''" >
           <xsl:value-of select="($currentSectPr)/w:pgMar/@w:bottom" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:bottom" />
         </xsl:otherwise>
       </xsl:choose>
@@ -3371,7 +3368,7 @@
         <xsl:when test="$currentSectPr =''" >
           <xsl:value-of select="($currentSectPr)/w:pgMar/@w:left" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left" />
         </xsl:otherwise>
       </xsl:choose>
@@ -3381,7 +3378,7 @@
         <xsl:when test="$currentSectPr =''" >
           <xsl:value-of select="($currentSectPr)/w:pgMar/@w:right" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right" />
         </xsl:otherwise>
       </xsl:choose>
@@ -3406,10 +3403,8 @@
       <xsl:choose>
         <!--  or $relV='inner-margin-area'-->
         <xsl:when test="$relV='bottom-margin-area'">
-
           <xsl:value-of select="number($pageHeight) - number($marBottom)" />
         </xsl:when>
-
         <xsl:otherwise>
           <xsl:value-of select="number($pageHeight)" />
         </xsl:otherwise>
@@ -3431,9 +3426,6 @@
     See bug: 1747143
     -->
     <xsl:if test="name($shape/..)!='v:group'">
-
-
-
       <xsl:variable name="posX">
         <xsl:if test="not(contains($shape/@style,'mso-left-percent'))">
           <xsl:variable name="x">
@@ -3681,7 +3673,7 @@
 
       <xsl:variable name="verRelPos">
         <xsl:if test="contains($shape/@style,'mso-top-percent')">
-          <xsl:choose >
+          <xsl:choose>
             <xsl:when test="contains($shape/@style,'mso-position-vertical-relative:margin')">
               <!--<xsl:value-of select="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440 * ($relativeHeight div 1000)" />-->
               <xsl:value-of select="((($pageHeight div 1440)-($marTop div 1440)- ($marBottom div 1440))) * ($relativeHeight div 1000)" />
@@ -3704,7 +3696,7 @@
             <xsl:when test="contains($shape/@style,'mso-position-vertical-relative:page')">
               <xsl:value-of select="$pageHeight div 1440 * ($relativeHeight div 1000)" />
             </xsl:when>
-            <!--<xsl:otherwise >
+            <!--<xsl:otherwise>
             <xsl:value-of select="//w:pgSz/@w:h div 1440" />
           </xsl:otherwise>-->
           </xsl:choose>
@@ -3722,7 +3714,7 @@
       <xsl:variable name="horRelPos">
         <xsl:if test="contains($shape/@style,'mso-left-percent')">
 
-          <xsl:choose >
+          <xsl:choose>
             <xsl:when test="contains($shape/@style,'mso-position-horizontal-relative:margin')">
               <xsl:value-of select="((($pageWidth div 1440)- ($marRight div 1440)- ($marLeft div 1440)))* ($relativeWidth div 1000)" />
             </xsl:when>
@@ -3745,7 +3737,7 @@
             <xsl:when test="contains($shape/@style,'mso-position-horizontal-relative:page')">
               <xsl:value-of select="$pageWidth div 1440 * ($relativeWidth div 1000)" />
             </xsl:when>
-            <!--<xsl:otherwise >
+            <!--<xsl:otherwise>
             <xsl:value-of select="//w:pgSz/@w:w div 1440" />
           </xsl:otherwise>-->
           </xsl:choose>
@@ -3851,9 +3843,9 @@
           <xsl:value-of select="concat('draw-transform:',$xCord, ':',$yCord, ':',$xCenter, ':', $yCenter, ':', $var_flipH, ':', $var_flipV, ':', $angle)" />
         </xsl:attribute>
       </xsl:if>
-
     </xsl:if>
   </xsl:template>
+  
   <!--added by chhavi for alttext-->
   <xsl:template name="AltText">
     <xsl:param name="shape" select="." />
@@ -4053,48 +4045,48 @@
     <xsl:variable name="relativeTo" select="ooc:ParseValueFromList($shape/@style, 'mso-height-relative')" />
     <!--added to calulate the value of top bottom margin and page width height in case of mirror margin-->
     <xsl:variable name="marTop">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPrForSize =''" >
           <xsl:value-of select="($currentSectPrForSize)/w:pgMar/@w:top" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:top" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="marBottom">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPrForSize =''" >
           <xsl:value-of select="($currentSectPrForSize)/w:pgMar/@w:bottom" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:bottom" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="pageWidth">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPrForSize =''" >
           <xsl:value-of select="($currentSectPrForSize)/w:pgSz/@w:w" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="pageHeight">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPrForSize =''" >
           <xsl:value-of select="($currentSectPrForSize)/w:pgSz/@w:h" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <!--end here-->
     <xsl:variable name="VarHeight">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="contains($shape/@style,'mso-height-relative:margin')">
           <xsl:value-of select="($pageHeight  - ($marBottom + $marTop)) div 1440 " />
         </xsl:when>
@@ -4112,7 +4104,7 @@
           <xsl:value-of select="$marTop div 1440 " />
         </xsl:when>
         <!--end here-->
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="$pageHeight div 1440" />
         </xsl:otherwise>
       </xsl:choose>
@@ -4305,21 +4297,21 @@
 
     <!--added to calulate the value of left right margin and page width height in case of mirror margin-->
     <xsl:variable name="pageWidth">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPrForWidth =''" >
           <xsl:value-of select="($currentSectPrForWidth)/w:pgSz/@w:w" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="pageHeight">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="$currentSectPrForWidth =''" >
           <xsl:value-of select="($currentSectPrForWidth)/w:pgSz/@w:h" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h" />
         </xsl:otherwise>
       </xsl:choose>
@@ -4329,7 +4321,7 @@
         <xsl:when test="$currentSectPrForWidth =''" >
           <xsl:value-of select="($currentSectPrForWidth)/w:pgMar/@w:left" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left" />
         </xsl:otherwise>
       </xsl:choose>
@@ -4339,7 +4331,7 @@
         <xsl:when test="$currentSectPrForWidth =''" >
           <xsl:value-of select="($currentSectPrForWidth)/w:pgMar/@w:right" />
         </xsl:when>
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right" />
         </xsl:otherwise>
       </xsl:choose>
@@ -4350,7 +4342,7 @@
 
 
     <xsl:variable name="VarWidth">
-      <xsl:choose >
+      <xsl:choose>
         <xsl:when test="contains($shape/@style,'mso-width-relative:margin')">
           <xsl:value-of select="($pageWidth  - ($marLeft + $marRight)) div 1440 " />
         </xsl:when>
@@ -4368,7 +4360,7 @@
           <xsl:value-of select="$marLeft div 1440 " />
         </xsl:when>
         <!--end here-->
-        <xsl:otherwise >
+        <xsl:otherwise>
           <xsl:value-of select="$pageWidth div 1440" />
         </xsl:otherwise>
       </xsl:choose>

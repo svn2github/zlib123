@@ -561,7 +561,7 @@
 
           <xsl:attribute name="text:use-index-source-styles">true</xsl:attribute>
           <xsl:call-template name="InsertContentOfIndexProperties">
-            <xsl:with-param name="styleName" select="ooc:NCNameFromString('Contents Heading')" />
+            <xsl:with-param name="styleName" select="'Contents Heading'" />
             <xsl:with-param name="maxLevel" select="$maxLevel" />
             <xsl:with-param name="instrTextContent" select="$instrTextContent" />
             <xsl:with-param name="type" select="$type" />
@@ -574,7 +574,7 @@
             <xsl:attribute name="text:alphabetical-separators">true</xsl:attribute>
           </xsl:if>
           <xsl:call-template name="InsertContentOfIndexProperties">
-            <xsl:with-param name="styleName" select="ooc:NCNameFromString('Index Heading')" />
+            <xsl:with-param name="styleName" select="'Index Heading'" />
             <xsl:with-param name="maxLevel" select="$maxLevel" />
             <xsl:with-param name="instrTextContent" select="$instrTextContent" />
             <xsl:with-param name="type" select="$type" />
@@ -590,7 +590,7 @@
             </xsl:choose>
           </xsl:attribute>
           <xsl:call-template name="InsertContentOfIndexProperties">
-            <xsl:with-param name="styleName" select="ooc:NCNameFromString('Table index heading')" />
+            <xsl:with-param name="styleName" select="'Table index heading'" />
             <xsl:with-param name="maxLevel" select="$maxLevel" />
             <xsl:with-param name="instrTextContent" select="$instrTextContent" />
           </xsl:call-template>
@@ -820,11 +820,13 @@
     <xsl:attribute name="text:style-name">
       <xsl:choose>
         <!--math, dialogika: bugfix #1771286 BEGIN-->
-        <xsl:when test="$type='INDEXA' and key('Part', 'word/styles.xml')/w:styles/w:style/w:name[@w:val=(concat('index ',$level))]">
-          <xsl:value-of select="concat('index ',$level)" />
+        <xsl:when test="$type='INDEXA' and key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=(concat('Index',$level))]">
+          <xsl:value-of select="ooc:NCNameFromString(concat('Index',$level))" />
         </xsl:when>
         <!--math, dialogika: bugfix #1771286 END-->
-        <xsl:when test="$type='INDEXA'">Normal</xsl:when>
+        <xsl:when test="$type='INDEXA'">
+          <xsl:value-of select="ooc:NCNameFromString('Normal')" />
+        </xsl:when>
         <xsl:when test="$level=0">
           <xsl:call-template name="TocToContent">
             <xsl:with-param name="styleValue">

@@ -29,6 +29,30 @@
           return input.Replace(oldValue, newValue);
       }
       
+      
+      /// <summary>
+      /// Returns the current date and time as an XSD dateTime string in the format CCYY-MM-DDThh:mm:ss
+      /// </summary>
+      public string DateTimeNow()
+      {
+          return string.Format("{0:s}", System.DateTime.Now);
+      }
+      
+      /// <summary>
+      /// Formats a given date as an XSD dateTime string in the format CCYY-MM-DDThh:mm:ss
+      /// If the input value is an empty node-set the current date and time are returned
+      /// </summary>
+      public string FormatDateTime(string dateTime)
+      {
+          DateTime result;
+
+          if (!DateTime.TryParse(dateTime, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal, out result))
+          {
+              result = System.DateTime.Now;
+          }
+          return string.Format("{0:s}", result);
+      }
+      
       public string CmFromTwips(string twipsValue)
       {
           // concat(format-number($length * 2.54 div 1440,'#.###'),'cm')
@@ -54,7 +78,7 @@
       /// Get a value from a semicolon-separated list of key-value pairs.
       /// The pairs are separated by colon as in CSS-like strings.
       /// </summary>
-      public static string ParseValueFromList(string input, string key)
+      public string ParseValueFromList(string input, string key)
       {
           string value = String.Empty;
 

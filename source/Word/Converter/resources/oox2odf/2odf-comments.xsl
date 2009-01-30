@@ -36,7 +36,8 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="office dc meta pzip xlink w oox">
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="office dc meta pzip w oox ooc">
 
   <xsl:template name="InsertComment">
     <xsl:param name="Id" />
@@ -48,7 +49,7 @@
       </xsl:if>
       <xsl:if test="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date">
         <dc:date>
-          <xsl:value-of select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date" />
+          <xsl:value-of select="ooc:FormatDateTime(key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date)" />
         </dc:date>
       </xsl:if>
       <xsl:apply-templates select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/w:p" />

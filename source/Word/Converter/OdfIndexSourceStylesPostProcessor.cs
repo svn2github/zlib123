@@ -140,7 +140,7 @@ namespace OdfConverter.Wordprocessing
                         if (!AllStyles.Contains(thisStyle))
                         {
                             //add text:index-source-style element to allStyles arraylist and, as a child, to text:index-source-styles-element, if it wasn't added before
-                            IndexSourceStyleElement.AddAttribute(new Attribute("text", "style-name", OdfStyleNameGenerator.Instance.NCNameFromString(thisStyle), TEXT_NAMESPACE));
+                            IndexSourceStyleElement.AddAttribute(new Attribute("text", "style-name", thisStyle, TEXT_NAMESPACE));
                             AllStyles.Add(thisStyle);
                             IndexSourceStyles.AddChild(IndexSourceStyleElement);
                         }

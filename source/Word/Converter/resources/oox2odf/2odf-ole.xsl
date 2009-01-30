@@ -11,7 +11,7 @@
                 xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
                 xmlns:oox="urn:oox"
                 xmlns:ooc="urn:odf-converter"
-                exclude-result-prefixes="xlink o r rels w v oox ooc">
+                exclude-result-prefixes="o r rels w v oox ooc">
 
   <!-- 
   *************************************************************************
@@ -92,6 +92,11 @@
       </style:graphic-properties>
     </style:style>
   </xsl:template>
+
+  <!-- currently ignore field codes in OLE objects 
+       and prevent adding the code to the output document -->
+  <xsl:template match="o:FieldCodes" />
+  <xsl:template match="o:FieldCodes" mode="trackchanges" />
 
   <!-- 
   *************************************************************************

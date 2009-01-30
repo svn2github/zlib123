@@ -29,8 +29,7 @@
           text:note-class="footnote">
           <text:note-citation>
             <xsl:choose>
-              <xsl:when
-                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On' or $textFootnote!=''">
+              <xsl:when test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On' or $textFootnote!=''">
                 <xsl:choose>
                   <xsl:when test="$textFootnote!=''">
                     <xsl:attribute name="text:label">
@@ -70,8 +69,7 @@
           text:note-class="endnote">
           <text:note-citation>
             <xsl:choose>
-              <xsl:when
-                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On'  or $textEndnote!=''">
+              <xsl:when test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On'  or $textEndnote!=''">
                 <xsl:choose>
                   <xsl:when test="$textEndnote">
                     <xsl:attribute name="text:label">

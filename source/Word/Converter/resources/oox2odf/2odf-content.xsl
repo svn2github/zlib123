@@ -49,7 +49,7 @@
   xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:oox="urn:oox"
   xmlns:ooc="urn:odf-converter"               
-  exclude-result-prefixes="w r rels pcut wp v o oox ooc">
+  exclude-result-prefixes="w r rels pchar wp v o oox ooc">
 
   <xsl:import href="2odf-tables.xsl" />
   <xsl:import href="2odf-lists.xsl" />
@@ -97,8 +97,10 @@
       </office:automatic-styles>
       <office:body>
         <office:text>
+          <xsl:for-each select="key('PartsByType', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument')">
+            <xsl:call-template name="TrackChanges" />
+          </xsl:for-each>
           <xsl:call-template name="InsertUserFieldDecls" />
-          <xsl:call-template name="TrackChanges" />
           <xsl:call-template name="InsertDocumentBody" />
         </office:text>
       </office:body>
@@ -109,8 +111,7 @@
   <xsl:template name="InsertFrameStyles">
     <!-- when w:pict is child of paragraph-->
     <!--<xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
-			<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict"
-			  mode="automaticpict" />
+			<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict" mode="automaticpict" />
 		</xsl:if>-->
 
     <!-- when w:pict is child of a cell-->
@@ -188,7 +189,7 @@
         <xsl:when test="w:pStyle">
 
           <xsl:variable name="isDefaultTOCStyle">
-            <xsl:call-template name ="CheckDefaultTOCStyle">
+            <xsl:call-template name="CheckDefaultTOCStyle">
               <xsl:with-param name="name" select="w:pStyle/@w:val" />
             </xsl:call-template>
           </xsl:variable>
@@ -438,7 +439,7 @@
       </xsl:when>
 
       <!-- ignore paragraph if it's deleted in change tracking mode-->
-      <xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />
+      <!--<xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />-->
 
       <!--  check if the paragraph is a list element (it can be a heading but only if it's style is NOT linked to a list level 
 				- for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
@@ -509,11 +510,13 @@
             </xsl:attribute>
           </xsl:if>
           <!--header outline level -->
-          <xsl:call-template name="InsertHeadingOutlineLvl">
+          <!-- Fix: outline level is invalid for text:p -->
+          <!--<xsl:call-template name="InsertHeadingOutlineLvl">
             <xsl:with-param name="outlineLevel" select="$outlineLevel" />
-          </xsl:call-template>
+          </xsl:call-template>-->
           <!-- unnumbered heading is list header  -->
-          <xsl:call-template name="InsertHeadingAsListHeader" />
+          <!-- Fix: text:is-list-header is invalid for text:p -->
+          <!--<xsl:call-template name="InsertHeadingAsListHeader" />-->
           <!--change track end-->
           <xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
             <text:change-end text:change-id="{generate-id(key('p', number(@oox:id)-1))}" />
@@ -847,16 +850,10 @@
 		-->
     <xsl:if test="parent::w:body or (ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='seperate'))">
 
-      <xsl:variable name="NameBookmark">
-        <xsl:value-of select="@w:name" />
-      </xsl:variable>
-      <xsl:variable name="OutlineLvl">
-        <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val" />
-      </xsl:variable>
-      <xsl:variable name="Id">
-        <xsl:value-of select="@w:id" />
-      </xsl:variable>
-
+      <xsl:variable name="NameBookmark" select="@w:name" />
+      <xsl:variable name="OutlineLvl" select="parent::w:p/w:pPr/w:outlineLvl/@w:val" />
+      <xsl:variable name="Id" select="@w:id" />
+      
       <xsl:choose>
         <!--math, dialogika: bugfix #1785483 BEGIN-->
         <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != '' and $OutlineLvl !='9'">
@@ -887,12 +884,9 @@
 			20080710/divo: w:bookmarkEnd can also be directly below w:body. This condition was missing
 		-->
     <xsl:if test="parent::w:body or (ancestor::w:p and not(following-sibling::w:r[1]/w:fldChar/@w:fldCharType='end'))">
-      <xsl:variable name="NameBookmark">
-        <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name" />
-      </xsl:variable>
-      <xsl:variable name="OutlineLvl">
-        <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val" />
-      </xsl:variable>
+      <xsl:variable name="NameBookmark" select="key('bookmarkStart', @w:id)/@w:name" />
+      <xsl:variable name="OutlineLvl" select="parent::w:p/w:pPr/w:outlineLvl/@w:val" />
+      
       <xsl:choose>
         <xsl:when test="contains($NameBookmark, '_Toc')  and  $OutlineLvl != ''">
           <text:toc-mark-end text:id="@w:id" />
@@ -1044,14 +1038,9 @@
 	<xsl:template match="w:sym" mode="automaticstyles">
 		<style:style style:name="{generate-id(.)}" style:family="text">
 			<xsl:if test="@w:font">
-				<style:text-properties>
-					<xsl:attribute name="style:font-name">
-						<xsl:value-of select="@w:font" />
-					</xsl:attribute>
-					<xsl:attribute name="style:font-name-complex">
-						<xsl:value-of select="@w:font" />
-					</xsl:attribute>
-          <xsl:if test="../w:rPr/w:position">
+				<style:text-properties style:font-name="{@w:font}"
+                               style:font-name-complex="{@w:font}">
+					<xsl:if test="../w:rPr/w:position">
             <xsl:for-each select="../w:rPr">
               <xsl:call-template name="InsertTextPosition" />
             </xsl:for-each>

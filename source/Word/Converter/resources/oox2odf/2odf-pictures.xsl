@@ -47,7 +47,7 @@
   xmlns:oox="urn:oox"
   xmlns:ooc="urn:odf-converter"                
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w uri a pic r rels o wp w xlink oox ooc rels">
+  exclude-result-prefixes="w uri a pic r v rels o wp w oox ooc rels">
 
   <!--
   *************************************************************************
@@ -489,22 +489,16 @@
   </xsl:template>
 
   <xsl:template name="InsertImageBorder">
-    <xsl:if
-      test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln[not(a:noFill)]">
+    <xsl:if test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln[not(a:noFill)]">
       <xsl:variable name="width">
         <xsl:call-template name="ConvertEmu3">
-          <xsl:with-param name="length">
-            <xsl:value-of
-              select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"
-            />
-          </xsl:with-param>
+          <xsl:with-param name="length" select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w" />
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="type">
         <xsl:choose>
-          <xsl:when
-            test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:prstDash/@val = 'solid'">
+          <xsl:when test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:prstDash/@val = 'solid'">
             <xsl:text>solid</xsl:text>
           </xsl:when>
           <xsl:when
@@ -528,9 +522,7 @@
         <xsl:choose>
           <xsl:when
             test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr">
-            <xsl:value-of
-              select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr/@val"
-            />
+            <xsl:value-of select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr/@val" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>000000</xsl:text>

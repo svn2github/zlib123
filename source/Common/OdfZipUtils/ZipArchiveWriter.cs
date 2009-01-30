@@ -1,4 +1,4 @@
-﻿/* 
+/* 
  * Copyright (c) 2006-2008 Clever Age
  * Copyright (c) 2006-2009 DIaLOGIKa
  *

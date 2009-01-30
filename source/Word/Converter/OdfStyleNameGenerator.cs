@@ -38,7 +38,7 @@ namespace OdfConverter.Wordprocessing
     {
         // see http://www.w3.org/TR/REC-xml-names/#NT-NCName for allowed characters in NCName
         private Regex _invalidLettersAtStart = new Regex(@"^([^\p{Ll}\p{Lu}\p{Lo}\p{Lt}\p{Nl}_])(.*)", RegexOptions.Compiled); // valid start chars are \p{Ll}\p{Lu}\p{Lo}\p{Lt}\p{Nl}_
-        private Regex _invalidChars = new Regex(@"[^\p{Ll}\p{Lu}\p{Lo}\p{Lt}\p{Nl}\p{Mc}\p{Me}\p{Mn}\p{Lm}\p{Nd}]", RegexOptions.Compiled);
+        private Regex _invalidChars = new Regex(@"[^_\p{Ll}\p{Lu}\p{Lo}\p{Lt}\p{Nl}\p{Mc}\p{Me}\p{Mn}\p{Lm}\p{Nd}]", RegexOptions.Compiled);
 
         private Dictionary<string, string> _name2ncname = new Dictionary<string, string>();
         private Dictionary<string, string> _ncname2name = new Dictionary<string, string>();
