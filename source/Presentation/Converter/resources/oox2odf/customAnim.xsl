@@ -121,14 +121,10 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 									</xsl:if>
 								</xsl:for-each>
 							</xsl:variable>
-							<!--end-->
-							<xsl:variable name="TransFOlderName">
-								<xsl:value-of select="'transFileName:'" />
-							</xsl:variable>
+							<!--end-->						
 							<xsl:attribute name="xlink:href">
-								<xsl:value-of select ="concat('../',$FolderNameGUID,'-')"/>
-								<xsl:value-of select="$TransFOlderName"/>
-								<xsl:value-of select="concat('/',$soundfilename)"/>
+                <xsl:value-of select="'../'"/>
+                <xsl:value-of select="concat('transFileName:',concat($FolderNameGUID,'-'),':',concat('/',$soundfilename))" />
 							</xsl:attribute>
                 <xsl:if test="p:sld/p:transition/p:sndAc/p:stSnd/@loop=1">
 								<xsl:attribute name="smil:repeatCount">

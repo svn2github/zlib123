@@ -6180,27 +6180,20 @@ exclude-result-prefixes="p a r xlink rels">
 							<xsl:value-of select="$soundfilename"/>
 						</xsl:otherwise>
 					</xsl:choose>
-				</xsl:variable>
-				
-				<xsl:variable name="TransFOlderName">
-					<xsl:value-of select="'transFileName:'" />
-				</xsl:variable>
-				
+				</xsl:variable>	
+							
 				<!--comment added by yeswanth.s , 18 July 2008-->
 				<!--Here for this attribute, TransFOlderName should be in seperate value-of. so 3 value-of has been used-->
 				<xsl:attribute name ="xlink:href">
-					<xsl:value-of select ="concat('../',$FolderNameGUID,'-')"/>
-					<xsl:value-of select="$TransFOlderName"/>
-					<xsl:value-of select="concat('/',$soundfilename)"/>
+          <xsl:value-of select="'../'"/>
+          <xsl:value-of select="concat('transFileName:',concat($FolderNameGUID,'-'),':',concat('/',$extractfilename))" />
 				</xsl:attribute>
 				<!--some code here-->
 				<!--comment added by yeswanth.s , 18 July 2008-->
 				<!--Here for this 'pzip:target' attribute, TransFOlderName should be in seperate value-of. so 3 value-of has been used-->
 				<pzip:extract pzip:source="{concat('ppt/media/',$soundfilename)}">
 					<xsl:attribute name ="pzip:target">
-					<xsl:value-of select ="concat($FolderNameGUID,'-')"/>
-					<xsl:value-of select="$TransFOlderName"/>
-					<xsl:value-of select="concat('|',$extractfilename)"/>
+            <xsl:value-of select="concat('transFileName:',concat($FolderNameGUID,'-'),':',concat('|',$extractfilename))" />					
 				</xsl:attribute>
 				</pzip:extract> 
 				<!--end-->
