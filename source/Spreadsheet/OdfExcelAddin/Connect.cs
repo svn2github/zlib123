@@ -135,21 +135,20 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                */
 
                 case OfficeVersion.OfficeXP:
-                   
-                    this._application.SetBool("DisplayAlerts", false); 
+
                     doc = this._application.Invoke("Workbooks").
                     Invoke("Open", fileName, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                             Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                             Type.Missing, Type.Missing, Type.Missing);
                     break;
 
-                default:
-                    this._application.SetBool("DisplayAlerts", false); 
+                default:                    
                     doc = this._application.Invoke("Workbooks").
                     Invoke("Open", fileName, Type.Missing, readOnly, Type.Missing, Type.Missing,
                             Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                             Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                     break;
+
             }
             return doc;
         }
@@ -157,21 +156,29 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         private LateBindingObject SaveDocumentAs(LateBindingObject doc, string fileName)
         {
             //bool addToRecentFiles = false;
+            bool bDisplayAlerts = this._application.GetBool("DisplayAlerts");
             switch (this._officeVersion)
             {
+                
                 case OfficeVersion.OfficeXP:
+                    
+                    this._application.SetBool("DisplayAlerts", false); 
                     doc.Invoke("SaveAs",
                     fileName, Word12Class, Type.Missing, Type.Missing, Type.Missing,
                     Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing,
                     Type.Missing, Type.Missing, Type.Missing);
+                    this._application.SetBool("DisplayAlerts", bDisplayAlerts); 
                     break;
 
 
                 case OfficeVersion.Office2003:
+                    
+                    this._application.SetBool("DisplayAlerts", false); 
                     doc.Invoke("SaveAs",
                         fileName, Word12Class, Type.Missing, Type.Missing, Type.Missing,
                         Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing,
                         Type.Missing, Type.Missing, Type.Missing);
+                    this._application.SetBool("DisplayAlerts", bDisplayAlerts); 
                     break;
                 default:
                     doc.Invoke("SaveAs",
