@@ -126,7 +126,17 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
             LateBindingObject doc = null;
             switch (this._officeVersion)
             {
+                /*Added By: Sandeep
+                 Defect  : 2107258(Crash, sharepoint services hangs ) 
+                 Desc    : The input file is  linked to sharepoint services server, when clicking 'yes' on the dialog box asking "do you want to load pending changes",
+                           the conversion hangs Excel. The "file conversion in progress" dialog box is 
+                           displayed and apparently another (very small) box on top of it.
+                           To fix this Additional property added , DispalayAlerts= false for office XP and other office files, to supress messages 
+               */
+
                 case OfficeVersion.OfficeXP:
+                   
+                    this._application.SetBool("DisplayAlerts", false); 
                     doc = this._application.Invoke("Workbooks").
                     Invoke("Open", fileName, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                             Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
@@ -134,6 +144,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                     break;
 
                 default:
+                    this._application.SetBool("DisplayAlerts", false); 
                     doc = this._application.Invoke("Workbooks").
                     Invoke("Open", fileName, Type.Missing, readOnly, Type.Missing, Type.Missing,
                             Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
