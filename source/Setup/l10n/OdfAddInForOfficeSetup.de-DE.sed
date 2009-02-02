@@ -27,7 +27,7 @@ FinishMessage=
 TargetName=OdfAddInForOfficeSetup-de.exe
 FriendlyName=ODF Add-In für Microsoft Office
 AppLaunched=CMD /C SetupPrepare.bat
-PostInstallCmd=CMD /C ECHO FINISHED
+PostInstallCmd=CMD /C WaitForProcess msiexec.exe OdfAddInForOfficeSetup.msi
 AdminQuietInstCmd=
 UserQuietInstCmd=
 FILE0="setup.exe"
@@ -36,6 +36,7 @@ FILE2="extensibilityMSM.msi"
 FILE3="lockbackRegKey.msi"
 FILE4="office2003-kb907417sfxcab-ENU.exe"
 FILE5="SetupPrepare.bat"
+FILE6="WaitForProcess.exe"
 [SourceFiles]
 SourceFiles0=de-DE
 SourceFiles1=de-DE\KB908002\
@@ -49,3 +50,4 @@ SourceFiles2=..\..\scripts\
 %FILE4%=
 [SourceFiles2]
 %FILE5%=
+%FILE6%=
