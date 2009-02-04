@@ -123,20 +123,29 @@ namespace WaitForProcess
                 catch (Exception)
                 {
                 }
-                
-                // code using System.Diagnostics only
-                //Process[] processList = Process.GetProcessesByName(processName);
 
-                //foreach (Process process in processList)
-                //{
-                //    if (process.MainWindowTitle.ToLowerInvariant().Contains(installerName.ToLowerInvariant()))
-                //    {
-                //        // max wait 1h
-                //        process.WaitForExit(3600000);
-                //        Console.WriteLine("Installation finished.");
-                //        return;
-                //    }
-                //}
+                try
+                {
+
+                    // fallback using System.Diagnostics only
+                    Process[] processList = Process.GetProcessesByName(processName);
+
+                    foreach (Process process in processList)
+                    {
+                        if (process.MainWindowTitle.ToLowerInvariant().Contains(installerName.ToLowerInvariant()))
+                        {
+                            // max wait 1h
+                            process.WaitForExit(3600000);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
+                // measure of last resort: go to bed for 20 min
+                Thread.Sleep(1200000);
             }
         }
     }
