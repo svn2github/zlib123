@@ -71,9 +71,9 @@ namespace WaitForProcess
         [STAThread]
         static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length != 3)
             {
-                Console.WriteLine("Usage: WaitForProcess.exe <process name> <window title>");
+                Console.WriteLine("Usage: WaitForProcess.exe <process name> <command line arg> <window title>");
             }
             else
             {
@@ -82,10 +82,12 @@ namespace WaitForProcess
 
                 string processName = args[0];
                 string installerName = args[1];
+                string mainWindowTitle = args[2];
 
                 try
                 {
                     // use WMI to retrieve the command line
+                    Trace.WriteLine("Querying WMI");
                     SelectQuery selectQuery = new SelectQuery(string.Format("select CommandLine, ProcessId from Win32_Process where name='{0}'", processName));
 
                     using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(selectQuery))
@@ -95,13 +97,16 @@ namespace WaitForProcess
                             try
                             {
                                 string commandLine = wmiProcess.Properties["CommandLine"].Value.ToString();
-
+                                
+                                Trace.WriteLine("Process found: " + commandLine);
+                                
                                 // check whether we got the right process where our installer is contained in the command-line args
                                 if (commandLine.ToLowerInvariant().Contains(installerName.ToLowerInvariant()))
                                 {
                                     // we assume the process id to be numeric. if it isn't we are pretty much out of luck anyway
                                     int processId = int.Parse(wmiProcess.Properties["ProcessId"].Value.ToString());
-                                    
+                                    Trace.WriteLine("Process ID is: " + processId);
+
                                     Process process = Process.GetProcessById(processId);
                                     if (process != null && !process.HasExited)
                                     {
@@ -112,36 +117,42 @@ namespace WaitForProcess
                                 }
 
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
                                 // fail silently (yes, we do, hehe)
+                                Trace.WriteLine(ex.ToString());
                             }
 
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Trace.WriteLine(ex.ToString());
                 }
 
                 try
                 {
-
+                    Trace.WriteLine("Retrieving list of running processes");
                     // fallback using System.Diagnostics only
-                    Process[] processList = Process.GetProcessesByName(processName);
+                    string processNameWithoutExtension = processName.Contains(".") ? processName.Substring(0, processName.LastIndexOf('.')) : processName;
+                    //Process[] processList = Process.GetProcessesByName(processNameWithoutExtension);
+                    Process[] processList = Process.GetProcesses();
 
                     foreach (Process process in processList)
                     {
-                        if (process.MainWindowTitle.ToLowerInvariant().Contains(installerName.ToLowerInvariant()))
+                        Trace.WriteLine("Process found: " + process.Id + " " + process.ProcessName + " " + process.MainWindowTitle);
+                        if (process.ProcessName.Contains(processNameWithoutExtension) && process.MainWindowTitle.ToLowerInvariant().Contains(mainWindowTitle.ToLowerInvariant()))
                         {
-                            // max wait 1h
-                            process.WaitForExit(3600000);
+                            Trace.WriteLine("Waiting for process");
+                            process.WaitForExit();
                             return;
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Trace.WriteLine(ex.ToString());
                 }
 
                 // measure of last resort: go to bed for 20 min
