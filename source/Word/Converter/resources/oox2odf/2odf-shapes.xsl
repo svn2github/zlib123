@@ -1281,10 +1281,8 @@
   <xsl:template match="v:fill[@type='gradient']" mode="officestyles">
     <xsl:variable name="parentShape" select="parent::node()" />
     <xsl:variable name="gradientName" select="concat('Gradient_', generate-id(.))" />
-    <xsl:variable name="focusValue">
-      <xsl:value-of select="substring-before(@focus, '%')" />
-    </xsl:variable>
-
+    <xsl:variable name="focusValue" select="substring-before(@focus, '%')" />
+    
     <draw:gradient draw:name="{ooc:NCNameFromString($gradientName)}"
                    draw:display-name="{$gradientName}">
       <xsl:attribute name="draw:style">
@@ -1295,6 +1293,9 @@
           <xsl:when test="$focusValue='50' or $focusValue='-50'">
             <xsl:text>axial</xsl:text>
           </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>linear</xsl:text>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
       <xsl:attribute name="draw:start-color">
