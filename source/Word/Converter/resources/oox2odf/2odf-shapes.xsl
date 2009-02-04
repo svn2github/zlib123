@@ -160,7 +160,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox">
             <xsl:with-param name="shapetype" select="'isosceles-triangle'" />
           </xsl:apply-templates >
@@ -186,7 +186,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'right-triangle'" />
           </xsl:apply-templates >
@@ -202,11 +202,11 @@
           <!--<xsl:call-template name="InsertShapeHeight" />-->
           <!--<xsl:call-template name="InsertshapeAbsolutePos" />-->
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="GetLineCoordinates" />
+          <xsl:call-template name="InsertLineCoordinateAttributes" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Line'" />
           </xsl:apply-templates >
-          <xsl:call-template name="AltText" />
         </draw:line>
       </xsl:when >
       <!--Elbow Connector-->
@@ -218,8 +218,8 @@
           <!--<xsl:call-template name="InsertShapeHeight" />-->
           <!--<xsl:call-template name="InsertshapeAbsolutePos" />-->
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
-          <xsl:call-template name="GetLineCoordinates" />
+          <xsl:call-template name="InsertLineCoordinateAttributes" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Elbow Connector'" />
           </xsl:apply-templates >
@@ -235,8 +235,8 @@
           <!--<xsl:call-template name="InsertShapeHeight" />-->
           <!--<xsl:call-template name="InsertshapeAbsolutePos" />-->
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
-          <xsl:call-template name="GetLineCoordinates" />
+          <xsl:call-template name="InsertLineCoordinateAttributes" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Curved Connector'" />
           </xsl:apply-templates >
@@ -267,7 +267,7 @@
             <xsl:call-template name="InsertShapeHeight" />
             <xsl:call-template name="InsertshapeAbsolutePos" />
             <xsl:call-template name="InsertShapeZindexAttribute" />
-            <xsl:call-template name="AltText" />
+            <xsl:call-template name="InsertAlternativeTextElement" />
             <xsl:apply-templates select="v:textbox" >
               <xsl:with-param name="shapetype" select="'Flowchart Process'" />
             </xsl:apply-templates >
@@ -287,7 +287,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Flowchart Alternate Process'" />
           </xsl:apply-templates >
@@ -314,7 +314,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Flowchart Decision'" />
           </xsl:apply-templates >
@@ -330,7 +330,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Flowchart Data'" />
           </xsl:apply-templates >
@@ -346,7 +346,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Flowchart Predefined Process'" />
           </xsl:apply-templates >
@@ -362,7 +362,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Internal Storage'" />
           </xsl:apply-templates >
@@ -378,7 +378,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Document'" />
           </xsl:apply-templates >
@@ -394,7 +394,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Multi Document'" />
           </xsl:apply-templates >
@@ -410,7 +410,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Terminator'" />
           </xsl:apply-templates >
@@ -426,7 +426,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Collate'" />
           </xsl:apply-templates >
@@ -442,7 +442,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Sort'" />
           </xsl:apply-templates >
@@ -458,7 +458,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Extract'" />
           </xsl:apply-templates >
@@ -474,7 +474,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Merge'" />
           </xsl:apply-templates >
@@ -490,7 +490,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Sorted Data'" />
           </xsl:apply-templates >
@@ -506,7 +506,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Delay'" />
           </xsl:apply-templates >
@@ -522,7 +522,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Sequential Access Storage'" />
           </xsl:apply-templates >
@@ -538,7 +538,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Magnetic Disk'" />
           </xsl:apply-templates >
@@ -554,7 +554,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Direct Access Storage'" />
           </xsl:apply-templates >
@@ -570,7 +570,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'FlowChart Display'" />
           </xsl:apply-templates >
@@ -586,7 +586,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Rectangular Callout'" />
           </xsl:apply-templates >
@@ -648,7 +648,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Rounded Rectangular Callout'" />
           </xsl:apply-templates >
@@ -708,7 +708,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Oval Callout'" />
           </xsl:apply-templates >
@@ -750,7 +750,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Right Arrow'" />
           </xsl:apply-templates >
@@ -776,7 +776,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Left Arrow'" />
           </xsl:apply-templates >
@@ -802,7 +802,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Up Arrow'" />
           </xsl:apply-templates >
@@ -828,7 +828,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Down Arrow'" />
           </xsl:apply-templates >
@@ -854,7 +854,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Trapezoid'" />
           </xsl:apply-templates >
@@ -879,7 +879,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Can'" />
           </xsl:apply-templates >
@@ -905,7 +905,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Cube'" />
           </xsl:apply-templates >
@@ -936,7 +936,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Octagon'" />
           </xsl:apply-templates >
@@ -962,7 +962,7 @@
           <xsl:call-template name="InsertShapeHeight" />
           <xsl:call-template name="InsertshapeAbsolutePos" />
           <xsl:call-template name="InsertShapeZindexAttribute" />
-          <xsl:call-template name="AltText" />
+          <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
             <xsl:with-param name="shapetype" select="'Parallelogram'" />
           </xsl:apply-templates >
@@ -1099,17 +1099,13 @@
               </xsl:variable>
               <xsl:call-template name="InsertAnchorTypeAttribute" />
               <xsl:call-template name="InsertShapeZindexAttribute" />
-              <xsl:call-template name="AltText" />
               <xsl:call-template name="InsertLinePos1">
-                <xsl:with-param name="flip">
-                  <xsl:value-of select="$flip" />
-                </xsl:with-param>
+                <xsl:with-param name="flip" select="$flip" />
               </xsl:call-template>
               <xsl:call-template name="InsertLinePos2">
-                <xsl:with-param name="flip">
-                  <xsl:value-of select="$flip" />
-                </xsl:with-param>
+                <xsl:with-param name="flip" select="$flip" />
               </xsl:call-template>
+              <xsl:call-template name="InsertAlternativeTextElement" />
             </draw:line>
           </xsl:when>
           <xsl:otherwise>
@@ -1163,8 +1159,7 @@
                       <xsl:call-template name="InsertShapeHeight" />
                       <xsl:call-template name="InsertshapeAbsolutePos" />
                       <xsl:call-template name="InsertShapeZindexAttribute" />
-                      <xsl:call-template name="AltText" />
-
+                      <xsl:call-template name="InsertAlternativeTextElement" />
                       <xsl:apply-templates select="v:textbox">
                         <xsl:with-param name="shapetype" select="'Rectangle'" />
                       </xsl:apply-templates >
@@ -1182,7 +1177,7 @@
                   <xsl:call-template name="InsertShapeHeight" />
                   <xsl:call-template name="InsertshapeAbsolutePos" />
                   <xsl:call-template name="InsertShapeZindexAttribute" />
-                  <xsl:call-template name="AltText" />
+                  <xsl:call-template name="InsertAlternativeTextElement" />
                   <xsl:apply-templates select="v:textbox" >
                     <xsl:with-param name="shapetype" select="'Oval'" />
                   </xsl:apply-templates >
@@ -1197,7 +1192,7 @@
                   <xsl:call-template name="InsertShapeHeight" />
                   <xsl:call-template name="InsertshapeAbsolutePos" />
                   <xsl:call-template name="InsertShapeZindexAttribute" />
-                  <xsl:call-template name="AltText" />
+                  <xsl:call-template name="InsertAlternativeTextElement" />
                   <xsl:apply-templates select="v:textbox" >
                     <xsl:with-param name="shapetype" select="'Rounded Rectangle'" />
                   </xsl:apply-templates >
@@ -3847,7 +3842,7 @@
   </xsl:template>
   
   <!--added by chhavi for alttext-->
-  <xsl:template name="AltText">
+  <xsl:template name="InsertAlternativeTextElement">
     <xsl:param name="shape" select="." />
     <xsl:if test="$shape/@alt!=''">
       <xsl:element name="svg:desc">
@@ -4375,7 +4370,7 @@
   </xsl:template>
 
   <!-- Sona Line Functions-->
-  <xsl:template name="GetLineCoordinates">
+  <xsl:template name="InsertLineCoordinateAttributes">
     <xsl:param name="shape" select="." />
     <xsl:variable name="leftMarginTemp" select="ooc:ParseValueFromList($shape/@style, 'margin-left')" />
     <xsl:variable name="topMarginTemp" select="ooc:ParseValueFromList($shape/@style, 'margin-top')" />
