@@ -307,7 +307,10 @@ namespace OdfConverter.CommandLineTool
             bool converted = false;
             bool validated = false;
 
-            _report.LogInfo(options.InputFullName, "Converting {0} into {1}", options.InputFullName.Substring(options.InputBaseFolder.Length + 1), options.OutputFullName.Substring(options.OutputBaseFolder.Length + 1));
+            string relativeInputFileName = options.InputFullName.Substring(options.InputBaseFolder.Length).TrimStart('\\');
+            string relativeOutputFileName = options.OutputFullName.Substring(options.OutputBaseFolder.Length).TrimStart('\\');
+            _report.LogInfo(options.InputFullName, "Converting {0} into {1}", relativeInputFileName, relativeOutputFileName);
+
             converted = convertFile(options.InputFullName, options.OutputFullName, options);
             if (converted && options.Validate)
             {
