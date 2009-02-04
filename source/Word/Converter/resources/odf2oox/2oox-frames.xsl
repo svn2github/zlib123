@@ -972,24 +972,24 @@
                 or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                 or $frameStyle/style:graphic-properties/@fo:min-width">
         <!-- Sona: The above condition valid only for frames-->
-        <xsl:if test="parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
-        <xsl:text>mso-wrap-style:none;</xsl:text>
+        <xsl:if test="parent::draw:frame or draw:frame">
+          <xsl:text>mso-wrap-style:none;</xsl:text>
         </xsl:if>
       </xsl:when>
       <xsl:when test="(@fo:min-height and parent::draw:frame/@fo:min-width) or parent::draw:frame/@fo:min-width">
         <!-- Sona: The above condition valid only for frames-->
-        <xsl:if test ="parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
-        <xsl:text>mso-wrap-style:none;</xsl:text>
+        <xsl:if test="parent::draw:frame or draw:frame">
+          <xsl:text>mso-wrap-style:none;</xsl:text>
         </xsl:if>
       </xsl:when>
       <xsl:when test="(not($frameStyle/style:graphic-properties/@fo:wrap-option) or $frameStyle/style:graphic-properties/@fo:wrap-option='wrap')
-                and not(self::node()[name()='draw:frame']) 
-                and not(parent::node()[name()='draw:frame'])">
+                and not(draw:frame) 
+                and not(parent::draw:frame)">
         <xsl:text>mso-wrap-style:none;</xsl:text>
       </xsl:when>
-      <xsl:when test="not($frameStyle/@style:parent-style-name) and (self::node()[name()='draw:frame'] or parent::node()[name()='draw:frame'])">
-      <xsl:text>mso-wrap-style:none;</xsl:text>
-      </xsl:when>
+      <!--<xsl:when test="not($frameStyle/@style:parent-style-name) and (draw:frame or parent::draw:frame)">
+        <xsl:text>mso-wrap-style:none;</xsl:text>
+      </xsl:when>-->
     </xsl:choose>
 
     <!--text-box spacing/margins -->
@@ -1493,16 +1493,15 @@
               </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:if test="not(parent::node()[name()='draw:frame']) and not(self::node()[name()='draw:frame'])
-                and (not($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
-                       and $frameStyle/style:graphic-properties/@draw:auto-grow-width
-                or not($frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">
+              <xsl:if test="not(parent::draw:frame) and not(draw:frame)
+                          and (not($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
+                               and $frameStyle/style:graphic-properties/@draw:auto-grow-width
+                               or not($frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
               </xsl:if>
-              <xsl:if test="((parent::node()[name()='draw:frame']) or (self::node()[name()='draw:frame']))
-                and (not($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
-                       and $frameStyle/style:graphic-properties/@draw:auto-grow-width
-                or not($frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">
+              <xsl:if test="(parent::draw:frame or draw:frame)
+                          and ($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
+                               or $frameStyle/style:graphic-properties/@draw:auto-grow-height = 'true')">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
               </xsl:if>
             </xsl:otherwise>
