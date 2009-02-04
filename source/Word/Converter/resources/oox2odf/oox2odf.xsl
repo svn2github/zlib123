@@ -103,7 +103,7 @@
   -->
 
   <!-- App version number -->
-  <xsl:variable name="app-version">2.0.0</xsl:variable>
+  <xsl:variable name="app-version">3.0.0</xsl:variable>
 
   <xsl:template match="/oox:package">
 
