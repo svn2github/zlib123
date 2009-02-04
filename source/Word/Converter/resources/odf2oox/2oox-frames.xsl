@@ -108,6 +108,8 @@
   Summary:  Converts a text box in a frame to a VML shape
   Author:   Clever Age
   -->
+  <!-- WARNING: There is an identical match-template defined in 2oox-shapes.xsl.
+       This template will therefore most likely never match -->
   <xsl:template match="draw:text-box" mode="paragraph">
     <w:r>
       <w:rPr>

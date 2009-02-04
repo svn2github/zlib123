@@ -1195,8 +1195,7 @@
       <w:pict>
 
         <!-- this properties are needed to make z-index work properly -->
-        <v:shapetype  id="_x0000_t202" coordsize="21600,21600" path="m,l,21600r21600,l21600,xe"
-          xmlns:o="urn:schemas-microsoft-com:office:office">
+        <v:shapetype id="_x0000_t202" coordsize="21600,21600" path="m,l,21600r21600,l21600,xe" xmlns:o="urn:schemas-microsoft-com:office:office">
           <v:stroke joinstyle="miter"/>
           <v:path gradientshapeok="t" o:connecttype="rect"/>
         </v:shapetype>

@@ -41,7 +41,8 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  exclude-result-prefixes="xlink draw svg fo office style text">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="xlink draw svg fo office style text ooc">
 
   <!--
   *************************************************************************
@@ -61,7 +62,7 @@
   Summary: frames containing external images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and (starts-with(@xlink:href, '/') or contains(@xlink:href, ':'))]]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriAbsolute(./draw:image/@xlink:href)]]" mode="paragraph">
     <!-- Note: An external path either starts with a slash or with a protocol such as http:, thats why we check for ':' in the href -->
     
     <!-- insert link to TOC field when required (user indexes) -->
@@ -111,7 +112,7 @@
   Summary: frames containing internal images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and not(starts-with(./draw:image/@xlink:href, '/') or contains(./draw:image/@xlink:href,':'))]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(ooc:IsUriAbsolute(./draw:image/@xlink:href))]]" mode="paragraph">
     <!-- Note: An internal path neither starts with a slash nor with a protocol such as http:, thats why we check for ':' in the href -->
     
     <!-- insert link to TOC field when required (user indexes) -->
