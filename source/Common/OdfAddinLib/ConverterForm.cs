@@ -29,16 +29,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using System.IO;
-using System.Threading;
-using CleverAge.OdfConverter.OdfConverterLib;
 using System.Resources;
-using System.Collections;
+using System.Windows.Forms;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -71,7 +64,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             //this code is for displaying the label in progress bar               
             //Code change 1 of 2
             this.lblMessage.Text = manager.GetString("ProgressBarLoadLabel");
-            this.lblMessage.Visible  = true;
+            this.lblMessage.Visible = true;
 
             if (this.Parent == null)
             {
@@ -92,8 +85,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        public bool Canceled {
-            get {
+        public bool Canceled
+        {
+            get
+            {
                 return cancel;
             }
         }
@@ -116,7 +111,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void DoConvert()
         {
-            try {
+            try
+            {
                 converter.RemoveMessageListeners();
                 converter.AddProgressMessageListener(new AbstractConverter.MessageListener(ProgressMessageInterceptor));
                 converter.AddFeedbackMessageListener(new AbstractConverter.MessageListener(FeedbackMessageInterceptor));
@@ -127,7 +123,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.computeSize = false;
                 converter.Transform(this.inputFile, this.outputFile);
                 WorkComplete(null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 WorkComplete(e);
             }
         }
@@ -147,17 +145,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (this.progressBar1.Value == 1)
                 //when progress bar value is 1 then label is made in visible
                 {
-                    this.lblMessage.Visible = false; 
+                    this.lblMessage.Visible = false;
                 }
                 if (this.progressBar1.Value >= this.progressBar1.Maximum)
                 //when progress bar crosses maximum value, another message will be displayed 
-                {                    
+                {
                     this.lblMessage.Visible = true;
-                    this.lblMessage.Text = manager.GetString("ProgressBarExitLabel");                    
+                    this.lblMessage.Text = manager.GetString("ProgressBarExitLabel");
                 }
             }
             Application.DoEvents();
-            if (cancel) {
+            if (cancel)
+            {
                 // As we need to leave converter.OdfToOox, throw an exception
                 throw new CancelledException();
             }
@@ -167,27 +166,27 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             string messageKey = ((OdfEventArgs)e).Message;
             string messageValue = null;
-            
-        	int index = messageKey.IndexOf('%');
-        	// parameters substitution
-        	if (index > 0)
-        	{
-        		string [] param  = messageKey.Substring(index+1).Split(new char [] {'%'});
-        		messageValue = manager.GetString(messageKey.Substring(0, index));
-        		
-        		if (messageValue != null)
-        		{
-        			for (int i = 0; i < param.Length; i++)
-        			{
-        				messageValue = messageValue.Replace("%"+(i+1), param[i]);
-        			}
-        		}
-        	}
-        	else 
-        	{
-            	messageValue = manager.GetString(messageKey);
-        	}
-            
+
+            int index = messageKey.IndexOf('%');
+            // parameters substitution
+            if (index > 0)
+            {
+                string[] param = messageKey.Substring(index + 1).Split(new char[] { '%' });
+                messageValue = manager.GetString(messageKey.Substring(0, index));
+
+                if (messageValue != null)
+                {
+                    for (int i = 0; i < param.Length; i++)
+                    {
+                        messageValue = messageValue.Replace("%" + (i + 1), param[i]);
+                    }
+                }
+            }
+            else
+            {
+                messageValue = manager.GetString(messageKey);
+            }
+
             if (messageValue != null && !lostElements.Contains(messageValue))
             {
                 lostElements.Add(messageValue);
@@ -198,7 +197,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             if (e == null)
             {
-                    DialogResult = DialogResult.OK;
+                DialogResult = DialogResult.OK;
             }
             else
             {
@@ -214,18 +213,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void cancelButton_Click(object sender, EventArgs e) {
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
             cancel = true;
         }
 
-        private void ConverterForm_Load(object sender, EventArgs e) {
+        private void ConverterForm_Load(object sender, EventArgs e)
+        {
             FileInfo file = new FileInfo(inputFile);
-            this.Text = manager.GetString("ConversionFormTitle").Replace("%1",  file.Name);
+            this.Text = manager.GetString("ConversionFormTitle").Replace("%1", file.Name);
         }
 
-        private void ConverterForm_Activated(object sender, EventArgs e) {
+        private void ConverterForm_Activated(object sender, EventArgs e)
+        {
             // Launch conversion
-            if (!converting) {
+            if (!converting)
+            {
                 converting = true;
                 Application.DoEvents();
                 DoConvert();
