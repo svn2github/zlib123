@@ -40,15 +40,15 @@
 				<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MyFileAssociationDlgDescription)" />
 				<Control Id="DetailedDescription" Type="Text" X="25" Y="55" Height="30" Width="300" Transparent="yes" NoPrefix="yes" Text="!(loc.MyFileAssociationDlgDetailedDescription)" />
 
-				<Control Id="AssociateWord" Type="CheckBox" Property="FILE_ASSOCIATION_ODT" CheckBoxValue="1" X="35" Y="85" Height="15" Width="200" Default="no" Text="OpenDocument Text Documents (.odt)" Disabled="yes">
+				<Control Id="AssociateWord" Type="CheckBox" Property="FILE_ASSOCIATION_ODT" CheckBoxValue="1" X="35" Y="85" Height="15" Width="200" Default="no" Text="!(loc.FileTypeOdt) (.odt)" Disabled="yes">
 					<!-- only enable if feature WORDADDIN is to be installed or not to be uninstalled -->
 					<Condition Action="enable"><![CDATA[ (&WORDADDIN=3) OR NOT (&WORDADDIN=2) AND (!WORDADDIN=3)]]></Condition>
 				</Control>
-				<Control Id="AssociateExcel" Type="CheckBox" Property="FILE_ASSOCIATION_ODS" CheckBoxValue="1" X="35" Y="110" Height="15" Width="200" Default="no" Text="OpenDocument Spreadsheets (.ods)" Disabled="yes">
+				<Control Id="AssociateExcel" Type="CheckBox" Property="FILE_ASSOCIATION_ODS" CheckBoxValue="1" X="35" Y="110" Height="15" Width="200" Default="no" Text="!(loc.FileTypeOds) (.ods)" Disabled="yes">
 					<!-- only enable if feature EXCELADDIN is to be installed -->
 					<Condition Action="enable"><![CDATA[ (&EXCELADDIN=3) OR NOT (&EXCELADDIN=2) AND (!EXCELADDIN=3)]]></Condition>
 				</Control>
-				<Control Id="AssociatePowerPoint" Type="CheckBox" Property="FILE_ASSOCIATION_ODP" CheckBoxValue="1" X="35" Y="135" Height="15" Width="200" Default="no" Text="OpenDocument Presentations (.odp)" Disabled="yes">
+				<Control Id="AssociatePowerPoint" Type="CheckBox" Property="FILE_ASSOCIATION_ODP" CheckBoxValue="1" X="35" Y="135" Height="15" Width="200" Default="no" Text="!(loc.FileTypeOdp) (.odp)" Disabled="yes">
 					<!-- only enable if feature POWERPOINTADDIN is to be installed -->
 					<Condition Action="enable"><![CDATA[ (&POWERPOINTADDIN=3) OR NOT (&POWERPOINTADDIN=2) AND (!POWERPOINTADDIN=3)]]></Condition>
 				</Control>
