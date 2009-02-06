@@ -42,8 +42,8 @@
   exclude-result-prefixes="office text table fo style draw xlink v svg number">
 
 
-	<!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->
-	<!--<xsl:strip-space elements="*"/>
+  <!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->
+  <!--<xsl:strip-space elements="*"/>
     <xsl:preserve-space elements="text:p"/>
     <xsl:preserve-space elements="text:span"/>-->
 
@@ -51,8 +51,7 @@
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
   <xsl:key name="indexes" match="text:illustration-index | text:table-index" use="''"/>
   <xsl:key name="user-indexes" match="text:user-index" use="''"/>
-  <xsl:key name="user-index-by-name" match="text:user-index/text:user-index-source"
-    use="@text:index-name"/>
+  <xsl:key name="user-index-by-name" match="text:user-index/text:user-index-source" use="@text:index-name"/>
   <xsl:key name="alphabetical-indexes" match="text:alphabetical-index" use="''"/>
   <xsl:key name="bibliography-entries" match="text:bibliography-mark" use="@text:identifier"/>
   <xsl:key name="index-styles" match="text:table-of-content-source/*" use="@text:style-name"/>
@@ -73,9 +72,7 @@
       <!-- when hyperlink option is on in TOC -->
       <xsl:when test="text:a">
         <!-- apply templates to nodes except tabs who do not have preceding sibling other than tabs (converted into indent) -->
-        <xsl:apply-templates
-          select="child::node()[not(self::text:tab[not(preceding-sibling::node()[not(self::text:tab)])])]"
-          mode="paragraph"/>
+        <xsl:apply-templates select="child::node()[not(self::text:tab[not(preceding-sibling::node()[not(self::text:tab)])])]" mode="paragraph"/>
       </xsl:when>
       <!-- default scenario -->
       <xsl:otherwise>
@@ -152,9 +149,7 @@
   <xsl:template name="InsertIndexFiguresPrefs">
     <w:instrText xml:space="preserve"> TOC \c "</w:instrText>
     <w:instrText>
-      <xsl:value-of
-        select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"
-      />
+      <xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name" />
     </w:instrText>
     <w:instrText xml:space="preserve">" </w:instrText>
     <!-- no page numbering if not defined in index -->
@@ -196,9 +191,7 @@
         test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >1">
         <w:instrText xml:space="preserve">\c "</w:instrText>
         <w:instrText>
-          <xsl:value-of
-            select="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"
-          />
+          <xsl:value-of select="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count" />
         </w:instrText>
         <w:instrText xml:space="preserve">" </w:instrText>
       </xsl:when>
@@ -212,9 +205,7 @@
       test="ancestor-or-self::text:alphabetical-index/text:alphabetical-index-source/@fo:language">
       <w:instrText xml:space="preserve">\z "</w:instrText>
       <w:instrText>
-        <xsl:value-of
-          select="ancestor-or-self::text:alphabetical-index/text:alphabetical-index-source/@fo:language"
-        />
+        <xsl:value-of select="ancestor-or-self::text:alphabetical-index/text:alphabetical-index-source/@fo:language" />
       </w:instrText>
       <w:instrText xml:space="preserve">"</w:instrText>
     </xsl:if>
@@ -223,16 +214,14 @@
   <xsl:template name="InsertIllustrationInPrefs">
     <w:instrText xml:space="preserve"> TOC  \c "</w:instrText>
     <w:instrText>
-      <xsl:value-of
-        select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"
-      />
+      <xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name" />
     </w:instrText>
     <w:instrText xml:space="preserve">" </w:instrText>
   </xsl:template>
 
 
   <!--math, dialogika: Added to calculate range for TOC entries (for \o) BEGIN-->
-  
+
   <xsl:template name="GetMinOutlineLvlDefined">
     <xsl:param name="min" select="1" />
 
@@ -273,8 +262,8 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>  
-  
+  </xsl:template>
+
   <!--Returns the maximum consecutive outline level that is defined in a paragraph starting from min up to max-->
   <xsl:template name="GetMaxConsecutiveHeadingWithOutline">
     <xsl:param name="min" select="1" />
@@ -294,13 +283,13 @@
     <xsl:choose>
 
       <xsl:when test="$min &gt; $max">
-        <xsl:value-of select="$max" />        
+        <xsl:value-of select="$max" />
       </xsl:when>
-      
+
       <!--Default heading style with outline-level = min found-->
-      
+
       <!--<xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style/@style:default-outline-level = $min">-->
-      <xsl:when test="$Style and $IsDefaultHeading = 'true'">   
+      <xsl:when test="$Style and $IsDefaultHeading = 'true'">
         <xsl:call-template name="GetMaxConsecutiveHeadingWithOutline">
           <xsl:with-param name="min">
             <xsl:value-of select="$min + 1"/>
@@ -324,8 +313,8 @@
   <xsl:template name="InsertTocPrefs">
     <xsl:variable name="tocSource"
       select="ancestor::text:table-of-content/text:table-of-content-source"/>
-    
-    
+
+
 
     <w:instrText xml:space="preserve"> TOC </w:instrText>
     <!-- outline level -->
@@ -338,21 +327,21 @@
       <xsl:variable name="MinOutline">
         <xsl:call-template name="GetMinOutlineLvlDefined" />
       </xsl:variable>
-      
+
       <xsl:variable name="MaxConsideredOutline">
-      <xsl:choose>
-        <xsl:when test="$tocSource/@text:outline-level=10">9</xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$tocSource/@text:outline-level"/>
-        </xsl:otherwise>
-      </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="$tocSource/@text:outline-level=10">9</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$tocSource/@text:outline-level"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="MaxConsecutiveOutline">
         <xsl:call-template name="GetMaxConsecutiveHeadingWithOutline" >
           <xsl:with-param name="min">
             <xsl:value-of select="$MinOutline"/>
-          </xsl:with-param>          
+          </xsl:with-param>
           <xsl:with-param name="max">
             <xsl:value-of select="$MaxConsideredOutline"/>
           </xsl:with-param>
@@ -363,16 +352,20 @@
       <!--Specify the range of outline levels that is to be used in TOC-->
       <xsl:if test="$MinOutline != '0' and not($MinOutline &gt; $MaxConsecutiveOutline)">
         <w:instrText xml:space="preserve">\o "</w:instrText>
-        <w:instrText><xsl:value-of select="$MinOutline"/></w:instrText>
+        <w:instrText>
+          <xsl:value-of select="$MinOutline"/>
+        </w:instrText>
         <w:instrText xml:space="preserve">-</w:instrText>
-        <w:instrText><xsl:value-of select="$MaxConsecutiveOutline"/></w:instrText>
+        <w:instrText>
+          <xsl:value-of select="$MaxConsecutiveOutline"/>
+        </w:instrText>
         <w:instrText xml:space="preserve">" </w:instrText>
       </xsl:if>
 
       <!--Add additional outline levels that cannot be included in the range (only one possible)
-          due to gaps in the list of defined outline levels-->      
+          due to gaps in the list of defined outline levels-->
       <w:instrText xml:space="preserve">\t "</w:instrText>
-      <w:instrText>        
+      <w:instrText>
         <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level &gt; $MaxConsecutiveOutline and not(@style:default-outline-level &gt; $MaxConsideredOutline)]" >
           <xsl:choose>
             <xsl:when test="@style:display-name">
@@ -393,14 +386,16 @@
                 <xsl:text>[INSERTSEPARATOR]</xsl:text>
               </xsl:if>
             </xsl:otherwise>
-          </xsl:choose>          
+          </xsl:choose>
         </xsl:for-each>
       </w:instrText>
       <w:instrText xml:space="preserve">" </w:instrText>
 
       <!--<w:instrText xml:space="preserve">\o "1-</w:instrText>
       <w:instrText>
-        --><!-- include elements with outline styles up to selected level  --><!--
+        -->
+      <!-- include elements with outline styles up to selected level  -->
+      <!--
         <xsl:choose>
           <xsl:when test="$tocSource/@text:outline-level=10">9</xsl:when>
           <xsl:otherwise>
@@ -409,11 +404,11 @@
         </xsl:choose>
       </w:instrText>
       <w:instrText xml:space="preserve">" </w:instrText>-->
-      
-    </xsl:if>
-    <!--math, dialogika: changed to include styles form outline numbering correctly END-->    
 
-    
+    </xsl:if>
+    <!--math, dialogika: changed to include styles form outline numbering correctly END-->
+
+
     <!-- separator before page numbering. default is right align, null if no tab-stop defined -->
     <xsl:if test="$tocSource/text:table-of-content-entry-template and not($tocSource/text:table-of-content-entry-template/text:index-entry-tab-stop[@style:type = 'right'])">
       <w:instrText xml:space="preserve">\p " " </w:instrText>
@@ -433,8 +428,8 @@
 
     <!--math, dialogika: changed to include additional styles only if enabled BEGIN-->
     <xsl:if test="$tocSource/text:index-source-styles and $tocSource/@text:use-index-source-styles='true'">
-    <!--<xsl:if test="$tocSource/text:index-source-styles">-->
-    <!--math, dialogika: changed to include additional styles only if enabled END-->
+      <!--<xsl:if test="$tocSource/text:index-source-styles">-->
+      <!--math, dialogika: changed to include additional styles only if enabled END-->
       <w:instrText xml:space="preserve">\t "</w:instrText>
       <w:instrText>
         <xsl:call-template name="InsertTOCLevelStyle">
@@ -489,7 +484,7 @@
             <xsl:for-each select="key('styles', $levelStyleName)">
               <xsl:choose>
                 <xsl:when test="@style:display-name">
-                  <xsl:value-of select="@style:display-name"/>                  
+                  <xsl:value-of select="@style:display-name"/>
                   <!--<xsl:text>;</xsl:text>-->
                   <xsl:text>[INSERTSEPARATOR]</xsl:text>
                   <xsl:value-of select="$level"/>
@@ -563,14 +558,10 @@
   <xsl:template name="InsertTOCBgColor">
     <xsl:if
       test="key('styles', ancestor::text:table-of-content/@text:style-name)/style:section-properties/@fo:background-color">
-      <xsl:variable name="bgColor">
-        <xsl:value-of
-          select="key('styles', ancestor::text:table-of-content/@text:style-name)/style:section-properties/@fo:background-color"
-        />
-      </xsl:variable>
+      <xsl:variable name="bgColor" select="key('styles', ancestor::text:table-of-content/@text:style-name)/style:section-properties/@fo:background-color" />
+
       <xsl:if test="$bgColor != 'transparent' ">
-        <w:shd w:val="clear" w:color="auto"
-          w:fill="{translate(translate(substring-after($bgColor, '#'),'f','F'),'c','C')}"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="{translate(translate(substring-after($bgColor, '#'),'f','F'),'c','C')}"/>
       </xsl:if>
     </xsl:if>
   </xsl:template>
@@ -630,13 +621,10 @@
       <w:instrText xml:space="preserve">" </w:instrText>
       <!-- find style associated to main entries. If more than one index, use style of first only. -->
       <xsl:if test="@text:main-entry='true' ">
-        <xsl:variable name="MainStyleName">
-          <xsl:value-of
-            select="key('alphabetical-indexes', '')/text:alphabetical-index-source/@text:main-entry-style-name"
-          />
-        </xsl:variable>
+        <xsl:variable name="mainStyleName" select="key('alphabetical-indexes', '')/text:alphabetical-index-source/@text:main-entry-style-name" />
+
         <xsl:for-each select="document('styles.xml')">
-          <xsl:for-each select="key('styles', $MainStyleName)/style:text-properties">
+          <xsl:for-each select="key('styles', $mainStyleName)/style:text-properties">
             <xsl:if test="@fo:font-weight = 'bold' ">
               <w:instrText xml:space="preserve">\b </w:instrText>
             </xsl:if>
@@ -691,8 +679,7 @@
   <xsl:template match="text:user-index-mark-end" mode="paragraph">
     <xsl:variable name="id" select="@text:id"/>
     <xsl:variable name="entryText">
-      <xsl:for-each
-        select="preceding-sibling::node()[preceding-sibling::text:user-index-mark-start[@text:id = $id]]">
+      <xsl:for-each select="preceding-sibling::node()[preceding-sibling::text:user-index-mark-start[@text:id = $id]]">
         <!-- ignore all ...mark-start/end and track-changes -->
         <xsl:if test="not(contains(name(), 'mark-') or contains(name(), 'change-'))">
           <xsl:choose>
@@ -757,16 +744,14 @@
     <xsl:choose>
 
       <!-- first case : first paragraph of a table -->
-      <xsl:when
-        test="(self::text:p or self::text:h) and key('user-indexes', '')/text:user-index-source/@text:use-tables='true' ">
+      <xsl:when test="(self::text:p or self::text:h) and key('user-indexes', '')/text:user-index-source/@text:use-tables='true' ">
         <xsl:variable name="isFirstParagraphOfTable">
           <xsl:call-template name="IsFirstParagraphOfTable"/>
         </xsl:variable>
         <xsl:if test="$isFirstParagraphOfTable = 'true' ">
           <xsl:variable name="entryText" select="ancestor-or-self::table:table[last()]/@table:name"/>
           <!-- insert a TC field for every index that uses tables -->
-          <xsl:for-each
-            select="key('user-indexes', '')[text:user-index-source/@text:use-tables='true']">
+          <xsl:for-each select="key('user-indexes', '')[text:user-index-source/@text:use-tables='true']">
             <xsl:call-template name="InsertUserFieldInstructions">
               <xsl:with-param name="entryText" select="$entryText"/>
               <xsl:with-param name="isIndexMark">false</xsl:with-param>
@@ -779,8 +764,7 @@
       <xsl:when test="self::draw:frame/descendant::draw:image and not(ancestor::draw:frame)">
         <xsl:for-each select="self::draw:frame/descendant::draw:image">
           <xsl:variable name="entryText" select="parent::draw:frame/@draw:name"/>
-          <xsl:for-each
-            select="key('user-indexes', '')[text:user-index-source/@text:use-graphics='true']">
+          <xsl:for-each select="key('user-indexes', '')[text:user-index-source/@text:use-graphics='true']">
             <xsl:call-template name="InsertUserFieldInstructions">
               <xsl:with-param name="entryText" select="$entryText"/>
               <xsl:with-param name="isIndexMark">false</xsl:with-param>
@@ -793,8 +777,7 @@
       <xsl:when test="self::draw:frame/descendant::draw:text-box and not(ancestor::draw:frame)">
         <xsl:for-each select="self::draw:frame/descendant::draw:text-box">
           <xsl:variable name="entryText" select="parent::draw:frame/@draw:name"/>
-          <xsl:for-each
-            select="key('user-indexes', '')[text:user-index-source/@text:use-floating-frames='true']">
+          <xsl:for-each select="key('user-indexes', '')[text:user-index-source/@text:use-floating-frames='true']">
             <xsl:call-template name="InsertUserFieldInstructions">
               <xsl:with-param name="entryText" select="$entryText"/>
               <xsl:with-param name="isIndexMark">false</xsl:with-param>
@@ -807,8 +790,7 @@
       <xsl:when test="self::draw:frame/descendant::draw:object-ole and not(ancestor::draw:frame)">
         <xsl:for-each select="self::draw:frame/descendant::draw:object-ole">
           <xsl:variable name="entryText" select="parent::draw:frame/@draw:name"/>
-          <xsl:for-each
-            select="key('user-indexes', '')[text:user-index-source/@text:use-objects='true']">
+          <xsl:for-each select="key('user-indexes', '')[text:user-index-source/@text:use-objects='true']">
             <xsl:call-template name="InsertUserFieldInstructions">
               <xsl:with-param name="entryText" select="$entryText"/>
               <xsl:with-param name="isIndexMark">false</xsl:with-param>
@@ -852,9 +834,7 @@
         <xsl:call-template name="InsertBibliographyEntryText">
           <xsl:with-param name="bibliographyConfiguration"
             select="document('styles.xml')/office:document-styles/office:styles/text:bibliography-configuration"/>
-          <xsl:with-param name="entryTemplate"
-            select="ancestor::office:text/text:bibliography/text:bibliography-source/text:bibliography-entry-template[@text:bibliography-type=$bibliographyType]/child::node()"
-          />
+          <xsl:with-param name="entryTemplate" select="ancestor::office:text/text:bibliography/text:bibliography-source/text:bibliography-entry-template[@text:bibliography-type=$bibliographyType]/child::node()" />
         </xsl:call-template>
         <w:instrText xml:space="preserve">" </w:instrText>
         <!-- index id -->
@@ -885,8 +865,7 @@
         <w:tab/>
         <xsl:call-template name="InsertBibliographyEntryText">
           <xsl:with-param name="bibliographyConfiguration" select="$bibliographyConfiguration"/>
-          <xsl:with-param name="entryTemplate"
-            select="$entryTemplate[preceding-sibling::text:index-entry-tab-stop]"/>
+          <xsl:with-param name="entryTemplate" select="$entryTemplate[preceding-sibling::text:index-entry-tab-stop]"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
@@ -907,25 +886,18 @@
 
     <xsl:if test="count($entryTemplate) &gt; 0">
       <xsl:choose>
-        <xsl:when
-          test="$entryTemplate[1][self::text:index-entry-bibliography/@text:bibliography-data-field = 'identifier']">
+        <xsl:when test="$entryTemplate[1][self::text:index-entry-bibliography/@text:bibliography-data-field = 'identifier']">
           <xsl:choose>
             <xsl:when test="$bibliographyConfiguration/@text:numbered-entries = 'true' ">
-              <xsl:value-of
-                select="substring-before(substring-after(text(), $bibliographyConfiguration/@text:prefix), $bibliographyConfiguration/@text:suffix)"
-              />
+              <xsl:value-of select="substring-before(substring-after(text(), $bibliographyConfiguration/@text:prefix), $bibliographyConfiguration/@text:suffix)" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of
-                select="concat($bibliographyConfiguration/@text:prefix, @text:identifier, $bibliographyConfiguration/@text:suffix)"
-              />
+              <xsl:value-of select="concat($bibliographyConfiguration/@text:prefix, @text:identifier, $bibliographyConfiguration/@text:suffix)" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        <xsl:when
-          test="$entryTemplate[1][self::text:index-entry-bibliography/@text:bibliography-data-field != 'identifier']">
-          <xsl:value-of
-            select="@*[name() = concat('text:', $entryTemplate[1]/@text:bibliography-data-field)]"/>
+        <xsl:when test="$entryTemplate[1][self::text:index-entry-bibliography/@text:bibliography-data-field != 'identifier']">
+          <xsl:value-of select="@*[name() = concat('text:', $entryTemplate[1]/@text:bibliography-data-field)]"/>
         </xsl:when>
         <xsl:when test="$entryTemplate[1][self::text:index-entry-span]">
           <xsl:value-of select="$entryTemplate[1]/text()"/>
@@ -955,25 +927,17 @@
     <xsl:param name="level" select="1"/>
 
     <xsl:if test="$level &lt; 10">
-      <xsl:variable name="levelStyleName">
-        <xsl:value-of
-          select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/@text:style-name"
-        />
-      </xsl:variable>
+      <xsl:variable name="levelStyleName" select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/@text:style-name" />
       <!-- if hyperlink -->
-      <xsl:variable name="levelTextStyleName">
-        <xsl:value-of
-          select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/*[self::text:index-entry-link-start or self::text:index-entry-link-end]/@text:style-name"
-        />
-      </xsl:variable>
+      <xsl:variable name="levelTextStyleName" select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/*[self::text:index-entry-link-start or self::text:index-entry-link-end]/@text:style-name" />
+
       <w:style w:styleId="{concat('TOC', $level)}" w:type="paragraph">
         <w:name w:val="{concat('toc ', $level)}"/>
         <w:basedOn w:val="{$levelStyleName}"/>
         <w:autoRedefine/>
         <w:semiHidden/>
         <w:pPr>
-          <xsl:for-each
-            select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]">
+          <xsl:for-each select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]">
             <xsl:call-template name="OverrideIndexParagraphTabs">
               <xsl:with-param name="levelStyleName" select="$levelStyleName"/>
               <xsl:with-param name="level" select="$level"/>
@@ -1007,12 +971,9 @@
     <xsl:param name="level"/>
 
     <xsl:variable name="leftTabStop">
-      <xsl:if
-        test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
+      <xsl:if test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
         <xsl:call-template name="GetLargestTabStop">
-          <xsl:with-param name="tabStops"
-            select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]"
-          />
+          <xsl:with-param name="tabStops" select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]" />
         </xsl:call-template>
       </xsl:if>
     </xsl:variable>
@@ -1038,9 +999,7 @@
           <w:tab w:pos="{$leftTabStop}">
             <xsl:attribute name="w:val">
               <xsl:variable name="styleType">
-                <xsl:value-of
-                  select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]/@style:type"
-                />
+                <xsl:value-of select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]/@style:type" />
               </xsl:variable>
               <xsl:choose>
                 <xsl:when test="$styleType">
@@ -1051,9 +1010,7 @@
             </xsl:attribute>
             <xsl:attribute name="w:leader">
               <xsl:call-template name="ComputeTabStopLeader">
-                <xsl:with-param name="tabStop"
-                  select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position][1]"
-                />
+                <xsl:with-param name="tabStop" select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position][1]" />
               </xsl:call-template>
             </xsl:attribute>
           </w:tab>
@@ -1072,14 +1029,9 @@
     </xsl:if>
 
     <!-- tabs before text are retained as indent if no numbering is defined -->
-    <xsl:if
-      test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
+    <xsl:if test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
       <xsl:if test="$numberingFormat = '' ">
-        <w:ind>
-          <xsl:attribute name="w:left">
-            <xsl:value-of select="$leftTabStop"/>
-          </xsl:attribute>
-        </w:ind>
+        <w:ind w:left="{$leftTabStop}" />
       </xsl:if>
     </xsl:if>
   </xsl:template>
@@ -1131,8 +1083,7 @@
 
 
   <!-- warn loss of index properties -->
-  <xsl:template
-    match="text:table-of-content|text:illustration-index|text:table-index|text:object-index|text:user-index|text:alphabetical-index|text:bibliography">
+  <xsl:template match="text:table-of-content|text:illustration-index|text:table-index|text:object-index|text:user-index|text:alphabetical-index|text:bibliography">
     <xsl:variable name="indexName">
       <xsl:choose>
         <xsl:when test="contains(name(), '-index')">
@@ -1175,47 +1126,43 @@
   <xsl:template match="text:alphabetical-index-auto-mark-file">
     <xsl:message terminate="no">translation.odf2oox.alphabeticalIndexConcordanceFile</xsl:message>
   </xsl:template>
-  
+
   <xsl:template name="InsertIndexTabs">
-    <xsl:variable name="styleName">
-      <xsl:value-of select="@text:style-name"/>
-    </xsl:variable>
+    <xsl:variable name="styleName" select="@text:style-name" />
 
     <xsl:if test="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops">
-    <w:tabs>
-      <xsl:variable name="tabInd">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
+      <w:tabs>
+        <xsl:variable name="tabInd">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left" />
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:for-each select="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops/style:tab-stop">
-        <w:tab>
-          <xsl:attribute name="w:val">
-            <xsl:choose>
-              <xsl:when test="@style:type = 'left' ">left</xsl:when>
-              <xsl:when test="@style:type = 'right' ">right</xsl:when>
-              <xsl:when test="@style:type = 'center' ">center</xsl:when>
-              <xsl:otherwise>left</xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:attribute name="w:leader">
-            <xsl:call-template name="ComputeTabStopLeader"/>
-          </xsl:attribute>
-          <xsl:variable name="pos">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="@style:position"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:attribute name="w:pos">
-                <xsl:value-of select="$pos+$tabInd"/>
-          </xsl:attribute>
-        </w:tab>
-      </xsl:for-each>
-    </w:tabs>
+          <w:tab>
+            <xsl:attribute name="w:val">
+              <xsl:choose>
+                <xsl:when test="@style:type = 'left' ">left</xsl:when>
+                <xsl:when test="@style:type = 'right' ">right</xsl:when>
+                <xsl:when test="@style:type = 'center' ">center</xsl:when>
+                <xsl:otherwise>left</xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+            <xsl:attribute name="w:leader">
+              <xsl:call-template name="ComputeTabStopLeader"/>
+            </xsl:attribute>
+            <xsl:variable name="pos">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="@style:position"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:attribute name="w:pos">
+              <xsl:value-of select="$pos+$tabInd"/>
+            </xsl:attribute>
+          </w:tab>
+        </xsl:for-each>
+      </w:tabs>
     </xsl:if>
   </xsl:template>
 
