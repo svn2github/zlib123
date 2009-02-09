@@ -42,7 +42,7 @@
   MATCHING TEMPLATES
   *************************************************************************
   -->
-  
+
   <xsl:template match="text:page-number" mode="paragraph">
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
@@ -90,6 +90,7 @@
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
     <w:r>
+      <xsl:call-template name="InsertRunProperties"/>
       <xsl:apply-templates mode="text"/>
     </w:r>
     <w:r>
@@ -105,7 +106,8 @@
           <xsl:when test="../text:character-count"> NUMCHARS </xsl:when>
           <xsl:when test="../text:paragraph-count "> DOCPROPERTY Paragraphs </xsl:when>
         </xsl:choose>
-        <xsl:call-template name="GetNumberFormattingSwitch"/> \* MERGEFORMAT </xsl:attribute>
+        <xsl:call-template name="GetNumberFormattingSwitch"/> \* MERGEFORMAT
+      </xsl:attribute>
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
@@ -143,9 +145,7 @@
             <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
           </xsl:attribute>
           <w:r>
-            <w:rPr>
-              <xsl:call-template name="InsertLanguage"/>
-            </w:rPr>
+            <xsl:call-template name="InsertRunProperties"/>
             <w:t>
               <xsl:value-of select="text()"/>
             </w:t>
@@ -192,6 +192,7 @@
     <xsl:choose>
       <xsl:when test="@text:fixed='true'">
         <w:r>
+          <xsl:call-template name="InsertRunProperties"/>
           <w:t>
             <xsl:value-of select="text()"/>
           </w:t>
@@ -218,9 +219,7 @@
             <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
           </xsl:attribute>
           <w:r>
-            <w:rPr>
-              <w:noProof/>
-            </w:rPr>
+            <xsl:call-template name="InsertRunProperties"/>
             <w:t>
               <xsl:value-of select="text()"/>
             </w:t>
@@ -325,7 +324,7 @@
   <!-- Sender Fields -->
   <xsl:template match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]" mode="paragraph">
     <xsl:variable name="username" select="."/>
-    
+
     <w:fldSimple w:instr="{concat('USERNAME ' ,$username,'\* MERGEFORMAT')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
@@ -333,7 +332,7 @@
 
   <xsl:template match="text:sender-initials[not(@text:fixed='true')]" mode="paragraph">
     <xsl:variable name="userinitial" select="."/>
-    
+
     <w:fldSimple w:instr="{concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
@@ -341,7 +340,7 @@
 
   <xsl:template match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]" mode="paragraph">
     <xsl:variable name="adress" select="."/>
-    
+
     <w:fldSimple w:instr="{concat('USERADDRESS ' ,$adress,'\* MERGEFORMAT')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
@@ -349,7 +348,7 @@
 
   <xsl:template match="text:sender-title" mode="paragraph">
     <xsl:variable name="title" select="."/>
-    
+
     <w:fldSimple w:instr="{concat('TITLE ' ,$title,'\* MERGEFORMAT')}">
     </w:fldSimple>
   </xsl:template>
@@ -393,7 +392,7 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="styleName" select="office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level=$outline-level]/@text:style-name" />
-              
+
               <xsl:choose>
                 <xsl:when test="key('styles',$styleName)/@style:display-name">
                   <xsl:value-of select="key('styles',$styleName)/@style:display-name"/>
@@ -421,9 +420,7 @@
             </xsl:choose>
           </xsl:attribute>
           <w:r>
-            <w:rPr>
-              <w:noProof/>
-            </w:rPr>
+            <xsl:call-template name="InsertRunProperties"/>
             <xsl:apply-templates mode="text"/>
           </w:r>
         </w:fldSimple>
@@ -433,9 +430,7 @@
       <xsl:if test="contains(@text:display, 'name')">
         <w:fldSimple w:instr="{concat('STYLEREF &quot;',$style,'&quot; \* MERGEFORMAT')}">
           <w:r>
-            <w:rPr>
-              <w:noProof/>
-            </w:rPr>
+            <xsl:call-template name="InsertRunProperties"/>
             <xsl:apply-templates mode="text"/>
           </w:r>
         </w:fldSimple>
@@ -483,6 +478,7 @@
     <xsl:if test="not(@text:display='none')">
       <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
         <w:r>
+          <xsl:call-template name="InsertRunProperties"/>
           <xsl:apply-templates mode="text"/>
         </w:r>
       </w:fldSimple>
@@ -499,6 +495,7 @@
     <xsl:if test="not(@text:display='none')">
       <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
         <w:r>
+          <xsl:call-template name="InsertRunProperties"/>
           <xsl:apply-templates mode="text"/>
         </w:r>
       </w:fldSimple>
@@ -601,9 +598,7 @@
     </w:r>
     <w:bookmarkStart w:id="{bookmarkID}" w:name="{$varName}" />
     <w:r>
-      <w:rPr>
-        <w:noProof/>
-      </w:rPr>
+      <xsl:call-template name="InsertRunProperties"/>
       <w:t>
         <xsl:value-of select="$varValue"/>
       </w:t>
@@ -615,6 +610,7 @@
     <xsl:if test="not(@text:display='none' or self::text:user-field-decl)">
       <w:fldSimple w:instr="{concat(' REF ', $varName, ' ')}">
         <w:r>
+          <xsl:call-template name="InsertRunProperties"/>
           <xsl:apply-templates mode="text"/>
         </w:r>
       </w:fldSimple>

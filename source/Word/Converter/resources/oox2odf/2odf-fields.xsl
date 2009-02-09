@@ -275,6 +275,13 @@
     <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles" />
   </xsl:template>
 
+  <xsl:template match="w:t" mode="fieldDisplayValue">
+    <!-- ODF 1.1 only allows text inside ODF fields, no text:s nodes, therefore spaces are replaced by en-space -->
+    <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
+  </xsl:template>
+
+  <xsl:template match="text()" mode="fieldDisplayValue" />
+  
   <xsl:template name="BuildFieldCode">
     <xsl:param name="ooxFieldId" select="@oox:fid | parent::*/@oox:fid" />
 
@@ -540,11 +547,7 @@
       </xsl:when>-->
       <xsl:otherwise>
         <!-- translate field to static text -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -564,65 +567,37 @@
         </text:creation-time>-->
         <!-- TODO: which one is correct? creation-time? or creation-date? -->
         <text:creation-date style:data-style-name="{generate-id(.)}">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:creation-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'DATE'">
         <text:date style:data-style-name="{generate-id(.)}">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:date>
       </xsl:when>
       <xsl:when test="$fieldType = 'EDITTIME'">
         <text:editing-duration style:data-style-name="{generate-id(.)}">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:editing-duration>
       </xsl:when>
       <xsl:when test="$fieldType = 'PRINTDATE'">
         <text:print-date style:data-style-name="{generate-id(.)}">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:print-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'SAVEDATE'">
         <text:modification-date style:data-style-name="{generate-id(.)}">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:modification-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'TIME'">
         <text:time style:data-style-name="{generate-id(.) }">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:time>
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
 
@@ -642,11 +617,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text: COMPARE, DOCVARIABLE, GOTOBUTTON, IF, PRINT-->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -662,20 +633,12 @@
     <xsl:choose>
       <xsl:when test="$fieldType = 'AUTHOR'">
         <text:initial-creator>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:initial-creator>
       </xsl:when>
       <xsl:when test="$fieldType = 'COMMENTS'">
         <text:description>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:description>
       </xsl:when>
       <xsl:when test="$fieldType = 'DOCPROPERTY'">
@@ -686,11 +649,7 @@
       </xsl:when>
       <xsl:when test="$fieldType = 'FILENAME'">
         <text:file-name text:display="name">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:file-name>
       </xsl:when>
       <xsl:when test="$fieldType = 'INFO'">
@@ -703,83 +662,47 @@
       </xsl:when>
       <xsl:when test="$fieldType = 'KEYWORDS'">
         <text:keywords>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:keywords>
       </xsl:when>
       <xsl:when test="$fieldType = 'LASTSAVEDBY'">
         <text:creator>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:creator>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMCHARS'">
         <text:character-count>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:character-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMPAGES'">
         <text:page-count>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:page-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMWORDS'">
         <text:word-count>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:word-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'SUBJECT'">
         <text:subject>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:subject>
       </xsl:when>
       <xsl:when test="$fieldType = 'TITLE'">
         <text:title>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:title>
       </xsl:when>
       <xsl:when test="$fieldType = 'TEMPLATE'">
         <text:template-name text:display="name">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:template-name>
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text: FILESIZE -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -801,11 +724,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text: INDEX, RD, TA, TC, TOA, TOC -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -852,11 +771,7 @@
           </xsl:call-template>
         </xsl:variable>
         <text:a xlink:type="simple" xlink:href="{$linkTarget}" >
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:a>
       </xsl:when>
       <xsl:when test="'CITATION'">
@@ -875,11 +790,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text: STYLEREF -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
 
@@ -902,23 +813,16 @@
       </xsl:when>
       <xsl:when test="$fieldType = 'REVNUM'">
         <text:editing-cycles>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:editing-cycles>
       </xsl:when>
       <xsl:when test="$fieldType = 'SEQ'">
         <xsl:variable name="refType" select="substring-before($fieldInstruction,' ')" />
 
         <text:sequence text:ref-name="{concat('ref',concat($refType, $fieldDisplayValue//w:t))}"
-          text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+                       text:name="{$refType}" 
+                       text:formula="{concat(concat('ooow:',$refType),'+1')}">
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:sequence>
       </xsl:when>
       <xsl:when test="$fieldType = 'AUTONUM' or $fieldType = 'AUTONUMLGL' 
@@ -934,11 +838,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -955,38 +855,22 @@
     <xsl:choose>
       <xsl:when test="$fieldType = 'USERADDRESS'">
         <text:sender-street>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:sender-street>
       </xsl:when>
       <xsl:when test="$fieldType = 'USERINITIALS'">
         <text:author-initials>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:author-initials>
       </xsl:when>
       <xsl:when test="$fieldType = 'USERNAME'">
         <text:author-name text:fixed="false">
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:author-name>
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1100,11 +984,7 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      <xsl:for-each select="$fieldDisplayValue[//w:t]">
-        <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-        <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-      </xsl:for-each>
-      <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+      <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
 
     </text:bookmark-ref>
   </xsl:template>
@@ -2004,29 +1884,17 @@
       </xsl:when>
       <xsl:when test="$docpropCategory = 'COMPANY'">
         <text:sender-company>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:sender-company>
       </xsl:when>
       <xsl:when test="$docpropCategory = 'PARAGRAPHS'">
         <text:paragraph-count>
-          <xsl:for-each select="$fieldDisplayValue[//w:t]">
-            <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-            <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-          </xsl:for-each>
-          <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:paragraph-count>
       </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text -->
-        <xsl:for-each select="$fieldDisplayValue[//w:t]">
-          <!-- ODF 1.1 only allows text, no text:s nodes, therefore spaces are replaces by en-space -->
-          <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
-        </xsl:for-each>
-        <!--<xsl:apply-templates select="$fieldDisplayValue//w:t" />-->
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
