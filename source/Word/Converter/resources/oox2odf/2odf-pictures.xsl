@@ -213,19 +213,27 @@
     maindoc foreground: 1.500.000.001 - 2.147.483.647
     -->
     <xsl:choose>
-      <xsl:when test ="ancestor::*[w:hdr] or ancestor::*[w:ftr]">
-        <xsl:choose>
+      <xsl:when test="ancestor::w:hdr or ancestor::w:ftr">
+        <!--<xsl:choose>
           <xsl:when test="$z-index &lt; 0">
-            <!-- VML in hdr ftr background -->
+            --><!-- VML in hdr ftr background --><!--
             <xsl:value-of select="500000000 - number($z-index)" />
           </xsl:when>
           <xsl:when test="$z-index &gt;= 0">
-            <!-- VML in hdr ftr foreground -->
+            --><!-- VML in hdr ftr foreground --><!--
             <xsl:value-of select="500000001 + number($z-index)" />
           </xsl:when>
           <xsl:otherwise>
-            <!-- index not set -->
+            --><!-- index not set --><!--
             <xsl:value-of select="500000001" />
+          </xsl:otherwise>
+        </xsl:choose>-->
+        <xsl:choose>
+          <xsl:when test="$z-index = ''">
+            <xsl:value-of select="0"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="500000000 + number($z-index)" />            
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -234,10 +242,10 @@
           <xsl:when test="$z-index = ''">
             <xsl:value-of select="0"/>
           </xsl:when>
-          <xsl:when test="$z-index &lt; 0">
-            <!-- VML in main doc background -->
+          <!--<xsl:when test="$z-index &lt; 0">
+            --><!-- VML in main doc background --><!--
             <xsl:value-of select="1500000000 - number($z-index)" />
-          </xsl:when>
+          </xsl:when>-->
           <xsl:otherwise>
             <!-- VML in main doc foreground -->
             <xsl:value-of select="1500000001 + number($z-index)" />
