@@ -30,9 +30,9 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-  xmlns:o="urn:schemas-microsoft-com:office:office" 
-  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" 
-  xmlns:w10="urn:schemas-microsoft-com:office:word" 
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:w10="urn:schemas-microsoft-com:office:word"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
@@ -44,7 +44,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:ooc="urn:odf-converter"                
+  xmlns:ooc="urn:odf-converter"
   exclude-result-prefixes="config svg office number text table style fo draw xlink ooc">
 
   <xsl:import href="2oox-tables.xsl"/>
@@ -61,10 +61,9 @@
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
   <!-- key to find hyperlinks with a particular style. -->
   <xsl:key name="style-modified-hyperlinks" match="text:a" use="text:span/@text:style-name"/>
-  
+
   <!-- protected sections -->
-  <xsl:variable name="protected-sections"
-    select="document('content.xml')/office:document-content/office:body//text:section[@text:protected='true']"/>
+  <xsl:variable name="protected-sections" select="document('content.xml')/office:document-content/office:body//text:section[@text:protected='true']"/>
 
   <!-- table of content count -->
   <xsl:variable name="tocCount">
@@ -72,18 +71,16 @@
       <xsl:value-of select="count(key('toc', ''))"/>
     </xsl:for-each>
   </xsl:variable>
-  
+
   <!-- remember id of first paragraph -->
   <xsl:variable name="firstParaId" select="generate-id(($body/office:text/text:p | $body/office:text/text:h)[1])" />
-  
-  
+
   <!-- main document -->
   <xsl:template name="document">
     <w:document>
       <!-- Translate the default master page color as the document background color -->
       <xsl:for-each select="document('styles.xml')">
-        <xsl:variable name="defaultBgColor"
-          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:background-color"/>
+        <xsl:variable name="defaultBgColor" select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:background-color"/>
         <xsl:if test="$defaultBgColor != 'transparent'">
           <w:background w:color="{translate(substring-after($defaultBgColor,'#'),'f','F')}"/>
         </xsl:if>
@@ -111,13 +108,13 @@
       <xsl:call-template name="InsertDocumentFinalSectionProperties"/>
     </w:body>
   </xsl:template>
- 
-  
+
+
   <!-- paragraphs and headings -->
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
     <xsl:param name="isFirstRow" select="'false'"/>
-    
+
     <xsl:message terminate="no">progress:text:p</xsl:message>
     <!-- insert frames for first paragraph of document if we are in an envelope  -->
     <!--xsl:call-template name="InsertEnvelopeFrames"/-->
@@ -132,7 +129,7 @@
       <w:p></w:p>
     </xsl:if>
     -->
-    
+
     <w:p>
       <xsl:if test="not(parent::table:table-cell)">
         <xsl:call-template name="InsertDropCap">
@@ -200,7 +197,7 @@
 
       <!-- reference to user-defined-TOC if we are in first paragraph of a table -->
       <xsl:call-template name="InsertTCField"/>
-     
+
       <!-- If there is a page-break-after in the paragraph style -->
       <xsl:call-template name="InsertPageBreakAfter"/>
     </w:p>
@@ -272,7 +269,7 @@
         <xsl:if test="preceding-sibling::node()[1][self::text:table-of-content]">
           <xsl:call-template name="InsertIndexFieldCodeEnd"/>
         </xsl:if>
-        
+
         <xsl:apply-templates mode="paragraph"/>
       </xsl:otherwise>
 
@@ -331,9 +328,7 @@
     <xsl:param name="level"/>
     <xsl:param name="isFirstRow"/>
 
-    <xsl:variable name="styleName">
-      <xsl:value-of select="@text:style-name"/>
-    </xsl:variable>
+    <xsl:variable name="styleName" select="@text:style-name" />
     
     <!-- 
     makz: Insert paragraph style reference.
@@ -348,9 +343,7 @@
         -->
         <xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
           <xsl:call-template name="InsertParagraphStyle">
-            <xsl:with-param name="styleName">
-              <xsl:value-of select="key('automatic-styles', $styleName)/@style:parent-style-name"/>
-            </xsl:with-param>
+            <xsl:with-param name="styleName" select="key('automatic-styles', $styleName)/@style:parent-style-name"/>
           </xsl:call-template>
         </xsl:if>
 
@@ -360,7 +353,7 @@
         <xsl:for-each select="key('automatic-styles', $styleName)">
           <xsl:apply-templates select="style:paragraph-properties" mode="pPr"/>
         </xsl:for-each>
-        
+
       </xsl:when>
       <xsl:when test="$styleName">
 
@@ -372,7 +365,7 @@
             <xsl:value-of select="$styleName"/>
           </xsl:with-param>
         </xsl:call-template>
-        
+
       </xsl:when>
     </xsl:choose>
 
@@ -382,13 +375,10 @@
       <!--math, dialogika: changed for correct indentation calculation of headings 
       that are not in an <text:list> element but have an outline level BEGIN -->
 
-      <xsl:variable name = "ParagraphProperties"
-         select="key('automatic-styles', $styleName)/style:paragraph-properties" />
+      <xsl:variable name="ParagraphProperties" select="key('automatic-styles', $styleName)/style:paragraph-properties" />
 
-      <xsl:variable name="MarginLeft">
-        <xsl:value-of select="$ParagraphProperties/@fo:margin-left"/>
-      </xsl:variable>
-
+      <xsl:variable name="MarginLeft" select="$ParagraphProperties/@fo:margin-left" />
+      
       <xsl:variable name="OutlineLvl">
         <xsl:choose>
           <xsl:when test="@text:outline-level">
@@ -398,16 +388,15 @@
         </xsl:choose>
       </xsl:variable>
 
-      <xsl:variable name="OutlineLvlProperties"
-        select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level = $OutlineLvl]/style:list-level-properties" />     
-                
+      <xsl:variable name="OutlineLvlProperties" select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level = $OutlineLvl]/style:list-level-properties" />
+
       <xsl:variable name="SpaceBefore">
         <xsl:choose>
           <xsl:when test="$OutlineLvlProperties/@text:space-before" >
             <xsl:value-of select="$OutlineLvlProperties/@text:space-before" />
           </xsl:when>
           <xsl:otherwise>0cm</xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
       </xsl:variable>
 
       <xsl:variable name="MinLabelWidth">
@@ -426,7 +415,7 @@
           </xsl:when>
           <xsl:otherwise>0cm</xsl:otherwise>
         </xsl:choose>
-      </xsl:variable>      
+      </xsl:variable>
 
       <xsl:variable name="TextIndent">
         <xsl:choose>
@@ -436,10 +425,10 @@
           <xsl:otherwise>0cm</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
 
       <w:ind>
-        
+
         <xsl:attribute name="w:left">
           <xsl:variable name="myMarginLeft">
             <xsl:call-template name="twips-measure">
@@ -494,7 +483,7 @@
             </xsl:call-template>
           </xsl:variable>
           <!--<xsl:value-of select="substring-before($TextIndent, 'cm') - substring-before($MinLabelWidth, 'cm')" />-->
-          <!--math, dialogika: Bugfix #2001515: if @text:is-list-header = 'true' list option min-label-width is ignored BEGIN-->          
+          <!--math, dialogika: Bugfix #2001515: if @text:is-list-header = 'true' list option min-label-width is ignored BEGIN-->
           <xsl:choose>
             <xsl:when test ="@text:is-list-header = 'true'">
               <xsl:value-of select="$myTextIndent"/>
@@ -507,7 +496,7 @@
         </xsl:variable>
 
         <xsl:choose>
-        <xsl:when test="$FirstLineIndent &gt; 0">
+          <xsl:when test="$FirstLineIndent &gt; 0">
             <xsl:attribute name="w:firstLine">
               <xsl:value-of select="$FirstLineIndent" />
             </xsl:attribute>
@@ -516,9 +505,9 @@
             <xsl:attribute name="w:hanging">
               <xsl:value-of select="-$FirstLineIndent" />
             </xsl:attribute>
-          </xsl:otherwise>        
+          </xsl:otherwise>
         </xsl:choose>
-       
+
       </w:ind>
 
       <xsl:variable name="MarginLeftTwip">
@@ -544,7 +533,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:variable name="MinLabelWidthTwip">
         <xsl:call-template name="twips-measure">
           <xsl:with-param name="length">
@@ -580,8 +569,8 @@
           </xsl:for-each>
         </xsl:if>
         <!--math, dialogika bugfix #1834587 END-->
-        
-      </w:tabs>      
+
+      </w:tabs>
 
       <!--<xsl:call-template name="InsertTabStops">
         <xsl:with-param name="styleName" select="$styleName"/>
@@ -594,7 +583,7 @@
         <xsl:with-param name="minLabelWidthTwip" select="$minLabelWidthTwip"/>
         <xsl:with-param name="spaceBeforeTwip" select="$spaceBeforeTwip"/>
       </xsl:call-template>-->
-      
+
       <!--<w:ind>
         <xsl:attribute name="w:left">
           <xsl:call-template name="twips-measure">
@@ -637,7 +626,7 @@
 
       <!--math, dialogika: changed for correct indentation calculation of headings 
       that are not in an <text:list> element but have an outline level END -->
-      
+
     </xsl:if>
 
     <!-- insert page break before table when required -->
@@ -654,10 +643,10 @@
     <xsl:call-template name="InsertFrameProperties"/>
 
     <!-- insert numbering properties -->
-      <xsl:call-template name="InsertNumbering">
-        <xsl:with-param name="level" select="$level"/>
-      </xsl:call-template>
-      
+    <xsl:call-template name="InsertNumbering">
+      <xsl:with-param name="level" select="$level"/>
+    </xsl:call-template>
+
 
     <!-- line numbering -->
     <xsl:call-template name="InsertSupressLineNumbers"/>
@@ -701,22 +690,16 @@
       <xsl:when test="ancestor::text:table-of-content and not (ancestor::text:index-title)">
         <xsl:choose>
           <xsl:when test="key('automatic-styles', $styleName)/@style:parent-style-name">
-            <xsl:variable name="level">
-              <xsl:value-of
-                select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = key('automatic-styles', $styleName)/@style:parent-style-name]/@text:outline-level "
-              />
-            </xsl:variable>
+            <xsl:variable name="level" select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = key('automatic-styles', $styleName)/@style:parent-style-name]/@text:outline-level " />
+            
             <xsl:if test="number($level)">
               <w:pStyle w:val="{concat('TOC', $level)}"/>
             </xsl:if>
           </xsl:when>
           <xsl:otherwise>
             <xsl:if test="key('styles', $styleName)">
-              <xsl:variable name="level">
-                <xsl:value-of
-                  select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level "
-                />
-              </xsl:variable>
+              <xsl:variable name="level" select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level " />
+              
               <xsl:if test="number($level)">
                 <w:pStyle w:val="{concat('TOC', $level)}"/>
               </xsl:if>
@@ -1070,11 +1053,7 @@
         </xsl:variable>
         <w:r>
           <xsl:call-template name="InsertRunProperties"/>
-          <w:commentReference>
-            <xsl:attribute name="w:id">
-              <xsl:value-of select="$id"/>
-            </xsl:attribute>
-          </w:commentReference>
+          <w:commentReference w:id="{$id}" />
         </w:r>
       </xsl:otherwise>
 
@@ -1085,18 +1064,17 @@
   <!-- links -->
   <xsl:template match="text:a" mode="paragraph">
     <xsl:choose>
-      
+
       <!-- TOC hyperlink -->
       <xsl:when test="name(../..) = 'text:index-body'">
-        
+
         <!--
         makz: new TOC Hyperlink Conversion
         -->
         <xsl:variable name="linkNr" select="count(../preceding-sibling::text:p) + 1"/>
-        <w:hyperlink w:history="1" w:tooltip="{@office:title}">
-          <xsl:attribute name="w:anchor">
-            <xsl:value-of select="concat('Toc_', generate-id(ancestor::text:table-of-content), '_', $linkNr)"/>
-          </xsl:attribute>
+        <w:hyperlink w:history="1" 
+                     w:tooltip="{@office:title}"
+                     w:anchor="{concat('Toc_', generate-id(ancestor::text:table-of-content), '_', $linkNr)}">
           <xsl:apply-templates mode="paragraph"/>
         </w:hyperlink>
 
@@ -1117,7 +1095,7 @@
               <xsl:value-of select="@office:target-frame-name"/>
             </xsl:attribute>
           </xsl:if>
-         
+
           <xsl:apply-templates mode="paragraph"/>
         </w:hyperlink>
       </xsl:otherwise>
@@ -1249,7 +1227,7 @@
     </w:r>
   </xsl:template>
 
-  
+
   <!--
   Summary:  Inserts the direct formatting of a run.
   Author:   CleverAge
@@ -1281,7 +1259,7 @@
       -->
       <xsl:choose>
         <xsl:when test="key('automatic-styles', $styleName)">
-          
+
           <!-- 
           makz: Add the parent style of the automatic style as style ref 
           -->
@@ -1293,7 +1271,7 @@
               </xsl:with-param>
             </xsl:call-template>-->
           </xsl:if>
-          
+
           <!-- 
           makz: Convert the automatic style 
           -->
@@ -1341,7 +1319,7 @@
     </xsl:variable>
 
     <xsl:variable name="myStyle" select="key('automatic-styles', $styleName)" />
-    
+
     <xsl:choose>
 
       <xsl:when test="$myStyle[1]/style:text-properties/@style:use-window-font-color = 'true' and $myStyle[1]/style:text-properties/@style:text-underline-type = 'none'">
@@ -1466,27 +1444,15 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:variable name="styleName" select="@text:style-name"/>
-          <xsl:variable name="precStyleName">
-            <xsl:value-of
-              select="preceding-sibling::node()[1][self::text:p or self::text:h]/@text:style-name"/>
-          </xsl:variable>
+          <xsl:variable name="precStyleName" select="preceding-sibling::node()[1][self::text:p or self::text:h]/@text:style-name"/>
+          
           <xsl:for-each select="document('styles.xml')">
-            <xsl:choose>
-              <xsl:when
-                test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:break-before='column' ">
-                <w:r>
-                  <w:br w:type="column"/>
-                </w:r>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:if
-                  test="key('automatic-styles',$precStyleName)/style:paragraph-properties/@fo:break-after='column' ">
-                  <w:r>
-                    <w:br w:type="column"/>
-                  </w:r>
-                </xsl:if>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:if test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:break-before='column' 
+                       or key('automatic-styles',$precStyleName)/style:paragraph-properties/@fo:break-after='column' ">
+              <w:r>
+                <w:br w:type="column"/>
+              </w:r>
+            </xsl:if>
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
@@ -1564,8 +1530,11 @@
 
   <!-- sequences used for index of tables, index of illustrations -->
   <xsl:template match="text:sequence" mode="paragraph">
-    <w:fldSimple>
-      <xsl:call-template name="InsertSequenceFieldNumType"/>
+    <xsl:variable name="numType">
+      <xsl:call-template name="GetNumberFormattingSwitch"/>
+    </xsl:variable>
+
+    <w:fldSimple w:instr="{concat('SEQ ', @text:name,' ', $numType)}">
       <xsl:call-template name="InsertIndexOfFiguresBookmark"/>
     </w:fldSimple>
   </xsl:template>
@@ -1584,8 +1553,10 @@
   <!-- Protected sections -->
   <xsl:template match="text:section[@text:protected = 'true' ]" priority="2">
     <xsl:if test="@text:protection-key">
-      <xsl:message terminate="no">translation.odf2oox.protectionKey%<xsl:value-of
-          select="@text:name"/></xsl:message>
+      <xsl:message terminate="no">
+        translation.odf2oox.protectionKey%<xsl:value-of
+          select="@text:name"/>
+      </xsl:message>
     </xsl:if>
     <xsl:choose>
       <!-- in a read-only odf document : grant permission not needed -->
@@ -1603,9 +1574,7 @@
   </xsl:template>
 
   <!-- Editable sections -->
-  <xsl:template
-    match="text:section[key('automatic-styles', @text:style-name)[1]/style:section-properties/@style:editable = 'true']"
-    priority="1">
+  <xsl:template match="text:section[key('automatic-styles', @text:style-name)[1]/style:section-properties/@style:editable = 'true']" priority="1">
     <!--  in a read-only document : grant permission -->
     <xsl:choose>
       <xsl:when test="boolean($load-readonly)">

@@ -464,9 +464,8 @@
     <xsl:param name="frameStyle"/>
     <xsl:param name="frame"/>
 
-    <xsl:variable name="anchor">
-      <xsl:value-of select="$frame/@text:anchor-type"/>
-    </xsl:variable>
+    <xsl:variable name="anchor" select="$frame/@text:anchor-type"/>
+    
     <xsl:variable name="horizontalRel">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$frameStyle"/>
@@ -649,9 +648,8 @@
     <xsl:param name="frame"/>
 
     <xsl:variable name="graphicProps" select="$frameStyle/style:graphic-properties"/>
-    <xsl:variable name="anchor">
-      <xsl:value-of select="$frame/@text:anchor-type"/>
-    </xsl:variable>
+    <xsl:variable name="anchor" select="$frame/@text:anchor-type"/>
+    
     <xsl:variable name="wrappedPara">
       <xsl:variable name="wrapping">
         <xsl:call-template name="GetGraphicProperties">
@@ -1276,12 +1274,9 @@
               <xsl:value-of select="substring-before($shadowForFrame, ' ')"/>
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="firstShadow">
-            <xsl:value-of select=" substring-before(substring-after($shadowForFrame, ' '), ' ')"/>
-          </xsl:variable>
-          <xsl:variable name="secondShadow">
-            <xsl:value-of select=" substring-after(substring-after($shadowForFrame, ' '), ' ')"/>
-          </xsl:variable>
+          <xsl:variable name="firstShadow" select="substring-before(substring-after($shadowForFrame, ' '), ' ')"/>
+          <xsl:variable name="secondShadow" select="substring-after(substring-after($shadowForFrame, ' '), ' ')"/>
+          
           <xsl:if test="$firstShadow != '' and $secondShadow != '' ">
             <xsl:attribute name="offset">
               <xsl:call-template name="point-measure">
@@ -1340,12 +1335,9 @@
             <xsl:value-of select="$shadowColor"/>
           </xsl:attribute>
         </xsl:if>
-        <xsl:variable name="firstShadow">
-          <xsl:value-of select="$shadowOffsetX"/>
-        </xsl:variable>
-        <xsl:variable name="secondShadow">
-          <xsl:value-of select="$shadowOffsetY"/>
-        </xsl:variable>
+        <xsl:variable name="firstShadow" select="$shadowOffsetX"/>
+        <xsl:variable name="secondShadow" select="$shadowOffsetY"/>
+        
         <xsl:if test="$firstShadow != '' and $secondShadow != '' ">
           <xsl:attribute name="offset">
             <xsl:call-template name="point-measure">
@@ -1730,15 +1722,10 @@
             <xsl:value-of select="$recursive_result"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:variable name="anchor">
-              <xsl:value-of select="$frame[1]/@text:anchor-type"/>
-            </xsl:variable>
-            <xsl:variable name="horizontalPos">
-              <xsl:value-of select="$frameStyle/style:graphic-properties/@style:horizontal-pos"/>
-            </xsl:variable>
-            <xsl:variable name="horizontalRel">
-              <xsl:value-of select="$frameStyle/style:graphic-properties/@style:horizontal-rel"/>
-            </xsl:variable>
+            <xsl:variable name="anchor" select="$frame[1]/@text:anchor-type"/>
+            <xsl:variable name="horizontalPos" select="$frameStyle/style:graphic-properties/@style:horizontal-pos"/>
+            <xsl:variable name="horizontalRel" select="$frameStyle/style:graphic-properties/@style:horizontal-rel"/>
+            
             <!-- page properties. not valid if more than one page-master-style -->
             <xsl:variable name="pageWidth">
               <xsl:call-template name="point-measure">
@@ -2232,22 +2219,17 @@
     <!-- frame properties -->
     <xsl:variable name="frameWidth">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"
-        />
+        <xsl:with-param name="length" select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width" />
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="frameHeight">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"
-        />
+        <xsl:with-param name="length" select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height" />
       </xsl:call-template>
     </xsl:variable>
     <!-- value used by Word to calculate frame position -->
-    <xsl:variable name="frameOffset">
-      <xsl:value-of select="round(($frameWidth - $frameHeight) div 2)"/>
-    </xsl:variable>
+    <xsl:variable name="frameOffset" select="round(($frameWidth - $frameHeight) div 2)"/>
+    
     <!-- special distance with rotation -->
     <xsl:choose>
       <xsl:when test="$angle = 90">
@@ -2286,37 +2268,21 @@
             <xsl:value-of select="$recursive_result"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:variable name="verticalPos">
-              <xsl:value-of select="$shapeStyle/style:graphic-properties/@style:vertical-pos"/>
-            </xsl:variable>
-            <xsl:variable name="verticalRel">
-              <xsl:value-of select="$shapeStyle/style:graphic-properties/@style:vertical-rel"/>
-            </xsl:variable>
+            <xsl:variable name="verticalPos" select="$shapeStyle/style:graphic-properties/@style:vertical-pos"/>
+            <xsl:variable name="verticalRel" select="$shapeStyle/style:graphic-properties/@style:vertical-rel"/>
             <xsl:variable name="pageHeight">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:page-height"
-                  />
-                </xsl:with-param>
+                <xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:page-height" />
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="pageTopMargin">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-top"
-                  />
-                </xsl:with-param>
+                <xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-top" />
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="pageBottomMargin">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-bottom"
-                  />
-                </xsl:with-param>
+                <xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-bottom" />
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="frameMarginTop">
@@ -2490,22 +2456,17 @@
     <!-- frame properties -->
     <xsl:variable name="frameWidth">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"
-        />
+        <xsl:with-param name="length" select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width" />
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="frameHeight">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"
-        />
+        <xsl:with-param name="length" select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height" />
       </xsl:call-template>
     </xsl:variable>
     <!-- value used by Word to calculate frame position -->
-    <xsl:variable name="frameOffset">
-      <xsl:value-of select="round(($frameWidth - $frameHeight) div 2)"/>
-    </xsl:variable>
+    <xsl:variable name="frameOffset" select="round(($frameWidth - $frameHeight) div 2)"/>
+    
     <!-- special distance with rotation -->
     <xsl:choose>
       <xsl:when test="$angle = 90">
@@ -2534,17 +2495,13 @@
 
     <xsl:choose>
       <xsl:when test="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName] ">
-        <xsl:value-of
-          select="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName]"/>
+        <xsl:value-of select="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName]"/>
       </xsl:when>
 
       <xsl:when test="$shapeStyle/@style:parent-style-name">
-        <xsl:variable name="parentStyleName">
-          <xsl:value-of select="$shapeStyle/@style:parent-style-name"/>
-        </xsl:variable>
+        <xsl:variable name="parentStyleName" select="$shapeStyle/@style:parent-style-name"/>
 
-        <xsl:variable name="parentStyle"
-          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyleName]"/>
+        <xsl:variable name="parentStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyleName]"/>
 
         <xsl:call-template name="GetGraphicProperties">
           <xsl:with-param name="shapeStyle" select="$parentStyle"/>

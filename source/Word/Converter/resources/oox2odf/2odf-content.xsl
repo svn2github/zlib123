@@ -711,12 +711,11 @@
   <xsl:template match="w:tab[not(parent::w:tabs)]">
     <xsl:choose>
       <xsl:when test="ancestor::w:footnote or ancestor::w:endnote">
-        <xsl:variable name="StyleId">
-          <xsl:value-of select="ancestor::w:p/w:pPr/w:pStyle/@w:val" />
-        </xsl:variable>
+        <xsl:variable name="styleId" select="ancestor::w:p/w:pPr/w:pStyle/@w:val" />
+        
         <xsl:choose>
           <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:tab[1]) 
-                    and (ancestor::w:p/w:pPr/w:ind/@w:hanging != '' or key('StyleId', $StyleId)/w:pPr/w:ind/@w:hanging != '')" />
+                    and (ancestor::w:p/w:pPr/w:ind/@w:hanging != '' or key('StyleId', $styleId)/w:pPr/w:ind/@w:hanging != '')" />
               <!-- no tab -->
           <xsl:otherwise>
             <text:tab />
@@ -821,13 +820,9 @@
           <xsl:variable name="document">
             <xsl:call-template name="GetDocumentName" />
           </xsl:variable>
-          <xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
-            <xsl:if test="./@Id=$relationshipId">
-              <xsl:call-template name="GetLinkPath">
-                <xsl:with-param name="linkHref" select="@Target" />
-              </xsl:call-template>
-            </xsl:if>
-          </xsl:for-each>
+          <xsl:call-template name="GetLinkPath">
+            <xsl:with-param name="linkHref" select="key('Part', concat('word/_rels/',$document,'.rels'))/rels:Relationships/rels:Relationship[@Id=$relationshipId]/@Target" />
+          </xsl:call-template>
         </xsl:if>
       </xsl:attribute>
 
@@ -959,9 +954,8 @@
 
       <!-- convert white spaces  -->
       <xsl:otherwise>
-        <xsl:variable name="before">
-          <xsl:value-of select="substring-before($string,' ')" />
-        </xsl:variable>
+        <xsl:variable name="before" select="substring-before($string,' ')" />
+        
         <xsl:variable name="after">
           <xsl:call-template name="CutStartSpaces">
             <xsl:with-param name="cuted">

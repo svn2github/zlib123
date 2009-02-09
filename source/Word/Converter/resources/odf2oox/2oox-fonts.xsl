@@ -56,13 +56,9 @@
             <xsl:attribute name="w:name">Symbol</xsl:attribute>
           </xsl:when>
           <!-- take value of font-family if it exists -->
-          <xsl:when
-            test="@svg:font-family and not(translate(@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)) = '' ">
-            <xsl:variable name="fontFamily">
-              <xsl:value-of
-                select="translate(@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
-              />
-            </xsl:variable>
+          <xsl:when test="@svg:font-family and not(translate(@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)) = '' ">
+            <xsl:variable name="fontFamily" select="translate(@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)" />
+            
             <xsl:choose>
               <!-- take only first font of list (svg:font-family="font1, font2, font3 ...") -->
               <xsl:when test="contains($fontFamily, ',')">
@@ -120,11 +116,8 @@
       <xsl:when test="$fontName = 'StarSymbol' ">Symbol</xsl:when>
       <!-- take value of font-family if it exists -->
       <xsl:when test="key('fonts',$fontName)/@svg:font-family">
-        <xsl:variable name="fontFamily">
-          <xsl:value-of
-            select="translate(key(&quot;fonts&quot;,$fontName)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
-          />
-        </xsl:variable>
+        <xsl:variable name="fontFamily" select="translate(key(&quot;fonts&quot;,$fontName)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)" />
+        
         <xsl:choose>
           <!-- take only first font of list (svg:font-family="font1, font2, font3 ...") -->
           <xsl:when test="contains($fontFamily, ',')">

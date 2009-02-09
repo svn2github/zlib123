@@ -29,13 +29,13 @@
       public bool IsUriAbsolute(string uri)
       {
           Uri tmp;
-          return Uri.TryCreate(uri, UriKind.Absolute, out tmp);
+          return Uri.TryCreate(uri, UriKind.Absolute, out tmp) || uri.StartsWith("/") || uri.Contains(":");
       }
 
       public bool IsUriRelative(string uri)
       {
           Uri tmp;
-          return Uri.TryCreate(uri, UriKind.Relative, out tmp);
+          return Uri.TryCreate(uri, UriKind.Relative, out tmp) && !uri.StartsWith("/") && !uri.Contains(":");
       }
 
       public bool IsUriValid(string uri)

@@ -28,9 +28,7 @@
     <!--xsl:variable name="id">
       <xsl:value-of select="generate-id(preceding::w:p/w:pPr/w:sectPr)"/>
     </xsl:variable-->
-    <xsl:variable name="id2">
-      <xsl:value-of select="generate-id(.)"/>
-    </xsl:variable>
+    <xsl:variable name="id2" select="generate-id(.)"/>
     <xsl:choose>
       <xsl:when
         test="preceding::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]
@@ -100,9 +98,8 @@
                 <xsl:variable name="width" select="./@w:w"/>
                 <xsl:choose>
                   <xsl:when test="preceding-sibling::w:col[1]/@w:space">
-                    <xsl:variable name="space">
-                      <xsl:value-of select="round(number(preceding-sibling::w:col[1]/@w:space) div 2)"/>
-                    </xsl:variable>
+                    <xsl:variable name="space" select="round(number(preceding-sibling::w:col[1]/@w:space) div 2)"/>
+                    
                     <xsl:value-of select="concat($width + $space,'*')"/>
                   </xsl:when>
                   <xsl:when test="./@w:space">

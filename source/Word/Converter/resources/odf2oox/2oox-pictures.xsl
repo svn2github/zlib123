@@ -62,7 +62,7 @@
   Summary: frames containing external images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriAbsolute(./draw:image/@xlink:href)]]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriAbsolute(@xlink:href)]]" mode="paragraph">
     <!-- Note: An external path either starts with a slash or with a protocol such as http:, thats why we check for ':' in the href -->
     
     <!-- insert link to TOC field when required (user indexes) -->
@@ -112,7 +112,7 @@
   Summary: frames containing internal images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(ooc:IsUriAbsolute(./draw:image/@xlink:href))]]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriRelative(@xlink:href)]]" mode="paragraph">
     <!-- Note: An internal path neither starts with a slash nor with a protocol such as http:, thats why we check for ':' in the href -->
     
     <!-- insert link to TOC field when required (user indexes) -->

@@ -68,7 +68,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </w:bookmarkStart>
-    <xsl:if test="name()='text:bookmark'">
+    <xsl:if test="text:bookmark">
       <w:bookmarkEnd>
         <xsl:attribute name="w:id">
           <xsl:call-template name="GenerateBookmarkId">
@@ -97,10 +97,8 @@
   <!-- Insert Cross References (Bookmark) -->
   <xsl:template match="text:bookmark-ref | text:reference-ref | text:sequence-ref" mode="paragraph">
     <xsl:variable name="TextName" select="@text:ref-name"/>
-    <xsl:variable name="masterPage"
-      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header/text:p"/>
-    <xsl:if
-      test="key('bookmark-reference-start', $TextName) or $masterPage/text:reference-mark-start[@text:name=$TextName] or $masterPage/text:bookmark-start[@text:name=$TextName]">
+    <xsl:variable name="masterPage" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header/text:p"/>
+    <xsl:if test="key('bookmark-reference-start', $TextName) or $masterPage/text:reference-mark-start[@text:name=$TextName] or $masterPage/text:bookmark-start[@text:name=$TextName]">
       <w:r>
         <w:fldChar w:fldCharType="begin"/>
       </w:r>
@@ -327,21 +325,10 @@
   <!-- Insert BookmarkStart Id or BookmarkEnd Id -->
   <xsl:template name="GenerateBookmarkId">
     <xsl:param name="TextName"/>
-    <xsl:variable name="ReferenceMarkStart">
-      <xsl:value-of
-        select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )"
-      />
-    </xsl:variable>
-    <xsl:variable name="BookmarkStart">
-      <xsl:value-of
-        select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"
-      />
-    </xsl:variable>
-    <xsl:variable name="Bookmark">
-      <xsl:value-of
-        select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark)"
-      />
-    </xsl:variable>
+    <xsl:variable name="ReferenceMarkStart" select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )" />
+    <xsl:variable name="BookmarkStart" select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)" />
+    <xsl:variable name="Bookmark" select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark)" />
+    
     <xsl:value-of select="$ReferenceMarkStart+$BookmarkStart+$Bookmark"/>
   </xsl:template>
 
@@ -500,14 +487,10 @@
 
       <!--count element with source styles-->
       <xsl:when test="$sourceStyleNum > 0">
-        <xsl:variable name="sourceStyleName"
-          select="$tableOfContent/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
-        <xsl:variable name="elementSum">
-          <xsl:value-of
-            select="$counter + count(preceding::text:p[@text:style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)]) +
+        <xsl:variable name="sourceStyleName" select="$tableOfContent/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
+        <xsl:variable name="elementSum" select="$counter + count(preceding::text:p[@text:style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)]) +
             count(preceding::text:p[key('automatic-styles',@text:style-name)/@style:parent-style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)])" />
-        </xsl:variable>
-
+        
         <xsl:call-template name="CalculateBookmarkId">
           <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
           <xsl:with-param name="counter" select="$elementSum"/>
@@ -525,11 +508,8 @@
   <xsl:template name="InsertIndexOfFiguresBookmark">
 
     <xsl:variable name="textName" select="@text:name"/>
-    <xsl:variable name="id">
-      <xsl:value-of select="number(count(preceding::text:sequence[@text:name = $textName]))+1"/>
-    </xsl:variable>
-    <xsl:variable name="indexOfObjects"
-      select="generate-id(key('indexes','')[child::*/@text:caption-sequence-name = $textName])"/>
+    <xsl:variable name="id" select="number(count(preceding::text:sequence[@text:name = $textName]))+1"/>
+    <xsl:variable name="indexOfObjects" select="generate-id(key('indexes','')[child::*/@text:caption-sequence-name = $textName])"/>
 
     <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc', $id, $indexOfObjects)}"/>
     <w:r>

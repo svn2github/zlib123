@@ -182,13 +182,11 @@
 
     <!-- column number -->
     <xsl:choose>
-      <xsl:when
-        test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >4">
+      <xsl:when test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >4">
         <xsl:message terminate="no">translation.odf2oox.alphabeticalIndexColumnNumber</xsl:message>
         <w:instrText xml:space="preserve">\c "4" </w:instrText>
       </xsl:when>
-      <xsl:when
-        test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >1">
+      <xsl:when test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >1">
         <w:instrText xml:space="preserve">\c "</w:instrText>
         <w:instrText>
           <xsl:value-of select="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count" />
@@ -269,14 +267,11 @@
     <xsl:param name="min" select="1" />
     <xsl:param name="max" select="9" />
 
-    <xsl:variable name="Style"
-                  select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level = $min]" />
+    <xsl:variable name="Style" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level = $min]" />
 
     <xsl:variable name="IsDefaultHeading">
       <xsl:call-template name ="CheckDefaultHeading">
-        <xsl:with-param name="Name">
-          <xsl:value-of select="$Style/@style:name" />
-        </xsl:with-param>
+        <xsl:with-param name="Name" select="$Style/@style:name" />
       </xsl:call-template>
     </xsl:variable>
 
@@ -291,12 +286,8 @@
       <!--<xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style/@style:default-outline-level = $min">-->
       <xsl:when test="$Style and $IsDefaultHeading = 'true'">
         <xsl:call-template name="GetMaxConsecutiveHeadingWithOutline">
-          <xsl:with-param name="min">
-            <xsl:value-of select="$min + 1"/>
-          </xsl:with-param>
-          <xsl:with-param name="max">
-            <xsl:value-of select="$max"/>
-          </xsl:with-param>
+          <xsl:with-param name="min" select="$min + 1"/>
+          <xsl:with-param name="max" select="$max"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -998,9 +989,8 @@
         <xsl:if test="$leftTabStop != '' and $numberingFormat != '' ">
           <w:tab w:pos="{$leftTabStop}">
             <xsl:attribute name="w:val">
-              <xsl:variable name="styleType">
-                <xsl:value-of select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]/@style:type" />
-              </xsl:variable>
+              <xsl:variable name="styleType" select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]/@style:type" />
+
               <xsl:choose>
                 <xsl:when test="$styleType">
                   <xsl:value-of select="$styleType"/>
@@ -1152,9 +1142,7 @@
             </xsl:attribute>
             <xsl:variable name="pos">
               <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="@style:position"/>
-                </xsl:with-param>
+                <xsl:with-param name="length" select="@style:position"/>
               </xsl:call-template>
             </xsl:variable>
             <xsl:attribute name="w:pos">

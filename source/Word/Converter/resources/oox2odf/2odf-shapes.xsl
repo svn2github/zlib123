@@ -148,7 +148,6 @@
       Author: Sona
   -->
   <xsl:template name="GetShape">
-    <xsl:param name="currentShape" />
     <xsl:param name="shapeTypeId" />
     <xsl:param name="pathId" />
     <xsl:choose>
@@ -1642,9 +1641,7 @@
       <xsl:call-template name="InsertTextBoxPadding" />
     </xsl:for-each>
     <!-- Sona: Gradient for Frame-->
-    <xsl:variable name="shapeTypeId">
-      <xsl:value-of select="substring-after($shape/@type,'#')" />
-    </xsl:variable>
+    <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
     <xsl:variable name="pathId">
       <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
         <xsl:if test="position()=1">
@@ -2724,10 +2721,8 @@
           </xsl:choose>
         </xsl:variable>
         <!--code added by yeswanth.s : For defect# 1836547-->
-        <xsl:variable name="bWNoUnit">
-          <xsl:value-of select="number(substring-before($borderWeight,'cm'))" />
-        </xsl:variable>
-
+        <xsl:variable name="bWNoUnit" select="number(substring-before($borderWeight,'cm'))" />
+        
         <xsl:variable name="mappedBorderWeight">
           <xsl:choose>
             <xsl:when test="$lineStyle">
@@ -2883,8 +2878,8 @@
   <!-- Sona Added Dash properties -->
   <xsl:template name="getDashType">
     <xsl:param name="shape" />
-    <xsl:variable name="val" select="$shape/v:stroke/@dashstyle">
-    </xsl:variable>
+    <xsl:variable name="val" select="$shape/v:stroke/@dashstyle" />
+    
     <xsl:variable name="cap">
       <xsl:choose>
         <xsl:when test="$shape/v:stroke/@endcap">
@@ -2972,6 +2967,7 @@
 
     </xsl:choose>
   </xsl:template>
+  
   <xsl:template name="AddDashType">
     <xsl:param name="name" />
     <xsl:param name="cap" />
@@ -3408,7 +3404,7 @@
     </xsl:variable>
 
     <xsl:variable name="myId">
-      <xsl:variable name="myFileName" select="substring-after(ancestor::*[name()='oox:part']/@oox:name, 'word/')" />
+      <xsl:variable name="myFileName" select="substring-after(ancestor::oox:part/@oox:name, 'word/')" />
       <xsl:value-of select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Target=$myFileName]/@Id" />
     </xsl:variable>
     <xsl:variable name="myFooterSectPr" select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr[w:footerReference/@r:id=$myId]" />
@@ -3745,9 +3741,7 @@
         </xsl:attribute>
       </xsl:if>
       <!--Sona : Rotation Implementation -->
-      <xsl:variable name="shapeTypeId">
-        <xsl:value-of select="substring-after($shape/@type,'#')" />
-      </xsl:variable>
+      <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
       <xsl:variable name="pathId">
         <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
           <xsl:if test="position()=1">
@@ -3846,9 +3840,9 @@
   <xsl:template name="InsertAlternativeTextElement">
     <xsl:param name="shape" select="." />
     <xsl:if test="$shape/@alt!=''">
-      <xsl:element name="svg:desc">
+      <svg:desc>
         <xsl:value-of select="$shape/@alt" />
-      </xsl:element>
+      </svg:desc>
     </xsl:if>
   </xsl:template>
   <!--end here-->
@@ -4150,9 +4144,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="shapeTypeId">
-          <xsl:value-of select="substring-after($shape/@type,'#')" />
-        </xsl:variable>
+        <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
         <xsl:variable name="pathId">
           <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
             <xsl:if test="position()=1">

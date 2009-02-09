@@ -262,7 +262,7 @@
 
       <xsl:choose>
         <!-- images in header must be anchored to paragraph or as-char -->
-        <xsl:when test="ancestor::*[w:hdr]">
+        <xsl:when test="ancestor::w:hdr">
           <xsl:choose>
             <xsl:when test="name(.) = 'wp:inline'">
               <xsl:text>as-char</xsl:text>
@@ -421,31 +421,29 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
-      <xsl:if test="./@Id=$id">
-        <xsl:variable name="targetmode" select="./@TargetMode"/>
-        <xsl:variable name="pzipsource" select="./@Target"/>
-        <xsl:variable name="pziptarget">
-          <xsl:choose>
-            <xsl:when test="$targetName != ''">
-              <xsl:value-of select="$targetName"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="substring-after($pzipsource,'/')"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:attribute name="xlink:href">
-          <xsl:choose>
-            <xsl:when test="$targetmode='External'">
-              <xsl:value-of select="$pziptarget"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </xsl:if>
+    <xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))/rels:Relationships/rels:Relationship[@Id=$id]">
+      <xsl:variable name="targetmode" select="./@TargetMode"/>
+      <xsl:variable name="pzipsource" select="./@Target"/>
+      <xsl:variable name="pziptarget">
+        <xsl:choose>
+          <xsl:when test="$targetName != ''">
+            <xsl:value-of select="$targetName"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-after($pzipsource,'/')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:attribute name="xlink:href">
+        <xsl:choose>
+          <xsl:when test="$targetmode='External'">
+            <xsl:value-of select="$pziptarget"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:for-each>
   </xsl:template>
 
@@ -1003,12 +1001,8 @@
 
         <xsl:attribute name="fo:clip">
 
-          <xsl:variable name="oldValue">
-            <xsl:value-of
-              select="concat('rect(',$topCrop,'cm ',$rightCrop,'cm ',$bottomCrop,'cm ',$leftCrop,'cm',')')"
-            />
-          </xsl:variable>
-
+          <xsl:variable name="oldValue" select="concat('rect(',$topCrop,'cm ',$rightCrop,'cm ',$bottomCrop,'cm ',$leftCrop,'cm',')')" />
+            
           <xsl:variable name="filecode" select="pic:blipFill/a:blip/@r:embed"></xsl:variable>
           <xsl:variable name="filename" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id = $filecode]/@Target"></xsl:variable>
           <xsl:value-of select="concat('COMPUTEODFCROPPING[', pic:blipFill/a:srcRect/@r, ',' ,pic:blipFill/a:srcRect/@l, ',' , pic:blipFill/a:srcRect/@t, ',' ,pic:blipFill/a:srcRect/@b, ',word/' , $filename,  ',' , $oldValue, ']')"/>

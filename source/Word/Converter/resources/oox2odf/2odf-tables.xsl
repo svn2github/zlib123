@@ -712,10 +712,8 @@
     <xsl:call-template name="InsertCellVAlign"/>
 
     <!-- margins-->
-    <xsl:variable name="mstyleId">
-      <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
-    </xsl:variable>
-
+    <xsl:variable name="mstyleId" select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
+    
     <xsl:choose>
       <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$mstyleId or @w:styleId=concat('CONTENT_',$mstyleId)]">
         <xsl:variable name="mstyle" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>

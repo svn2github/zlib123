@@ -1013,24 +1013,19 @@
   <!-- alphabetical index mark -->
   <xsl:template name="InsertIndexMark">
     <xsl:param name="instrText" />
-    <xsl:variable name="Value">
-      <xsl:value-of select="substring-before(substring-after($instrText,'&quot;'),'&quot;')" />
-    </xsl:variable>
-
+    <xsl:variable name="value" select="substring-before(substring-after($instrText,'&quot;'),'&quot;')" />
+    
     <text:alphabetical-index-mark>
       <xsl:choose>
-        <xsl:when test="not(contains($Value, ':'))">
+        <xsl:when test="not(contains($value, ':'))">
           <xsl:attribute name="text:string-value">
-            <xsl:value-of select="$Value" />
+            <xsl:value-of select="$value" />
           </xsl:attribute>
         </xsl:when>
-        <xsl:when test="contains($Value, ':')">
-          <xsl:variable name="TextKey1">
-            <xsl:value-of select="substring-before($Value, ':')" />
-          </xsl:variable>
-          <xsl:variable name="TextKey2">
-            <xsl:value-of select="substring-after($Value, ':')" />
-          </xsl:variable>
+        <xsl:when test="contains($value, ':')">
+          <xsl:variable name="TextKey1" select="substring-before($value, ':')" />
+          <xsl:variable name="TextKey2" select="substring-after($value, ':')" />
+          
           <xsl:choose>
             <xsl:when test="contains($TextKey2, ':')">
               <xsl:attribute name="text:string-value">
@@ -1118,10 +1113,8 @@
     <xsl:param name="fieldCode" />
     <xsl:param name="dateText" />
 
-    <xsl:variable name="FormatDate">
-      <xsl:value-of select="substring-before(substring-after($dateText, '&quot;'), '&quot;')" />
-    </xsl:variable>
-
+    <xsl:variable name="FormatDate" select="substring-before(substring-after($dateText, '&quot;'), '&quot;')" />
+    
     <!-- some of the DOCPROPERTY date field types have constant date format, 
       which is not saved in fieldCode so it need to be given directly in these cases-->
     <xsl:choose>
@@ -1137,12 +1130,8 @@
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:call-template name="InsertDateFormat">
-          <xsl:with-param name="FormatDate">
-            <xsl:value-of select="$FormatDate" />
-          </xsl:with-param>
-          <xsl:with-param name="ParamField">
-            <xsl:text>DATE</xsl:text>
-          </xsl:with-param>
+          <xsl:with-param name="FormatDate" select="$FormatDate" />
+          <xsl:with-param name="ParamField" select="'DATE'" />
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -1204,18 +1193,12 @@
 
   <xsl:template name="InsertTimeStyle">
     <xsl:param name="timeText" />
-    <xsl:variable name="FormatDate">
-      <xsl:value-of
-        select="substring-before(substring-after($timeText, '&quot;'), '&quot;')" />
-    </xsl:variable>
+    
     <xsl:call-template name="InsertDateFormat">
-      <xsl:with-param name="FormatDate">
-        <xsl:value-of select="$FormatDate" />
-      </xsl:with-param>
-      <xsl:with-param name="ParamField">
-        <xsl:text>TIME</xsl:text>
-      </xsl:with-param>
+      <xsl:with-param name="FormatDate" select="substring-before(substring-after($timeText, '&quot;'), '&quot;')" />
+      <xsl:with-param name="ParamField" select="'TIME'" />
     </xsl:call-template>
+    
   </xsl:template>
 
   <xsl:template name="InsertFieldProperties">
@@ -1698,9 +1681,8 @@
       </xsl:when>
       <xsl:otherwise>
 
-        <xsl:variable name="rId">
-          <xsl:value-of select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Target = $docName]/@Id" />
-        </xsl:variable>
+        <xsl:variable name="rId" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Target = $docName]/@Id" />
+        
         <xsl:for-each select="key('Part', 'word/document.xml')">
           <xsl:for-each select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
             <xsl:if test="w:pgNumType/@w:chapStyle">
@@ -1721,9 +1703,8 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <xsl:variable name="WInstr">
-      <xsl:value-of select="./@w:instr" />
-    </xsl:variable>
+    <xsl:variable name="WInstr" select="./@w:instr" />
+    
     <text:page-number>
 
       <xsl:variable name="rId" select="concat('',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Target=$docName]/@Id)" />
@@ -1844,18 +1825,10 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="City">
-      <xsl:value-of select="$Path/b:City" />
-    </xsl:variable>
-
-    <xsl:variable name="StateProvince">
-      <xsl:value-of select="$Path/b:StateProvince" />
-    </xsl:variable>
-
-    <xsl:variable name="CountryRegion">
-      <xsl:value-of select="$Path/b:CountryRegion" />
-    </xsl:variable>
-
+    <xsl:variable name="City" select="$Path/b:City" />
+    <xsl:variable name="StateProvince" select="$Path/b:StateProvince" />
+    <xsl:variable name="CountryRegion" select="$Path/b:CountryRegion" />
+    
     <xsl:variable name="Address">
       <xsl:choose>
         <xsl:when test="$City != '' and $StateProvince != '' and $CountryRegion != ''">

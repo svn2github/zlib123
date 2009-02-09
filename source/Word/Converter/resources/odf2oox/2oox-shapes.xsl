@@ -58,34 +58,17 @@
   *************************************************************************
   -->
 	<!-- Sona Shape constants-->
-	<xsl:variable name="sm-sm">
-		<xsl:value-of select ="'0.15'"/>
-	</xsl:variable>
-	<xsl:variable name="sm-med">
-		<xsl:value-of select ="'0.18'"/>
-	</xsl:variable>
-	<xsl:variable name="sm-lg">
-		<xsl:value-of select ="'0.2'"/>
-	</xsl:variable>
-	<xsl:variable name="med-sm">
-		<xsl:value-of select ="'0.21'" />
-	</xsl:variable>
-	<xsl:variable name="med-med">
-		<xsl:value-of select ="'0.25'"/>
-	</xsl:variable>
-	<xsl:variable name="med-lg">
-		<xsl:value-of select ="'0.3'" />
-	</xsl:variable>
-	<xsl:variable name="lg-sm">
-		<xsl:value-of select ="'0.31'" />
-	</xsl:variable>
-	<xsl:variable name="lg-med">
-		<xsl:value-of select ="'0.35'" />
-	</xsl:variable>
-	<xsl:variable name="lg-lg">
-		<xsl:value-of select ="'0.4'" />
-	</xsl:variable>
-	<!-- 
+	<xsl:variable name="sm-sm" select="'0.15'"/>
+	<xsl:variable name="sm-med" select="'0.18'"/>
+	<xsl:variable name="sm-lg" select="'0.2'"/>
+	<xsl:variable name="med-sm" select="'0.21'" />
+	<xsl:variable name="med-med" select="'0.25'"/>
+	<xsl:variable name="med-lg" select="'0.3'" />
+	<xsl:variable name="lg-sm" select="'0.31'" />
+	<xsl:variable name="lg-med" select="'0.35'" />
+	<xsl:variable name="lg-lg" select="'0.4'" />
+	
+  <!-- 
   Summary:  Forward shapes in paragraph mode to shapes mode 
   Author:   Clever Age
   -->
@@ -1799,10 +1782,8 @@
                 <xsl:with-param name="attribName">draw:fill-image-name</xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:variable name="stretch">
-              <xsl:value-of select="$shapeStyle/style:graphic-properties/@style:repeat"/>
-            </xsl:variable>
-
+            <xsl:variable name="stretch" select="$shapeStyle/style:graphic-properties/@style:repeat"/>
+            
             <xsl:for-each select="document('styles.xml')//draw:fill-image[@draw:name = $BitmapName]">
               <!-- radial gradients not handled yet -->
               <xsl:choose>
@@ -1851,10 +1832,9 @@
           <!-- Sona: Picture fill for frame-->
           <xsl:when test ="$fillProperty = '' and (parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame'])">
             <xsl:if test ="$shapeStyle/style:graphic-properties/style:background-image/@*">
-            <xsl:variable name="stretch">
-              <xsl:value-of select="$shapeStyle/style:graphic-properties/style:background-image/@style:repeat"/>
-            </xsl:variable>
-            <xsl:choose>
+            <xsl:variable name="stretch" select="$shapeStyle/style:graphic-properties/style:background-image/@style:repeat"/>
+            
+              <xsl:choose>
               <xsl:when test="$stretch='stretch'">
                 <xsl:attribute name="type">frame</xsl:attribute>
               </xsl:when>
@@ -1946,7 +1926,7 @@
 		<xsl:choose>
       <xsl:when test ="$shapeBorder='none' or ($shapeBorder = '' and (name(parent::node()) = 'draw:frame' or self::node()[name()='draw:frame']))">
 				<xsl:attribute name ="stroked">
-					<xsl:value-of select ="'f'"/>
+					<xsl:value-of select="'f'"/>
 				</xsl:attribute>
 			</xsl:when>		
 			<xsl:otherwise>
@@ -2002,8 +1982,8 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name ="ConvertMeasure">
-						<xsl:with-param name ="length" select ="@svg:x1"/>
-						<xsl:with-param name ="unit" select ="'point'"/>
+						<xsl:with-param name ="length" select="@svg:x1"/>
+						<xsl:with-param name ="unit" select="'point'"/>
 					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -2015,8 +1995,8 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name ="ConvertMeasure">
-						<xsl:with-param name ="length" select ="@svg:y1"/>
-						<xsl:with-param name ="unit" select ="'point'"/>
+						<xsl:with-param name ="length" select="@svg:y1"/>
+						<xsl:with-param name ="unit" select="'point'"/>
 					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -2028,8 +2008,8 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name ="ConvertMeasure">
-						<xsl:with-param name ="length" select ="@svg:x2"/>
-						<xsl:with-param name ="unit" select ="'point'"/>
+						<xsl:with-param name ="length" select="@svg:x2"/>
+						<xsl:with-param name ="unit" select="'point'"/>
 					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -2041,8 +2021,8 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name ="ConvertMeasure">
-						<xsl:with-param name ="length" select ="@svg:y2"/>
-						<xsl:with-param name ="unit" select ="'point'"/>
+						<xsl:with-param name ="length" select="@svg:y2"/>
+						<xsl:with-param name ="unit" select="'point'"/>
 					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -2061,8 +2041,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="margin-top">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="$y2"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="$y2"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>margin-top:</xsl:text>
@@ -2085,8 +2065,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="height">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>height:</xsl:text>
@@ -2103,8 +2083,8 @@
 			<xsl:when test="$x1 &gt; $x2 and $y2 &gt;= $y1">
 				<!--<xsl:variable name="margin-left">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="$x2"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="$x2"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>margin-left:</xsl:text>
@@ -2118,8 +2098,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="margin-top">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="$y1"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="$y1"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>margin-top:</xsl:text>
@@ -2133,8 +2113,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="width">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>width:</xsl:text>
@@ -2148,8 +2128,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="height">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>height:</xsl:text>
@@ -2167,8 +2147,8 @@
 			<xsl:when test="$x1 &gt; $x2 and $y1 &gt; $y2">
 				<!--<xsl:variable name="margin-left">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="$x2"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="$x2"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>margin-left:</xsl:text>
@@ -2182,8 +2162,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="margin-top">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="$y2"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="$y2"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>margin-top:</xsl:text>
@@ -2197,8 +2177,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="width">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>width:</xsl:text>
@@ -2212,8 +2192,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="height">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>height:</xsl:text>
@@ -2231,8 +2211,8 @@
 			<xsl:otherwise>
 				<!--<xsl:variable name="margin-left">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="$x1"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="$x1"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>margin-left:</xsl:text>
@@ -2246,8 +2226,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="margin-top">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="$y1"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="$y1"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>margin-top:</xsl:text>
@@ -2261,8 +2241,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="width">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="concat(substring-before($x2,'in')-substring-before($x1,'in'),'in')"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="concat(substring-before($x2,'in')-substring-before($x1,'in'),'in')"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>width:</xsl:text>
@@ -2276,8 +2256,8 @@
 				<xsl:text>;</xsl:text>
 				<!--<xsl:variable name="height">
           <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select ="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
-            <xsl:with-param name ="unit" select ="'point'"/>
+            <xsl:with-param name ="length" select="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
+            <xsl:with-param name ="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
 				<xsl:text>height:</xsl:text>
@@ -2336,7 +2316,7 @@
 			<!--Dash Styles-->
 			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:stroke!='' and $shapeStyle/style:graphic-properties/@draw:stroke!='none'">
 				<xsl:variable name="drawStrokeDash" select="$shapeStyle/style:graphic-properties/@draw:stroke-dash"></xsl:variable>
-				<xsl:variable name ="strokeStyle" select ="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$drawStrokeDash]"></xsl:variable>
+				<xsl:variable name ="strokeStyle" select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$drawStrokeDash]"></xsl:variable>
 				<xsl:variable name="drawStroke" select="$shapeStyle/style:graphic-properties/@draw:stroke"/>
         <!-- Sona: Arrow feature continuation -->
         <xsl:variable name="Unit1">
@@ -2389,7 +2369,7 @@
 				</xsl:attribute>
         <xsl:if test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
 					<xsl:attribute name ="endcap">
-						<xsl:value-of select ="'round'"/>
+						<xsl:value-of select="'round'"/>
 					</xsl:attribute>
 				</xsl:if>
 			</xsl:if>
@@ -2399,7 +2379,7 @@
       <!-- Sonata: Defect #2151408-->
 			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-start and $shapeStyle/style:graphic-properties/@draw:marker-start !=''">
 				<xsl:variable name ="drawArrowTypeStart" select="$shapeStyle/style:graphic-properties/@draw:marker-start"></xsl:variable>
-				<xsl:variable name ="startArrow" select ="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeStart]"></xsl:variable>
+				<xsl:variable name ="startArrow" select="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeStart]"></xsl:variable>
 				<xsl:attribute name ="startarrow">
 					<xsl:choose>
 						<xsl:when test ="$startArrow/@svg:d='m10 0-10 30h20z'">
@@ -2431,8 +2411,8 @@
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:call-template name ="setArrowSize">
-						<xsl:with-param name ="size" select ="substring-before($shapeStyle/style:graphic-properties/@draw:marker-start-width,$Unit)" />
-						<xsl:with-param name ="arrType" select ="'start'"></xsl:with-param>
+						<xsl:with-param name ="size" select="substring-before($shapeStyle/style:graphic-properties/@draw:marker-start-width,$Unit)" />
+						<xsl:with-param name ="arrType" select="'start'"></xsl:with-param>
 					</xsl:call-template >
 				</xsl:if>
 			</xsl:if>
@@ -2440,7 +2420,7 @@
       <!-- Sonata: Defect #2151408-->
 			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-end and $shapeStyle/style:graphic-properties/@draw:marker-end !=''">
 				<xsl:variable name ="drawArrowTypeEnd" select="$shapeStyle/style:graphic-properties/@draw:marker-end"></xsl:variable>
-				<xsl:variable name ="endArrow" select ="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeEnd]"></xsl:variable>
+				<xsl:variable name ="endArrow" select="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeEnd]"></xsl:variable>
 				<xsl:attribute name ="endarrow">
 					<xsl:choose>
 						<xsl:when test ="$endArrow/@svg:d='m10 0-10 30h20z'">
@@ -2472,8 +2452,8 @@
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:call-template name ="setArrowSize">
-						<xsl:with-param name ="size" select ="substring-before($shapeStyle/style:graphic-properties/@draw:marker-end-width,$Unit)" />
-						<xsl:with-param name ="arrType" select ="'end'"></xsl:with-param>
+						<xsl:with-param name ="size" select="substring-before($shapeStyle/style:graphic-properties/@draw:marker-end-width,$Unit)" />
+						<xsl:with-param name ="arrType" select="'end'"></xsl:with-param>
 					</xsl:call-template >
 				</xsl:if>
 			</xsl:if>
@@ -2488,62 +2468,62 @@
 				<xsl:choose>
 					<xsl:when test ="($size &lt;= $sm-sm)">
 						<xsl:attribute name ="startarrowwidth">
-							<xsl:value-of select ="'narrow'"/>
+							<xsl:value-of select="'narrow'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="startarrowlength">
-							<xsl:value-of select ="'short'"/>
+							<xsl:value-of select="'short'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $sm-sm) and ($size &lt;= $sm-med)">
 						<xsl:attribute name ="startarrowwidth">
-							<xsl:value-of select ="'narrow'"/>
+							<xsl:value-of select="'narrow'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $sm-med) and ($size &lt;= $sm-lg)">
 						<xsl:attribute name ="startarrowwidth">
-							<xsl:value-of select ="'narrow'"/>
+							<xsl:value-of select="'narrow'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="startarrowlength">
-							<xsl:value-of select ="'long'"/>
+							<xsl:value-of select="'long'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $sm-lg) and ($size &lt;= $med-sm)">
 						<xsl:attribute name ="startarrowlength">
-							<xsl:value-of select ="'short'"/>
+							<xsl:value-of select="'short'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<!--<xsl:when test ="($size &gt; $med-med) and ($size &lt;= $med-lg)">
         <xsl:attribute name ="startarrowwidth">
-          <xsl:value-of select ="'med'"/>
+          <xsl:value-of select="'med'"/>
         </xsl:attribute>
         <xsl:attribute name ="startarrowlength">
-          <xsl:value-of select ="'lg'"/>
+          <xsl:value-of select="'lg'"/>
         </xsl:attribute>
       </xsl:when>-->
 					<xsl:when test ="($size &gt; $med-lg) and ($size &lt;= $lg-sm)">
 						<xsl:attribute name ="startarrowlength">
-							<xsl:value-of select ="'long'"/>
+							<xsl:value-of select="'long'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $lg-sm) and ($size &lt;= $lg-med)">
 						<xsl:attribute name ="startarrowwidth">
-							<xsl:value-of select ="'wide'"/>
+							<xsl:value-of select="'wide'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="startarrowlength">
-							<xsl:value-of select ="'short'"/>
+							<xsl:value-of select="'short'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $lg-med) and ($size &lt;= $lg-lg)">
 						<xsl:attribute name ="startarrowwidth">
-							<xsl:value-of select ="'wide'"/>
+							<xsl:value-of select="'wide'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $lg-lg)">
 						<xsl:attribute name ="startarrowwidth">
-							<xsl:value-of select ="'wide'"/>
+							<xsl:value-of select="'wide'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="startarrowlength">
-							<xsl:value-of select ="'long'"/>
+							<xsl:value-of select="'long'"/>
 						</xsl:attribute>
 					</xsl:when>
 				</xsl:choose>
@@ -2552,62 +2532,62 @@
 				<xsl:choose>
 					<xsl:when test ="($size &lt;= $sm-sm)">
 						<xsl:attribute name ="endarrowwidth">
-							<xsl:value-of select ="'narrow'"/>
+							<xsl:value-of select="'narrow'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="endarrowlength">
-							<xsl:value-of select ="'short'"/>
+							<xsl:value-of select="'short'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $sm-sm) and ($size &lt;= $sm-med)">
 						<xsl:attribute name ="endarrowwidth">
-							<xsl:value-of select ="'narrow'"/>
+							<xsl:value-of select="'narrow'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $sm-med) and ($size &lt;= $sm-lg)">
 						<xsl:attribute name ="endarrowwidth">
-							<xsl:value-of select ="'narrow'"/>
+							<xsl:value-of select="'narrow'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="endarrowlength">
-							<xsl:value-of select ="'long'"/>
+							<xsl:value-of select="'long'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $sm-lg) and ($size &lt;= $med-sm)">
 						<xsl:attribute name ="endarrowlength">
-							<xsl:value-of select ="'short'"/>
+							<xsl:value-of select="'short'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<!--<xsl:when test ="($size &gt; $med-med) and ($size &lt;= $med-lg)">
         <xsl:attribute name ="startarrowwidth">
-          <xsl:value-of select ="'med'"/>
+          <xsl:value-of select="'med'"/>
         </xsl:attribute>
         <xsl:attribute name ="startarrowlength">
-          <xsl:value-of select ="'lg'"/>
+          <xsl:value-of select="'lg'"/>
         </xsl:attribute>
       </xsl:when>-->
 					<xsl:when test ="($size &gt; $med-lg) and ($size &lt;= $lg-sm)">
 						<xsl:attribute name ="endarrowlength">
-							<xsl:value-of select ="'long'"/>
+							<xsl:value-of select="'long'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $lg-sm) and ($size &lt;= $lg-med)">
 						<xsl:attribute name ="endarrowwidth">
-							<xsl:value-of select ="'wide'"/>
+							<xsl:value-of select="'wide'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="endarrowlength">
-							<xsl:value-of select ="'short'"/>
+							<xsl:value-of select="'short'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $lg-med) and ($size &lt;= $lg-lg)">
 						<xsl:attribute name ="endarrowwidth">
-							<xsl:value-of select ="'wide'"/>
+							<xsl:value-of select="'wide'"/>
 						</xsl:attribute>
 					</xsl:when>
 					<xsl:when test ="($size &gt; $lg-lg)">
 						<xsl:attribute name ="endarrowwidth">
-							<xsl:value-of select ="'wide'"/>
+							<xsl:value-of select="'wide'"/>
 						</xsl:attribute>
 						<xsl:attribute name ="endarrowlength">
-							<xsl:value-of select ="'long'"/>
+							<xsl:value-of select="'long'"/>
 						</xsl:attribute>
 					</xsl:when>
 				</xsl:choose>

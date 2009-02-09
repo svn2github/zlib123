@@ -38,9 +38,10 @@
 				xmlns:v="urn:schemas-microsoft-com:vml"
 				xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 				xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
 				xmlns:oox="urn:oox"
         xmlns:ooc="urn:odf-converter"
-				exclude-result-prefixes="w v r oox ooc">
+				exclude-result-prefixes="w v r oox ooc rels">
 
 	<!-- a key on all numberings defined in numbering.xml -->
 	<xsl:key name="numId" match="w:num" use="@w:numId"/>
@@ -132,16 +133,12 @@
 					<xsl:call-template name="GetDocumentName"/>
 				</xsl:variable>
 
-				<xsl:variable name="lvlPicBulletId">
-					<xsl:value-of select="w:lvlPicBulletId/@w:val"/>
-				</xsl:variable>
-
-				<xsl:variable name="rId">
-					<xsl:value-of select="key('numPicBullet', $lvlPicBulletId)/w:pict/v:shape/v:imagedata/@r:id"/>
-				</xsl:variable>
-
+				<xsl:variable name="lvlPicBulletId" select="w:lvlPicBulletId/@w:val"/>
+				
+				<xsl:variable name="rId" select="key('numPicBullet', $lvlPicBulletId)/w:pict/v:shape/v:imagedata/@r:id"/>
+				
 				<xsl:variable name="XlinkHref">
-					<xsl:variable name="pzipsource" select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship'][@Id=$rId]/@Target" />
+					<xsl:variable name="pzipsource" select="key('Part', concat('word/_rels/',$document,'.rels'))/rels:Relationships/rels:Relationship[@Id=$rId]/@Target" />
 					<xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'/'))"/>
 				</xsl:variable>
 
@@ -310,10 +307,9 @@
 		</xsl:attribute>
 
 		<xsl:if test="$BeforeAfterNum != ''">
-			<xsl:variable name="NumPrefix">
-				<xsl:value-of select="substring-before($BeforeAfterNum, '%')"/>
-			</xsl:variable>
-			<xsl:if test="$NumPrefix != ''">
+			<xsl:variable name="NumPrefix" select="substring-before($BeforeAfterNum, '%')"/>
+			
+      <xsl:if test="$NumPrefix != ''">
 				<xsl:attribute name="style:num-prefix">
 					<xsl:value-of select="$NumPrefix"/>
 				</xsl:attribute>
@@ -359,13 +355,9 @@
 	<xsl:template name="InsertListLevelProperties">
 		<xsl:param name="numId"/>
 
-		<xsl:variable name="Ind" select="w:pPr/w:ind"/>
-
 		<xsl:variable name="ListStyleInd" select="w:pPr/w:ind"/>
 
 		<xsl:variable name="tab" select="w:pPr/w:tabs/w:tab/@w:pos"/>
-		
-		<xsl:variable name="abstractNumId" select="parent::w:abstractNum/@w:abstractNumId"/>
 		
 		<xsl:variable name="ilvl" select="@w:ilvl"/>
 		
@@ -518,10 +510,8 @@
 
 		<xsl:variable name="SpaceToNextTab">
 
-			<xsl:variable name="MinTabOffset">
-				<xsl:value-of select="350"/>
-			</xsl:variable>
-
+			<xsl:variable name="MinTabOffset" select="350"/>
+			
 			<xsl:choose>
 				<xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
 				<xsl:when test="w:suff/@w:val='space'">350</xsl:when>
@@ -566,13 +556,9 @@
 
 						<xsl:otherwise>
 							<!--no hanging-->
-							<xsl:variable name="DefaultTab">
-								<xsl:value-of select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
-							</xsl:variable>
-							<xsl:variable name="NextDefaultTabPos">
-								<xsl:value-of select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
-							</xsl:variable>
-
+							<xsl:variable name="DefaultTab" select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+							<xsl:variable name="NextDefaultTabPos" select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
+							
 							<xsl:choose>
 								<xsl:when test="$MinRelevantCustomTab != 'NaN'">
 									<!--take min relevant custom tab-->
@@ -1117,10 +1103,9 @@
 							<xsl:if
 							  test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
 								<xsl:attribute name="style:num-suffix">
-									<xsl:variable name="suffix">
-										<xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"/>
-									</xsl:variable>
-									<xsl:choose>
+									<xsl:variable name="suffix" select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"/>
+									
+                  <xsl:choose>
 										<xsl:when test="w:suff/@w:val='space'">
 											<xsl:value-of select="concat($suffix,' ')"/>
 										</xsl:when>

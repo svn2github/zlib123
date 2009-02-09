@@ -81,7 +81,6 @@
 
     <!--fo:margin-top and bottom must be defined together (ODF 1.1 Spec.)-->
     <!--if only one is set we must get the other in hierarchy style-->
-    <xsl:variable name="From" select="name(parent::node()/parent::node())"/>
     <xsl:variable name="parentStyle" select="parent::node()/parent::node()/w:basedOn/@w:val"/>
     <xsl:variable name="NodeStyleId" select="parent::node()/parent::node()/@w:styleId"/>
     <xsl:variable name="NodeStyleFromContent" select="parent::node()/w:pStyle/@w:val"/>
@@ -89,7 +88,7 @@
     <!--/@w:styleId-->
     <!--if name of parent:parent node is w:style or w:p -->
     <xsl:choose>
-      <xsl:when test="$From='w:style'">
+      <xsl:when test="ancestor::w:style">
         <xsl:choose>
           <xsl:when test="count(@w:before)=0 and count(@w:after)=0">
             <!--Nothing to do the parent style is well defined-->
@@ -140,7 +139,7 @@
           </xsl:when>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="$From='w:p'">
+      <xsl:when test="ancestor::w:p">
         <xsl:choose>
           <xsl:when test="count(@w:before)=0 and count(@w:after)=0">
             <!--Nothing to do the parent style is well defined-->
@@ -614,10 +613,8 @@
   <xsl:template match="w:style[@w:type != 'numbering' ]">
     <xsl:message terminate="no">progress:w:style</xsl:message>
 
-    <xsl:variable name="currentStyleId">
-      <xsl:value-of select="@w:styleId"/>
-    </xsl:variable>
-
+    <xsl:variable name="currentStyleId" select="@w:styleId"/>
+    
     <!--math: Added for bugfix #1934315 START-->
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
@@ -918,8 +915,6 @@
       <!-- document styles -->
       <office:styles>
         <!-- Sona: #2014221 and Arrow Feature Continuation-->
-        <xsl:variable name="vmlElementType" select="v:shape | v:rect | v:line | v:group|v:oval|v:roundrect" />
-
         <xsl:for-each select ="key('Part', 'word/document.xml')/w:document/w:body//node()[name()='v:shape' or name()='v:rect' or name()='v:line' or name()='v:group' or name()='v:oval' or name()='v:roundrect']">
           <xsl:call-template name="getDashType">
             <xsl:with-param name="shape" select="." />
@@ -930,21 +925,13 @@
         </xsl:for-each>
 
         <!--code added by yeswanth.s : 17 Oct 08-->
-        <xsl:variable name="typeName">
-          <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/header'"/>
-        </xsl:variable>
-        <xsl:for-each select="document('word/_rels/document.xml.rels')//rels:Relationships/rels:Relationship[@Type = $typeName]">
-          <xsl:variable name="headerXML">
-            <xsl:value-of select="./@Target"/>
-          </xsl:variable>
-          <xsl:for-each select="document(concat('word/',$headerXML))//w:pict/node()[name()='v:shape' or name()='v:rect' or name()='v:line' or name()='v:group' or name()='v:oval' or name()='v:roundrect']">
-            <xsl:call-template name="getDashType">
-              <xsl:with-param name="shape" select="." />
-            </xsl:call-template>
-            <xsl:call-template name="InsertArrowStyle">
-              <xsl:with-param name="shape" select="." />
-            </xsl:call-template>
-          </xsl:for-each>
+        <xsl:for-each select="key('PartsByType', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/header')//w:pict/node()[name()='v:shape' or name()='v:rect' or name()='v:line' or name()='v:group' or name()='v:oval' or name()='v:roundrect']">
+          <xsl:call-template name="getDashType">
+            <xsl:with-param name="shape" select="." />
+          </xsl:call-template>
+          <xsl:call-template name="InsertArrowStyle">
+            <xsl:with-param name="shape" select="." />
+          </xsl:call-template>
         </xsl:for-each>
         <!--end-->
 
@@ -2435,12 +2422,8 @@
 
     <!--clam, dialogika-->
     <xsl:variable name="min-height-minus-height">
-      <xsl:variable name="min-height-without-unit">
-        <xsl:value-of select="substring($min-height, 0, string-length($min-height)-1)"/>
-      </xsl:variable>
-      <xsl:variable name="min-height-0point1">
-        <xsl:value-of select="$min-height-without-unit - 0.1"/>
-      </xsl:variable>
+      <xsl:variable name="min-height-without-unit" select="substring($min-height, 0, string-length($min-height)-1)"/>
+      <xsl:variable name="min-height-0point1" select="$min-height-without-unit - 0.1"/>
       <xsl:value-of select="concat(string($min-height-0point1), 'cm')"/>
     </xsl:variable>
 
@@ -2885,33 +2868,22 @@
 
   <xsl:template name="FirstLine">
 
-    <xsl:variable name="StyleId">
-      <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
-    </xsl:variable>
-
+    <xsl:variable name="StyleId" select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
+    
     <xsl:variable name="NumId">
       <xsl:choose>
         <xsl:when test="w:numPr/w:numId/@w:val">
           <xsl:value-of select="w:numPr/w:numId/@w:val"/>
         </xsl:when>
         <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val">
-          <xsl:value-of
-					  select="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val"
-          />
+          <xsl:value-of select="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val" />
         </xsl:when>
-        <xsl:when
-				  test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
-          <xsl:value-of
-					  select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
-          />
+        <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:variable name="Abstract">
-            <xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
-          </xsl:variable>
-          <xsl:value-of
-					  select="key('Part', 'word/numbering.xml')/w:numbering/w:num[w:abstractNumId/@w:val = $Abstract]/@w:numId"
-          />
+          <xsl:variable name="Abstract" select="parent::w:abstractNum/@w:abstractNumId"/>
+          <xsl:value-of select="key('Part', 'word/numbering.xml')/w:numbering/w:num[w:abstractNumId/@w:val = $Abstract]/@w:numId" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -3673,16 +3645,12 @@
       w:afterAutospacing and w:beforeAutospacing attributes are lost
       w:afterLines and w:beforeLines attributes are lost 
     -->
-    <xsl:variable name="StyleId">
-      <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
-    </xsl:variable>
-
+    <xsl:variable name="StyleId" select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
+    
     <!-- are we in a list -->
     <xsl:variable name="CheckIfList">
       <xsl:call-template name="CheckIfList">
-        <xsl:with-param name="StyleId">
-          <xsl:value-of select="$StyleId"/>
-        </xsl:with-param>
+        <xsl:with-param name="StyleId" select="$StyleId"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -3693,11 +3661,8 @@
           <xsl:value-of select="number(w:ind/@w:left)"/>
         </xsl:when>
         <!-- Automatic styles should not duplicate the inherited fo:margin-left property (cf. 15.5.17 of ODF v 1.0 spec)  -->
-        <xsl:when
-				  test="key('StyleId', $StyleId)/w:pPr/w:ind/@w:left != '' and $CheckIfList != 'true'">
-          <xsl:value-of
-					  select="key('StyleId', $StyleId)/w:pPr/w:ind/@w:left"
-          />
+        <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:ind/@w:left != '' and $CheckIfList != 'true'">
+          <xsl:value-of select="key('StyleId', $StyleId)/w:pPr/w:ind/@w:left" />
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
@@ -4167,23 +4132,17 @@
 
   <!--math, dialogika: changed for correct indentation calculation BEGIN -->
 
-  <xsl:template name="GetIndirektListLevelParameter">
+  <xsl:template name="GetIndirectListLevelParameter">
     <xsl:param name="StyleId"/>
     <xsl:param name="Parameter"/>
 
-    <xsl:variable name="NumberingDefinitions"
-		  select="key('Part', 'word/numbering.xml')/w:numbering"/>
+    <xsl:variable name="NumberingDefinitions" select="key('Part', 'word/numbering.xml')/w:numbering"/>
 
-    <xsl:variable name="ParagraphStyleDefinition"
-		  select="key('StyleId',$StyleId)"/>
+    <xsl:variable name="ParagraphStyleDefinition" select="key('StyleId',$StyleId)"/>
 
-    <xsl:variable name="IndirectNumId">
-      <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
-    </xsl:variable>
-
-    <xsl:variable name="IndirectAbstractNumId">
-      <xsl:value-of select="key('numId', $IndirectNumId)/w:abstractNumId/@w:val"/>
-    </xsl:variable>
+    <xsl:variable name="IndirectNumId" select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
+    
+    <xsl:variable name="IndirectAbstractNumId" select="key('numId', $IndirectNumId)/w:abstractNumId/@w:val"/>
 
     <xsl:variable name="IndirectIlvl">
       <xsl:choose>
@@ -4198,8 +4157,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="IndirectListLevelDefinition"
-		  select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
+    <xsl:variable name="IndirectListLevelDefinition" select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
 
     <xsl:choose>
       <xsl:when test = "$IndirectListLevelDefinition">
@@ -4217,7 +4175,7 @@
       </xsl:when>
 
       <xsl:when test = "$ParagraphStyleDefinition/w:basedOn/@w:val">
-        <xsl:call-template name="GetIndirektListLevelParameter">
+        <xsl:call-template name="GetIndirectListLevelParameter">
           <xsl:with-param name="StyleId">
             <xsl:value-of select="$ParagraphStyleDefinition/w:basedOn/@w:val" />
           </xsl:with-param>
@@ -4263,51 +4221,25 @@
           <xsl:otherwise>
 
             <!--not in style context-->
-
-            <xsl:variable name="DirectNumId">
-              <xsl:value-of select="w:numPr/w:numId/@w:val"/>
-            </xsl:variable>
-
-            <xsl:variable name="DirectIlvl">
-              <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
-            </xsl:variable>
-
-            <xsl:variable name="NumberingDefinitions"
-						  select="key('Part', 'word/numbering.xml')/w:numbering"/>
-
-            <xsl:variable name="DirectAbstractNumId">
-              <xsl:value-of select="key('numId', $DirectNumId)/w:abstractNumId/@w:val"/>
-            </xsl:variable>
-
-            <xsl:variable name="DirectListLevelDefinition"
-						   select="key('abstractNumId', $DirectAbstractNumId)/w:lvl[@w:ilvl=$DirectIlvl][1]"/>
-
-            <xsl:variable name="StyleId">
-              <xsl:value-of select="w:pStyle/@w:val"/>
-            </xsl:variable>
-
-            <xsl:variable name="ParagraphStyleDefinition"
-						  select="key('StyleId', $StyleId)[1]"/>
-
-            <!--<xsl:variable name="IndirectNumId">
-              <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
-            </xsl:variable>-->
+            <xsl:variable name="DirectNumId" select="w:numPr/w:numId/@w:val"/>
+            <xsl:variable name="DirectIlvl" select="w:numPr/w:ilvl/@w:val"/>
+            <xsl:variable name="NumberingDefinitions" select="key('Part', 'word/numbering.xml')/w:numbering"/>
+            <xsl:variable name="DirectAbstractNumId" select="key('numId', $DirectNumId)/w:abstractNumId/@w:val"/>
+            <xsl:variable name="DirectListLevelDefinition" select="key('abstractNumId', $DirectAbstractNumId)/w:lvl[@w:ilvl=$DirectIlvl][1]"/>
+            <xsl:variable name="StyleId" select="w:pStyle/@w:val"/>
+            <xsl:variable name="ParagraphStyleDefinition" select="key('StyleId', $StyleId)[1]"/>
 
             <xsl:variable name="IndirectNumId">
-              <xsl:call-template name="GetIndirektListLevelParameter">
+              <xsl:call-template name="GetIndirectListLevelParameter">
                 <xsl:with-param name="StyleId">
                   <xsl:value-of select="$StyleId" />
                 </xsl:with-param>
                 <xsl:with-param name="Parameter">NumId</xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-
-            <!--<xsl:variable name="IndirectAbstractNumId">
-              <xsl:value-of select="$NumberingDefinitions/w:num[$IndirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
-            </xsl:variable>-->
-
+            
             <xsl:variable name="IndirectAbstractNumId">
-              <xsl:call-template name="GetIndirektListLevelParameter">
+              <xsl:call-template name="GetIndirectListLevelParameter">
                 <xsl:with-param name="StyleId">
                   <xsl:value-of select="$StyleId" />
                 </xsl:with-param>
@@ -4315,23 +4247,8 @@
               </xsl:call-template>
             </xsl:variable>
 
-            <!--<xsl:variable name="IndirectIlvl">
-              <xsl:choose>
-                <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val">
-                  <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val"/>
-                </xsl:when>
-                <xsl:when test="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]">
-                  <xsl:value-of select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]/@w:ilvl"/>
-                </xsl:when>
-                -->
-            <!--assume default level 0-->
-            <!--
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>-->
-
             <xsl:variable name="IndirectIlvl">
-              <xsl:call-template name="GetIndirektListLevelParameter">
+              <xsl:call-template name="GetIndirectListLevelParameter">
                 <xsl:with-param name="StyleId">
                   <xsl:value-of select="$StyleId" />
                 </xsl:with-param>
@@ -4340,8 +4257,7 @@
             </xsl:variable>
 
 
-            <xsl:variable name="IndirectListLevelDefinition"
-						  select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
+            <xsl:variable name="IndirectListLevelDefinition" select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
 
 
             <!--math: bugfix #2142500 : Use IndirectListLevelDefinition only if no direct list level definition is present.
@@ -4358,15 +4274,6 @@
                 <xsl:otherwise>'tab'</xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-
-            <!--<xsl:variable name ="Suffix">
-              <xsl:call-template name="GetIndirektListLevelParameter">
-                <xsl:with-param name="StyleId">
-                  <xsl:value-of select="$StyleId" />
-                </xsl:with-param>
-                <xsl:with-param name="Parameter">w:suff</xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>-->
 
             <xsl:variable name="Hanging">
               <xsl:choose>
@@ -4483,15 +4390,12 @@
             </xsl:variable>
 
 
-            <xsl:variable name="tabs"
-						  select="$DirectListLevelDefinition/w:pPr/w:tabs | $IndirectListLevelDefinition/w:pPr/w:tabs | $ParagraphStyleDefinition/w:pPr/w:tabs | w:tabs" />
+            <xsl:variable name="tabs" select="$DirectListLevelDefinition/w:pPr/w:tabs | $IndirectListLevelDefinition/w:pPr/w:tabs | $ParagraphStyleDefinition/w:pPr/w:tabs | w:tabs" />
 
             <xsl:variable name="SpaceToNextTab">
 
-              <xsl:variable name="MinTabOffset">
-                <xsl:value-of select ="350"/>
-              </xsl:variable>
-
+              <xsl:variable name="MinTabOffset" select ="350"/>
+              
               <xsl:choose>
                 <xsl:when test="$Suffix='nothing'">0</xsl:when>
                 <xsl:when test="$Suffix='space'">350</xsl:when>
@@ -4538,13 +4442,9 @@
 
                       <!--no hanging-->
 
-                      <xsl:variable name="DefaultTab">
-                        <xsl:value-of select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
-                      </xsl:variable>
-                      <xsl:variable name="NextDefaultTabPos">
-                        <xsl:value-of select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
-                      </xsl:variable>
-
+                      <xsl:variable name="DefaultTab" select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+                      <xsl:variable name="NextDefaultTabPos" select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
+                      
                       <xsl:choose>
                         <xsl:when test="$MinRelevantCustomTab != 'NaN'">
                           <!--take min relevant custom tab-->
@@ -4760,9 +4660,8 @@
   <xsl:template name="InsertParagraphTabStops">
     <xsl:param name="MarginLeft"/>
     <xsl:param name="parentStyleId"/>
-    <xsl:variable name="parentParentStyleId">
-      <xsl:value-of select="key('StyleId', $parentStyleId)/w:basedOn/@w:val" />
-    </xsl:variable>
+    <xsl:variable name="parentParentStyleId" select="key('StyleId', $parentStyleId)/w:basedOn/@w:val" />
+    
     <!-- divo: seems this won't work for parent's parent's parent styles etc -->
     <xsl:if test="w:tabs or key('StyleId', $parentStyleId)/w:pPr/w:tabs or key('StyleId', $parentParentStyleId)/w:pPr/w:tabs">
       <style:tab-stops>

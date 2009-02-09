@@ -452,9 +452,9 @@
   <xsl:template name="GetOutlineLevelMax">
     <xsl:param name="value" />
     <xsl:param name="count" />
-    <xsl:variable name="getValue">
-      <xsl:value-of select="key('OutlineLevel', '')[number($count)]/@w:val" />
-    </xsl:variable>
+    
+    <xsl:variable name="getValue" select="key('OutlineLevel', '')[number($count)]/@w:val" />
+    
     <xsl:choose>
       <xsl:when test="$count &gt; 0">
         <xsl:call-template name="GetOutlineLevelMax">
@@ -705,9 +705,8 @@
           </xsl:with-param>
           <xsl:with-param name="result">
             <xsl:variable name="styleId">
-              <xsl:variable name="styleName">
-                <xsl:value-of select="substring-before($string,';')" />
-              </xsl:variable>
+              <xsl:variable name="styleName" select="substring-before($string,';')" />
+              
               <xsl:choose>
                 <xsl:when test="key('StyleId', $styleName)" >
                   <xsl:value-of select="$styleName" />
@@ -992,12 +991,9 @@
             <xsl:call-template name="InsertHyperlinkStartToTOC" />
           </xsl:if>
 
-          <xsl:variable name="NumId">
-            <xsl:value-of select="string(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=concat('Heading', string($level))]/w:pPr/w:numPr/w:numId/@w:val)" />
-          </xsl:variable>
+          <xsl:variable name="NumId" select="string(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=concat('Heading', string($level))]/w:pPr/w:numPr/w:numId/@w:val)" />
           <xsl:variable name="AbstractNumId" select="string(key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val)" />
           <xsl:variable name="Tabs" select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId=$AbstractNumId]/w:lvl[@w:ilvl=number($level)-1]/w:pPr/w:tabs" />
-
 
           <xsl:choose>
             <xsl:when test="$Tabs/w:tab">
@@ -1048,9 +1044,7 @@
     <xsl:param name="instrText" />
     <xsl:param name="level" />
 
-    <xsl:variable name="NumId">
-      <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=concat('Heading', string($level))]/w:pPr/w:numPr/w:numId/@w:val" />
-    </xsl:variable>
+    <xsl:variable name="NumId" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=concat('Heading', string($level))]/w:pPr/w:numPr/w:numId/@w:val" />
     <xsl:variable name="AbstractNumId" select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val" />
     <xsl:variable name="suff" select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId=$AbstractNumId]/w:lvl[@w:ilvl=number($level)-1]/w:suff" />
 
@@ -1073,7 +1067,7 @@
           <text:index-entry-chapter />
           <!--math, dialogika: Bugfix #1947993 and #1828338 BEGIN-->
           <!--Only put space here (between number and text) if either no style with current level = outlineLvl is found or style with outlineLvl has a numbering-->
-          <xsl:variable name="StylesWithCurrentOutlineLevel" select="document('word/styles.xml')/w:styles/w:style[w:pPr/w:outlineLvl/@w:val = $level]" />
+          <!--<xsl:variable name="StylesWithCurrentOutlineLevel" select="document('word/styles.xml')/w:styles/w:style[w:pPr/w:outlineLvl/@w:val = $level]" />-->
           <!--<xsl:if test="not($StylesWithCurrentOutlineLevel[1]) or $StylesWithCurrentOutlineLevel/w:pPr/w:numPr/w:numId">
                   <text:index-entry-span>
                     <xsl:text> </xsl:text>
@@ -1253,7 +1247,6 @@
   <!-- clam, DIaLOGIKa: this template is only used inside the TOC -->
   <!-- insert entry properties for tabs -->
   <xsl:template match="w:tab" mode="TOCentry">
-    <xsl:param name="TOCMODE" />
     
     <xsl:variable name="tabCount" select="count(parent::w:r/preceding-sibling::w:r/w:tab)+1" />
     <xsl:variable name="leaderChar" select="@w:leader" />
@@ -1306,10 +1299,9 @@
 
   <!-- insert entry properties for tabs -->
   <xsl:template match="w:tab[not(parent::w:tabs)]" mode="entry">
-    <xsl:param name="TOCMODE"></xsl:param>
-    <xsl:variable name="tabCount">
-      <xsl:value-of select="count(parent::w:r/preceding-sibling::w:r/w:tab)+1" />
-    </xsl:variable>
+    <xsl:param name="TOCMODE" />
+    <xsl:variable name="tabCount" select="count(parent::w:r/preceding-sibling::w:r/w:tab)+1" />
+    
     <xsl:variable name="styleType">
       <xsl:call-template name="GetTabParams">
         <xsl:with-param name="param">w:val</xsl:with-param>

@@ -34,9 +34,7 @@
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
 
-    <xsl:variable name="shapeId">
-      <xsl:value-of select="@draw:name"/>
-    </xsl:variable>
+    <xsl:variable name="shapeId" select="@draw:name"/>
     <xsl:variable name="olePicture" select="substring-after(draw:image/@xlink:href, './')" />
     <xsl:variable name="olePictureType">
       <xsl:call-template name="GetOLEPictureType">

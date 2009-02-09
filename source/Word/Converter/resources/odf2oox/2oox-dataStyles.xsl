@@ -56,9 +56,6 @@
         <w:r>
           <w:instrText xml:space="preserve"> +<xsl:value-of select="@text:page-adjust"/> </w:instrText>
         </w:r>
-        <w:r>
-          <w:fldChar w:fldCharType="separate"/>
-        </w:r>
       </xsl:when>
       <xsl:otherwise>
         <w:r>
@@ -70,11 +67,11 @@
             </w:instrText>
           </xsl:if>
         </w:r>
-        <w:r>
-          <w:fldChar w:fldCharType="separate"/>
-        </w:r>
       </xsl:otherwise>
     </xsl:choose>
+    <w:r>
+      <w:fldChar w:fldCharType="separate"/>
+    </w:r>
     <xsl:apply-templates mode="paragraph"/>
     <w:r>
       <w:fldChar w:fldCharType="end"/>
@@ -327,49 +324,33 @@
 
   <!-- Sender Fields -->
   <xsl:template match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]" mode="paragraph">
-    <xsl:variable name="username">
-      <xsl:value-of select="."/>
-    </xsl:variable>
-    <w:fldSimple>
-      <xsl:attribute name="w:instr">
-        <xsl:value-of select="concat('USERNAME ' ,$username,'\* MERGEFORMAT')"/>
-      </xsl:attribute>
+    <xsl:variable name="username" select="."/>
+    
+    <w:fldSimple w:instr="{concat('USERNAME ' ,$username,'\* MERGEFORMAT')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
   <xsl:template match="text:sender-initials[not(@text:fixed='true')]" mode="paragraph">
-    <xsl:variable name="userinitial">
-      <xsl:value-of select="."/>
-    </xsl:variable>
-    <w:fldSimple>
-      <xsl:attribute name="w:instr">
-        <xsl:value-of select="concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')"/>
-      </xsl:attribute>
+    <xsl:variable name="userinitial" select="."/>
+    
+    <w:fldSimple w:instr="{concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
   <xsl:template match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]" mode="paragraph">
-    <xsl:variable name="adress">
-      <xsl:value-of select="."/>
-    </xsl:variable>
-    <w:fldSimple>
-      <xsl:attribute name="w:instr">
-        <xsl:value-of select="concat('USERADDRESS ' ,$adress,'\* MERGEFORMAT')"/>
-      </xsl:attribute>
+    <xsl:variable name="adress" select="."/>
+    
+    <w:fldSimple w:instr="{concat('USERADDRESS ' ,$adress,'\* MERGEFORMAT')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
   <xsl:template match="text:sender-title" mode="paragraph">
-    <xsl:variable name="title">
-      <xsl:value-of select="."/>
-    </xsl:variable>
-    <w:fldSimple>
-      <xsl:attribute name="w:instr">
-        <xsl:value-of select="concat('TITLE ' ,$title,'\* MERGEFORMAT')"/>
-      </xsl:attribute>
+    <xsl:variable name="title" select="."/>
+    
+    <w:fldSimple w:instr="{concat('TITLE ' ,$title,'\* MERGEFORMAT')}">
     </w:fldSimple>
   </xsl:template>
 
@@ -405,22 +386,14 @@
           <xsl:choose>
             <xsl:when
               test="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name">
-              <xsl:value-of
-                select="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name"
-              />
+              <xsl:value-of select="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name" />
             </xsl:when>
-            <xsl:when
-              test="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level and not(@style:display-name)]">
-              <xsl:value-of
-                select="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:name"
-              />
+            <xsl:when test="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level and not(@style:display-name)]">
+              <xsl:value-of select="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:name" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:variable name="styleName">
-                <xsl:value-of
-                  select="office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level=$outline-level]/@text:style-name"
-                />
-              </xsl:variable>
+              <xsl:variable name="styleName" select="office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level=$outline-level]/@text:style-name" />
+              
               <xsl:choose>
                 <xsl:when test="key('styles',$styleName)/@style:display-name">
                   <xsl:value-of select="key('styles',$styleName)/@style:display-name"/>
@@ -458,11 +431,7 @@
 
       <!-- if field displays name, convert into a reference to default heading style. -->
       <xsl:if test="contains(@text:display, 'name')">
-        <w:fldSimple>
-          <xsl:attribute name="w:instr">
-            <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \* MERGEFORMAT')"
-            />
-          </xsl:attribute>
+        <w:fldSimple w:instr="{concat('STYLEREF &quot;',$style,'&quot; \* MERGEFORMAT')}">
           <w:r>
             <w:rPr>
               <w:noProof/>
@@ -472,16 +441,6 @@
         </w:fldSimple>
       </xsl:if>
     </xsl:if>
-  </xsl:template>
-
-  <!--numbering type for sequence-->
-  <xsl:template name="InsertSequenceFieldNumType">
-    <xsl:variable name="numType">
-      <xsl:call-template name="GetNumberFormattingSwitch"/>
-    </xsl:variable>
-    <xsl:attribute name="w:instr">
-      <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
-    </xsl:attribute>
   </xsl:template>
 
   <!-- file name fields-->

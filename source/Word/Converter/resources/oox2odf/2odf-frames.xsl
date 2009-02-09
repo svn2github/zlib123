@@ -63,7 +63,7 @@
           Frames in header/footer need a surrounding text:p, otherwise, OpenOffice will not show them
           -->
           <xsl:choose>
-            <xsl:when test="ancestor::*[name()='w:hdr'] or ancestor::*[name()='w:ftr']">
+            <xsl:when test="ancestor::w:hdr or ancestor::w:ftr">
               <text:p>
                 <xsl:call-template name="InsertFrame">
                   <xsl:with-param name="framePr" select="w:pPr/w:framePr" />
@@ -272,7 +272,7 @@
     <xsl:attribute name="text:anchor-type">
       <xsl:choose>
 
-        <xsl:when test="ancestor::*[name()='w:hdr'] or ancestor::*[name()='w:ftr']">
+        <xsl:when test="ancestor::w:hdr or ancestor::w:ftr">
           <xsl:text>paragraph</xsl:text>
         </xsl:when>
         <xsl:when test="$framePr/@w:vAnchor='text' or $framePr/@w:hAnchor='text'">

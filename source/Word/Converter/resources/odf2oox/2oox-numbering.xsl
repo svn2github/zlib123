@@ -402,20 +402,13 @@
     <xsl:choose>
       <!-- first, if bullet is in styles -->
       <xsl:when test="ancestor::office:styles">
-        <xsl:value-of
-          select="1+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)"
-        />
+        <xsl:value-of select="1+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)" />
       </xsl:when>
       <!-- if list is in automatic styles of styles.xml -->
       <xsl:when test="ancestor::office:automatic-styles and ancestor::office:document-styles">
-        <xsl:variable name="bulletsCount">
-          <xsl:value-of
-            select="count(/office:document-styles/office:styles/text:list-style/text:list-level-style-image)"
-          />
-        </xsl:variable>
-        <xsl:value-of
-          select="1+$bulletsCount+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)"
-        />
+        <xsl:variable name="bulletsCount" select="count(/office:document-styles/office:styles/text:list-style/text:list-level-style-image)" />
+        
+        <xsl:value-of select="1+$bulletsCount+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)" />
       </xsl:when>
       <xsl:otherwise>
         <!-- list is in content.xml -->
@@ -424,9 +417,7 @@
             <xsl:value-of select="count(key('bullets',''))"/>
           </xsl:for-each>
         </xsl:variable>
-        <xsl:value-of
-          select="1+$bulletsCount+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)"
-        />
+        <xsl:value-of select="1+$bulletsCount+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -498,12 +489,10 @@
     <!-- disable hyphenation -->
     <xsl:for-each select="document('content.xml')">
       <xsl:choose>
-        <xsl:when
-          test="key('automatic-styles',@text:style-name)/style:text-properties/@fo:hyphenate='true'"/>
+        <xsl:when test="key('automatic-styles',@text:style-name)/style:text-properties/@fo:hyphenate='true'"/>
         <xsl:otherwise>
-          <xsl:variable name="styleName">
-            <xsl:value-of select="@text:style-name"/>
-          </xsl:variable>
+          <xsl:variable name="styleName" select="@text:style-name"/>
+          
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
               <xsl:when test="key('styles',$styleName)/style:text-properties/@fo:hyphenate='true'">
@@ -1782,17 +1771,15 @@
         <xsl:for-each select="document($context)">
           <xsl:choose>
             <xsl:when test="key('styles', $styleName)[1]/@style:default-outline-level">
-              <xsl:variable name="lvl">
-                <xsl:value-of select="key('styles', $styleName)[1]/@style:default-outline-level"/>
-              </xsl:variable>
+              <xsl:variable name="lvl" select="key('styles', $styleName)[1]/@style:default-outline-level"/>
+              
               <xsl:value-of select="number($lvl) - 1"/>
             </xsl:when>
             <xsl:otherwise>
               <!-- do not climb more than one non-automatic-style -->
               <xsl:if test="$context != 'styles.xml' ">
                 <xsl:call-template name="GetDefaultOutlineLevel">
-                  <xsl:with-param name="styleName"
-                    select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                  <xsl:with-param name="styleName" select="key('styles', $styleName)[1]/@style:parent-style-name"/>
                   <xsl:with-param name="context" select="$context"/>
                 </xsl:call-template>
               </xsl:if>

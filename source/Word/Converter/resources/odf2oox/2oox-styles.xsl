@@ -734,12 +734,9 @@
     </xsl:for-each>
 
     <!-- clear parent tabs if needed. -->
-    <xsl:variable name="styleName">
-      <xsl:value-of select="parent::node()/@style:name"/>
-    </xsl:variable>
-    <xsl:variable name="parentstyleName">
-      <xsl:value-of select="parent::node()/@style:parent-style-name"/>
-    </xsl:variable>
+    <xsl:variable name="styleName" select="parent::node()/@style:name"/>
+    <xsl:variable name="parentstyleName" select="parent::node()/@style:parent-style-name"/>
+    
     <!-- remember original context -->
     <xsl:variable name="styleContext">
       <xsl:choose>
@@ -1241,9 +1238,8 @@
       <xsl:if
         test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
         <!-- first percentage value specifies distance to baseline -->
-        <xsl:variable name="textPosition">
-          <xsl:value-of select="substring-before(@style:text-position, '%')"/>
-        </xsl:variable>
+        <xsl:variable name="textPosition" select="substring-before(@style:text-position, '%')"/>
+        
         <xsl:if test="$textPosition != '' and $textPosition != 0">
           <xsl:variable name="fontHeight">
             <xsl:call-template name="computeSize"/>
@@ -1253,9 +1249,7 @@
               <xsl:attribute name="w:val">
                 <xsl:choose>
                   <xsl:when test="contains($textPosition, '-')">
-                    <xsl:value-of
-                      select="concat('-', round(number(substring-after($textPosition, '-')) div 100 * $fontHeight))"
-                    />
+                    <xsl:value-of select="concat('-', round(number(substring-after($textPosition, '-')) div 100 * $fontHeight))" />
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="round(number($textPosition) div 100 * $fontHeight)"/>
@@ -1572,33 +1566,24 @@
           <xsl:otherwise>
             <!-- fetch the default font size for this style family -->
             <xsl:variable name="defaultProps">
-              <xsl:variable name="family">
-                <xsl:value-of select="$node/../@style:family"/>
-              </xsl:variable>
+              <xsl:variable name="family" select="$node/../@style:family"/>
+              
               <xsl:for-each select="document('styles.xml')">
                 <xsl:choose>
-                  <xsl:when
-                    test="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]">
-                    <xsl:value-of
-                      select="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]"
-                    />
+                  <xsl:when test="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]">
+                    <xsl:value-of select="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]" />
                   </xsl:when>
                   <xsl:otherwise>
                     <!-- when there is no other possibility -->
-                    <xsl:value-of
-                      select="office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@*[name() = $fontStyle]"
-                    />
+                    <xsl:value-of select="office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@*[name() = $fontStyle]" />
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:for-each>
             </xsl:variable>
-            <xsl:variable name="defaultValue"
-              select="number(substring-before($defaultProps, 'pt'))*2"/>
+            <xsl:variable name="defaultValue" select="number(substring-before($defaultProps, 'pt'))*2"/>
             <xsl:choose>
               <xsl:when test="contains($node/@*[name() = $fontStyle], '%')">
-                <xsl:value-of
-                  select="round(number(substring-before($node/@*[name() = $fontStyle], '%')) div 100 * number($defaultValue))"
-                />
+                <xsl:value-of select="round(number(substring-before($node/@*[name() = $fontStyle], '%')) div 100 * number($defaultValue))" />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$defaultValue"/>
@@ -2335,9 +2320,8 @@
                 <xsl:with-param name="length" select="@fo:end-indent"/>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:variable name="width">
-              <xsl:value-of select="number($start + $end)"/>
-            </xsl:variable>
+            <xsl:variable name="width" select="number($start + $end)"/>
+            
             <!-- space -->
             <xsl:attribute name="w:space">
               <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent ) -->
@@ -2345,8 +2329,7 @@
                 <xsl:when test="following-sibling::style:column/@fo:start-indent">
                   <xsl:variable name="followingStart">
                     <xsl:call-template name="twips-measure">
-                      <xsl:with-param name="length"
-                        select="following-sibling::style:column/@fo:start-indent"/>
+                      <xsl:with-param name="length" select="following-sibling::style:column/@fo:start-indent"/>
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:value-of select="number($followingStart + $end)"/>
@@ -2500,32 +2483,25 @@
       <xsl:when test="$node/@style:shadow != 'none' ">
         <!-- border shadow may not be displayed properly -->
         <xsl:message terminate="no">translation.odf2oox.paragraphPageShadow</xsl:message>
-        <xsl:variable name="firstShadow">
-          <xsl:value-of select=" substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
-        </xsl:variable>
-        <xsl:variable name="secondShadow">
-          <xsl:value-of select=" substring-after(substring-after($node/@style:shadow, ' '), ' ')"/>
-        </xsl:variable>
-        <w:top>
-          <xsl:attribute name="w:val">none</xsl:attribute>
+        <xsl:variable name="firstShadow" select="substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
+        <xsl:variable name="secondShadow" select="substring-after(substring-after($node/@style:shadow, ' '), ' ')"/>
+        
+        <w:top w:val="none">
           <xsl:if test="contains($secondShadow,'-')">
             <xsl:attribute name="w:shadow">true</xsl:attribute>
           </xsl:if>
         </w:top>
-        <w:left>
-          <xsl:attribute name="w:val">none</xsl:attribute>
+        <w:left w:val="none">
           <xsl:if test="contains($firstShadow,'-')">
             <xsl:attribute name="w:shadow">true</xsl:attribute>
           </xsl:if>
         </w:left>
-        <w:bottom>
-          <xsl:attribute name="w:val">none</xsl:attribute>
+        <w:bottom w:val="none">
           <xsl:if test="not(contains($secondShadow,'-'))">
             <xsl:attribute name="w:shadow">true</xsl:attribute>
           </xsl:if>
         </w:bottom>
-        <w:right>
-          <xsl:attribute name="w:val">none</xsl:attribute>
+        <w:right w:val="none">
           <xsl:if test="not(contains($firstShadow,'-'))">
             <xsl:attribute name="w:shadow">true</xsl:attribute>
           </xsl:if>
@@ -2545,12 +2521,9 @@
     <xsl:if test="$node/@style:shadow != 'none' ">
       <!-- border shadow may not be displayed properly -->
       <xsl:message terminate="no">translation.odf2oox.paragraphPageShadow</xsl:message>
-      <xsl:variable name="firstShadow">
-        <xsl:value-of select=" substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
-      </xsl:variable>
-      <xsl:variable name="secondShadow">
-        <xsl:value-of select=" substring-after(substring-after($node/@style:shadow, ' '), ' ')"/>
-      </xsl:variable>
+      <xsl:variable name="firstShadow" select="substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
+      <xsl:variable name="secondShadow" select="substring-after(substring-after($node/@style:shadow, ' '), ' ')"/>
+      
       <xsl:choose>
         <xsl:when test="$side = 'top' and contains($secondShadow,'-')">
           <xsl:attribute name="w:shadow">true</xsl:attribute>
@@ -2681,12 +2654,9 @@
     </xsl:attribute>
 
     <xsl:if test="$node/@style:shadow != 'none' ">
-      <xsl:variable name="firstShadow">
-        <xsl:value-of select=" substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
-      </xsl:variable>
-      <xsl:variable name="secondShadow">
-        <xsl:value-of select=" substring-after(substring-after($node/@style:shadow, ' '), ' ')"/>
-      </xsl:variable>
+      <xsl:variable name="firstShadow" select="substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
+      <xsl:variable name="secondShadow" select="substring-after(substring-after($node/@style:shadow, ' '), ' ')"/>
+      
       <xsl:choose>
         <xsl:when test="$side = 'top' and contains($secondShadow,'-')">
           <!-- border shadow may not be displayed properly -->
