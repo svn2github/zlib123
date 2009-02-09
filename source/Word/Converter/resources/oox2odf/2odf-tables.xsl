@@ -113,7 +113,7 @@
           <xsl:value-of select="ooc:NCNameFromString(w:tblStyle/@w:val)"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:call-template name="MasterPageName"/>
+      <xsl:call-template name="InsertMasterPageNameAttribute"/>
       <xsl:call-template name="InsertTableProperties">
         <xsl:with-param name="Default">StyleTableProperties</xsl:with-param>
       </xsl:call-template>

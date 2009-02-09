@@ -48,7 +48,7 @@
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:oox="urn:oox"
-  xmlns:ooc="urn:odf-converter"               
+  xmlns:ooc="urn:odf-converter"
   exclude-result-prefixes="w r rels pchar wp v o oox ooc">
 
   <xsl:import href="2odf-tables.xsl" />
@@ -182,9 +182,8 @@
   </xsl:template>
 
   <!--  when paragraph has no parent style it should be set to Normal style which contains all default paragraph properties -->
-  <xsl:template name="InsertParagraphParentStyle">
-    <xsl:attribute name="style:parent-style-name">
-
+  <xsl:template name="InsertParagraphParentStyleNameAttribute">
+    <xsl:variable name="parentStyleId">
       <xsl:choose>
         <xsl:when test="w:pStyle">
 
@@ -196,21 +195,27 @@
 
           <xsl:choose>
             <xsl:when test="$isDefaultTOCStyle='true'">
-              <xsl:value-of select="ooc:NCNameFromString(concat('Contents ',substring-after(w:pStyle/@w:val,'TOC')))" />
+              <xsl:value-of select="concat('Contents ',substring-after(w:pStyle/@w:val,'TOC'))" />
             </xsl:when>
-            <xsl:when test="w:pStyle/@w:val='FootnoteText'">
-              <xsl:value-of select="ooc:NCNameFromString('Footnote Symbol')" />
-            </xsl:when>
+            <!--<xsl:when test="w:pStyle/@w:val='FootnoteText'">
+              <xsl:value-of select="'Footnote Symbol'" />
+            </xsl:when>-->
             <xsl:otherwise>
-              <xsl:value-of select="ooc:NCNameFromString(w:pStyle/@w:val)" />
+              <xsl:value-of select="w:pStyle/@w:val" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>Normal</xsl:text>
-        </xsl:otherwise>
+        <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:type='paragraph' and @w:default='1']">
+          <!-- if no style is referenced use the last paragraph style which has the w:default attribute set (see p692 OpenXML spec) -->
+          <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:type='paragraph' and @w:default='1'][last()]/@w:styleId" />
+        </xsl:when>
       </xsl:choose>
-    </xsl:attribute>
+    </xsl:variable>
+    <xsl:if test="$parentStyleId != ''">
+      <xsl:attribute name="style:parent-style-name">
+        <xsl:value-of select="ooc:NCNameFromString($parentStyleId)" />
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
 
@@ -244,8 +249,8 @@
 	  mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
-      <xsl:call-template name="InsertParagraphParentStyle" />
-      <xsl:call-template name="MasterPageName" />
+      <xsl:call-template name="InsertParagraphParentStyleNameAttribute" />
+      <xsl:call-template name="InsertMasterPageNameAttribute" />
 
       <style:paragraph-properties>
         <xsl:for-each select="parent::w:p">
@@ -271,7 +276,8 @@
 	  mode="automaticstyles">
     <xsl:if test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
-        <xsl:call-template name="MasterPageName" />
+        <xsl:call-template name="InsertParagraphParentStyleNameAttribute" />
+        <xsl:call-template name="InsertMasterPageNameAttribute" />
         <xsl:call-template name="InsertDefaultParagraphProperties" />
       </style:style>
     </xsl:if>
@@ -542,7 +548,7 @@
 
           <!--clam, dialogika: bugfix #2088822-->
           <xsl:variable name="myNum" select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId = $numId]"></xsl:variable>
-          
+
           <xsl:if test="$myNum/w:lvlOverride[@w:ilvl=$outlineLevel]/w:startOverride">
             <xsl:attribute name="text:restart-numbering">true</xsl:attribute>
             <xsl:attribute name="text:start-value">
@@ -583,13 +589,13 @@
     <text:change text:change-id="{generate-id(w:pPr/w:rPr)}" />
 
     <xsl:apply-templates select="key('p', @oox:id+1)/child::node()" />
-    
+
     <xsl:if test="key('p', @oox:id+1)/w:pPr/w:rPr/w:del">
       <xsl:for-each select="key('p', @oox:id+1)">
         <xsl:call-template name="InsertDeletedParagraph" />
       </xsl:for-each>
     </xsl:if>
-    
+
   </xsl:template>
 
   <!--  set heading as list header (needed when number was deleted manually)-->
@@ -712,11 +718,11 @@
     <xsl:choose>
       <xsl:when test="ancestor::w:footnote or ancestor::w:endnote">
         <xsl:variable name="styleId" select="ancestor::w:p/w:pPr/w:pStyle/@w:val" />
-        
+
         <xsl:choose>
           <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:tab[1]) 
                     and (ancestor::w:p/w:pPr/w:ind/@w:hanging != '' or key('StyleId', $styleId)/w:pPr/w:ind/@w:hanging != '')" />
-              <!-- no tab -->
+          <!-- no tab -->
           <xsl:otherwise>
             <text:tab />
           </xsl:otherwise>
@@ -848,15 +854,15 @@
       <xsl:variable name="NameBookmark" select="@w:name" />
       <xsl:variable name="OutlineLvl" select="parent::w:p/w:pPr/w:outlineLvl/@w:val" />
       <xsl:variable name="Id" select="@w:id" />
-      
+
       <xsl:choose>
         <!--math, dialogika: bugfix #1785483 BEGIN-->
         <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != '' and $OutlineLvl !='9'">
           <!--math, dialogika: bugfix #1785483 END-->
           <text:bookmark text:name="{$NameBookmark}" />
-            
+
           <text:toc-mark-start text:id="{@w:id}" text:outline-level="{$OutlineLvl + 1}" />
-            
+
         </xsl:when>
         <!-- a bookmark must begin and end in the same text flow -->
         <xsl:when test="ancestor::w:tc and not(ancestor::w:tc//w:bookmarkEnd[@w:id=$Id])">
@@ -871,7 +877,7 @@
 
   <xsl:template match="w:bookmarkEnd">
     <xsl:variable name="Id" select="@w:id" />
-    
+
     <!--
 			makz: check if the w:bookmarkStart doesn't belong to a user field.
 			user fields are translated to user-field-decl
@@ -881,7 +887,7 @@
     <xsl:if test="parent::w:body or (ancestor::w:p and not(following-sibling::w:r[1]/w:fldChar/@w:fldCharType='end'))">
       <xsl:variable name="NameBookmark" select="key('bookmarkStart', @w:id)/@w:name" />
       <xsl:variable name="OutlineLvl" select="parent::w:p/w:pPr/w:outlineLvl/@w:val" />
-      
+
       <xsl:choose>
         <xsl:when test="contains($NameBookmark, '_Toc')  and  $OutlineLvl != ''">
           <text:toc-mark-end text:id="@w:id" />
@@ -955,7 +961,7 @@
       <!-- convert white spaces  -->
       <xsl:otherwise>
         <xsl:variable name="before" select="substring-before($string,' ')" />
-        
+
         <xsl:variable name="after">
           <xsl:call-template name="CutStartSpaces">
             <xsl:with-param name="cuted">
@@ -1020,7 +1026,7 @@
   <xsl:template match="w:br[@w:type='page' or @w:type='column']" mode="automaticstyles">
     <xsl:if test="not(ancestor::w:p/w:pPr)">
       <style:style style:name="{generate-id(ancestor::w:p)}" style:family="paragraph">
-        <xsl:call-template name="MasterPageName" />
+        <xsl:call-template name="InsertMasterPageNameAttribute" />
         <style:paragraph-properties>
           <xsl:call-template name="InsertParagraphProperties" />
         </style:paragraph-properties>
@@ -1028,21 +1034,21 @@
     </xsl:if>
   </xsl:template>
 
-	<!-- symbols : text style -->
-	<xsl:template match="w:sym" mode="automaticstyles">
-		<style:style style:name="{generate-id(.)}" style:family="text">
-			<xsl:if test="@w:font">
-				<style:text-properties style:font-name="{@w:font}"
+  <!-- symbols : text style -->
+  <xsl:template match="w:sym" mode="automaticstyles">
+    <style:style style:name="{generate-id(.)}" style:family="text">
+      <xsl:if test="@w:font">
+        <style:text-properties style:font-name="{@w:font}"
                                style:font-name-complex="{@w:font}">
-					<xsl:if test="../w:rPr/w:position">
+          <xsl:if test="../w:rPr/w:position">
             <xsl:for-each select="../w:rPr">
               <xsl:call-template name="InsertTextPosition" />
             </xsl:for-each>
           </xsl:if>
-				</style:text-properties>
-			</xsl:if>
-		</style:style>
-	</xsl:template>
+        </style:text-properties>
+      </xsl:if>
+    </style:style>
+  </xsl:template>
 
   <!-- symbols -->
   <xsl:template match="w:sym">
@@ -1057,7 +1063,7 @@
   <xsl:template match="text()" mode="automaticpict" />
 
   <!-- insert a master page name when required -->
-  <xsl:template name="MasterPageName">
+  <xsl:template name="InsertMasterPageNameAttribute">
     <xsl:if test="ancestor::w:body">
 
       <!-- NB : precSectPr defines properties of preceding section,
