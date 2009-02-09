@@ -347,11 +347,8 @@
     <w:instrText>
       <xsl:choose>
         <xsl:when test="../text:sequence-ref[@text:ref-name=$TextName]">
-          <xsl:variable name="indexOfObjects"
-            select="generate-id(key('indexes','')[child::*/@text:caption-sequence-name = key('bookmark-reference-start', $TextName)/@text:name])"/>
-          <xsl:value-of
-            select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1, $indexOfObjects)"
-          />
+          <xsl:variable name="indexOfObjects" select="generate-id(key('indexes','')[child::*/@text:caption-sequence-name = key('bookmark-reference-start', $TextName)/@text:name])"/>
+          <xsl:value-of select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1, $indexOfObjects)" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="SuppressForbiddenChars">
@@ -520,7 +517,7 @@
     <w:bookmarkEnd w:id="{$id}"/>
   </xsl:template>
 
-  <!-- compute a string to get an acceptable sting in OOX -->
+  <!-- compute a string to get an acceptable string in OOX -->
   <xsl:template name="SuppressForbiddenChars">
     <xsl:param name="string"/>
 

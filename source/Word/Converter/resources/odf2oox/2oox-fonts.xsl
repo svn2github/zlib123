@@ -38,9 +38,7 @@
   <xsl:template name="fonts">
     <w:fonts>
       <!-- We suppose that the fonts declared in content.xml and styles.xml are the same. -->
-      <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:font-face-decls/style:font-face"
-        mode="fonts"/>
+      <xsl:apply-templates select="document('content.xml')/office:document-content/office:font-face-decls/style:font-face" mode="fonts"/>
     </w:fonts>
   </xsl:template>
 
