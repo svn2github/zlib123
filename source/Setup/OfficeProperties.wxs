@@ -90,7 +90,7 @@
 		</Property>
 
 		<Property Id="WORD2007TEMPLATE5" Secure="yes">
-			<DirectorySearch Id="DirSearch_Word2007Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2007]" Depth="0" />
+			<DirectorySearch Id="DirSearch_Word2007Template5" Path="[AppDataFolder]Microsoft\[TEMPLATEDIR2007]" Depth="0" />
 		</Property>
 
 		<!-- detect Word 2003 template folder -->
@@ -115,7 +115,7 @@
 		</Property>
 
 		<Property Id="WORD2003TEMPLATE5" Secure="yes">
-			<DirectorySearch Id="DirSearch_Word2003Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2003]" Depth="0" />
+			<DirectorySearch Id="DirSearch_Word2003Template5" Path="[AppDataFolder]Microsoft\[TEMPLATEDIR2003]" Depth="0" />
 		</Property>
 
 
@@ -141,7 +141,7 @@
 		</Property>
 
 		<Property Id="WORD2002TEMPLATE5" Secure="yes">
-			<DirectorySearch Id="DirSearch_Word2002Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2002]" Depth="0" />
+			<DirectorySearch Id="DirSearch_Word2002Template5" Path="[AppDataFolder]Microsoft\[TEMPLATEDIR2002]" Depth="0" />
 		</Property>
 
 
@@ -167,7 +167,7 @@
 		</Property>
 
 		<Property Id="WORD2000TEMPLATE5" Secure="yes">
-			<DirectorySearch Id="DirSearch_Word2000Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2000]" Depth="0" />
+			<DirectorySearch Id="DirSearch_Word2000Template5" Path="[AppDataFolder]Microsoft\[TEMPLATEDIR2000]" Depth="0" />
 		</Property>
 
 		<CustomAction Id="GetOfficeInfos" Property="ODFTEMPLATEFOLDER" Value="[TEMPLATEPATH]" />
@@ -178,7 +178,7 @@
 		<CustomAction Id="ActionWord2007TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE3]" />
 		<CustomAction Id="ActionWord2007TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE4]" />
 		<CustomAction Id="ActionWord2007TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE5]" />
-		<CustomAction Id="ActionWord2007TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+		<CustomAction Id="ActionWord2007TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[AppDataFolder]Microsoft\Templates" />
 
 		<!-- assigning template folder for Word 2003 -->
 		<CustomAction Id="ActionWord2003TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE1]" />
@@ -186,7 +186,7 @@
 		<CustomAction Id="ActionWord2003TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE3]" />
 		<CustomAction Id="ActionWord2003TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE4]" />
 		<CustomAction Id="ActionWord2003TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE5]" />
-		<CustomAction Id="ActionWord2003TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+		<CustomAction Id="ActionWord2003TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[AppDataFolder]Microsoft\Templates" />
 
 		<!-- assigning template folder for Word 2002 -->
 		<CustomAction Id="ActionWord2002TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE1]" />
@@ -194,7 +194,7 @@
 		<CustomAction Id="ActionWord2002TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE3]" />
 		<CustomAction Id="ActionWord2002TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE4]" />
 		<CustomAction Id="ActionWord2002TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE5]" />
-		<CustomAction Id="ActionWord2002TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+		<CustomAction Id="ActionWord2002TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[AppDataFolder]Microsoft\Templates" />
 
 		<!-- assigning template folder for Word 2000 -->
 		<CustomAction Id="ActionWord2000TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE1]" />
@@ -202,7 +202,7 @@
 		<CustomAction Id="ActionWord2000TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE3]" />
 		<CustomAction Id="ActionWord2000TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE4]" />
 		<CustomAction Id="ActionWord2000TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE5]" />
-		<CustomAction Id="ActionWord2000TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+		<CustomAction Id="ActionWord2000TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[AppDataFolder]Microsoft\Templates" />
 
 		<InstallExecuteSequence>
 			<!-- entry point -->
