@@ -55,9 +55,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        public void AddComment(string message)
+        public void AddComment(string message, params object[] args)
         {
-            string text = "*** " + message;
+            string text = "*** " + string.Format(message, args);
 
             if (this._writer != null)
             {

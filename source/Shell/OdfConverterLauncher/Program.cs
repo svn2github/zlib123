@@ -265,13 +265,12 @@ namespace OdfConverterLauncher
             {
                 AbstractOdfAddin addin = null;
                 IOfficeApplication app = null;
-                string output = "";
-
-                bool showUserInterface = true;
-
+                ConversionOptions options = new ConversionOptions();
+                
                 // args[0] might be a short DOS name but we want the full path name
                 FileInfo fi = new FileInfo(args[0]);
                 string input = fi.FullName;
+                string output = "";
 
                 try
                 {
@@ -280,21 +279,34 @@ namespace OdfConverterLauncher
                         addin = new OdfConverter.Presentation.OdfPowerPointAddin.Connect();
                         app = new Presentation();
                         output = addin.AddinLib.GetTempFileName(input, ".pptx");
+                        options.ConversionDirection = ConversionDirection.OdpToPptx;
+                        options.DocumentType = Path.GetExtension(input).ToUpper().Equals(".OTP") ? DocumentType.Template : DocumentType.Document;
                     }
                     else if (input.ToUpper().EndsWith(".ODS") || input.ToUpper().EndsWith(".OTS"))
                     {
                         addin = new OdfConverter.Spreadsheet.OdfExcelAddin.Connect();
                         app = new Excel();
                         output = addin.AddinLib.GetTempFileName(input, ".xlsx");
+                        options.ConversionDirection = ConversionDirection.OdsToXlsx;
+                        options.DocumentType = Path.GetExtension(input).ToUpper().Equals(".OTS") ? DocumentType.Template : DocumentType.Document;
                     }
                     else if (input.ToUpper().EndsWith(".ODT") || input.ToUpper().EndsWith(".OTT"))
                     {
                         addin = new OdfConverter.Wordprocessing.OdfWordAddin.Connect();
                         app = new Word();
                         output = addin.AddinLib.GetTempFileName(input, ".docx");
+                        options.ConversionDirection = ConversionDirection.OdtToDocx;
+                        options.DocumentType = Path.GetExtension(input).ToUpper().Equals(".OTT") ? DocumentType.Template : DocumentType.Document;
                     }
                     addin.SetUICulture();
-                    addin.AddinLib.OdfToOox(input, output, showUserInterface);
+
+                    options.InputFullName = input;
+                    options.OutputFullName = output;
+                    options.Generator = addin.GetGenerator();
+                    options.ShowProgress = true;
+                    options.ShowUserInterface = true;
+                    
+                    addin.AddinLib.OdfToOox(input, output, options);
                     
                     if (File.Exists((string)output))
                     {

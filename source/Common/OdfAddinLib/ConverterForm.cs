@@ -44,7 +44,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private string inputFile;
         private string outputFile;
         private ResourceManager manager;
-        private bool isDirect;
+        private ConversionOptions options;
         private bool computeSize;
         private int size;
         private Exception exception;
@@ -52,14 +52,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private bool converting;
         private List<string> lostElements;
 
-        public ConverterForm(AbstractConverter converter, string inputFile, string outputFile, ResourceManager manager, bool isDirect)
+        public ConverterForm(AbstractConverter converter, string inputFile, string outputFile, ResourceManager manager, ConversionOptions options)
         {
             InitializeComponent();
             this.converter = converter;
             this.inputFile = inputFile;
             this.outputFile = outputFile;
             this.manager = manager;
-            this.isDirect = isDirect;
+            this.options = options;
             lostElements = new List<string>();
             //this code is for displaying the label in progress bar               
             //Code change 1 of 2
@@ -116,17 +116,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 converter.RemoveMessageListeners();
                 converter.AddProgressMessageListener(new AbstractConverter.MessageListener(ProgressMessageInterceptor));
                 converter.AddFeedbackMessageListener(new AbstractConverter.MessageListener(FeedbackMessageInterceptor));
-                converter.DirectTransform = this.isDirect;
+                converter.DirectTransform = this.options.IsDirectTransform;
                 this.computeSize = true;
                 converter.ComputeSize(this.inputFile);
                 this.progressBar1.Maximum = this.size;
                 this.computeSize = false;
-                converter.Transform(this.inputFile, this.outputFile);
+                converter.Transform(this.inputFile, this.outputFile, this.options);
                 WorkComplete(null);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                WorkComplete(e);
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                WorkComplete(ex);
             }
         }
 

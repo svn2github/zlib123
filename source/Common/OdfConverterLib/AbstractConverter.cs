@@ -289,14 +289,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <param name="fileName"></param>
         protected virtual void CheckOoxFile(string fileName) { }
 
-
-
-
         public void ComputeSize(string inputFile)
         {
-            Transform(inputFile, null);
+            Transform(inputFile, null, null);
         }
 
+        [Obsolete("Please use void Transform(string inputFile, string outputFile, ConversionOptions options) instead")]
         public void Transform(string inputFile, string outputFile)
         {
             Transform(inputFile, outputFile, null);

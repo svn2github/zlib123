@@ -28,7 +28,7 @@
       <office:meta>
         <!-- generator -->
         <meta:generator>
-          <xsl:value-of select="$generator"/><xsl:value-of select="concat(' ', $app-version)"/>
+          <xsl:value-of select="$generator"/>"/>
         </meta:generator>
         <!-- title -->
         <xsl:apply-templates
@@ -97,10 +97,7 @@
     <!-- @Private -->
 
     <dc:title>
-      <xsl:variable name="titl">
-        <xsl:value-of select="."/>
-      </xsl:variable>
-      <xsl:value-of select="substring($titl ,1 ,65533)"/>
+      <xsl:value-of select="substring(., 1, 65533)"/>
     </dc:title>
   </xsl:template>
 
@@ -111,10 +108,7 @@
     <!-- @Private -->
 
     <dc:description>
-      <xsl:variable name="descript">
-        <xsl:value-of select="."/>
-      </xsl:variable>
-      <xsl:value-of select="substring($descript ,1 ,65533)"/>
+      <xsl:value-of select="substring(., 1, 65533)"/>
     </dc:description>
   </xsl:template>
 
@@ -178,10 +172,7 @@
     <!-- @Private -->
 
     <dc:subject>
-      <xsl:variable name="subj">
-        <xsl:value-of select="."/>
-      </xsl:variable>
-      <xsl:value-of select="substring($subj ,1 ,65533)"/>
+      <xsl:value-of select="substring(., 1, 65533)"/>
     </dc:subject>
   </xsl:template>
 
@@ -194,9 +185,7 @@
       <xsl:choose>
         <xsl:when test=". &gt; 60">
           <xsl:text>PT</xsl:text>
-          <xsl:variable name="hours">
-            <xsl:value-of select="round(.) div 60"/>
-          </xsl:variable>
+          <xsl:variable name="hours" select="round(.) div 60"/>
           <xsl:value-of select="$hours"/>
           <xsl:text>H</xsl:text>
           <xsl:value-of select="number(.) - (number($hours) * 60)"/>
@@ -307,10 +296,7 @@
     <!-- @Private -->
 
     <meta:keyword>
-      <xsl:variable name="keyw">
-        <xsl:value-of select="."/>
-      </xsl:variable>
-      <xsl:value-of select="substring($keyw ,1 ,65533)"/>
+      <xsl:value-of select="substring(., 1, 65533)"/>
     </meta:keyword>
   </xsl:template>
 

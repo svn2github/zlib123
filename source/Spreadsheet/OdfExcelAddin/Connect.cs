@@ -59,12 +59,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         /// <summary>
         /// Class name for Excel12 documents
         /// </summary>
-        private const int Word12Class = 51;
-
-        /// <summary>
-        /// Format Id for Excel12 documents in current configuration
-        /// </summary>
-        private int _word12SaveFormat = -1;
+        private const int Excel12Class = 51;
 
         /// <summary>
         ///		Implements the constructor for the Add-in object.
@@ -84,56 +79,11 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         }
 
 
-        /// <summary>
-        /// Initializes Word12Format field
-        /// </summary>
-        private int FindWord12SaveFormat()
-        {
-            int saveFormat = -1;
-            try
-            {
-                if (_officeVersion == OfficeVersion.Office2007)
-                {
-                    saveFormat = 12;
-                }
-                else
-                {
-                    // iterate through file converters to find the correct format
-                    LateBindingObject converters = _application.Invoke("FileConverters");
-
-                    for (int i = 1; i <= converters.GetInt32("Count"); i++)
-                    {
-                        LateBindingObject converter = converters.Invoke("Item", i);
-                        string className = converter.GetString("ClassName");
-                        if (className.Equals(Word12Class))
-                        {
-                            // Converter found
-                            saveFormat = converter.GetInt32("SaveFormat");
-                            break;
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                throw;
-            }
-            return saveFormat;
-        }
-
         private LateBindingObject OpenDocument(string fileName, bool confirmConversions, bool readOnly, bool addToRecentFiles, bool isVisible, bool openAndRepair)
         {
             LateBindingObject doc = null;
             switch (this._officeVersion)
             {
-                /*Added By: Sandeep
-                 Defect  : 2107258(Crash, sharepoint services hangs ) 
-                 Desc    : The input file is  linked to sharepoint services server, when clicking 'yes' on the dialog box asking "do you want to load pending changes",
-                           the conversion hangs Excel. The "file conversion in progress" dialog box is 
-                           displayed and apparently another (very small) box on top of it.
-                           To fix this Additional property added , DispalayAlerts= false for office XP and other office files, to supress messages 
-               */
-
                 case OfficeVersion.OfficeXP:
 
                     doc = this._application.Invoke("Workbooks").
@@ -155,48 +105,37 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
 
         private LateBindingObject SaveDocumentAs(LateBindingObject doc, string fileName)
         {
-            //bool addToRecentFiles = false;
+            // prevent any popup dialogs which block the application in the background
             bool bDisplayAlerts = this._application.GetBool("DisplayAlerts");
+            this._application.SetBool("DisplayAlerts", false); 
+                    
             switch (this._officeVersion)
             {
-                
                 case OfficeVersion.OfficeXP:
-                    
-                    this._application.SetBool("DisplayAlerts", false); 
-                    doc.Invoke("SaveAs",
-                    fileName, Word12Class, Type.Missing, Type.Missing, Type.Missing,
-                    Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing,
-                    Type.Missing, Type.Missing, Type.Missing);
-                    this._application.SetBool("DisplayAlerts", bDisplayAlerts); 
-                    break;
-
-
-                case OfficeVersion.Office2003:
-                    
-                    this._application.SetBool("DisplayAlerts", false); 
-                    doc.Invoke("SaveAs",
-                        fileName, Word12Class, Type.Missing, Type.Missing, Type.Missing,
+                    doc.Invoke("SaveAs", fileName, Excel12Class, Type.Missing, Type.Missing, Type.Missing,
                         Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing,
                         Type.Missing, Type.Missing, Type.Missing);
-                    this._application.SetBool("DisplayAlerts", bDisplayAlerts); 
-                    break;
-                default:
-                    doc.Invoke("SaveAs",
-                    fileName, XlFileFormat.xlOpenXMLWorkbook, Type.Missing, Type.Missing, Type.Missing,
-                    Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                    Type.Missing, Type.Missing, Type.Missing);
                     break;
 
+                case OfficeVersion.Office2003:
+                    doc.Invoke("SaveAs", fileName, Excel12Class, Type.Missing, Type.Missing, Type.Missing,
+                        Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing,
+                        Type.Missing, Type.Missing, Type.Missing);
+                    break;
+
+                default:
+                    doc.Invoke("SaveAs", fileName, XlFileFormat.xlOpenXMLWorkbook, Type.Missing, Type.Missing, Type.Missing,
+                        Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                        Type.Missing, Type.Missing, Type.Missing);
+                    break;
             }
+            this._application.SetBool("DisplayAlerts", bDisplayAlerts); 
+                    
             return doc;
         }
 
         protected override void InitializeAddin()
         {
-            this._word12SaveFormat = FindWord12SaveFormat();
-
-            //// Tell Word that the Normal.dot template should not be saved (unless the user later on makes it dirty)
-            //this._application.Invoke("NormalTemplate").SetBool("Saved", true);
         }
 
         /// <summary>
@@ -209,7 +148,16 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                 // create a temporary file
                 string fileName = this._addinLib.GetTempFileName(odfFile, ".xlsx");
 
-                this._addinLib.OdfToOox(odfFile, fileName, true);
+                ConversionOptions options = new ConversionOptions();
+                options.InputFullName = odfFile;
+                options.OutputFullName = fileName;
+                options.ConversionDirection = ConversionDirection.OdsToXlsx;
+                options.Generator = this.GetGenerator();
+                options.DocumentType = Path.GetExtension(odfFile).ToUpper().Equals(".OTS") ? DocumentType.Template : DocumentType.Document;
+                options.ShowProgress = true;
+                options.ShowUserInterface = true;
+
+                this._addinLib.OdfToOox(odfFile, fileName, options);
 
                 try
                 {
@@ -238,7 +186,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                    System.Diagnostics.Trace.WriteLine(ex.ToString());
                     System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
                     return;
                 }
@@ -352,7 +300,17 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                             sourceFileName = tempXlsxName;
                         }
 
-                        this._addinLib.OoxToOdf(sourceFileName, odfFileName, true);
+                        ConversionOptions options = new ConversionOptions();
+                        options.InputFullName = sourceFileName;
+                        options.OutputFullName = odfFileName;
+                        options.ConversionDirection = ConversionDirection.XlsxToOds;
+                        options.Generator = this.GetGenerator();
+                        options.DocumentType = Path.GetExtension(sourceFileName).ToUpper().Equals(".XLTX")
+                            || Path.GetExtension(sourceFileName).ToUpper().Equals(".XLTM") ? DocumentType.Template : DocumentType.Document;
+                        options.ShowProgress = true;
+                        options.ShowUserInterface = true;
+
+                        this._addinLib.OoxToOdf(sourceFileName, odfFileName, options);
 
                         if (tempXlsxName != null && File.Exists((string)tempXlsxName))
                         {

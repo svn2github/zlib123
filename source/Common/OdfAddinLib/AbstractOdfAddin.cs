@@ -83,6 +83,8 @@ namespace OdfConverter.OdfConverterLib
         protected LateBindingObject /*CommandBarButton*/ _exportButton;
         protected LateBindingObject /*CommandBarButton*/ _optionsButton;
 
+        protected string _generator;
+
 
         protected virtual string[] getOpenFileNames()
         {
@@ -165,6 +167,23 @@ namespace OdfConverter.OdfConverterLib
             {
                 System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(culture);
             }
+        }
+
+        public virtual string GetGenerator()
+        {
+            string generator = Microsoft.Win32.Registry.GetValue(this.RegistryKeyUser, "Generator", null) as string;
+
+            if (generator == null)
+            {
+                generator = Microsoft.Win32.Registry.GetValue(this.RegistryKeyLocalMachine, "Generator", null) as string;
+            }
+
+            if (generator == null)
+            {
+                generator = "ODF Add-in for Microsoft Office";
+            }
+
+            return generator + " (Office " + _application.GetString("Build") + ")";
         }
 
         /// <summary>
@@ -363,8 +382,9 @@ namespace OdfConverter.OdfConverterLib
             {
                 importOdf();
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
             }
         }
 
@@ -391,8 +411,9 @@ namespace OdfConverter.OdfConverterLib
             {
                 exportOdf();
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
             }
         }
 
@@ -419,8 +440,9 @@ namespace OdfConverter.OdfConverterLib
             {
                 odfOptions();
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
             }
         }
 

@@ -38,6 +38,7 @@ using System.Runtime.CompilerServices;
 using OdfConverter.Office;
 using OdfConverter.OdfConverterLib;
 using System.Text;
+using Microsoft.Win32;
 
 namespace OdfConverter.Wordprocessing.OdfWordAddin
 {
@@ -60,6 +61,9 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
 
         protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\ODF Add-in for Word";
         protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Word";
+
+        protected const string OptionKey = @"Software\Microsoft\Office\12.0\Word\Options";
+        protected const string NoShowCnvMsg = "NoShowCnvMsg";
 
         /// <summary>
         /// Class name for Word12 documents
@@ -120,8 +124,9 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
                 throw;
             }
             return saveFormat;
@@ -130,29 +135,50 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         private LateBindingObject OpenDocument(string fileName, bool confirmConversions, bool readOnly, bool addToRecentFiles, bool isVisible, bool openAndRepair)
         {
             LateBindingObject doc = null;
-            switch (this._officeVersion)
+
+            // do not show warning message "Because this file was created in a newer version of Word, it has been converted to a format that you can work with."
+            // see: http://support.microsoft.com/kb/936695
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(Connect.OptionKey))
             {
-                case OfficeVersion.Office2000:
-                    doc = _application.Invoke("Documents").
-                    Invoke("Open", fileName, confirmConversions, readOnly, addToRecentFiles, Type.Missing,
-                            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            isVisible);
+                int noShowCnvMsg = (key.GetValue(Connect.NoShowCnvMsg, 2) as int?) ?? 2;
+                    
+                try
+                {
+                    key.SetValue(Connect.NoShowCnvMsg, 1, RegistryValueKind.DWord);
 
-                    break;
+                    switch (this._officeVersion)
+                    {
+                        case OfficeVersion.Office2000:
+                            doc = _application.Invoke("Documents").
+                            Invoke("Open", fileName, confirmConversions, readOnly, addToRecentFiles, Type.Missing,
+                                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                    isVisible);
 
-                case OfficeVersion.OfficeXP:
-                    doc = this._application.Invoke("Documents").
-                    Invoke("Open", fileName, confirmConversions, readOnly, addToRecentFiles, Type.Missing,
-                            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            isVisible, openAndRepair, Type.Missing, Type.Missing);
-                    break;
+                            break;
 
-                default:
-                    doc = this._application.Invoke("Documents").
-                    Invoke("Open", fileName, confirmConversions, readOnly, addToRecentFiles, Type.Missing,
-                            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            isVisible, openAndRepair, Type.Missing, Type.Missing, Type.Missing);
-                    break;
+                        case OfficeVersion.OfficeXP:
+                            doc = this._application.Invoke("Documents").
+                            Invoke("Open", fileName, confirmConversions, readOnly, addToRecentFiles, Type.Missing,
+                                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                    isVisible, openAndRepair, Type.Missing, Type.Missing);
+                            break;
+
+                        default:
+                            doc = this._application.Invoke("Documents").
+                            Invoke("Open", fileName, confirmConversions, readOnly, addToRecentFiles, Type.Missing,
+                                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                    isVisible, openAndRepair, Type.Missing, Type.Missing, Type.Missing);
+                            break;
+                    }
+                }
+                finally
+                {
+                    if (noShowCnvMsg != 1)
+                    {
+                        // restore default behavior
+                        key.SetValue(Connect.NoShowCnvMsg, 2, RegistryValueKind.DWord);
+                    }
+                }
             }
             return doc;
         }
@@ -160,6 +186,9 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         private LateBindingObject SaveDocumentAs(LateBindingObject doc, string fileName)
         {
             bool addToRecentFiles = false;
+            int wdDisplayAlerts = this._application.GetInt32("DisplayAlerts");
+            this._application.SetInt32("DisplayAlerts", 0); 
+            
             switch (this._officeVersion)
             {
                 case OfficeVersion.Office2000:
@@ -177,6 +206,8 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                         Type.Missing, Type.Missing, Type.Missing);
                     break;
             }
+            this._application.SetInt32("DisplayAlerts", wdDisplayAlerts); 
+
             return doc;
         }
 
@@ -199,7 +230,18 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                 string fileName = this._addinLib.GetTempFileName(odfFile, ".docx");
 
                 this._application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorWait);
-                this._addinLib.OdfToOox(odfFile, fileName, true);
+
+                ConversionOptions options = new ConversionOptions();
+                options.InputFullName = odfFile;
+                options.OutputFullName = fileName;
+                options.ConversionDirection = ConversionDirection.OdtToDocx;
+                options.Generator = this.GetGenerator();
+                options.DocumentType = Path.GetExtension(odfFile).ToUpper().Equals(".OTT") ? DocumentType.Template : DocumentType.Document;
+                options.ShowProgress = true;
+                options.ShowUserInterface = true;
+
+                this._addinLib.OdfToOox(odfFile, fileName, options);
+                
                 this._application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorNormal);
 
                 try
@@ -227,7 +269,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                 catch (Exception ex)
                 {
                     _application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorNormal);
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                    System.Diagnostics.Trace.WriteLine(ex.ToString());
                     System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
                     return;
                 }
@@ -364,12 +406,22 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
 
                             lMsg = _addinLib.GetString("OdfExportErrorTryDocxFirst");
                             System.Windows.Forms.MessageBox.Show(lMsg, DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                            System.Diagnostics.Debug.WriteLine(ex.ToString());
+                            System.Diagnostics.Trace.WriteLine(ex.ToString());
                             return;
                         }
                     }
 
-                    this._addinLib.OoxToOdf(sourceFileName, odfFileName, true);
+                    ConversionOptions options = new ConversionOptions();
+                    options.InputFullName = sourceFileName;
+                    options.OutputFullName = odfFileName;
+                    options.ConversionDirection = ConversionDirection.DocxToOdt;
+                    options.Generator = this.GetGenerator();
+                    options.DocumentType = Path.GetExtension(sourceFileName).ToUpper().Equals(".DOTX")
+                        || Path.GetExtension(sourceFileName).ToUpper().Equals(".DOTM") ? DocumentType.Template : DocumentType.Document;
+                    options.ShowProgress = true;
+                    options.ShowUserInterface = true;
+
+                    this._addinLib.OoxToOdf(sourceFileName, odfFileName, options);
 
                     if (tempDocxName != null && File.Exists((string)tempDocxName))
                     {
@@ -393,8 +445,9 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                 System.Windows.Forms.SendKeys.Send("+{TAB}+{TAB}+{TAB}{DOWN}{DOWN}{DOWN}{DOWN} ");
                 _application.Invoke("CommandBars").Invoke("FindControl", Type.Missing, 18, Type.Missing, Type.Missing).Invoke("Execute");
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
             }
         }
 

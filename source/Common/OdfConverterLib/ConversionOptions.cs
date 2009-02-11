@@ -89,7 +89,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private bool _validate = false;                 // validate the result of the transformations
         private bool _recursiveMode = false;            // go in subfolders ?
         private bool _forceOverwrite = false;			// override existing files ?
-        
+
         private string _reportPath = null;              // file to save report
         private ConversionReport _report = null;        // report to write log messages to
         private LogLevel _logLevel = LogLevel.Info;     // file to save report
@@ -267,6 +267,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             get { return _conversionDirection; }
             set { _conversionDirection = value; }
+        }
+
+        public bool IsDirectTransform
+        {
+            get
+            {
+                return (_conversionDirection == ConversionDirection.OdtToDocx
+                     || _conversionDirection == ConversionDirection.OdsToXlsx
+                     || _conversionDirection == ConversionDirection.OdpToPptx);
+            }
         }
 
         /// <summary>

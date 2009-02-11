@@ -123,7 +123,26 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <param name="inputFile">The path of the input file to convert.</param>
         /// <param name="outputFile">The path of the resulting file.</param>
         /// <param name="showUserInterface">True if a progress bar has to be shown, along with a feedback.</param>
+        [Obsolete("Please use OdfToOox(string inputFile, string outputFile, ConversionOptions options) instead.")]
         public void OdfToOox(string inputFile, string outputFile, bool showUserInterface)
+        {
+            this.odfToOox(inputFile, outputFile, showUserInterface, null);
+        }
+
+        /// <summary>
+        /// Transforms an ODF document into an OOX document.
+        /// </summary>
+        /// <param name="inputFile">The path of the input file to convert.</param>
+        /// <param name="outputFile">The path of the resulting file.</param>
+        /// <param name="options">The conversion options</param>
+        public void OdfToOox(string inputFile, string outputFile, ConversionOptions options)
+        {
+            this.odfToOox(inputFile, outputFile, options.ShowUserInterface, options);
+        }
+
+        // for backward compatibility remain parameter showUserInterface
+        // remove this parameter once method void OdfToOox(string inputFile, string outputFile, bool showUserInterface) is no longer used.
+        private void odfToOox(string inputFile, string outputFile, bool showUserInterface, ConversionOptions options)
         {
             if (showUserInterface)
             {
@@ -132,7 +151,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     // create a temporary file
 
                     // call the converter
-                    using (ConverterForm form = new ConverterForm(this.converter, inputFile, outputFile, this.resourceManager, true))
+                    using (ConverterForm form = new ConverterForm(this.converter, inputFile, outputFile, this.resourceManager, options))
                     {
                         if (System.Windows.Forms.DialogResult.OK == form.ShowDialog())
                         {
@@ -185,22 +204,23 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "CorruptedInputFileLabel", "CorruptedInputFileDetail");
                     infoBox.ShowDialog();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    if (e.InnerException != null && e.InnerException is System.Xml.XmlException)
+                    System.Diagnostics.Trace.WriteLine(ex.ToString());
+                    if (ex.InnerException != null && ex.InnerException is System.Xml.XmlException)
                     {
                         // An xsl exception may embed an xml exception. In this case we have a non well formed xml document.
                         List<string> messages = new List<string>();
                         messages.Add("CorruptedInputFileDetail");
                         messages.Add("");
-                        messages.Add(e.Message);
-                        messages.Add("InnerException: " + e.InnerException.Message);
+                        messages.Add(ex.Message);
+                        messages.Add("InnerException: " + ex.InnerException.Message);
                         InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "CorruptedInputFileLabel", (string[])messages.ToArray());
                         infoBox.ShowDialog();
                     }
                     else
                     {
-                        InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
+                        InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "OdfUnexpectedError", ex.GetType() + ": " + ex.Message + " (" + ex.StackTrace + ")");
                         infoBox.ShowDialog();
                     }
                     if (File.Exists(outputFile))
@@ -214,15 +234,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 try
                 {
                     converter.DirectTransform = true;
-                    converter.Transform(inputFile, outputFile);
+                    converter.Transform(inputFile, outputFile, options);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
+                    System.Diagnostics.Trace.WriteLine(ex.ToString());
+
                     if (File.Exists(outputFile))
                     {
                         File.Delete(outputFile);
                     }
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -233,13 +255,30 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <param name="inputFile">The path of the input file to convert.</param>
         /// <param name="outputFile">The path of the resulting file.</param>
         /// <param name="showUserInterface">True if a progress bar has to be shown, along with a feedback.</param>
+        [Obsolete("Please use OoxToOdf(string inputFile, string outputFile, ConversionOptions options) instead.")]
         public void OoxToOdf(string inputFile, string outputFile, bool showUserInterface)
+        {
+            this.ooxToOdf(inputFile, outputFile, showUserInterface, null);
+        }
+
+        /// <summary>
+        /// Transforms an OOX document into an ODF document.
+        /// </summary>
+        /// <param name="inputFile">The path of the input file to convert.</param>
+        /// <param name="outputFile">The path of the resulting file.</param>
+        /// <param name="options">The conversion options</param>
+        public void OoxToOdf(string inputFile, string outputFile, ConversionOptions options)
+        {
+            this.ooxToOdf(inputFile, outputFile, options.ShowUserInterface, options);
+        }
+
+        private void ooxToOdf(string inputFile, string outputFile, bool showUserInterface, ConversionOptions options)
         {
             if (showUserInterface)
             {
                 try
                 {
-                    using (ConverterForm form = new ConverterForm(this.converter, inputFile, outputFile, this.resourceManager, false))
+                    using (ConverterForm form = new ConverterForm(this.converter, inputFile, outputFile, this.resourceManager, options))
                     {
                         System.Windows.Forms.DialogResult dr = form.ShowDialog();
 
@@ -278,9 +317,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     //InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", e.Message, this.resourceManager);
                     infoBox.ShowDialog();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
+                    System.Diagnostics.Trace.WriteLine(ex.ToString());
+
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "OdfUnexpectedError", ex.GetType() + ": " + ex.Message + " (" + ex.StackTrace + ")");
                     infoBox.ShowDialog();
 
                     if (File.Exists(outputFile))
@@ -294,15 +335,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 try
                 {
                     converter.DirectTransform = false;
-                    converter.Transform(inputFile, outputFile);
+                    converter.Transform(inputFile, outputFile, options);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
+                    System.Diagnostics.Trace.WriteLine(ex.ToString());
+
                     if (File.Exists(outputFile))
                     {
                         File.Delete(outputFile);
                     }
-                    throw e;
+                    throw;
                 }
             }
         }

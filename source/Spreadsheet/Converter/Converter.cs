@@ -39,8 +39,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                             .GetType("SpreadsheetConverter2Odf");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
                 return null;
             }
             return stylesheet;
@@ -103,9 +104,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 docContent.Load(readerContent);
                 //End Of code change, for the defect 1740412
             }
-            catch (XmlException e)
+            catch (XmlException ex)
             {
-                throw new NotAnOdfDocumentException(e.Message);
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                throw new NotAnOdfDocumentException(ex.Message, ex);
             }
             
 
@@ -139,13 +141,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 XmlReader reader = XmlReader.Create("[Content_Types].xml", settings);
                 doc.Load(reader);
             }
-            catch (XmlException e)
+            catch (XmlException ex)
             {
-                throw new NotAnOoxDocumentException(e.Message);
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                throw new NotAnOoxDocumentException(ex.Message, ex);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw e;
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                throw;
             }
             XmlNodeList nodelist = doc.SelectNodes("//node()[@ContentType='" + OOX_MIME_TYPE_SPREADSHEET + "'"
                                                     + " or @ContentType='" + OOX_MIME_TYPE_SPREADSHEET_TEMPLATE + "'"
