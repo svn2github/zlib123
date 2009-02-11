@@ -375,7 +375,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     }
                     else
                     {
-                        parameters.AddParam("generator", "", "OpenXML/ODF Translator v2.5");
+                        parameters.AddParam("generator", "", "OpenXML/ODF Translator");
                     }
                     XmlWriter finalWriter;
                     if (this.packaging)
