@@ -70,8 +70,9 @@ namespace OdfConverter.Wordprocessing
                                             .GetType("WordprocessingConverter2Odf");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
                 return null;
             }
             return stylesheet;
@@ -126,15 +127,15 @@ namespace OdfConverter.Wordprocessing
                 XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
                 doc.Load(reader);
             }
-            catch (XmlException e)
+            catch (XmlException ex)
             {
-                Debug.WriteLine(e.Message);
-                throw new NotAnOdfDocumentException(e.Message);
+                System.Diagnostics.Trace.WriteLine(ex.ToString()); 
+                throw new NotAnOdfDocumentException(ex.Message, ex);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.WriteLine(e.Message);
-                throw e;
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                throw;
             }
 
             XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
