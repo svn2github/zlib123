@@ -203,7 +203,11 @@ namespace OdfConverter.CommandLineTool
             int nbConverted = 0;
             int nbValidated = 0;
             int nbNotValidated = 0;
-            this._report.AddComment("Processing " + nbFiles + " file(s).");
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            this._report.AddComment("Processing {0} file(s).", nbFiles);
 
             foreach (string input in files)
             {
@@ -260,13 +264,13 @@ namespace OdfConverter.CommandLineTool
                     _report.LogInfo(options.InputFullName, "Skipping file {0}. {1}", options.InputFullName, ex.Message);
                 }
             }
-
-            this._report.AddComment("Result: " + nbConverted + " of " + nbFiles + " file(s) were converted successfully.");
+            stopwatch.Stop();
+            this._report.AddComment("Result: {0} of {1} file(s) were converted successfully in {2}.", nbConverted, nbFiles, stopwatch.Elapsed);
 
             if (batchOptions.Validate)
             {
-                this._report.AddComment("   " + nbValidated + " file(s) could be validated.");
-                this._report.AddComment("   " + nbNotValidated + " file(s) could not be validated.");
+                this._report.AddComment("   {0} file(s) could be validated.", nbValidated);
+                this._report.AddComment("   {0} file(s) could not be validated.", nbNotValidated);
             }
         }
 
