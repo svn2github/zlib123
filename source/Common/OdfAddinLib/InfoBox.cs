@@ -55,7 +55,7 @@ namespace OdfConverter.OdfConverterLib
         /// A flag indicating whether a "Do not show this message again" checkbox is shown in the dialog
         /// </summary>
         private bool _showDisableCheckbox = false;
-        
+
         /// <summary>
         /// Client size of dialog box in "no details" mode
         /// </summary>
@@ -109,10 +109,12 @@ namespace OdfConverter.OdfConverterLib
 
         private void InfoBox_Load(object sender, EventArgs e)
         {
-            try {
+            try
+            {
                 // Change the title
                 string newTitle = _manager.GetString("OdfConverterTitle");
-                if (!string.IsNullOrEmpty(newTitle)) {
+                if (!string.IsNullOrEmpty(newTitle))
+                {
                     this.Text = newTitle;
                 }
                 // Store the offsets of buttons and groupbox
@@ -136,24 +138,27 @@ namespace OdfConverter.OdfConverterLib
                 else
                 {
                     OK.Top = label.Height + label.Top;
-                    Details.Top = label.Height + label.Top; 
+                    Details.Top = label.Height + label.Top;
                 }
 
                 // Test if everything fits
                 int offsetRight = 0;
                 int offsetBottom = 0;
                 int leftMargin = label.Left;
-                if (Details.Left < OK.Right) {
+                if (Details.Left < OK.Right)
+                {
                     offsetRight = (OK.Right + leftMargin - Details.Left);
                     Details.Left += offsetRight;
                     grpDetails.Width += offsetRight;
                 }
-                if (Details.Right + leftMargin > _smallSize.Width) {
+                if (Details.Right + leftMargin > _smallSize.Width)
+                {
                     offsetRight += Details.Right + leftMargin - _smallSize.Width;
                     this.Width += offsetRight;
                     _smallSize.Width += offsetRight;
                 }
-                if (Details.Bottom + leftMargin > _smallSize.Height) {
+                if (Details.Bottom + leftMargin > _smallSize.Height)
+                {
                     offsetBottom = Details.Bottom + leftMargin - _smallSize.Height;
                     this.Height += offsetBottom;
                     _smallSize.Height += offsetBottom;
@@ -168,10 +173,13 @@ namespace OdfConverter.OdfConverterLib
                 proposedSize = new Size(label1.Width, 2000);
                 newSize = label1.GetPreferredSize(proposedSize);
                 newHeight = newSize.Height;
-                if (newHeight > txtDetails.Height) {
+                if (newHeight > txtDetails.Height)
+                {
                     // Will add scrollbars
                     txtDetails.ScrollBars = ScrollBars.Vertical;
-                } else {
+                }
+                else
+                {
                     // No scrollbar needed
                     int offset2 = newHeight - txtDetails.Height;
                     txtDetails.Height = newHeight;
@@ -179,14 +187,16 @@ namespace OdfConverter.OdfConverterLib
                     grpDetails.Height += offset2;
                 }
                 _largeSize = _smallSize;
-                _largeSize.Height = grpDetails.Top + grpDetails.Height+ 10;
+                _largeSize.Height = grpDetails.Top + grpDetails.Height + 10;
                 // At loadtime : no details
                 this._showDetails = false;
                 this.ClientSize = _smallSize;
                 txtDetails.Visible = _showDetails;
                 grpDetails.Visible = _showDetails;
-            } catch {
-                // No message no crash
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
             }
         }
 
@@ -219,5 +229,5 @@ namespace OdfConverter.OdfConverterLib
                 Microsoft.Win32.Registry.SetValue(this._addin.RegistryKeyUser, ConfigForm.FidelityValue, "false");
             }
         }
-     }
+    }
 }

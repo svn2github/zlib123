@@ -80,9 +80,10 @@ namespace OdfConverter.OdfConverterLib
 
                 chkbxIsErrorIgnored.Checked = fidelityValue.Equals("false", StringComparison.InvariantCultureIgnoreCase);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message);
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                MessageBox.Show(ex.Message);
             }
         }
 

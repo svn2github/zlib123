@@ -204,7 +204,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         }
                         else
                         {
-                            System.Diagnostics.Trace.WriteLine("ERROR: Namespace {0} not included.", rel.Type);
+                            System.Diagnostics.Trace.WriteLine(string.Format("ERROR: Namespace {0} not included.", rel.Type));
                         }
                     }
                 }
