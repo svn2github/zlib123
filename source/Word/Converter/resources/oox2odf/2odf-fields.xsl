@@ -770,7 +770,7 @@
             <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           </xsl:call-template>
         </xsl:variable>
-        <text:a xlink:type="simple" xlink:href="{$linkTarget}" >
+        <text:a xlink:type="simple" xlink:href="{ooc:UriFromPath($linkTarget)}" >
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:a>
       </xsl:when>

@@ -149,7 +149,7 @@
         <draw:object xlink:show="embed" 
                      xlink:type="simple" 
                      xlink:actuate="onLoad"
-                     xlink:href="{concat('urn:odf-converter:makeOdfPath#', substring-after($oldFilePath, 'file:///'))}" />
+                     xlink:href="{ooc:UriFromPath($oldFilePath)}" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

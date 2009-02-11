@@ -74,6 +74,17 @@
           return OdfStyleNameGenerator.Instance.NCNameFromString(name); 
       }
       
+      public string UriFromPath(string path)
+      {
+          System.Uri result = null;
+
+          if (!System.Uri.TryCreate(path, System.UriKind.RelativeOrAbsolute, out result))
+          {
+              return path;
+          }
+          return result.ToString();
+      }
+      
       /// <summary>
       /// Get a value from a semicolon-separated list of key-value pairs.
       /// The pairs are separated by colon as in CSS-like strings.

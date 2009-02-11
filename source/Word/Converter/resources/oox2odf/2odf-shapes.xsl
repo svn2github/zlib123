@@ -1071,7 +1071,7 @@
             </xsl:otherwise>
           </xsl:choose>
           <!-- image href from relationships-->
-          <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" xlink:href="">
+          <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
             <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
               <xsl:call-template name="InsertImageHref">
                 <xsl:with-param name="document" select="$document" />
@@ -1373,7 +1373,7 @@
   Author: Clever Age
   -->
   <xsl:template match="w:pict[v:shape/@href]">
-    <draw:a xlink:type="simple" xlink:href="{v:shape/@href}">
+    <draw:a xlink:type="simple" xlink:href="{ooc:UriFromPath(v:shape/@href)}">
       <xsl:apply-templates />
     </draw:a>
   </xsl:template>

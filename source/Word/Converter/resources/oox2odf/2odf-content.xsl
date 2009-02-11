@@ -798,7 +798,7 @@
   <xsl:template name="GetLinkPath">
     <xsl:param name="linkHref" />
     <xsl:choose>
-      <xsl:when test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'https://') or contains($linkHref, 'mailto:')">
+      <xsl:when test="contains($linkHref, 'file://') or contains($linkHref, 'http://') or contains($linkHref, 'https://') or contains($linkHref, 'mailto:')">
         <xsl:value-of select="$linkHref" />
       </xsl:when>
       <xsl:when test="contains($linkHref,'#')">
@@ -827,7 +827,7 @@
             <xsl:call-template name="GetDocumentName" />
           </xsl:variable>
           <xsl:call-template name="GetLinkPath">
-            <xsl:with-param name="linkHref" select="key('Part', concat('word/_rels/',$document,'.rels'))/rels:Relationships/rels:Relationship[@Id=$relationshipId]/@Target" />
+            <xsl:with-param name="linkHref" select="ooc:UriFromPath(key('Part', concat('word/_rels/',$document,'.rels'))/rels:Relationships/rels:Relationship[@Id=$relationshipId]/@Target)" />
           </xsl:call-template>
         </xsl:if>
       </xsl:attribute>

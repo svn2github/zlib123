@@ -97,7 +97,7 @@
         </xsl:variable>
 
         <xsl:call-template name="GetLinkPath">
-          <xsl:with-param name="linkHref" select="$relDestination"/>
+          <xsl:with-param name="linkHref" select="ooc:UriFromPath($relDestination)" />
         </xsl:call-template>
       </xsl:attribute>
       <xsl:apply-templates select="wp:inline | wp:anchor"/>
@@ -159,7 +159,7 @@
       <xsl:call-template name="SetSize"/>
 
       <!-- image href from relationships-->
-      <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" xlink:href="">
+      <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
         <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
           <xsl:call-template name="InsertImageHref">
             <xsl:with-param name="document" select="$document"/>
@@ -445,7 +445,7 @@
       <xsl:attribute name="xlink:href">
         <xsl:choose>
           <xsl:when test="$targetmode='External'">
-            <xsl:value-of select="$pziptarget"/>
+            <xsl:value-of select="ooc:UriFromPath($pziptarget)"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
