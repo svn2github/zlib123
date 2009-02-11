@@ -434,7 +434,7 @@
 
       <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  REGISTRY SETTINGS
-                 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+           ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
       <Component Id="RegistryTemplates" Guid="405AEA6C-4BF0-4269-9DB5-25792EFF406E" DiskId="1">
         <!-- Templates will be installed for the current user only -->
         <RegistryKey Id="RegOptionsTemplatesInstalled"
@@ -465,6 +465,7 @@
 							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Word"
 							 Action="createAndRemoveOnUninstall">
           <RegistryValue Type="string" Name="language" Value="!(loc.lcid)"/>
+          <RegistryValue Type="string" Name="generator" Value="ODF Add-in for Microsoft Office !(wix.VersionNumber)"/>
         </RegistryKey>
 
       </Component>
@@ -489,6 +490,7 @@
 							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Excel"
 							 Action="createAndRemoveOnUninstall">
           <RegistryValue Type="string" Name="language" Value="!(loc.lcid)"/>
+          <RegistryValue Type="string" Name="generator" Value="ODF Add-in for Microsoft Office !(wix.VersionNumber)"/>
         </RegistryKey>
 
       </Component>
@@ -513,6 +515,7 @@
 							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for PowerPoint"
 							 Action="createAndRemoveOnUninstall">
           <RegistryValue Type="string" Name="language" Value="!(loc.lcid)"/>
+          <RegistryValue Type="string" Name="generator" Value="ODF Add-in for Microsoft Office !(wix.VersionNumber)"/>
         </RegistryKey>
 
       </Component>
@@ -528,7 +531,7 @@
 
       <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  CONTEXT MENU ENTRIES
-                 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+           ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
       <Component Id="RegistryEntryContextMenuOdt" Guid="4BA5BA24-4F65-4BDF-99EB-CB4B947F31A9" DiskId="1" KeyPath="yes">
         <RegistryKey Id="RegKeyOdt" Root="HKCR" Action="create" Key=".odt">
           <RegistryValue Type="string" Value="openDocument.WriterDocument.1" />
@@ -576,7 +579,7 @@
 
       <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  FILE ASSOCIATIONS
-                 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+           ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
       <Component Id="FileAssociationOdt" Guid="1F338E6D-3B94-4C5B-864C-D97D26A55437" DiskId="1" KeyPath="yes">
         <Condition><![CDATA[ FILE_ASSOCIATION_ODT ]]></Condition>
         <ProgId Id='openDocument.WriterDocument.1' Description='!(loc.FileTypeOdt)'>
