@@ -52,7 +52,7 @@ namespace OdfConverter.CommandLineTool
     /// </summary>
     public class OdfConverter
     {
-        private const string GENERATOR = "OpenXML/ODF Translator Command Line Tool";
+        private const string GENERATOR = "OpenXML/ODF Translator Command Line Tool 3.0";
         private ConversionReport _report = null;
         private IValidator _ooxValidator = null;
         private IValidator _odfValidator = null;
