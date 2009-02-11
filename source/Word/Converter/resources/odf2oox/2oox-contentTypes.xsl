@@ -31,7 +31,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  exclude-result-prefixes="w r office style">
+  exclude-result-prefixes="w office style">
 
   <!-- content types -->
   <xsl:template name="contentTypes">

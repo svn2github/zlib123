@@ -39,7 +39,7 @@
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:ooc="urn:odf-converter"
-  exclude-result-prefixes="w r xlink office draw text style manifest v config ooc">
+  exclude-result-prefixes="w xlink office draw text style manifest v config ooc">
 
   <xsl:template name="InsertPartRelationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -201,7 +201,7 @@
 
         </xsl:when>
         <!-- internal OLE -->
-        <xsl:when test="not(contains(@xlink:href, ':')) and not (starts-with(@xlink:href, '/'))">
+        <xsl:when test="not(contains(@xlink:href, ':')) and not (starts-with(@xlink:href, '/') and not(starts-with(@xlink:href, '../')))">
           <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
 
           <!-- 
@@ -228,8 +228,8 @@
           </xsl:call-template>
 
         </xsl:when>
-        <!-- external OLE on network or driver -->
-        <xsl:when test="substring-before(@xlink:href, '/')='' or contains(@xlink:href, ':')">
+        <!-- external OLE on network or local drive -->
+        <xsl:when test="substring-before(@xlink:href, '/')='' or contains(@xlink:href, ':') or starts-with(@xlink:href, '../')">
 
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                         Id="{$oleId}"
@@ -330,8 +330,8 @@
       </xsl:variable>
       <xsl:if test="@xlink:href and $supported = 'true' ">
         <xsl:choose>
-          <!-- External IRI (either contains a protocal such as http: or starts with a slash) -->
-          <xsl:when test="contains(@xlink:href, ':') or starts-with(@xlink:href, '/')">
+          <!-- External IRI (either contains a protocal such as http: or starts with a slash, or a relative IRI pointing outside the package) -->
+          <xsl:when test="contains(@xlink:href, ':') or starts-with(@xlink:href, '/') or starts-with(@xlink:href, '../')">
             <!-- External image : If relative path, image may not be converted. -->
             <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                           Id="{generate-id(.)}"
@@ -339,9 +339,9 @@
                           TargetMode="External">
               <xsl:attribute name="Target">
                 <xsl:choose>
-                  <xsl:when test="contains(@xlink:href, './')">
+                  <!--<xsl:when test="starts-with(@xlink:href, './')">
                     <xsl:value-of select="concat('../../', @xlink:href)" />
-                  </xsl:when>
+                  </xsl:when>-->
                   <xsl:when test="starts-with(@xlink:href, '/')">
                     <xsl:value-of select="substring-after(@xlink:href, '/')" />
                   </xsl:when>

@@ -62,7 +62,7 @@
   Summary: frames containing external images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriAbsolute(@xlink:href)]]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriAbsolute(@xlink:href) or starts-with(@xlink:href, '../')]]" mode="paragraph">
     <!-- Note: An external path either starts with a slash or with a protocol such as http:, thats why we check for ':' in the href -->
     
     <!-- insert link to TOC field when required (user indexes) -->
@@ -112,7 +112,7 @@
   Summary: frames containing internal images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriRelative(@xlink:href)]]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[ooc:IsUriRelative(@xlink:href) and not(starts-with(@xlink:href, '../'))]]" mode="paragraph">
     <!-- Note: An internal path neither starts with a slash nor with a protocol such as http:, thats why we check for ':' in the href -->
     
     <!-- insert link to TOC field when required (user indexes) -->
@@ -351,7 +351,20 @@
             </pic:cNvPicPr>
           </pic:nvPicPr>
           <pic:blipFill>
-            <a:blip r:embed="{generate-id(draw:image)}"/>
+            <a:blip>
+              <xsl:choose>
+                <xsl:when test="draw:image[ooc:IsUriAbsolute(@xlink:href) and not(starts-with(@xlink:href, '../'))]">
+                  <xsl:attribute name="r:embed">
+                    <xsl:value-of select="generate-id(draw:image)"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="r:link">
+                    <xsl:value-of select="generate-id(draw:image)"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
+            </a:blip>
             <xsl:if
               test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip">
               <xsl:message terminate="no">translation.odf2oox.croppedImage</xsl:message>
@@ -553,70 +566,29 @@
   -->
   <xsl:template name="InsertImageCropProperties">
     <xsl:param name="clip"/>
-    <a:srcRect>
-      <xsl:variable name="firstVal" select="substring-before(substring-after($clip,'('),' ' )"/>
-      <xsl:variable name="secondVal"
-        select="substring-before(substring-after($clip,concat('(',$firstVal,' ')),' ')"/>
-      <xsl:variable name="thirdVal"
-        select="substring-before(substring-after($clip,concat('(',$firstVal,' ',$secondVal,' ')),' ')"/>
-      <xsl:variable name="fourthVal"
-        select="substring-before(substring-after($clip,concat('(',$firstVal,' ',$secondVal,' ',$thirdVal,' ')),')')"/>
-      <xsl:variable name="t">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="$firstVal"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="b">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="$thirdVal"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="r">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="$secondVal"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="l">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="$fourthVal"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="height">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="@svg:height"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="width">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="@svg:width"/>
-        </xsl:call-template>
-      </xsl:variable>
 
-      <xsl:variable name="filename" select="node()/@xlink:href"></xsl:variable>
+    <xsl:variable name="firstVal" select="substring-before(substring-after($clip,'('),' ' )"/>
+    <xsl:variable name="secondVal" select="substring-before(substring-after($clip,concat('(',$firstVal,' ')),' ')"/>
+    <xsl:variable name="thirdVal" select="substring-before(substring-after($clip,concat('(',$firstVal,' ',$secondVal,' ')),' ')"/>
+    <xsl:variable name="fourthVal" select="substring-before(substring-after($clip,concat('(',$firstVal,' ',$secondVal,' ',$thirdVal,' ')),')')"/>
+    
+    <xsl:variable name="t" select="ooc:TwipsFromMeasuredUnit($firstVal)" />
+    <xsl:variable name="b" select="ooc:TwipsFromMeasuredUnit($thirdVal)" />
+    <xsl:variable name="r" select="ooc:TwipsFromMeasuredUnit($secondVal)" />
+    <xsl:variable name="l" select="ooc:TwipsFromMeasuredUnit($fourthVal)" />
+      
+    <xsl:variable name="height" select="ooc:TwipsFromMeasuredUnit(@svg:height)" />
+    <xsl:variable name="width" select="ooc:TwipsFromMeasuredUnit(@svg:width)" />
 
-      <!--clam: compute cropping on postprocessor-->
-      <xsl:attribute name="t">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $firstVal, ',' , $filename,  ',t,' , round(($t * 100 div ($t + $b + $height)) * 1000), ']')"/>
-      </xsl:attribute>
-      <xsl:attribute name="b">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $thirdVal, ',' , $filename,  ',b,' , round(($b * 100 div ($t + $b + $height)) * 1000), ']')"/>
-      </xsl:attribute>
-      <xsl:attribute name="r">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $secondVal, ',' , $filename,  ',r,', round(($r * 100 div ($r + $l + $width)) * 1000), ']')"/>
-      </xsl:attribute>
-      <xsl:attribute name="l">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $fourthVal, ',' , $filename,  ',l,', round(($l * 100 div ($l + $r + $width)) * 1000), ']')"/>
-      </xsl:attribute>
-      <!--<xsl:attribute name="b">
-        <xsl:value-of select=" round(($b * 100 div ($t + $b + $height)) * 1000)"/>
-      </xsl:attribute>
-      <xsl:attribute name="r">
-        <xsl:value-of select=" round(($r * 100 div ($r + $l + $width)) * 1000)"/>
-      </xsl:attribute>
-      <xsl:attribute name="l">
-        <xsl:value-of select=" round(($l * 100 div ($l + $r + $width)) * 1000)"/>
-      </xsl:attribute>-->
-    </a:srcRect>
+    <xsl:variable name="filename" select="node()/@xlink:href"></xsl:variable>
+
+    <!-- compute cropping in postprocessor-->
+    <a:srcRect t="{concat('COMPUTEOOXCROPPING[', $firstVal, ',' , $filename,  ',t,' , round(($t * 100 div ($t + $b + $height)) * 1000), ']')}"
+               l="{concat('COMPUTEOOXCROPPING[', $fourthVal, ',' , $filename,  ',l,', round(($l * 100 div ($l + $r + $width)) * 1000), ']')}"
+               b="{concat('COMPUTEOOXCROPPING[', $thirdVal, ',' , $filename,  ',b,' , round(($b * 100 div ($t + $b + $height)) * 1000), ']')}"
+               r="{concat('COMPUTEOOXCROPPING[', $secondVal, ',' , $filename,  ',r,', round(($r * 100 div ($r + $l + $width)) * 1000), ']')}"
+               />
+      
   </xsl:template>
 
 
