@@ -10,7 +10,7 @@
 		<BootstrapperFile Include="Microsoft.CompatibilityPack">
 			<ProductName>Compatibility Pack for the 2007 Office system</ProductName>
 		</BootstrapperFile>
-		<BootstrapperFile Include="Microsoft.OtkLoader.2.0">
+		<BootstrapperFile Include="Microsoft.KB908002.OdfConverter">
 			<ProductName>Shared Add-in Support Update for Microsoft .NET Framework 2.0 (KB908002)</ProductName>
 		</BootstrapperFile>
 		<BootstrapperFile Include="Microsoft.Windows.Installer.3.1">
