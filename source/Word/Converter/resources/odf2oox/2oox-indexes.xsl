@@ -39,6 +39,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:ooc="urn:odf-converter"                
   exclude-result-prefixes="office text table fo style draw xlink v svg number">
 
 
@@ -97,6 +98,7 @@
     Else the paragraph conversion insetrs the TOC end.
     
     divo: Reverted this fix because it may cause the field not to be closed (see #2571743)
+       TOC translation needs refactoring... the original implentation from v1.1 is too messed up
     -->
     <!--<xsl:if test="
             count(following-sibling::text:p) = 0 and 
@@ -1035,16 +1037,8 @@
     <xsl:param name="tabStops"/>
     <xsl:param name="result" select="0"/>
     <!-- get value of first tab-stop -->
-    <xsl:variable name="toCompare">
-      <xsl:choose>
-        <xsl:when test="$tabStops[1]/@style:position != '' ">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="$tabStops[1]/@style:position"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="toCompare" select="ooc:TwipsFromMeasuredUnit($tabStops[1]/@style:position)" />
+    
     <!-- add to other tab-stops -->
     <xsl:choose>
       <xsl:when test="count($tabStops) &gt; 1">
@@ -1126,11 +1120,8 @@
 
     <xsl:if test="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops">
       <w:tabs>
-        <xsl:variable name="tabInd">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left" />
-          </xsl:call-template>
-        </xsl:variable>
+        <xsl:variable name="tabInd" select="ooc:TwipsFromMeasuredUnit(key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left)" />
+
         <xsl:for-each select="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops/style:tab-stop">
           <w:tab>
             <xsl:attribute name="w:val">
@@ -1144,11 +1135,7 @@
             <xsl:attribute name="w:leader">
               <xsl:call-template name="ComputeTabStopLeader"/>
             </xsl:attribute>
-            <xsl:variable name="pos">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@style:position"/>
-              </xsl:call-template>
-            </xsl:variable>
+            <xsl:variable name="pos" select="ooc:TwipsFromMeasuredUnit(@style:position)" />
             <xsl:attribute name="w:pos">
               <xsl:value-of select="$pos+$tabInd"/>
             </xsl:attribute>

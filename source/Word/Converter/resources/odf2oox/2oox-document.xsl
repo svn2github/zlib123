@@ -116,20 +116,7 @@
     <xsl:param name="isFirstRow" select="'false'"/>
 
     <xsl:message terminate="no">progress:text:p</xsl:message>
-    <!-- insert frames for first paragraph of document if we are in an envelope  -->
-    <!--xsl:call-template name="InsertEnvelopeFrames"/-->
-
-    <!--dialogika, clam: bugfix not neccessary anymore because each section break has its own paragraph now-->
-    <!--clam bugfix #1615689-->
-    <!--
-    <xsl:variable name="followings" select="following::*[name()='text:p' or name()='text:h' or name()='table:table'][1]"/>
-    <xsl:variable name="next-end-section" select="ancestor::text:section[1] and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id(ancestor::text:section[1]))"/>
-    <xsl:variable name="next-new-section" select="following::text:section[1] and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id(following::text:section[1]))"/>
-    <xsl:if test="($next-end-section or $next-new-section) and not(node())">
-      <w:p></w:p>
-    </xsl:if>
-    -->
-
+    
     <w:p>
       <xsl:if test="not(parent::table:table-cell)">
         <xsl:call-template name="InsertDropCap">
@@ -150,26 +137,7 @@
         </xsl:if>
       </w:pPr>
 
-      <!--dialogika, clam: empty paragraphs cannot have a border in word,
-      so we insert a blank in this case (bug #1569267)-->
-      <!-- commented out by divo, this workaround is not needed, the actual problem 
-           was fixed by a modification of section break translation -->
-      <!--xsl:if test="not(node())">
-        <xsl:variable name="styleName">
-          <xsl:value-of select="@text:style-name"/>
-        </xsl:variable>
-        <xsl:variable name="myStyle" select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]"></xsl:variable>
-        <xsl:variable name="myStyleParent" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $myStyle/@style:parent-style-name]"></xsl:variable>
-        <xsl:if test="$myStyle/style:paragraph-properties/@fo:border-bottom or $myStyleParent/style:paragraph-properties/@fo:border-bottom">
-          <w:r>
-            <w:t xml:space="preserve">
-              <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces"/>
-            </w:t>
-          </w:r>
-          </xsl:if>
-      </xsl:if-->
-
-      <!-- if paragraph is the very first of page, declare user variables -->
+      <!-- if paragraph is the very first of the document, declare user variables -->
       <xsl:if test="$body/office:text/text:user-field-decls">
         <xsl:if test="generate-id(.) = $firstParaId">
           <xsl:call-template name="InsertUserFieldDeclaration"/>
@@ -179,7 +147,7 @@
       <!-- insert drawing objects that are preceding-sibling of current. -->
       <xsl:call-template name="InsertPrecedingDrawingObject"/>
 
-      <!--   insert bookmark for element which is contained in TOC-->
+      <!-- insert bookmark for element which is contained in TOC-->
       <xsl:if test="$tocCount &gt; 0">
         <xsl:call-template name="InsertTOCBookmark"/>
       </xsl:if>
@@ -280,8 +248,7 @@
 
   <!-- inserts page-break-after if defined for paragraph  -->
   <xsl:template name="InsertPageBreakAfter">
-    <xsl:if
-      test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page' ">
+    <xsl:if test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page' ">
       <w:r>
         <w:br w:type="page"/>
       </w:r>
@@ -306,8 +273,7 @@
   <!-- inserts page-break-before if defined in preceding table -->
   <xsl:template name="InsertPageBreakAfterTable">
     <xsl:if test="preceding-sibling::node()[1][self::table:table]">
-      <xsl:if
-        test="key('automatic-styles', preceding-sibling::node()[1][self::table:table]/@table:style-name)/style:table-properties/@fo:break-after='page' ">
+      <xsl:if test="key('automatic-styles', preceding-sibling::node()[1][self::table:table]/@table:style-name)/style:table-properties/@fo:break-after='page' ">
         <w:r>
           <w:br w:type="page"/>
         </w:r>
@@ -338,18 +304,14 @@
     <xsl:choose>
       <xsl:when test="key('automatic-styles', $styleName)">
 
-        <!-- 
-        makz: Reference the parent style of the automatic style
-        -->
+        <!-- Reference the parent style of the automatic style... -->
         <xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
           <xsl:call-template name="InsertParagraphStyle">
             <xsl:with-param name="styleName" select="key('automatic-styles', $styleName)/@style:parent-style-name"/>
           </xsl:call-template>
         </xsl:if>
 
-        <!-- 
-        makz: Convert the automatic style
-        -->
+        <!-- ...and convert the automatic style -->
         <xsl:for-each select="key('automatic-styles', $styleName)">
           <xsl:apply-templates select="style:paragraph-properties" mode="pPr"/>
         </xsl:for-each>
@@ -357,13 +319,9 @@
       </xsl:when>
       <xsl:when test="$styleName">
 
-        <!--
-        makz: Reference the normal style
-        -->
+        <!-- Reference the style defined in the style part -->
         <xsl:call-template name="InsertParagraphStyle">
-          <xsl:with-param name="styleName">
-            <xsl:value-of select="$styleName"/>
-          </xsl:with-param>
+          <xsl:with-param name="styleName" select="$styleName"/>
         </xsl:call-template>
 
       </xsl:when>
@@ -430,66 +388,30 @@
       <w:ind>
 
         <xsl:attribute name="w:left">
-          <xsl:variable name="myMarginLeft">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$MarginLeft" />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="mySpaceBefore">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$SpaceBefore" />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="myMinLabelWidth">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$MinLabelWidth" />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$myMarginLeft + $mySpaceBefore + $myMinLabelWidth"/>
-          <!--<xsl:call-template name="twips-measure">
-            <xsl:with-param name="length">
-              <xsl:value-of select="concat(substring-before($MarginLeft, 'cm') + substring-before($SpaceBefore, 'cm') + substring-before($MinLabelWidth, 'cm'),'cm')" />
-            </xsl:with-param>
-          </xsl:call-template>-->
+          <xsl:variable name="twipsMarginLeft" select="ooc:TwipsFromMeasuredUnit($MarginLeft)" />
+          <xsl:variable name="twipsSpaceBefore" select="ooc:TwipsFromMeasuredUnit($SpaceBefore)" />
+          <xsl:variable name="twipsMinLabelWidth" select="ooc:TwipsFromMeasuredUnit($MinLabelWidth)" />
+
+          <xsl:value-of select="$twipsMarginLeft + $twipsSpaceBefore + $twipsMinLabelWidth"/>
+          
         </xsl:attribute>
 
         <xsl:attribute name="w:right">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$ParagraphProperties/@fo:margin-right"/>
-            </xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit($ParagraphProperties/@fo:margin-right)"/>
         </xsl:attribute>
 
         <xsl:variable name="FirstLineIndent">
-          <xsl:variable name="myTextIndent">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$TextIndent" />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="myMinLabelWidth">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$MinLabelWidth" />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
+          <xsl:variable name="twipsTextIndent" select="ooc:TwipsFromMeasuredUnit($TextIndent)" />
+          <xsl:variable name="twipsMinLabelWidth" select="ooc:TwipsFromMeasuredUnit($MinLabelWidth)" />
+
           <!--<xsl:value-of select="substring-before($TextIndent, 'cm') - substring-before($MinLabelWidth, 'cm')" />-->
           <!--math, dialogika: Bugfix #2001515: if @text:is-list-header = 'true' list option min-label-width is ignored BEGIN-->
           <xsl:choose>
             <xsl:when test ="@text:is-list-header = 'true'">
-              <xsl:value-of select="$myTextIndent"/>
+              <xsl:value-of select="$twipsTextIndent"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$myTextIndent - $myMinLabelWidth"/>
+              <xsl:value-of select="$twipsTextIndent - $twipsMinLabelWidth"/>
             </xsl:otherwise>
           </xsl:choose>
           <!--math, dialogika: Bugfix #2001515: if @text:is-list-header = 'true' list option min-label-width is ignored END-->
@@ -510,55 +432,15 @@
 
       </w:ind>
 
-      <xsl:variable name="MarginLeftTwip">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$MarginLeft" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="TextIndentTwip">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$TextIndent" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="MinLabelDistanceTwip">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$MinLabelDistance" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="MinLabelWidthTwip">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$MinLabelWidth" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="SpaceBeforeTwip">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$SpaceBefore" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
       <w:tabs>
 
         <xsl:call-template name="InsertNumberingTab">
           <xsl:with-param name="tabVal">num</xsl:with-param>
-          <xsl:with-param name="addLeftIndent" select="$MarginLeftTwip"/>
-          <xsl:with-param name="firstLineIndent" select="$TextIndentTwip"/>
-          <xsl:with-param name="minLabelDistanceTwip" select="$MinLabelDistanceTwip"/>
-          <xsl:with-param name="minLabelWidthTwip" select="$MinLabelWidthTwip"/>
-          <xsl:with-param name="spaceBeforeTwip" select="$SpaceBeforeTwip"/>
+          <xsl:with-param name="addLeftIndent" select="ooc:TwipsFromMeasuredUnit($MarginLeft)"/>
+          <xsl:with-param name="firstLineIndent" select="ooc:TwipsFromMeasuredUnit($TextIndent)"/>
+          <xsl:with-param name="minLabelDistanceTwip" select="ooc:TwipsFromMeasuredUnit($MinLabelDistance)"/>
+          <xsl:with-param name="minLabelWidthTwip" select="ooc:TwipsFromMeasuredUnit($MinLabelWidth)"/>
+          <xsl:with-param name="spaceBeforeTwip" select="ooc:TwipsFromMeasuredUnit($SpaceBefore)"/>
         </xsl:call-template>
 
         <!--math, dialogika bugfix #1834587 BEGIN-->
@@ -571,61 +453,6 @@
         <!--math, dialogika bugfix #1834587 END-->
 
       </w:tabs>
-
-      <!--<xsl:call-template name="InsertTabStops">
-        <xsl:with-param name="styleName" select="$styleName"/>
-        <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
-        <xsl:with-param name="enforceOverride" select="$enforceOverride"/>
-        <xsl:with-param name="addLeftIndent" select="$addLeftIndent"/>
-        <xsl:with-param name="firstLineIndent" select="$firstLineIndent"/>
-        <xsl:with-param name="displayedLevels" select="$displayedLevels"/>
-        <xsl:with-param name="minLabelDistanceTwip" select="$minLabelDistanceTwip"/>
-        <xsl:with-param name="minLabelWidthTwip" select="$minLabelWidthTwip"/>
-        <xsl:with-param name="spaceBeforeTwip" select="$spaceBeforeTwip"/>
-      </xsl:call-template>-->
-
-      <!--<w:ind>
-        <xsl:attribute name="w:left">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length">
-              <xsl:value-of select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-left"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:if test="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-right">
-        <xsl:attribute name="w:right">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length">
-              <xsl:value-of select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-right"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:text-indent">
-          <xsl:variable name="Indent">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:text-indent"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when  test="$Indent &lt; 0">
-              <xsl:attribute name="w:hanging">
-                    <xsl:value-of select="-$Indent"/>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:when test="$Indent &gt; 0">
-              <xsl:attribute name="w:firstLine">
-                    <xsl:value-of select="$Indent"/>
-              </xsl:attribute>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:if>
-      </w:ind>-->
-
-      <!--math, dialogika: changed for correct indentation calculation of headings 
-      that are not in an <text:list> element but have an outline level END -->
 
     </xsl:if>
 
@@ -722,34 +549,26 @@
 
   <!-- insert frame properties if paragraph is in a particular fame (eg envelope) -->
   <xsl:template name="InsertFrameProperties">
-    <xsl:if
-      test="(@text:style-name='Addressee' or @text:style-name='Sender') and ancestor::draw:frame">
+    <xsl:if test="(@text:style-name='Addressee' or @text:style-name='Sender') and ancestor::draw:frame">
       <xsl:variable name="framePr" select="ancestor::draw:frame[last()]"/>
       <w:framePr>
         <!-- width -->
         <xsl:if test="$framePr/@svg:width">
           <xsl:attribute name="w:w">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$framePr/@svg:width"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($framePr/@svg:width)" />
           </xsl:attribute>
         </xsl:if>
         <!-- height -->
         <xsl:choose>
           <xsl:when test="ancestor::draw:text-box[last()]/@fo:min-height">
             <xsl:attribute name="w:h">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length"
-                  select="ancestor::draw:text-box[last()]/@fo:min-height"/>
-              </xsl:call-template>
+              <xsl:value-of select="ooc:TwipsFromMeasuredUnit(ancestor::draw:text-box[last()]/@fo:min-height)"/>
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
             <xsl:if test="$framePr/@svg:height">
               <xsl:attribute name="w:h">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length" select="$framePr/@svg:height"/>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:TwipsFromMeasuredUnit($framePr/@svg:height)" />
               </xsl:attribute>
             </xsl:if>
           </xsl:otherwise>
@@ -765,16 +584,12 @@
         <!-- position -->
         <xsl:if test="$framePr/@svg:x">
           <xsl:attribute name="w:x">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$framePr/@svg:x"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($framePr/@svg:x)"/>
           </xsl:attribute>
         </xsl:if>
         <xsl:if test="$framePr/@svg:y">
           <xsl:attribute name="w:y">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$framePr/@svg:y"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($framePr/@svg:y)" />
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="w:hAnchor">page</xsl:attribute>
@@ -1679,16 +1494,12 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:if test="$dropcap/@style:distance">
-        <xsl:attribute name="dropcap:distance"
-          namespace="urn:cleverage:xmlns:post-processings:dropcap">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="$dropcap/@style:distance"/>
-          </xsl:call-template>
+        <xsl:attribute name="dropcap:distance" namespace="urn:cleverage:xmlns:post-processings:dropcap">
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit($dropcap/@style:distance)" />
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="$dropcap/@style:style-name">
-        <xsl:attribute name="dropcap:style-name"
-          namespace="urn:cleverage:xmlns:post-processings:dropcap">
+        <xsl:attribute name="dropcap:style-name" namespace="urn:cleverage:xmlns:post-processings:dropcap">
           <xsl:value-of select="$dropcap/@style:style-name"/>
         </xsl:attribute>
       </xsl:if>

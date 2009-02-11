@@ -36,7 +36,8 @@
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:o="urn:schemas-microsoft-com:office:office"
-  exclude-result-prefixes="office text style fo xlink">
+  xmlns:ooc="urn:odf-converter"               
+  exclude-result-prefixes="office text style fo xlink ooc">
 
   <xsl:output method="xml" encoding="UTF-8"/>
 
@@ -424,23 +425,12 @@
 
 
   <xsl:template name="InsertListParagraphProperties">
-    <xsl:variable name="spaceBeforeTwip">
-      <xsl:call-template name="twips-measure">
-        <xsl:with-param name="length" select="style:list-level-properties/@text:space-before"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="minLabelWidthTwip">
-      <xsl:call-template name="twips-measure">
-        <xsl:with-param name="length" select="style:list-level-properties/@text:min-label-width"/>
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="spaceBeforeTwip" select="ooc:TwipsFromMeasuredUnit(style:list-level-properties/@text:space-before)" />
+    <xsl:variable name="minLabelWidthTwip" select="ooc:TwipsFromMeasuredUnit(style:list-level-properties/@text:min-label-width)" />
     <xsl:variable name="minLabelDistanceTwip">
       <xsl:choose>
         <xsl:when test="not(@style:num-format = '')">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="style:list-level-properties/@text:min-label-distance"/>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit(style:list-level-properties/@text:min-label-distance)" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
@@ -1309,52 +1299,39 @@
     <xsl:param name="level"/>
     <xsl:param name="listStyleName"/>
 
-    <xsl:call-template name="twips-measure">
-      <xsl:with-param name="length">
-        <xsl:choose>
-          <!-- if no list defined -->
-          <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
-            <xsl:if
-              test="not(document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/@style:num-format = '')">
-              <xsl:value-of
-                select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
-              />
-            </xsl:if>
-          </xsl:when>
-          <!-- text:outline-style -->
-          <xsl:when test="$listStyleName = 'outline-style' ">
-            <xsl:if
-              test="document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
-              <xsl:value-of
-                select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"
-              />
-            </xsl:if>
-          </xsl:when>
-          <!-- look into content.xml -->
-          <xsl:when
-            test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
-            <xsl:value-of
-              select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"
-            />
-          </xsl:when>
-          <xsl:otherwise>
-            <!-- look into styles.xml -->
-            <xsl:for-each select="document('styles.xml')">
-              <xsl:choose>
-                <xsl:when
-                  test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
-                  <xsl:value-of
-                    select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"
-                  />
-                </xsl:when>
-                <!-- default value -->
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:with-param>
-    </xsl:call-template>
+    <xsl:variable name="numberingIndent">
+      <xsl:choose>
+        <!-- if no list defined -->
+        <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
+          <xsl:if test="not(document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/@style:num-format = '')">
+            <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance" />
+          </xsl:if>
+        </xsl:when>
+        <!-- text:outline-style -->
+        <xsl:when test="$listStyleName = 'outline-style' ">
+          <xsl:if test="document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
+            <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]" />
+          </xsl:if>
+        </xsl:when>
+        <!-- look into content.xml -->
+        <xsl:when test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
+          <xsl:value-of select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]" />
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- look into styles.xml -->
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:choose>
+              <xsl:when test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
+                <xsl:value-of select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]" />
+              </xsl:when>
+              <!-- default value -->
+              <xsl:otherwise>0</xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="ooc:TwipsFromMeasuredUnit($numberingIndent)" />
   </xsl:template>
 
   

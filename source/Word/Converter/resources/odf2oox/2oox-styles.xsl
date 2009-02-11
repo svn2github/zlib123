@@ -810,17 +810,11 @@
         <xsl:when test="@style:line-height-at-least">
           <xsl:attribute name="w:lineRule">atLeast</xsl:attribute>
           <xsl:attribute name="w:line">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@style:line-height-at-least"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@style:line-height-at-least)" />
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="@style:line-spacing">
-          <xsl:variable name="spacing">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@style:line-spacing"/>
-            </xsl:call-template>
-          </xsl:variable>
+          <xsl:variable name="spacing" select="ooc:TwipsFromMeasuredUnit(@style:line-spacing)" />
           <xsl:attribute name="w:lineRule">auto</xsl:attribute>
           <xsl:attribute name="w:line">
             <xsl:value-of select="number(240 + $spacing)"/>
@@ -830,8 +824,7 @@
           <xsl:attribute name="w:lineRule">auto</xsl:attribute>
           <xsl:attribute name="w:line">
             <!-- w:line expressed in 240ths of a line height when w:lineRule='auto' -->
-            <xsl:value-of
-              select="round(number(substring-before(@fo:line-height, '%')) * 240 div 100)"/>
+            <xsl:value-of select="round(number(substring-before(@fo:line-height, '%')) * 240 div 100)"/>
           </xsl:attribute>
         </xsl:when>
         <xsl:otherwise>
@@ -841,9 +834,7 @@
               <xsl:choose>
                 <xsl:when test="@fo:line-height = 'normal' ">240</xsl:when>
                 <xsl:otherwise>
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="@fo:line-height"/>
-                  </xsl:call-template>
+                  <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:line-height)" />
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
@@ -853,16 +844,12 @@
       <!-- top / bottom spacing -->
       <xsl:if test="@fo:margin-bottom">
         <xsl:attribute name="w:after">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@fo:margin-bottom"/>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:margin-bottom)" />
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="@fo:margin-top">
         <xsl:attribute name="w:before">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@fo:margin-top"/>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:margin-top)" />
         </xsl:attribute>
       </xsl:if>
     </w:spacing>
@@ -1195,27 +1182,13 @@
 
 
     <xsl:if test="@fo:letter-spacing">
-      <w:spacing>
-        <xsl:attribute name="w:val">
-          <xsl:choose>
-            <xsl:when test="@fo:letter-spacing='normal'">
-              <xsl:value-of select="0"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:letter-spacing"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </w:spacing>
+      <w:spacing w:val="{ooc:TwipsFromMeasuredUnit(@fo:letter-spacing)}" />
     </xsl:if>
 
     <xsl:if test="@style:text-scale">
       <w:w>
         <xsl:attribute name="w:val">
-          <xsl:variable name="scale"
-            select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
+          <xsl:variable name="scale" select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
           <xsl:choose>
             <xsl:when test="number($scale) &lt; 600">
               <xsl:value-of select="$scale"/>
@@ -1658,15 +1631,11 @@
                   <xsl:value-of select="ancestor::style:paragraph-properties/@fo:margin-left"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:variable name="parentStyleName"
-                    select="ancestor::style:style/@style:parent-style-name"/>
+                  <xsl:variable name="parentStyleName" select="ancestor::style:style/@style:parent-style-name"/>
                   <xsl:for-each select="document('styles.xml')">
                     <xsl:choose>
-                      <xsl:when
-                        test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left">
-                        <xsl:value-of
-                          select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left"
-                        />
+                      <xsl:when test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left">
+                        <xsl:value-of select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left" />
                       </xsl:when>
                       <xsl:otherwise>0</xsl:otherwise>
                     </xsl:choose>
@@ -1703,43 +1672,13 @@
             <xsl:with-param name="length">
               <xsl:choose>
                 <!-- particular case : right tab in indexes -->
-                <xsl:when
-                  test="self::text:index-entry-tab-stop[@style:type = 'right' and not(@style:position)]">
+                <xsl:when test="self::text:index-entry-tab-stop[@style:type = 'right' and not(@style:position)]">
                   <xsl:for-each select="document('styles.xml')">
 
                     <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation BEGIN-->
-
-                    <xsl:variable name="pageW">
-                      <xsl:call-template name="twips-measure">
-                        <!--<xsl:with-param name="length"
-                          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width"
-                        />-->
-                        <xsl:with-param name="length"
-                          select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:page-width"
-                        />
-                      </xsl:call-template>
-                    </xsl:variable>
-                    <xsl:variable name="pageMarginL">
-                      <xsl:call-template name="twips-measure">
-                        <!--<xsl:with-param name="length"
-                          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left"
-                        />-->
-                        <xsl:with-param name="length"
-                          select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-left"
-                        />
-                      </xsl:call-template>
-                    </xsl:variable>
-                    <xsl:variable name="pageMarginR">
-                      <xsl:call-template name="twips-measure">
-                        <!--<xsl:with-param name="length"
-                          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right"
-                        />-->
-                        <xsl:with-param name="length"
-                          select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-right"
-                        />
-                      </xsl:call-template>
-                    </xsl:variable>
-
+                    <xsl:variable name="pageW" select="ooc:TwipsFromMeasuredUnit(key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:page-width)" />
+                    <xsl:variable name="pageMarginL" select="ooc:TwipsFromMeasuredUnit(key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-left)" />
+                    <xsl:variable name="pageMarginR" select="ooc:TwipsFromMeasuredUnit(key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-right)" />
                     <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation END-->
 
                     <xsl:value-of select="$pageW - $pageMarginR - $pageMarginL"/>
@@ -1772,28 +1711,14 @@
                   pageLayoutName = key('master-pages', $masterPageName)[1]/@style:page-layout-name
                   key('page-layouts', $pageLayoutName)[1]/style:page-layout-properties/style:columns[@fo:column-count > 0]
                 -->
-                <xsl:when
-                  test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns[@fo:column-count > 0]">
-                  <xsl:value-of
-                    select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count"
-                  />
+                <xsl:when test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns[@fo:column-count > 0]">
+                  <xsl:value-of select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count" />
                 </xsl:when>
                 <xsl:otherwise>1</xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <xsl:variable name="columnGap">
-              <xsl:choose>
-                <xsl:when
-                  test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length"
-                      select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap"
-                    />
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
+            <xsl:variable name="columnGap" select="ooc:TwipsFromMeasuredUnit(document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap)" />
+
             <xsl:value-of select="round(($margin + $position - $columnGap) div $columnNumber)"/>
           </xsl:otherwise>
         </xsl:choose>
@@ -2053,9 +1978,7 @@
           </xsl:if>
           <xsl:if test="@text:offset">
             <xsl:attribute name="w:distance">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@text:offset"/>
-              </xsl:call-template>
+              <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@text:offset)" />
             </xsl:attribute>
           </xsl:if>
           <xsl:attribute name="w:restart">
@@ -2099,16 +2022,12 @@
       </xsl:if>
       <xsl:if test="@fo:page-width != 'none' ">
         <xsl:attribute name="w:w">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@fo:page-width"/>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:page-width)" />
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="@fo:page-height != 'none' ">
         <xsl:attribute name="w:h">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@fo:page-height"/>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:page-height)" />
         </xsl:attribute>
       </xsl:if>
     </w:pgSz>
@@ -2143,20 +2062,16 @@
             <!-- additional header height -->
             <xsl:when test="$hasHeader">
               <xsl:variable name="min-header-height">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length">
-                    <xsl:choose>
-                      <xsl:when test="$header-properties/@fo:min-height">
-                        <xsl:value-of select="$header-properties/@fo:min-height"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$header-properties/@svg:height"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:with-param>
-                </xsl:call-template>
+                <xsl:choose>
+                  <xsl:when test="$header-properties/@fo:min-height">
+                    <xsl:value-of select="$header-properties/@fo:min-height"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$header-properties/@svg:height"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:variable>
-              <xsl:value-of select="$top + $min-header-height"/>
+              <xsl:value-of select="$top + ooc:TwipsFromMeasuredUnit($min-header-height)"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$top"/>
@@ -2182,20 +2097,16 @@
             <!-- additional footer height -->
             <xsl:when test="$hasFooter">
               <xsl:variable name="min-footer-height">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length">
-                    <xsl:choose>
-                      <xsl:when test="$footer-properties/@fo:min-height">
-                        <xsl:value-of select="$footer-properties/@fo:min-height"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$footer-properties/@svg:height"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:with-param>
-                </xsl:call-template>
+                <xsl:choose>
+                  <xsl:when test="$footer-properties/@fo:min-height">
+                    <xsl:value-of select="$footer-properties/@fo:min-height"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$footer-properties/@svg:height"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:variable>
-              <xsl:value-of select="$bottom + $min-footer-height"/>
+              <xsl:value-of select="$bottom + ooc:TwipsFromMeasuredUnit($min-footer-height)"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$bottom"/>
@@ -2243,8 +2154,7 @@
         </xsl:when>
         <xsl:when test="attribute::node()[name() = concat('fo:padding-',$side)] != 'none' ">
           <xsl:call-template name="indent-val">
-            <xsl:with-param name="length"
-              select="attribute::node()[name() = concat('fo:padding-',$side)]"/>
+            <xsl:with-param name="length" select="attribute::node()[name() = concat('fo:padding-',$side)]"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
@@ -2254,15 +2164,10 @@
     <xsl:variable name="margin">
       <xsl:choose>
         <xsl:when test="@fo:margin != 'none' ">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@fo:margin"/>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:margin)" />
         </xsl:when>
         <xsl:when test="attribute::node()[name() = concat('fo:margin-',$side)] != 'none' ">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="attribute::node()[name() = concat('fo:margin-',$side)]"/>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:TwipsFromMeasuredUnit(attribute::node()[name() = concat('fo:margin-',$side)])" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
@@ -2292,9 +2197,7 @@
       <xsl:choose>
         <xsl:when test="@fo:column-gap">
           <xsl:attribute name="w:space">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:column-gap"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:column-gap)" />
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="style:column">
@@ -2310,32 +2213,22 @@
         <xsl:for-each select="style:column">
           <w:col>
             <!-- the left and right spaces -->
-            <xsl:variable name="start">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:start-indent"/>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:variable name="end">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:end-indent"/>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:variable name="width" select="number($start + $end)"/>
+            <xsl:variable name="twipsStartIndent" select="ooc:TwipsFromMeasuredUnit(@fo:start-indent)" />
+            <xsl:variable name="twipsEndIndent" select="ooc:TwipsFromMeasuredUnit(@fo:end-indent)" />
+              
+            <xsl:variable name="width" select="number($twipsStartIndent + $twipsEndIndent)"/>
             
             <!-- space -->
             <xsl:attribute name="w:space">
               <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent ) -->
               <xsl:choose>
                 <xsl:when test="following-sibling::style:column/@fo:start-indent">
-                  <xsl:variable name="followingStart">
-                    <xsl:call-template name="twips-measure">
-                      <xsl:with-param name="length" select="following-sibling::style:column/@fo:start-indent"/>
-                    </xsl:call-template>
-                  </xsl:variable>
-                  <xsl:value-of select="number($followingStart + $end)"/>
+                  <xsl:variable name="followingStart" select="ooc:TwipsFromMeasuredUnit(following-sibling::style:column/@fo:start-indent)" />
+                    
+                  <xsl:value-of select="number($followingStart + $twipsEndIndent)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="$end"/>
+                  <xsl:value-of select="$twipsEndIndent"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
@@ -2357,16 +2250,12 @@
       <w:pgMar>
         <xsl:if test="@fo:margin-left != '' or @fo:margin-left != 'none' ">
           <xsl:attribute name="w:left">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:margin-left"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:margin-left)" />
           </xsl:attribute>
         </xsl:if>
         <xsl:if test="@fo:margin-right != '' or @fo:margin-right != 'none' ">
           <xsl:attribute name="w:right">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:margin-right"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit(@fo:margin-right)" />
           </xsl:attribute>
         </xsl:if>
       </w:pgMar>
@@ -2870,11 +2759,7 @@
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$borderWidth"/>
-              </xsl:with-param>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($borderWidth)" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:with-param>
@@ -2960,21 +2845,19 @@
   <xsl:template name="GetParagraphMargin">
     <xsl:param name="side"/>
     <xsl:param name="style"/>
+    
     <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
+    
     <xsl:variable name="marginVal">
       <xsl:choose>
         <xsl:when test="$style/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]">
-          <xsl:value-of
-            select="$style/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]"/>
+          <xsl:value-of select="$style/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]"/>
         </xsl:when>
         <xsl:when test="$style/ancestor::office:automatic-styles">
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
-              <xsl:when
-                test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]">
-                <xsl:value-of
-                  select="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]"
-                />
+              <xsl:when test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]">
+                <xsl:value-of select="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]" />
               </xsl:when>
               <xsl:otherwise>0</xsl:otherwise>
             </xsl:choose>
@@ -2983,11 +2866,8 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:call-template name="twips-measure">
-      <xsl:with-param name="length">
-        <xsl:value-of select="$marginVal"/>
-      </xsl:with-param>
-    </xsl:call-template>
+    
+    <xsl:value-of select="ooc:TwipsFromMeasuredUnit($marginVal)" />
   </xsl:template>
 
 
@@ -2995,48 +2875,42 @@
   <xsl:template name="GetFirstLineIndent">
     <xsl:param name="style"/>
     <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
-    <xsl:call-template name="twips-measure">
-      <xsl:with-param name="length">
-        <xsl:choose>
-          <xsl:when
-            test="$style/style:paragraph-properties/@fo:text-indent and not($style/style:paragraph-properties/@style:auto-text-indent='true')">
-            <xsl:value-of select="$style/style:paragraph-properties/@fo:text-indent"/>
-          </xsl:when>
-          <xsl:when
-            test="$style/style:paragraph-properties/@style:auto-text-indent='true' and $style/style:text-properties/@fo:font-size">
-            <xsl:variable name="fontSize">
-              <xsl:call-template name="computeSize">
-                <xsl:with-param name="node" select="$style/style:text-properties"/>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:value-of select="concat($fontSize div 2, 'pt')"/>
-          </xsl:when>
-          <xsl:when test="$style/ancestor::office:automatic-styles">
-            <xsl:for-each select="document('styles.xml')">
-              <xsl:choose>
-                <xsl:when
-                  test="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent and not(key('styles', $styleName)/style:paragraph-properties/@style:auto-text-indent='true')">
-                  <xsl:value-of
-                    select="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent"/>
-                </xsl:when>
-                <xsl:when
-                  test="key('styles', $styleName)/style:paragraph-properties/@fo:auto-text-indent='true' and key('styles',$styleName)/style:text-properties/@fo:font-size">
-                  <xsl:variable name="fontSize">
-                    <xsl:call-template name="computeSize">
-                      <xsl:with-param name="node"
-                        select="key('styles', $styleName)[1]/style:text-properties"/>
-                    </xsl:call-template>
-                  </xsl:variable>
-                  <xsl:value-of select="concat($fontSize div 2, 'pt')"/>
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:with-param>
-    </xsl:call-template>
+    <xsl:variable name="firstLineIndent">
+      <xsl:choose>
+        <xsl:when test="$style/style:paragraph-properties/@fo:text-indent and not($style/style:paragraph-properties/@style:auto-text-indent='true')">
+          <xsl:value-of select="$style/style:paragraph-properties/@fo:text-indent"/>
+        </xsl:when>
+        <xsl:when test="$style/style:paragraph-properties/@style:auto-text-indent='true' and $style/style:text-properties/@fo:font-size">
+          <xsl:variable name="fontSize">
+            <xsl:call-template name="computeSize">
+              <xsl:with-param name="node" select="$style/style:text-properties"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="concat($fontSize div 2, 'pt')"/>
+        </xsl:when>
+        <xsl:when test="$style/ancestor::office:automatic-styles">
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:choose>
+              <xsl:when test="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent and not(key('styles', $styleName)/style:paragraph-properties/@style:auto-text-indent='true')">
+                <xsl:value-of select="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent"/>
+              </xsl:when>
+              <xsl:when test="key('styles', $styleName)/style:paragraph-properties/@fo:auto-text-indent='true' and key('styles',$styleName)/style:text-properties/@fo:font-size">
+                <xsl:variable name="fontSize">
+                  <xsl:call-template name="computeSize">
+                    <xsl:with-param name="node" select="key('styles', $styleName)[1]/style:text-properties"/>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="concat($fontSize div 2, 'pt')"/>
+              </xsl:when>
+              <xsl:otherwise>0</xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:value-of select="ooc:TwipsFromMeasuredUnit($firstLineIndent)" />
   </xsl:template>
 
 

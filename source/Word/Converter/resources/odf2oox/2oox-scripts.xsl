@@ -43,6 +43,59 @@
           Uri tmp;
           return Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out tmp);
       }
+      
+      ///<summary>
+      /// Convert various length units to twips (twentieths of a point)
+      ///</summary>
+      public int TwipsFromMeasuredUnit(string measuredUnit)
+      {
+          double value = 0;
+          double factor = 1.0;
+
+          Regex regex = new Regex(@"\s*([-.0-9]+)\s*([a-zA-Z]*)\s*");
+
+          GroupCollection groups = regex.Match(measuredUnit).Groups;
+          if (groups.Count == 3)
+          {
+              string strValue = groups[1].Value;
+              string strUnit = groups[2].Value;
+
+              switch (strUnit)
+              {
+                  case "cm":
+                      factor = 1440.0 / 2.54;
+                      break;
+                  case "mm":
+                      factor = 1440.0 / 25.4;
+                      break;
+                  case "in":
+                  case "inch":
+                      factor = 1440.0;
+                      break;
+                  case "pt":
+                      factor = 20.0;
+                      break;
+                  case "twip":
+                      factor = 1.0;
+                      break;
+                  case "pica":
+                      factor = 240;
+                      break;
+                  case "dpt":
+                      factor = 20.0;
+                      break;
+                  case "px":
+                      factor = 1440.0 / 96.0;
+                      break;
+              }
+
+              if (double.TryParse(strValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out value))
+              {
+                  value = value * factor;
+              }
+          }
+          return (int)Math.Round(value, MidpointRounding.AwayFromZero);
+      }
     ]]>
 
   </msxsl:script>

@@ -34,7 +34,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  exclude-result-prefixes="office text table fo style draw">
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="office text table fo style draw ooc">
 
 
   <!-- Specifies that measurement of table properties are interpreted as twentieths of a point -->
@@ -203,9 +204,7 @@
       <xsl:when test="$tableProp/@style:width">
         <w:tblW w:type="{$type}">
           <xsl:attribute name="w:w">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$tableProp/@style:width"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($tableProp/@style:width)" />
           </xsl:attribute>
         </w:tblW>
       </xsl:when>
@@ -228,7 +227,7 @@
       </xsl:choose>
     </xsl:if>
     <xsl:if test="not($tableProp/@table:align ='center')">
-      <xsl:call-template name="InsertTableIndent"/>
+      <xsl:call-template name="InsertTableIndentElement"/>
     </xsl:if>
 
     <!--table background-->
@@ -339,9 +338,7 @@
           <xsl:choose>
             <xsl:when test="number($checkRowHeight) &lt; 0">0</xsl:when>
             <xsl:otherwise>
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$rowHeight"/>
-              </xsl:call-template>
+              <xsl:value-of select="ooc:TwipsFromMeasuredUnit($rowHeight)" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
@@ -433,38 +430,23 @@
   Insert the table indent if margin-left defined, 
   or if cell-padding greater than 0. 
   -->
-  <xsl:template name="InsertTableIndent">
+  <xsl:template name="InsertTableIndentElement">
 
-    <xsl:variable name="marginLeft">
-      <xsl:choose>
-        <xsl:when
-          test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != ''  ">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left" />
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="marginLeft" select="ooc:TwipsFromMeasuredUnit(key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left)" />
 
     <xsl:variable name="padding">
       <xsl:choose>
-        <xsl:when
-          test="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding and @fo:padding != 'none'] and not(ancestor::table:table)">
+        <xsl:when test="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding and @fo:padding != 'none'] and not(ancestor::table:table)">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
-              <xsl:value-of
-                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding" />
+              <xsl:value-of select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding" />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when
-          test="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding-left and @fo:padding-left != 'none'] and not(ancestor::table:table)">
+        <xsl:when test="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding-left and @fo:padding-left != 'none'] and not(ancestor::table:table)">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
-              <xsl:value-of
-                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding-left" />
+              <xsl:value-of select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding-left" />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
@@ -472,11 +454,8 @@
       </xsl:choose>
     </xsl:variable>
 
-    <w:tblInd w:type="{$type}">
-      <xsl:attribute name="w:w">
-        <xsl:value-of select="$marginLeft + $padding"/>
-      </xsl:attribute>
-    </w:tblInd>
+    <w:tblInd w:type="{$type}" w:w="{$marginLeft + $padding}" />
+    
   </xsl:template>
 
   <!-- Inserts a table grid -->
@@ -507,9 +486,7 @@
       <xsl:attribute name="w:w">
         <xsl:choose>
           <xsl:when test="number($widthVal)">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$width"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($width)" />
           </xsl:when>
           <!-- WARNING : 0 should be the default value, but Word 2007 cannot compute layout properly.
           Another solution would be to return an empty string, but  an empty tblGrid does not pass validation (although it is permitted by OOX spec) -->
@@ -557,21 +534,10 @@
             <xsl:variable name="pageWidth">
               <!-- TODO : find a better matching page width -->
               <xsl:for-each select="document('styles.xml')">
-                <xsl:variable name="pageW">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width" />
-                  </xsl:call-template>
-                </xsl:variable>
-                <xsl:variable name="pageMarginL">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left" />
-                  </xsl:call-template>
-                </xsl:variable>
-                <xsl:variable name="pageMarginR">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right" />
-                  </xsl:call-template>
-                </xsl:variable>
+                <xsl:variable name="pageW" select="ooc:TwipsFromMeasuredUnit(key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width)" />
+                <xsl:variable name="pageMarginL" select="ooc:TwipsFromMeasuredUnit(key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left)" />
+                <xsl:variable name="pageMarginR" select="ooc:TwipsFromMeasuredUnit(key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right)" />
+
                 <xsl:value-of select="$pageW - $pageMarginR - $pageMarginL"/>
               </xsl:for-each>
             </xsl:variable>
@@ -812,9 +778,7 @@
               <xsl:value-of select="substring-before($relWidthString, '*')" />
             </xsl:when>
             <xsl:when test="$isRelTable='false' and $widthString">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$widthString" />
-              </xsl:call-template>
+              <xsl:value-of select="ooc:TwipsFromMeasuredUnit($widthString)" />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -1395,17 +1359,15 @@
 
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when
-            test="$rowProp/@fo:background-color and $rowProp/@fo:background-color != 'transparent' ">
-            <w:shd w:val="clear" w:color="auto"
-              w:fill="{substring($rowProp/@fo:background-color, 2, string-length($rowProp/@fo:background-color) -1)}"
-            />
+          <xsl:when test="$rowProp/@fo:background-color and $rowProp/@fo:background-color != 'transparent' ">
+            <w:shd w:val="clear" 
+                   w:color="auto" 
+                   w:fill="{substring($rowProp/@fo:background-color, 2, string-length($rowProp/@fo:background-color) -1)}" />
           </xsl:when>
-          <xsl:when
-            test="$tableProp/@fo:background-color and $tableProp/@fo:background-color != 'transparent' ">
-            <w:shd w:val="clear" w:color="auto"
-              w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"
-            />
+          <xsl:when test="$tableProp/@fo:background-color and $tableProp/@fo:background-color != 'transparent' ">
+            <w:shd w:val="clear" 
+                   w:color="auto"
+                   w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}" />
           </xsl:when>
         </xsl:choose>
       </xsl:otherwise>
@@ -1418,53 +1380,26 @@
     <xsl:param name="defaultMargin" select="'false'"/>
     <xsl:choose>
       <xsl:when test="$defaultMargin = 'false' and table:table[@table:is-sub-table='true']">
-        <w:top w:w="0" w:type="{$type}"/>
-        <w:left w:w="0" w:type="{$type}"/>
-        <w:bottom w:w="0" w:type="{$type}"/>
-        <w:right w:w="0" w:type="{$type}"/>
+        <w:top w:w="0" w:type="dxa"/>
+        <w:left w:w="0" w:type="dxa"/>
+        <w:bottom w:w="0" w:type="dxa"/>
+        <w:right w:w="0" w:type="dxa"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="$cellProp[@fo:padding and @fo:padding != 'none']">
-            <xsl:variable name="padding">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$cellProp/@fo:padding"/>
-              </xsl:call-template>
-            </xsl:variable>
-            <w:top w:w="{$padding}" w:type="{$type}"/>
-            <w:left w:w="{$padding}" w:type="{$type}"/>
-            <w:bottom w:w="{$padding}" w:type="{$type}"/>
-            <w:right w:w="{$padding}" w:type="{$type}"/>
+            <xsl:variable name="padding" select="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding)" />
+
+            <w:top w:type="dxa" w:w="{$padding}" />
+            <w:left w:type="dxa" w:w="{$padding}" />
+            <w:bottom w:type="dxa" w:w="{$padding}" />
+            <w:right w:type="dxa" w:w="{$padding}" />
           </xsl:when>
           <xsl:otherwise>
-            <w:top w:type="{$type}">
-              <xsl:attribute name="w:w">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length" select="$cellProp/@fo:padding-top"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:top>
-            <w:left w:type="{$type}">
-              <xsl:attribute name="w:w">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length" select="$cellProp/@fo:padding-left"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:left>
-            <w:bottom w:type="{$type}">
-              <xsl:attribute name="w:w">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length" select="$cellProp/@fo:padding-bottom"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:bottom>
-            <w:right w:type="{$type}">
-              <xsl:attribute name="w:w">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length" select="$cellProp/@fo:padding-right"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:right>
+            <w:top w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-top)" />
+            <w:left w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-left)" />
+            <w:bottom w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-bottom)" />
+            <w:right w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-right)" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -1563,20 +1498,14 @@
     <!-- get spacing value of table properties -->
     <xsl:variable name="tableSpace">
       <xsl:choose>
-        <xsl:when
-          test="$tableSide='top' and key('automatic-styles', following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
+        <xsl:when test="$tableSide='top' and key('automatic-styles', following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
           <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="key('automatic-styles',following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]"
-            />
+            <xsl:with-param name="length" select="key('automatic-styles',following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]" />
           </xsl:call-template>
         </xsl:when>
-        <xsl:when
-          test="$tableSide='bottom' and key('automatic-styles',preceding-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
+        <xsl:when test="$tableSide='bottom' and key('automatic-styles',preceding-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
           <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="key('automatic-styles',preceding-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]"
-            />
+            <xsl:with-param name="length" select="key('automatic-styles',preceding-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]" />
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
@@ -1589,27 +1518,12 @@
         <!-- get spacing value of paragraph style -->
         <xsl:variable name="paraSpace">
           <xsl:choose>
-            <xsl:when
-              test="key('automatic-styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length"
-                  select="key('automatic-styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]"
-                />
-              </xsl:call-template>
+            <xsl:when test="key('automatic-styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]">
+              <xsl:value-of select="ooc:TwipsFromMeasuredUnit(key('automatic-styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)])" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:for-each select="document('styles.xml')">
-                <xsl:choose>
-                  <xsl:when
-                    test="key('styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]">
-                    <xsl:call-template name="twips-measure">
-                      <xsl:with-param name="length"
-                        select="key('styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]"
-                      />
-                    </xsl:call-template>
-                  </xsl:when>
-                  <xsl:otherwise>0</xsl:otherwise>
-                </xsl:choose>
+                <xsl:value-of select="ooc:TwipsFromMeasuredUnit(key('styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)])" />
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
@@ -1626,107 +1540,4 @@
     </xsl:choose>
   </xsl:template>
 
-
-  <!-- 
-  makz:
-  The old Column width calculation by clever age was buggy and has been replaced by
-  InsertTableCellWidth, GetTotalCellWidth and GetColPos
-
-  <xsl:template name="InsertCellWidth">
-    <xsl:param name="tableProp"/>
-
-    <xsl:variable name="cellWidth">
-      <xsl:call-template name="GetCellWidth"/>
-    </xsl:variable>
-
-    <xsl:if test="number($cellWidth)">
-      <w:tcW>
-        <xsl:attribute name="w:type">
-          <xsl:choose>
-            <xsl:when test="$tableProp/@style:rel-width">
-              <xsl:text>pct</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$type"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:attribute name="w:w">
-          <xsl:value-of select="$cellWidth"/>
-        </xsl:attribute>
-      </w:tcW>
-    </xsl:if>
-  </xsl:template>
-
-  <xsl:template name="GetCellWidth">
-    <xsl:param name="colNumber">
-      <xsl:call-template name="GetColumnNumber"/>
-    </xsl:param>
-    <xsl:param name="colSpan">
-      <xsl:choose>
-        <xsl:when test="@table:number-columns-spanned">
-          <xsl:value-of select="@table:number-columns-spanned"/>
-        </xsl:when>
-        <xsl:otherwise>1</xsl:otherwise>
-      </xsl:choose>
-    </xsl:param>
-    <xsl:param name="currentColNumber">1</xsl:param>
-    <xsl:param name="currentPosInColumns">1</xsl:param>
-
-    <xsl:variable name="rangeColNumber">
-      <xsl:choose>
-        <xsl:when test="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]/@table:number-columns-repeated">
-          <xsl:value-of select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]/@table:number-columns-repeated" />
-        </xsl:when>
-        <xsl:otherwise>1</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:choose>
-      <xsl:when test="$colNumber &lt; ($currentColNumber + $rangeColNumber)">
-
-        <xsl:variable name="currentColumnWidth">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length">
-              <xsl:for-each  select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]">
-                <xsl:call-template name="ComputeColumnWidth"/>
-              </xsl:for-each>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:choose>
-          <xsl:when test="($colNumber + $colSpan) &lt;= ($currentColNumber + $rangeColNumber)">
-            <xsl:value-of select="$currentColumnWidth * $colSpan"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:variable name="remainingCellWidth">
-              <xsl:call-template name="GetCellWidth">
-                <xsl:with-param name="colNumber" select="$currentColNumber + $rangeColNumber"/>
-                <xsl:with-param name="colSpan" select="$colNumber + $colSpan - $currentColNumber - $rangeColNumber"/>
-                <xsl:with-param name="currentColNumber" select="$currentColNumber + $rangeColNumber"/>
-                <xsl:with-param name="currentPosInColumns" select="$currentPosInColumns + 1"/>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:value-of select="round(($remainingCellWidth + ($currentColNumber + $rangeColNumber - $colNumber) * $currentColumnWidth) * 10000) div 10000" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="GetCellWidth">
-          <xsl:with-param name="colNumber" select="$colNumber"/>
-          <xsl:with-param name="colSpan" select="$colSpan"/>
-          <xsl:with-param name="currentColNumber" select="$currentColNumber + $rangeColNumber"/>
-          <xsl:with-param name="currentPosInColumns" select="$currentPosInColumns + 1"/>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="GetColumnNumber">
-    <xsl:value-of select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1" />
-  </xsl:template>
-
-
- -->
 </xsl:stylesheet>

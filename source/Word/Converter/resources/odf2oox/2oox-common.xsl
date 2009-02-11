@@ -31,7 +31,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  exclude-result-prefixes="style svg fo">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="style svg fo ooc">
   
   <!--
 		Calculate a padding measure (limited to 31 pt)
@@ -56,11 +57,8 @@
 
   <xsl:template name="indent-val">
     <xsl:param name="length"/>
-    <xsl:variable name="result">
-      <xsl:call-template name="twips-measure">
-        <xsl:with-param name="length" select="$length"/>
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="result" select="ooc:TwipsFromMeasuredUnit($length)" />
+
     <xsl:choose>
       <xsl:when test="$result > 620">
         <xsl:message terminate="no">translation.odf2oox.paddingShortened</xsl:message>
@@ -169,23 +167,10 @@
     <xsl:param name="side"/>
 
     <!-- Lengths converted to common measurement so as to be compared-->
-    <xsl:variable name="inner">
-      <xsl:call-template name="twips-measure">
-        <xsl:with-param name="length" select="substring-before($borderLineWidth,' ')"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="between">
-      <xsl:call-template name="twips-measure">
-        <xsl:with-param name="length"
-          select="substring-before(substring-after($borderLineWidth,' '),' ')"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="outer">
-      <xsl:call-template name="twips-measure">
-        <xsl:with-param name="length"
-          select="substring-after(substring-after($borderLineWidth,' '),' ')"/>
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="inner" select="ooc:TwipsFromMeasuredUnit(substring-before($borderLineWidth,' '))" />
+    <xsl:variable name="between" select="ooc:TwipsFromMeasuredUnit(substring-before(substring-after($borderLineWidth,' '),' '))" />
+    <xsl:variable name="outer" select="ooc:TwipsFromMeasuredUnit(substring-after(substring-after($borderLineWidth,' '),' '))" />
+
     <xsl:choose>
       <xsl:when test="$side='top' or $side='left'">
         <xsl:choose>

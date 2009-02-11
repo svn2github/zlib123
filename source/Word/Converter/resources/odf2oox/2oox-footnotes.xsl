@@ -32,8 +32,10 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-  exclude-result-prefixes="text style office xlink draw pzip">
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="text style office xlink draw pzip ooc">
 
   <!-- Group footnotes under the same key -->
   <xsl:key name="footnotes" match="text:note[@text:note-class='footnote']" use="''"/>
@@ -122,16 +124,12 @@
       <w:spacing w:line="240" w:lineRule="auto">
         <xsl:if test="$separatorProps/@style:distance-after-sep">
           <xsl:attribute name="w:after">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$separatorProps/@style:distance-after-sep"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($separatorProps/@style:distance-after-sep)" />
           </xsl:attribute>
         </xsl:if>
         <xsl:if test="$separatorProps/@style:distance-before-sep">
           <xsl:attribute name="w:before">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$separatorProps/@style:distance-before-sep"/>
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit($separatorProps/@style:distance-before-sep)" />
           </xsl:attribute>
         </xsl:if>
       </w:spacing>

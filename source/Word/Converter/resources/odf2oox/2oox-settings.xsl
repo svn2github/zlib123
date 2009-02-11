@@ -34,8 +34,8 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:ooo="http://openoffice.org/2004/office"
-  exclude-result-prefixes="office fo style config ooo text">
-
+  xmlns:ooc="urn:odf-converter"               
+  exclude-result-prefixes="office fo style config ooo text ooc">
 
 	<xsl:variable name="configuration-settings" select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']"/>
 	<!-- read only configuration setting -->
@@ -84,9 +84,7 @@
       <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance">
         <w:defaultTabStop>
           <xsl:attribute name="w:val">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance" />
-            </xsl:call-template>
+            <xsl:value-of select="ooc:TwipsFromMeasuredUnit(document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance)" />
           </xsl:attribute>
         </w:defaultTabStop>
       </xsl:if>
