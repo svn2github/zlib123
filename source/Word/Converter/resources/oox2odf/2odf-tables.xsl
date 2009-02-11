@@ -586,7 +586,7 @@
         </xsl:when>
       </xsl:choose>
 
-      <xsl:call-template name="InsertTableIndent">
+      <xsl:call-template name="InsertTableIndentAttribute">
         <xsl:with-param name="tblPr" select="." />
       </xsl:call-template>
 
@@ -674,7 +674,7 @@
   Author:   makz (DIaLOGIKa)
   Params:   table: The w:tbl node
   -->
-  <xsl:template name="InsertTableIndent">
+  <xsl:template name="InsertTableIndentAttribute">
     <xsl:param name="tblPr" />
 
     <xsl:variable name="tableIndent">

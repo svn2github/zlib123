@@ -739,7 +739,7 @@
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'AUTOTEXT'">
-        <xsl:apply-templates />
+        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
       </xsl:when>
       <xsl:when test="$fieldType = 'REF' or $fieldType = 'PAGEREF'">
         <xsl:variable name="fieldArgument">
@@ -774,20 +774,20 @@
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:a>
       </xsl:when>
-      <xsl:when test="'CITATION'">
+      <xsl:when test="$fieldType = 'CITATION'">
         <xsl:call-template name="InsertTextBibliographyMark">
           <!-- TODO -->
           <xsl:with-param name="TextIdentifier" select="substring-before($fieldInstruction, ' \')" />
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'AUTOTEXTLIST' 
+      <!--<xsl:when test="$fieldType = 'AUTOTEXTLIST' 
                 or $fieldType = 'BIBLIOGRAPHY' 
                 or $fieldType = 'INCLUDEPICTURE' 
                 or $fieldType = 'INCLUDETEXT' or $fieldType = 'LINK' 
                 or $fieldType = 'NOTEREF' 
                 or $fieldType = 'QUOTE'">
 
-      </xsl:when>
+      </xsl:when>-->
       <xsl:otherwise>
         <!-- translate field to static text: STYLEREF -->
         <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
