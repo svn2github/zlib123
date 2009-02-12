@@ -1187,8 +1187,7 @@
   <!-- tabs -->
   <xsl:template match="text:tab" mode="paragraph">
     <xsl:choose>
-      <xsl:when
-        test="ancestor::text:index-body and ((preceding-sibling::text:a or parent::text:a) and preceding-sibling::text:tab)">
+      <xsl:when test="ancestor::text:index-body and ((preceding-sibling::text:a or parent::text:a) and preceding-sibling::text:tab)">
         <!-- do nothing : only one tab-stop converted in indexes -->
       </xsl:when>
       <xsl:when test="../../@text:style-name = 'X3AS7TABSTYLE'">

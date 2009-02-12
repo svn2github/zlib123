@@ -69,17 +69,19 @@
       <xsl:call-template name="InsertIndexFieldCodeStart"/>
     </xsl:if>
 
-    <xsl:choose>
-      <!-- when hyperlink option is on in TOC -->
+    <!-- Why has there been a special handling for links? The prevented other toc content such as tabs from being translated 
+         see #2592046 ODT - Index/Tables:Tab Stop Position, not retained.-->
+    <!--<xsl:choose>
+      --><!-- when hyperlink option is on in TOC --><!--
       <xsl:when test="text:a">
-        <!-- apply templates to nodes except tabs who do not have preceding sibling other than tabs (converted into indent) -->
+        --><!-- apply templates to nodes except tabs who do not have preceding sibling other than tabs (converted into indent) --><!--
         <xsl:apply-templates select="child::node()[not(self::text:tab[not(preceding-sibling::node()[not(self::text:tab)])])]" mode="paragraph"/>
       </xsl:when>
-      <!-- default scenario -->
-      <xsl:otherwise>
+      --><!-- default scenario --><!--
+      <xsl:otherwise>-->
         <xsl:apply-templates mode="paragraph"/>
-      </xsl:otherwise>
-    </xsl:choose>
+      <!--</xsl:otherwise>
+    </xsl:choose>-->
 
     <!-- inserts field code end in last index element -->
     <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
