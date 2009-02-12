@@ -28,7 +28,7 @@
       <office:meta>
         <!-- generator -->
         <meta:generator>
-          <xsl:value-of select="$generator"/>"/>
+          <xsl:value-of select="$generator"/>
         </meta:generator>
         <!-- title -->
         <xsl:apply-templates
