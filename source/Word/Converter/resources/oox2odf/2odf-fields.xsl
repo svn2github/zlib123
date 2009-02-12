@@ -135,57 +135,6 @@
 
   </xsl:template>
 
-  <!--<xsl:template name="left-trim">
-    <xsl:param name="string" />
-    <xsl:choose>
-      <xsl:when test="string-length(normalize-space($string)) = 0">
-        <xsl:value-of select="''" />
-      </xsl:when>
-      -->
-  <!-- normalize-space is used to check for any kind of white space or newline characters -->
-  <!--
-      <xsl:when test="normalize-space(substring($string, 1, 1)) = ''">
-        <xsl:call-template name="left-trim">
-          <xsl:with-param name="string" select="substring($string, 2)" />
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$string" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="right-trim">
-    <xsl:param name="string" />
-    <xsl:choose>
-      <xsl:when test="string-length(normalize-space($string)) = 0">
-        <xsl:value-of select="''" />
-      </xsl:when>
-      -->
-  <!-- normalize-space is used to check for any kind of white space or newline characters -->
-  <!--
-      <xsl:when test="normalize-space(substring($string, string-length($string))) = ''">
-        <xsl:call-template name="right-trim">
-          <xsl:with-param name="string" select="substring($string, 1, string-length($string) - 1)" />
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$string" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="trim">
-    <xsl:param name="string" />
-    <xsl:call-template name="right-trim">
-      <xsl:with-param name="string">
-        <xsl:call-template name="left-trim">
-          <xsl:with-param name="string" select="$string" />
-        </xsl:call-template>
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>-->
-
   <xsl:template match="w:instrText" mode="automaticstyles">
 
     <xsl:variable name="fieldCode">
@@ -225,7 +174,7 @@
     <!-- the context is w:r -->
 
     <!-- field creating is triggered by the first w:instrText or in case the field wraps over several paragraphs -->
-    <xsl:if test="w:instrText/@oox:firstInstrText or position() = 1">
+    <xsl:if test="w:instrText/@oox:firstInstrText or parent::node()/w:r[1] = self::node()">
       <text:span text:style-name="{generate-id(.)}">
 
         <xsl:variable name="fieldCode">
@@ -235,7 +184,7 @@
         <xsl:variable name="runParent" select="parent::node()" />
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="$fieldCode" />
-          <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByFieldId', @oox:fid)[parent::node() = $runParent]" />
+          <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByFieldId', @oox:fid)[ancestor::node() = $runParent]" />
         </xsl:call-template>
 
       </text:span>
@@ -248,13 +197,16 @@
 
   <!-- translate simple fields -->
   <xsl:template match="w:fldSimple">
-    <!-- a simple field may contain several runs, however we only keep the formatting of the first one -->
-    <text:span text:style-name="{generate-id(w:r)}">
-      <xsl:call-template name="InsertFieldFromFieldCode">
-        <xsl:with-param name="fieldCode" select="@w:instr" />
-        <xsl:with-param name="fieldDisplayValue" select="w:r" />
-      </xsl:call-template>
-    </text:span>
+    <!-- nested fields are handled by the surrounding field and converted to static text -->
+    <xsl:if test="w:r/oox:f &lt;= 1">
+      <!-- a simple field may contain several runs, however we only keep the formatting of the first one -->
+      <text:span text:style-name="{generate-id(w:r)}">
+        <xsl:call-template name="InsertFieldFromFieldCode">
+          <xsl:with-param name="fieldCode" select="@w:instr" />
+          <xsl:with-param name="fieldDisplayValue" select="w:r" />
+        </xsl:call-template>
+      </text:span>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime')
@@ -275,13 +227,17 @@
     <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles" />
   </xsl:template>
 
-  <xsl:template match="w:t" mode="fieldDisplayValue">
+  <xsl:template match="w:r" mode="fieldDisplayValue">
+    <xsl:apply-templates />
+  </xsl:template>
+  
+  <xsl:template match="w:t" mode="fieldDisplayValueEscapeSpace">
     <!-- ODF 1.1 only allows text inside ODF fields, no text:s nodes, therefore spaces are replaced by en-space -->
     <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
   </xsl:template>
 
   <xsl:template match="text()" mode="fieldDisplayValue" />
-  
+
   <xsl:template name="BuildFieldCode">
     <xsl:param name="ooxFieldId" select="@oox:fid | parent::*/@oox:fid" />
 
@@ -568,36 +524,36 @@
     <xsl:choose>
       <xsl:when test="$fieldType = 'CREATEDATE'">
         <!--<text:creation-time style:data-style-name="{generate-id(.)} ">
-          <xsl:apply-templates select="$fieldDisplayValue//w:t" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:creation-time>-->
         <!-- TODO: which one is correct? creation-time? or creation-date? -->
         <text:creation-date style:data-style-name="{generate-id(.)}">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:creation-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'DATE'">
         <text:date style:data-style-name="{generate-id(.)}">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:date>
       </xsl:when>
       <xsl:when test="$fieldType = 'EDITTIME'">
         <text:editing-duration style:data-style-name="{generate-id(.)}">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:editing-duration>
       </xsl:when>
       <xsl:when test="$fieldType = 'PRINTDATE'">
         <text:print-date style:data-style-name="{generate-id(.)}">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:print-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'SAVEDATE'">
         <text:modification-date style:data-style-name="{generate-id(.)}">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:modification-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'TIME'">
         <text:time style:data-style-name="{generate-id(.) }">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:time>
       </xsl:when>
       <xsl:otherwise>
@@ -638,12 +594,12 @@
     <xsl:choose>
       <xsl:when test="$fieldType = 'AUTHOR'">
         <text:initial-creator>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:initial-creator>
       </xsl:when>
       <xsl:when test="$fieldType = 'COMMENTS'">
         <text:description>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:description>
       </xsl:when>
       <xsl:when test="$fieldType = 'DOCPROPERTY'">
@@ -654,7 +610,7 @@
       </xsl:when>
       <xsl:when test="$fieldType = 'FILENAME'">
         <text:file-name text:display="name">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:file-name>
       </xsl:when>
       <xsl:when test="$fieldType = 'INFO'">
@@ -667,42 +623,42 @@
       </xsl:when>
       <xsl:when test="$fieldType = 'KEYWORDS'">
         <text:keywords>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:keywords>
       </xsl:when>
       <xsl:when test="$fieldType = 'LASTSAVEDBY'">
         <text:creator>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:creator>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMCHARS'">
         <text:character-count>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:character-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMPAGES'">
         <text:page-count>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:page-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMWORDS'">
         <text:word-count>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:word-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'SUBJECT'">
         <text:subject>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:subject>
       </xsl:when>
       <xsl:when test="$fieldType = 'TITLE'">
         <text:title>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:title>
       </xsl:when>
       <xsl:when test="$fieldType = 'TEMPLATE'">
         <text:template-name text:display="name">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:template-name>
       </xsl:when>
       <xsl:otherwise>
@@ -818,16 +774,16 @@
       </xsl:when>
       <xsl:when test="$fieldType = 'REVNUM'">
         <text:editing-cycles>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:editing-cycles>
       </xsl:when>
       <xsl:when test="$fieldType = 'SEQ'">
         <xsl:variable name="refType" select="substring-before($fieldInstruction,' ')" />
 
-        <text:sequence text:ref-name="{concat('ref',concat($refType, $fieldDisplayValue//w:t))}"
-                       text:name="{$refType}" 
+        <text:sequence text:ref-name="{concat('ref',concat($refType, $fieldDisplayValue/w:r))}"
+                       text:name="{$refType}"
                        text:formula="{concat(concat('ooow:',$refType),'+1')}">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:sequence>
       </xsl:when>
       <xsl:when test="$fieldType = 'AUTONUM' or $fieldType = 'AUTONUMLGL' 
@@ -860,17 +816,17 @@
     <xsl:choose>
       <xsl:when test="$fieldType = 'USERADDRESS'">
         <text:sender-street>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:sender-street>
       </xsl:when>
       <xsl:when test="$fieldType = 'USERINITIALS'">
         <text:author-initials>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:author-initials>
       </xsl:when>
       <xsl:when test="$fieldType = 'USERNAME'">
         <text:author-name text:fixed="false">
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:author-name>
       </xsl:when>
       <xsl:otherwise>
@@ -903,7 +859,7 @@
   <xsl:template name="InsertIndexMark">
     <xsl:param name="instrText" />
     <xsl:variable name="value" select="substring-before(substring-after($instrText,'&quot;'),'&quot;')" />
-    
+
     <text:alphabetical-index-mark>
       <xsl:choose>
         <xsl:when test="not(contains($value, ':'))">
@@ -914,7 +870,7 @@
         <xsl:when test="contains($value, ':')">
           <xsl:variable name="TextKey1" select="substring-before($value, ':')" />
           <xsl:variable name="TextKey2" select="substring-after($value, ':')" />
-          
+
           <xsl:choose>
             <xsl:when test="contains($TextKey2, ':')">
               <xsl:attribute name="text:string-value">
@@ -989,7 +945,7 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+      <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
 
     </text:bookmark-ref>
   </xsl:template>
@@ -999,7 +955,7 @@
     <xsl:param name="dateText" />
 
     <xsl:variable name="FormatDate" select="substring-before(substring-after($dateText, '&quot;'), '&quot;')" />
-    
+
     <!-- some of the DOCPROPERTY date field types have constant date format, 
       which is not saved in fieldCode so it need to be given directly in these cases-->
     <xsl:choose>
@@ -1078,12 +1034,12 @@
 
   <xsl:template name="InsertTimeStyle">
     <xsl:param name="timeText" />
-    
+
     <xsl:call-template name="InsertDateFormat">
       <xsl:with-param name="FormatDate" select="substring-before(substring-after($timeText, '&quot;'), '&quot;')" />
       <xsl:with-param name="ParamField" select="'TIME'" />
     </xsl:call-template>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertFieldProperties">
@@ -1551,7 +1507,7 @@
     <xsl:choose>
       <xsl:when test="$docName = 'document.xml'">
         <xsl:if test="following::w:sectPr[1]/w:pgNumType/@w:chapStyle">
-          <text:chapter text:display="number" 
+          <text:chapter text:display="number"
                         text:outline-level="{following::w:sectPr[1]/w:pgNumType/@w:chapStyle}" />
           <xsl:choose>
             <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'period'">
@@ -1567,7 +1523,7 @@
       <xsl:otherwise>
 
         <xsl:variable name="rId" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Target = $docName]/@Id" />
-        
+
         <xsl:for-each select="key('Part', 'word/document.xml')">
           <xsl:for-each select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
             <xsl:if test="w:pgNumType/@w:chapStyle">
@@ -1589,7 +1545,7 @@
     </xsl:choose>
 
     <xsl:variable name="WInstr" select="./@w:instr" />
-    
+
     <text:page-number>
 
       <xsl:variable name="rId" select="concat('',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Target=$docName]/@Id)" />
@@ -1713,7 +1669,7 @@
     <xsl:variable name="City" select="$Path/b:City" />
     <xsl:variable name="StateProvince" select="$Path/b:StateProvince" />
     <xsl:variable name="CountryRegion" select="$Path/b:CountryRegion" />
-    
+
     <xsl:variable name="Address">
       <xsl:choose>
         <xsl:when test="$City != '' and $StateProvince != '' and $CountryRegion != ''">
@@ -1889,12 +1845,12 @@
       </xsl:when>
       <xsl:when test="$docpropCategory = 'COMPANY'">
         <text:sender-company>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:sender-company>
       </xsl:when>
       <xsl:when test="$docpropCategory = 'PARAGRAPHS'">
         <text:paragraph-count>
-          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:paragraph-count>
       </xsl:when>
       <xsl:otherwise>

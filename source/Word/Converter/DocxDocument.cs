@@ -233,6 +233,12 @@ namespace OdfConverter.Wordprocessing
                                         fieldBegin = false;
                                     }
                                     break;
+                                case "fldSimple":
+                                    if (!xtr.IsEmptyElement)
+                                    {
+                                        _insideField++;
+                                    }
+                                    break;
                             }
 
                             if (xtr.IsEmptyElement)
@@ -242,6 +248,10 @@ namespace OdfConverter.Wordprocessing
                         }
                         break;
                     case XmlNodeType.EndElement:
+                        if (xtr.LocalName.Equals("fldSimple"))
+                        {
+                            _insideField--;
+                        }
                         if (!xtr.LocalName.Equals("proofErr"))
                         {
                             xtw.WriteEndElement();
