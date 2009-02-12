@@ -292,7 +292,12 @@
       </xsl:when>
       <!-- complex field -->
       <xsl:otherwise>
-        <xsl:value-of select="ooc:Trim(key('fieldRunsByFieldId', $ooxFieldId)//w:instrText)" />
+        <xsl:variable name="fieldCode">
+          <xsl:for-each select="key('fieldRunsByFieldId', $ooxFieldId)//w:instrText">
+            <xsl:value-of select="." />
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:value-of select="ooc:Trim($fieldCode)" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
