@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{E7055581-7C0C-429F-8134-99D3413C5756}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -140,9 +140,6 @@
     </ProjectReference>
     <Content Include="Converter.csproj" />
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\mimetype" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

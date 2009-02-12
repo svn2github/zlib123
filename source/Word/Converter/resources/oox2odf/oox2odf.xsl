@@ -110,7 +110,15 @@
     <pzip:archive pzip:target="{$outputFile}">
 
       <!-- mimetype -->
-      <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.text" />
+      <xsl:choose>
+        <xsl:when test="$documentType = 'Template'">
+          <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.text-template" />
+        </xsl:when>
+        <xsl:otherwise>
+          <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.text" />
+        </xsl:otherwise>
+      </xsl:choose>
+      
 
       <!-- Manifest -->
       <pzip:entry pzip:target="META-INF/manifest.xml">

@@ -38,7 +38,7 @@
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="oox e r xdr c">
 
-   <xsl:import href="relationships.xsl"/>
+  <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="headers.xsl"/>
@@ -77,6 +77,7 @@
   <!-- a string containing detailed information on environment and
        converter version to be added to the document's meta data -->
   <xsl:param name="generator"/>
+  <xsl:param name="documentType" />
 
   <xsl:output method="xml" encoding="UTF-8"/>
 
@@ -87,12 +88,32 @@
 
   <xsl:template match="/oox:package">
     <pzip:archive pzip:target="{$outputFile}">
+      
+      <!-- mimetype -->
+      <xsl:choose>
+        <xsl:when test="$documentType = 'Template'">
+          <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.spreadsheet-template" />
+        </xsl:when>
+        <xsl:otherwise>
+          <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.spreadsheet" />
+        </xsl:otherwise>
+      </xsl:choose>
 
       <!-- Manifest -->
       <pzip:entry pzip:target="META-INF/manifest.xml">
         <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
-          <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"
-            manifest:full-path="/"/>
+          <manifest:file-entry manifest:full-path="/">
+            <xsl:attribute name="manifest:media-type">
+              <xsl:choose>
+                <xsl:when test="$documentType = 'Template'">
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.spreadsheet-template'" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.spreadsheet'" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </manifest:file-entry>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="styles.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
@@ -100,11 +121,7 @@
           <xsl:call-template name="InsertChartEntries"/>
         </manifest:manifest>
       </pzip:entry>
-      <!--mimeType -->
-      <pzip:copy pzip:source="#CER#SpreadsheetConverter.dll#CleverAge.OdfConverter.Spreadsheet.resources.mimetype#" pzip:target="mimetype"/>
-      <!-- mime -->
-      <!--<pzip:copy pzip:source="#CER#SpreadsheetConverter.dll#CleverAge.OdfConverter.Spreadsheet.resources.mimetype#" pzip:target="mimetype" />-->
-
+      
       <!-- main content -->
       <pzip:entry pzip:target="content.xml">
         <xsl:call-template name="content"/>

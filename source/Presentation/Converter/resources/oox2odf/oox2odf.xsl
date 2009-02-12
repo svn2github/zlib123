@@ -53,6 +53,7 @@ Copyright (c) 2007, Sonata Software Limited
   <!-- a string containing detailed information on environment and
        converter version to be added to the document's meta data -->
   <xsl:param name="generator"/>
+  <xsl:param name="documentType" />
   
 	<xsl:output method="xml" encoding="UTF-8"/>
 
@@ -60,12 +61,34 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:variable name="app-version">2.0.0</xsl:variable>
 	<xsl:template match="/oox:source">
 		<pzip:archive pzip:target="{$outputFile}">
+
+      <!-- mimetype -->
+      <xsl:choose>
+        <xsl:when test="$documentType = 'Template'">
+          <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.presentation-template" />
+        </xsl:when>
+        <xsl:otherwise>
+          <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.presentation" />
+        </xsl:otherwise>
+      </xsl:choose>
+      
 			<!-- Manifest -->
 			<pzip:entry pzip:target="META-INF/manifest.xml">
 				<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
-					<manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.presentation"
-					  manifest:full-path="/"/>
-					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/statusbar/"/>
+					<manifest:file-entry manifest:full-path="/">
+            <xsl:attribute name="manifest:media-type">
+              <xsl:choose>
+                <xsl:when test="$documentType = 'Template'">
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.presentation-template'" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.presentation'" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </manifest:file-entry>
+          
+          <manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/statusbar/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/accelerator/current.xml"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/accelerator/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/floater/"/>
@@ -82,18 +105,12 @@ Copyright (c) 2007, Sonata Software Limited
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Thumbnails/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Thumbnails/thumbnail.png"/>
 					<manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
-                                         <!--Conformance Test-->
-                                         <manifest:file-entry manifest:media-type="" manifest:full-path="mimetype"/>
-					<xsl:for-each
-					  select="document('ppt/presentation.xml')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+					<xsl:for-each select="document('ppt/presentation.xml')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
 						<xsl:call-template name="InsertManifestFileEntry"/>
 					</xsl:for-each >
-                                      <xsl:call-template name="tmpMenifestEntryForOLEobject" />
+          <xsl:call-template name="tmpMenifestEntryForOLEobject" />
 				</manifest:manifest>
 			</pzip:entry>
-                                 <!--Conformance Test-->
-      <pzip:copy pzip:source="#CER#PresentationConverter.dll#Sonata.OdfConverter.Presentation.resources.mimetype#"
-             pzip:target="mimetype"/>
 			<pzip:entry pzip:target="content.xml">
 				<xsl:call-template name="content" />
 			</pzip:entry >
