@@ -42,9 +42,12 @@ namespace OdfConverter.Wordprocessing
     /// </summary>
     public class OdfParagraphPostProcessor : AbstractPostProcessor
     {
-        private Stack<Element> currentParagraphNode;
-        private Stack<Element> currentStyleNode;
-        private Stack context;
+        private Stack<Element> _currentParagraphNode;
+        private Stack<Element> _currentStyleNode;
+        private Stack<Element> _context;
+
+        private Attribute _currentAttribute = null;
+
         private StringBuilder paragraphTextBuilder = new StringBuilder();
         private string styleText;
         private bool bIsDoneStyle = false;
@@ -61,10 +64,9 @@ namespace OdfConverter.Wordprocessing
         public OdfParagraphPostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
-            this.currentParagraphNode = new Stack<Element>();
-            this.currentStyleNode = new Stack<Element>();
-            this.context = new Stack();
-            this.context.Push("root");
+            this._currentParagraphNode = new Stack<Element>();
+            this._currentStyleNode = new Stack<Element>();
+            this._context = new Stack<Element>();
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
@@ -74,19 +76,19 @@ namespace OdfConverter.Wordprocessing
             //if element is in paragraph or in style, than we push it into context stack
             if (IsInParagraph() || IsInStyle())
             {
-                this.context.Push(currentElement);
+                this._context.Push(currentElement);
             }
-            else if (localName.Equals("p"))
+            else if (localName.Equals("p") || localName.Equals("h"))
             {
                 //if it's a paragraph element, then we start pushing nodes into context stack instead of writing them
-                this.currentParagraphNode.Push(currentElement);
-                this.context.Push(currentElement);
+                this._currentParagraphNode.Push(currentElement);
+                this._context.Push(currentElement);
             }
             else if (localName.Equals("style"))
             {
                 //if it's a style element, then we start pushing nodes into context stack instead of writing them
-                this.currentStyleNode.Push(currentElement);
-                this.context.Push(currentElement);
+                this._currentStyleNode.Push(currentElement);
+                this._context.Push(currentElement);
             }
             else
             {
@@ -99,8 +101,7 @@ namespace OdfConverter.Wordprocessing
             //if attribute is in paragraph or in style we push it into context stack
             if (IsInParagraph() || IsInStyle())
             {
-                Attribute attribute = new Attribute(prefix, localName, ns);
-                this.context.Push(attribute);
+                _currentAttribute = new Attribute(prefix, localName, ns);
             }
             else
             {
@@ -113,11 +114,9 @@ namespace OdfConverter.Wordprocessing
             if (text != "" && (IsInParagraph() || IsInStyle()))
             {
                 //if text element in paragraph or in style is not in attribute, it is added to paragraphText or styleText
-                if (IsInAttribute())
+                if (_currentAttribute != null)
                 {
-                    Attribute attribute = (Attribute)this.context.Pop();
-                    attribute.Value = text;
-                    this.context.Push(attribute);
+                    _currentAttribute.Value += text;
                 }
                 else
                 {
@@ -129,10 +128,8 @@ namespace OdfConverter.Wordprocessing
                     {
                         this.styleText = this.styleText + text;
                     }
-                    Element element = (Element)this.context.Peek();
-                    this.context.Pop();
+                    Element element = this._context.Peek();
                     element.AddChild(text);
-                    this.context.Push(element); 
                 }
             }
             else
@@ -143,13 +140,11 @@ namespace OdfConverter.Wordprocessing
 
         public override void WriteEndAttribute()
         {
-            if (IsInParagraph() || IsInStyle())
+            if ((IsInParagraph() || IsInStyle()) && _currentAttribute != null)
             {
-                Attribute attribute = (Attribute)this.context.Pop();
-                Element element = (Element)this.context.Peek();
-                this.context.Pop();
-                element.AddAttribute(attribute);
-                this.context.Push(element);
+                Element element = this._context.Peek();
+                element.AddAttribute(_currentAttribute);
+                _currentAttribute = null;
             }
             else
             {
@@ -161,109 +156,66 @@ namespace OdfConverter.Wordprocessing
         {
             if (IsInParagraph())
             {
-                Element element = (Element)this.context.Peek();
-                this.context.Pop();
-                object rootElement = this.context.Peek();
-                this.context.Push(element);
+                Element element = this._context.Pop();
                 //if it's the end of a main paragraph we write elements from context stack using WriteParagraph method
-                if (element.Name.Equals("p") && IsRoot(rootElement))
+                if ((element.Name.Equals("p") || element.Name.Equals("h")) && this._context.Count == 0)
                 {
                     // a new child element, which contains all the text in paragraph is created
                     Element paragraphTextElement = new Element("text", "paragraph", element.Ns);
                     paragraphTextElement.AddChild(this.paragraphTextBuilder.ToString());
                     element.AddChild(paragraphTextElement);
+                
                     //and then WriteParagraph method is used
                     WriteParagraph(element, false);
+                    
                     this.paragraphTextBuilder = new StringBuilder();
-                    this.currentParagraphNode.Pop();
-                    this.context.Pop();
+                    this._currentParagraphNode.Pop();
                 }
-                //if it's the end of an element in paragraph, then it is popped from the context stack, and addaed as a child to parentElement
+                //if it's the end of an element in paragraph, then it is popped from the context stack, and added as a child to parentElement
                 else
                 {
-                    this.context.Pop();
-                    Element parentElement = (Element)this.context.Peek();
-                    this.context.Pop();
+                    Element parentElement = this._context.Peek();
                     parentElement.AddChild(element);
-                    this.context.Push(parentElement);
+                }
+            }
+            else if (IsInStyle())
+            {
+                Element element = this._context.Pop();
+                if (element.Name.Equals("style") && this._context.Count == 0)
+                {
+                    // a new child element, which contains all the text in paragraph is created
+                    Element styleTextElement = new Element("style", "style", element.Ns);
+                    styleTextElement.AddChild(this.styleText);
+                    element.AddChild(styleTextElement);
+
+                    //and then WriteStyle method is used                        
+                    WriteStyle(element, true);
+                    
+                    this.styleText = "";
+                    this._currentStyleNode.Pop();
+                }
+                else
+                {
+                    Element parentElement = (Element)this._context.Peek();
+                    parentElement.AddChild(element);
                 }
             }
             else
             {
-                if (IsInStyle())
-                {
-                    Element element = (Element)this.context.Peek();
-                    this.context.Pop();
-                    object rootElement = this.context.Peek();
-                    this.context.Push(element);
-                    if (element.Name.Equals("style") && IsRoot(rootElement))
-                    {
-                        // a new child element, which contains all the text in paragraph is created
-                        Element styleTextElement = new Element("style", "style", element.Ns);
-                        styleTextElement.AddChild(this.styleText);
-                        element.AddChild(styleTextElement);
-                        //and then WriteStyle method is used                        
-                        WriteStyle(element, true);
-                        this.styleText = "";
-                        this.currentStyleNode.Pop();
-                        this.context.Pop();
-                    }
-                    else
-                    {
-                        this.context.Pop();
-                        Element parentElement = (Element)this.context.Peek();
-                        this.context.Pop();
-                        parentElement.AddChild(element);
-                        this.context.Push(parentElement);
-                    }
-                }
-                else this.nextWriter.WriteEndElement();
+                this.nextWriter.WriteEndElement();
             }
         }
-        
+
         //method to check if we are in paragraph
         private bool IsInParagraph()
         {
-            if (this.currentParagraphNode.Count > 0 && this.currentParagraphNode.Peek().Name.Equals("p"))
-            {
-                return true;
-            }
-            return false;
+            return (this._currentParagraphNode.Count > 0 && (this._currentParagraphNode.Peek().Name.Equals("p") || this._currentParagraphNode.Peek().Name.Equals("h")));
         }
-        
+
         //method to check if we are in style definition
         private bool IsInStyle()
         {
-            if (this.currentStyleNode.Count > 0 && this.currentStyleNode.Peek().Name.Equals("style"))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        //method to check if we are not in attribute
-        private bool IsInAttribute()
-        {
-            if (this.context.Count > 0 && this.context.Peek() is Attribute)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        //method tocheck if element is root(if yes then we are ending paragraph)
-        private bool IsRoot(object element)
-        {
-            if (element is string)
-            {
-                string text = (string)element;
-                if ("root".Equals(text))
-                {
-                    return true;
-                }
-                return false;
-            }
-            return false;
+            return (this._currentStyleNode.Count > 0 && this._currentStyleNode.Peek().Name.Equals("style"));
         }
 
         private void WriteParagraph(Element element, bool bCutOneTime)
@@ -281,6 +233,7 @@ namespace OdfConverter.Wordprocessing
             else
             {
                 //if text in paragraph has more than 65535 characters, then the paragraph must be split
+                // NOTE: This is a workaround for OpenOffice.org versions before 3.0 
                 if (textChild.Length > 65535)
                 {
                     Element nextElement = new Element(element.Prefix, element.Name, element.Ns);
@@ -448,49 +401,53 @@ namespace OdfConverter.Wordprocessing
             return false;
         }
 
-        //Cut the paragraph in two parts with the element flag PCUT_NAMESPACE
+        //Split the paragraph in two paragraphs (triggered by an element in the PCUT_NAMESPACE)
         private void CutParagraph(Element element, bool bCutOneTime)
         {
             Element textParagraphElement = element.GetChild("paragraph", element.Ns);
             Element nextElement = new Element(element.Prefix, element.Name, element.Ns);
-            ArrayList children = (ArrayList)element.Children.Clone();
-            bool bMoveChild = false;
+            
+            ArrayList childrenFirstPart = new ArrayList();
+            ArrayList childrenSecondPart = new ArrayList();
 
-            foreach (Object child in children)
+            ArrayList children = childrenFirstPart;
+
+            foreach (Object child in element.Children)
             {
-                if (child is Element)
+                Element childElement = child as Element;
+                if (childElement != null && childElement.Ns == PCUT_NAMESPACE)
                 {
-                    Element childElement = (Element)child;
-                    if (childElement.Ns == PCUT_NAMESPACE && !bMoveChild)
-                    {
-                        bMoveChild = true;
-                        element.RemoveChild(child);
-                    }
-                    else if (bMoveChild)
-                    {
-                        element.RemoveChild(child);
-                        nextElement.AddChild(child);
-                    }
+                    children = childrenSecondPart;
                 }
-                else if (bMoveChild)
+                else
                 {
-                    element.RemoveChild(child);
-                    nextElement.AddChild(child);
+                    children.Add(child);
                 }
             }
+            element.Children = childrenFirstPart;
+            nextElement.Children = childrenSecondPart;
 
-            element.RemoveChild(textParagraphElement);
             foreach (Attribute attribute in element.Attributes)
             {
                 if (attribute.Ns == TEXT_NAMESPACE && attribute.Name == "style-name")
                 {
                     Attribute newAttribute = new Attribute(attribute.Prefix, attribute.Name, attribute.Ns);
-                    if (!bCutOneTime) newAttribute.Value = attribute.Value + EXTENSION_STYLE;
-                    else newAttribute.Value = attribute.Value;
+                    if (!bCutOneTime)
+                    {
+                        newAttribute.Value = attribute.Value + EXTENSION_STYLE;
+                    }
+                    else
+                    {
+                        newAttribute.Value = attribute.Value;
+                    }
                     nextElement.AddAttribute(newAttribute);
                 }
-                else nextElement.AddAttribute(attribute);
+                else
+                {
+                    nextElement.AddAttribute(attribute);
+                }
             }
+            element.RemoveChild(textParagraphElement);
             RemoveAllTextParagraphChildren(element);
             element.Write(this.nextWriter);
             nextElement.AddChild(textParagraphElement);
@@ -512,18 +469,19 @@ namespace OdfConverter.Wordprocessing
                     Element childElement = (Element)child;
                     if (childElement.Name == "paragraph-properties")
                     {
-                        Attribute AttributeToDelete = new Attribute("pcut", "pcut", PCUT_NAMESPACE);
+                        Attribute attributeToDelete = null;
                         foreach (Attribute attribute in childElement.Attributes)
                         {
                             if (attribute.Ns == PCUT_NAMESPACE)
                             {
                                 bHaveCutNameSpace = true;
-                                AttributeToDelete = (Attribute)attribute;
+                                attributeToDelete = (Attribute)attribute;
+                                break;
                             }
                         }
-                        if (bHaveCutNameSpace)
+                        if (attributeToDelete != null)
                         {
-                            childElement.RemoveAttribute(AttributeToDelete);
+                            childElement.RemoveAttribute(attributeToDelete);
                         }
                     }
                 }
