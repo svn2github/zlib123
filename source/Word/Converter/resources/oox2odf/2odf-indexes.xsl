@@ -905,14 +905,13 @@
     <xsl:param name="node" />
     <xsl:param name="instrTextContent" />
     <xsl:param name="type" />
+    
     <xsl:variable name="styleLevel">
       <xsl:choose>
         <xsl:when test="contains($instrTextContent,'\t')">
           <xsl:variable name="levelForStyle">
             <xsl:call-template name="GetStyleForLevel">
-              <xsl:with-param name="stylesWithLevels">
-                <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')" />
-              </xsl:with-param>
+              <xsl:with-param name="stylesWithLevels" select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')" />
               <xsl:with-param name="level" select="$level" />
             </xsl:call-template>
           </xsl:variable>
@@ -953,8 +952,8 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:if test="$count &gt; 0">
-
       <xsl:choose>
         <xsl:when test="$type='INDEXA'">
           <xsl:if test="contains($instrText, '\h') and not(contains($instrText, '\c'))">
@@ -1024,7 +1023,7 @@
 
         </xsl:when>
         <xsl:otherwise>
-          <xsl:for-each select="following-sibling::w:p[1][w:r/@oox:f]">
+          <xsl:for-each select="following-sibling::w:p[1][w:r/@oox:f or w:hyperlink/w:r/@oox:f]">
             <xsl:call-template name="EntryIterator">
               <xsl:with-param name="fieldCharCount" select="$count" />
               <xsl:with-param name="level" select="$level" />
@@ -1055,8 +1054,8 @@
           <xsl:with-param name="TOCMODE">true</xsl:with-param>
         </xsl:apply-templates>
         <text:index-entry-text />
-        <xsl:apply-templates select="$ParagraphPropertiesTabs[@w:val='right'][number(last())]" mode="TOCentry">
-        </xsl:apply-templates>
+        <xsl:apply-templates select="$ParagraphPropertiesTabs[@w:val='right'][number(last())]" mode="TOCentry" />
+        
         <text:index-entry-page-number />
         <xsl:if test="contains($instrText,'\h') and not(contains($instrText, '\c'))">
           <text:index-entry-link-end />
