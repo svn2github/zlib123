@@ -45,6 +45,21 @@
       }
       
       ///<summary>
+      /// Convert alphanumeric bookmark ids to numeric ids
+      ///</summary>
+      System.Collections.Generic.Dictionary<string, int> bookmarkIds = new System.Collections.Generic.Dictionary<string, int>();
+      public string GetBookmarkId(string id)
+      {
+          string result = id;
+          if (!bookmarkIds.ContainsKey(id))
+          {
+              bookmarkIds[id] = bookmarkIds.Count + 1;
+          }
+          return bookmarkIds[id].ToString();
+      }
+
+            
+      ///<summary>
       /// Convert various length units to twips (twentieths of a point)
       ///</summary>
       public int TwipsFromMeasuredUnit(string measuredUnit)

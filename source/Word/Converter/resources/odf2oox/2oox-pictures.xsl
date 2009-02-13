@@ -353,7 +353,7 @@
           <pic:blipFill>
             <a:blip>
               <xsl:choose>
-                <xsl:when test="draw:image[ooc:IsUriAbsolute(@xlink:href) and not(starts-with(@xlink:href, '../'))]">
+                <xsl:when test="draw:image[ooc:IsUriRelative(@xlink:href) and not(starts-with(@xlink:href, '../'))]">
                   <xsl:attribute name="r:embed">
                     <xsl:value-of select="generate-id(draw:image)"/>
                   </xsl:attribute>
@@ -365,12 +365,10 @@
                 </xsl:otherwise>
               </xsl:choose>
             </a:blip>
-            <xsl:if
-              test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip">
+            <xsl:if test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip">
               <xsl:message terminate="no">translation.odf2oox.croppedImage</xsl:message>
               <xsl:call-template name="InsertImageCropProperties">
-                <xsl:with-param name="clip"
-                  select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip" />
+                <xsl:with-param name="clip" select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip" />
               </xsl:call-template>
             </xsl:if>
             <a:stretch>

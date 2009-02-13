@@ -1396,10 +1396,10 @@
             <w:right w:type="dxa" w:w="{$padding}" />
           </xsl:when>
           <xsl:otherwise>
-            <w:top w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-top)" />
-            <w:left w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-left)" />
-            <w:bottom w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-bottom)" />
-            <w:right w:type="dxa" w:w="ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-right)" />
+            <w:top w:type="dxa" w:w="{ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-top)}" />
+            <w:left w:type="dxa" w:w="{ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-left)}" />
+            <w:bottom w:type="dxa" w:w="{ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-bottom)}" />
+            <w:right w:type="dxa" w:w="{ooc:TwipsFromMeasuredUnit($cellProp/@fo:padding-right)}" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>

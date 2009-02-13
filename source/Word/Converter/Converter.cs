@@ -92,8 +92,9 @@ namespace OdfConverter.Wordprocessing
                    "OdfConverter.Wordprocessing.OoxAutomaticStylesPostProcessor,"+fullname,
                    "OdfConverter.Wordprocessing.OoxParagraphsPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor", 
-                   "OdfConverter.Wordprocessing.OoxReplacementPostProcessor,"+fullname
+                   
                 };
+                // "OdfConverter.Wordprocessing.OoxReplacementPostProcessor,"+fullname
             }
         }
 

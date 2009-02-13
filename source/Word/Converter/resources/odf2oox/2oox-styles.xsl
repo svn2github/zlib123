@@ -28,6 +28,12 @@
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+	xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:w10="urn:schemas-microsoft-com:office:word"
+  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -42,8 +48,7 @@
 
   <xsl:variable name="asianLayoutId">1</xsl:variable>
   <!-- default language of the document -->
-  <xsl:variable name="default-language"
-    select="document('meta.xml')/office:document-meta/office:meta/dc:language"/>
+  <xsl:variable name="default-language" select="document('meta.xml')/office:document-meta/office:meta/dc:language"/>
 
   <!-- keys definition -->
   <xsl:key name="styles" match="style:style" use="@style:name"/>

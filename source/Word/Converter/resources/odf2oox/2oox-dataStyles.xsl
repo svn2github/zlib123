@@ -32,7 +32,8 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="style text office number">
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="style text office number ooc">
 
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
 
@@ -580,13 +581,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="bookmarkID">
-      <xsl:call-template name="GenerateBookmarkId">
-        <xsl:with-param name="TextName">
-          <xsl:value-of select="@text:name"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
+    
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
@@ -596,14 +591,14 @@
     <w:r>
       <w:fldChar w:fldCharType="seperate"/>
     </w:r>
-    <w:bookmarkStart w:id="{bookmarkID}" w:name="{$varName}" />
+    <w:bookmarkStart w:id="{ooc:GetBookmarkId(@text:name)}" w:name="{$varName}" />
     <w:r>
       <xsl:call-template name="InsertRunProperties"/>
       <w:t>
         <xsl:value-of select="$varValue"/>
       </w:t>
     </w:r>
-    <w:bookmarkEnd w:id="{bookmarkID}"/>
+    <w:bookmarkEnd w:id="{ooc:GetBookmarkId(@text:name)}"/>
     <w:r>
       <w:fldChar w:fldCharType="end"/>
     </w:r>

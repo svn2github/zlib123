@@ -34,7 +34,8 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="text fo style office draw xlink">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="text fo style office draw xlink ooc">
 
 	<!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->
 	<!--<xsl:strip-space elements="*"/>
@@ -54,14 +55,7 @@
 
   <!-- Insert BookmarkStart or ReferenceMarkStart-->
   <xsl:template match="text:bookmark-start | text:reference-mark-start | text:bookmark" mode="paragraph">
-    <w:bookmarkStart>
-      <xsl:attribute name="w:id">
-        <xsl:call-template name="GenerateBookmarkId">
-          <xsl:with-param name="TextName">
-            <xsl:value-of select="@text:name"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
+    <w:bookmarkStart w:id="{ooc:GetBookmarkId(@text:name)}">
       <xsl:attribute name="w:name">
         <xsl:call-template name="SuppressForbiddenChars">
           <xsl:with-param name="string" select="@text:name"/>
@@ -69,29 +63,13 @@
       </xsl:attribute>
     </w:bookmarkStart>
     <xsl:if test="text:bookmark">
-      <w:bookmarkEnd>
-        <xsl:attribute name="w:id">
-          <xsl:call-template name="GenerateBookmarkId">
-            <xsl:with-param name="TextName">
-              <xsl:value-of select="@text:name"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:bookmarkEnd>
+      <w:bookmarkEnd w:id="{ooc:GetBookmarkId(@text:name)}" />
     </xsl:if>
   </xsl:template>
 
   <!-- Insert BookmarkEnd -->
   <xsl:template match="text:bookmark-end | text:reference-mark-end" mode="paragraph">
-    <w:bookmarkEnd>
-      <xsl:attribute name="w:id">
-        <xsl:call-template name="GenerateBookmarkId">
-          <xsl:with-param name="TextName">
-            <xsl:value-of select="@text:name"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </w:bookmarkEnd>
+    <w:bookmarkEnd w:id="{ooc:GetBookmarkId(@text:name)}" />
   </xsl:template>
 
   <!-- Insert Cross References (Bookmark) -->
@@ -322,16 +300,6 @@
   </xsl:template>
 
 
-  <!-- Insert BookmarkStart Id or BookmarkEnd Id -->
-  <xsl:template name="GenerateBookmarkId">
-    <xsl:param name="TextName"/>
-    <xsl:variable name="ReferenceMarkStart" select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )" />
-    <xsl:variable name="BookmarkStart" select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)" />
-    <xsl:variable name="Bookmark" select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark)" />
-    
-    <xsl:value-of select="$ReferenceMarkStart+$BookmarkStart+$Bookmark"/>
-  </xsl:template>
-
   <!-- insert reference field -->
   <xsl:template name="InsertCrossReferences">
     <xsl:param name="TextName"/>
@@ -375,7 +343,7 @@
     <xsl:param name="linkNr"/>
     <xsl:param name="tocId"/>
     
-    <w:bookmarkStart w:id="{concat('urn:odf-converter:replace:bookmarkid:', $tocId, $linkNr)}"
+    <w:bookmarkStart w:id="{ooc:GetBookmarkId(concat($tocId, $linkNr))}"
                      w:name="{concat('Toc_', $tocId, '_', $linkNr)}" />
   </xsl:template>
 
@@ -384,7 +352,7 @@
     <xsl:param name="linkNr"/>
     <xsl:param name="tocId"/>
 
-    <w:bookmarkEnd w:id="{concat('urn:odf-converter:replace:bookmarkid:', $tocId, $linkNr)}" />
+    <w:bookmarkEnd w:id="{ooc:GetBookmarkId(concat($tocId, $linkNr))}" />
   </xsl:template>
 
   <!-- checks if element has style or element used to generate TOC -->

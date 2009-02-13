@@ -60,7 +60,6 @@
     <Compile Include="OdfParagraphPostProcessor.cs" />
     <Compile Include="OdfStyleNameGenerator.cs" />
     <Compile Include="OoxDefaultStyleVisibility.cs" />
-    <Compile Include="OoxReplacementPostProcessor.cs" />
     <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
     <Compile Include="OoxChangeTrackingPostProcessor.cs" />
     <Compile Include="OoxParagraphsPostProcessor.cs" />
