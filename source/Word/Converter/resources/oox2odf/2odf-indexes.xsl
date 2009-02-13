@@ -878,9 +878,7 @@
     <!--math: Added for bugfix #1934315 START-->
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name="CheckDefaultTOCStyle">
-        <xsl:with-param name="name">
-          <xsl:value-of select="$styleValue" />
-        </xsl:with-param>
+        <xsl:with-param name="name" select="$styleValue" />
       </xsl:call-template>
     </xsl:variable>
     <!--math: Added for bugfix #1934315 END-->

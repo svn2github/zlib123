@@ -414,8 +414,7 @@
   <!-- fonts -->
   <xsl:template match="w:rFonts" mode="rPrChildren">
     <xsl:choose>
-      <xsl:when
-			  test="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']/w:rPr/w:rFonts/@w:ascii">
+      <xsl:when test="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']/w:rPr/w:rFonts/@w:ascii">
         <xsl:attribute name="style:font-name">
           <xsl:value-of select="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']/w:rPr/w:rFonts/@w:ascii" />
         </xsl:attribute>
@@ -650,18 +649,6 @@
                   <xsl:value-of select="w:basedOn/@w:val"/>
                 </xsl:with-param>
               </xsl:call-template>
-              <!--<xsl:choose>
-                <xsl:when test ="$isParentDefaultTOCStyle='true'">
-                  <xsl:variable name ="parentStyle">
-                    <xsl:value-of select ="w:basedOn/@w:val"/>
-                  </xsl:variable>
-                  <xsl:value-of select="concat('Contents_20_',substring-after($parentStyle,'TOC'))" />                  
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="w:basedOn/@w:val"/>
-                </xsl:otherwise>
-              </xsl:choose>-->
-              <!--math: Added for bugfix #1934315 END-->
             </xsl:attribute>
           </xsl:if>
           <xsl:call-template name="InsertStyleProperties"/>
@@ -686,12 +673,20 @@
           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn/@w:val != '' ">
             <xsl:attribute name="style:parent-style-name">
-              <xsl:value-of select="ooc:NCNameFromString(w:basedOn/@w:val)"/>
+              <xsl:call-template name="TocToContent">
+                <xsl:with-param name="styleValue">
+                  <xsl:value-of select="w:basedOn/@w:val"/>
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:attribute>
           </xsl:if>
           <xsl:if test="w:next/@w:val != '' ">
             <xsl:attribute name="style:next-style-name">
-              <xsl:value-of select="ooc:NCNameFromString(w:next/@w:val)"/>
+              <xsl:call-template name="TocToContent">
+                <xsl:with-param name="styleValue">
+                  <xsl:value-of select="w:next/@w:val"/>
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:attribute>
           </xsl:if>
 
@@ -1073,10 +1068,10 @@
               </xsl:when>
               <xsl:otherwise>
                 <!-- insert attributes using match -->
-                <xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">
+                <!--<xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">-->
                   <xsl:apply-templates select="." mode="rPrChildren"/>
                   <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
-                </xsl:if>
+                <!--</xsl:if>-->
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
@@ -1156,12 +1151,12 @@
               </xsl:when>
               <xsl:otherwise>
                 <!-- insert attributes using match -->
-                <xsl:if test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
-                  <xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">
+                <!--<xsl:if test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
+                  <xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">-->
                     <xsl:apply-templates select="." mode="rPrChildren"/>
                     <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
-                  </xsl:if>
-                </xsl:if>
+                  <!--</xsl:if>
+                </xsl:if>-->
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
@@ -2815,51 +2810,6 @@
       <xsl:otherwise>false</xsl:otherwise>
     </xsl:choose>
 
-    <!--<xsl:choose>
-
-      -->
-    <!--math, dialogika: changed for correct indentation calculation BEGIN -->
-    <!--
-
-      -->
-    <!--<xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">-->
-    <!--
-      <xsl:when test="w:numPr/w:numId/@w:val">
-        <xsl:text>true</xsl:text>
-      </xsl:when>
-
-      -->
-    <!--<xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
-    <!--
-      <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
-        <xsl:text>true</xsl:text>
-      </xsl:when>
-
-      <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
-        <xsl:text>true</xsl:text>
-      </xsl:when>
-
-      -->
-    <!--<xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
-    <!--
-      <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val">
-        <xsl:text>true</xsl:text>
-      </xsl:when>
-
-      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val">
-        <xsl:call-template name="CheckIfList">
-          <xsl:with-param name ="StyleId" select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val"/>
-        </xsl:call-template>
-      </xsl:when>
-      -->
-    <!--math, dialogika: changed for correct indentation calculation END -->
-    <!--
-
-      <xsl:otherwise>
-        <xsl:text>false</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>-->
-
   </xsl:template>
 
   <!--math, dialogika: changed for correct indentation calculation END -->
@@ -3555,9 +3505,7 @@
       <xsl:otherwise>
         <xsl:for-each select="key('Part', 'word/styles.xml')">
           <xsl:call-template name="getStyleTextInd">
-            <xsl:with-param name="StyleId">
-              <xsl:value-of select="$StyleId" />
-            </xsl:with-param>
+            <xsl:with-param name="StyleId" select="$StyleId" />
           </xsl:call-template>
         </xsl:for-each>
       </xsl:otherwise>
@@ -3674,11 +3622,8 @@
           <xsl:value-of select="number(w:ind/@w:hanging)"/>
         </xsl:when>
         <!-- Automatic styles should not duplicate the inherited fo:text-indent property  -->
-        <xsl:when
-				  test="key('StyleId', $StyleId)/w:pPr/w:ind/@w:hanging != ''">
-          <xsl:value-of
-					  select="key('StyleId', $StyleId)/w:pPr/w:ind/@w:hanging"
-          />
+        <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:ind/@w:hanging != ''">
+          <xsl:value-of select="key('StyleId', $StyleId)/w:pPr/w:ind/@w:hanging" />
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
@@ -3691,9 +3636,7 @@
     <xsl:variable name="TextIndent">
       <xsl:variable name="TextIndentTemp">
         <xsl:call-template name="CalculateTextIndent">
-          <xsl:with-param name="StyleId">
-            <xsl:value-of select="$StyleId"/>
-          </xsl:with-param>
+          <xsl:with-param name="StyleId" select="$StyleId"/>
         </xsl:call-template>
       </xsl:variable>
 
@@ -3853,8 +3796,7 @@
     <!-- tab-stops -->
     <xsl:call-template name="InsertParagraphTabStops">
       <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
-      <xsl:with-param name="parentStyleId" select="w:pStyle/@w:val|parent::w:style/w:basedOn/@w:val"
-      />
+      <xsl:with-param name="parentStyleId" select="w:pStyle/@w:val|parent::w:style/w:basedOn/@w:val" />
     </xsl:call-template>
 
     <!-- drop cap properties -->
