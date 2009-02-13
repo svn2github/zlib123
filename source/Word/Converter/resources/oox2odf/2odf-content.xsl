@@ -49,7 +49,7 @@
   xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:oox="urn:oox"
   xmlns:ooc="urn:odf-converter"
-  exclude-result-prefixes="w r rels pchar wp v o oox ooc pcut">
+  exclude-result-prefixes="w r rels pchar wp v o oox ooc">
 
   <xsl:import href="2odf-tables.xsl" />
   <xsl:import href="2odf-lists.xsl" />

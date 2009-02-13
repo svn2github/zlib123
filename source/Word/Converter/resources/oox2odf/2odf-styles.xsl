@@ -639,7 +639,7 @@
       <!--<xsl:when test="contains($currentStyleId,'TOC')">-->
       <xsl:when test="$isDefaultTOCStyle = 'true'">
         <style:style style:name="{ooc:NCNameFromString(concat('Contents ',substring-after($currentStyleId,'TOC')))}"
-                     style:display-name="{concat('Contents ',substring-after(self::node()/w:name/@w:val,'toc'))}">
+                     style:display-name="{concat('Contents ', ooc:Trim(substring-after(self::node()/w:name/@w:val,'toc')))}">
 
           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
