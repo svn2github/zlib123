@@ -34,7 +34,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:dc="http://purl.org/dc/elements/1.1/" 
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -46,7 +46,7 @@
   xmlns:w10="urn:schemas-microsoft-com:office:word"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:oox="urn:oox"
-  xmlns:ooc="urn:odf-converter"                
+  xmlns:ooc="urn:odf-converter"
   exclude-result-prefixes="a pic w r wp o rels v w10 oox ooc pzip">
 
   <!--
@@ -60,7 +60,8 @@
   <!-- Sona Added Dashed Border-->
   <!-- Shape constants-->
   <xsl:variable name="dot" select="'0.07'" />
-  <xsl:variable name="dash" select="'0.0579'" />  <!-- 0.282-->
+  <xsl:variable name="dash" select="'0.0579'" />
+  <!-- 0.282-->
   <xsl:variable name="longDash" select="'0.1300'" />
   <xsl:variable name="distance" select="'0.0508'" />
 
@@ -226,7 +227,7 @@
       </xsl:when >
       <!--Curved Connector-->
       <xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m,c@0,0@1,5400@1,10800@1,16200@2,21600,21600,21600e'"   >
-        <draw:connector draw:type="curve"  
+        <draw:connector draw:type="curve"
                         draw:text-style-name="P1"
                         draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
           <xsl:call-template name="InsertAnchorTypeAttribute" />
@@ -1281,7 +1282,7 @@
     <xsl:variable name="parentShape" select="parent::node()" />
     <xsl:variable name="gradientName" select="concat('Gradient_', generate-id(.))" />
     <xsl:variable name="focusValue" select="substring-before(@focus, '%')" />
-    
+
     <draw:gradient draw:name="{ooc:NCNameFromString($gradientName)}"
                    draw:display-name="{$gradientName}">
       <xsl:attribute name="draw:style">
@@ -1461,40 +1462,42 @@
   <xsl:template match="w:pict[not(o:OLEObject)]" mode="automaticpict">
     <xsl:variable name="vmlElement" select="v:shape | v:rect | v:line | v:group | v:oval | v:roundrect" />
 
-    <style:style style:family="graphic">
-      <!--Sona-->
-      <xsl:attribute name="style:name">
-        <xsl:choose>
-          <xsl:when test="$vmlElement[1]">
-            <!--added by chhavi-->
-            <xsl:value-of  select="ooc:NCNameFromString(concat($vmlElement[1]/@id,generate-id()))" />
-            <!--end here-->
-            <!--<xsl:value-of  select="v:shape/@id" />-->
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="ooc:NCNameFromString(generate-id($vmlElement))" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <!--code added by yeswanth.s : bug# 1838676-->
-      <xsl:if test="$vmlElement[1]/v:textbox">
-        <xsl:attribute name="style:parent-style-name">
-          <xsl:text>Frame</xsl:text>
+    <xsl:if test="$vmlElement[1]">
+      <style:style style:family="graphic">
+        <!--Sona-->
+        <xsl:attribute name="style:name">
+          <xsl:choose>
+            <xsl:when test="$vmlElement[1]">
+              <!--added by chhavi-->
+              <xsl:value-of  select="ooc:NCNameFromString(concat($vmlElement[1]/@id,generate-id()))" />
+              <!--end here-->
+              <!--<xsl:value-of  select="v:shape/@id" />-->
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="ooc:NCNameFromString(generate-id($vmlElement))" />
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
-      </xsl:if>
-      <!--end-->
-      <!--in Word there are no parent style for image - make default Graphics in OO -->
-      <!--<xsl:attribute name="style:parent-style-name">
+        <!--code added by yeswanth.s : bug# 1838676-->
+        <xsl:if test="$vmlElement[1]/v:textbox">
+          <xsl:attribute name="style:parent-style-name">
+            <xsl:text>Frame</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <!--end-->
+        <!--in Word there are no parent style for image - make default Graphics in OO -->
+        <!--<xsl:attribute name="style:parent-style-name">
         <xsl:text>Graphics</xsl:text>
         <xsl:value-of select="w:tblStyle/@w:val" />
       </xsl:attribute>-->
 
-      <style:graphic-properties>
-        <xsl:call-template name="InsertShapeStyleProperties">
-          <xsl:with-param name="shape" select="$vmlElement" />
-        </xsl:call-template>
-      </style:graphic-properties>
-    </style:style>
+        <style:graphic-properties>
+          <xsl:call-template name="InsertShapeStyleProperties">
+            <xsl:with-param name="shape" select="$vmlElement" />
+          </xsl:call-template>
+        </style:graphic-properties>
+      </style:style>
+    </xsl:if>
     <!-- Sona: #2014221 and Arrow Feature Continuation-->
     <!--<xsl:call-template name="getDashType">
 			<xsl:with-param name="shape" select="$vmlElement" />
@@ -1659,7 +1662,7 @@
   <!-- Sona: Template for gradient fill for frame-->
   <xsl:template name="InsertGradientFillForFrame">
     <xsl:param name="shape" />
-    
+
     <xsl:variable name="PicrelId" select="$shape/v:fill/@r:id" />
     <xsl:variable name="PicfileSource">
       <!-- divo:  TODO the original author didn't consider gradient fill in other parts than the main document -->
@@ -1667,8 +1670,8 @@
         <xsl:value-of select="." />
       </xsl:for-each>
     </xsl:variable>
-    <style:background-image xlink:type="simple" 
-                            xlink:show="embed" 
+    <style:background-image xlink:type="simple"
+                            xlink:show="embed"
                             xlink:actuate="onLoad"
                             xlink:href="{concat('Pictures',substring-after($PicfileSource,'media'))}">
       <xsl:if test="$shape/v:fill[@type='frame']">
@@ -1684,7 +1687,7 @@
   <!-- Sona Template for Arrow Styles-->
   <xsl:template name="InsertLineArrowTemplateAttributes">
     <xsl:param name="shape" />
-    
+
     <xsl:variable name="actualShape" select="v:shape | v:line" />
     <xsl:if test="$actualShape/v:stroke/@endarrow">
       <xsl:attribute name="draw:marker-end">
@@ -2301,7 +2304,7 @@
     <xsl:variable name="pos" select="ooc:ParseValueFromList($shape/@style, 'position')" />
     <xsl:variable name="horizontalPos" select="ooc:ParseValueFromList($shape/@style, 'mso-position-horizontal')" />
     <xsl:variable name="horizontalRel" select="ooc:ParseValueFromList($shape/@style, 'mso-position-horizontal-relative')" />
-    
+
     <xsl:choose>
       <xsl:when test="$shape/@o:hralign and $shape/@o:hr='t'">
         <xsl:call-template name="InsertGraphicPosH">
@@ -2469,7 +2472,7 @@
     <xsl:variable name="verticalRelative" select="ooc:ParseValueFromList($shape/@style, 'mso-position-vertical-relative')" />
     <xsl:variable name="horizontalPosition" select="ooc:ParseValueFromList($shape/@style, 'mso-position-horizontal')" />
     <xsl:variable name="verticalPosition" select="ooc:ParseValueFromList($shape/@style, 'mso-position-vertical')" />
-      
+
     <xsl:variable name="margin-top">
       <xsl:choose>
         <xsl:when test="$verticalRelative='page' and $verticalPosition='top'">
@@ -2722,7 +2725,7 @@
         </xsl:variable>
         <!--code added by yeswanth.s : For defect# 1836547-->
         <xsl:variable name="bWNoUnit" select="number(substring-before($borderWeight,'cm'))" />
-        
+
         <xsl:variable name="mappedBorderWeight">
           <xsl:choose>
             <xsl:when test="$lineStyle">
@@ -2879,7 +2882,7 @@
   <xsl:template name="getDashType">
     <xsl:param name="shape" />
     <xsl:variable name="val" select="$shape/v:stroke/@dashstyle" />
-    
+
     <xsl:variable name="cap">
       <xsl:choose>
         <xsl:when test="$shape/v:stroke/@endcap">
@@ -2967,7 +2970,7 @@
 
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="AddDashType">
     <xsl:param name="name" />
     <xsl:param name="cap" />
@@ -3425,7 +3428,7 @@
               <xsl:when test="$LeftPercent &gt; 0">
                 <xsl:value-of select="$HorizontalWidth * $LeftPercent div 1000" />
               </xsl:when>
-              
+
               <!-- Sona: Fixed Defect #1990593-->
               <xsl:when test="$shape[name()='v:rect' or name()='v:line']">
                 <xsl:choose>
@@ -3493,7 +3496,7 @@
           </xsl:variable>
 
           <xsl:value-of select="$x" />
-          
+
         </xsl:if>
       </xsl:variable>
       <xsl:if test="$posX !='' and not(contains($shape/@style,'rotation'))">
@@ -3645,7 +3648,7 @@
           </xsl:variable>
 
           <xsl:value-of select="$y" />
-          
+
         </xsl:if>
       </xsl:variable>
       <xsl:if test="$posY !='' and not(contains($shape/@style,'rotation'))">
@@ -3700,7 +3703,7 @@
         </xsl:attribute>
       </xsl:if>
 
-      
+
       <xsl:variable name="relativeWidth" select="ooc:ParseValueFromList($shape/@style, 'mso-left-percent')" />
 
       <xsl:variable name="horRelPos">
@@ -3835,7 +3838,7 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
-  
+
   <!--added by chhavi for alttext-->
   <xsl:template name="InsertAlternativeTextElement">
     <xsl:param name="shape" select="." />
@@ -3950,7 +3953,7 @@
         <xsl:with-param name="z-index" select="$z-index" />
       </xsl:call-template>
     </xsl:attribute>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertShapeStyleName">
@@ -4576,7 +4579,7 @@
 
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="emu-measure">
     <!-- @Private -->
     <!-- @Description: Convert to emu (1cm = 360000 emu) -->
