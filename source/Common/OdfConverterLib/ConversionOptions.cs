@@ -83,9 +83,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     public class ConversionOptions
     {
         private string _inputFullName = null;           // input path
-        private string _inputBaseFolder = null;           // the root path of the input document
+        private string _inputBaseFolder = null;         // the root path of the input document
         private string _outputFullName = null;          // output path
-        private string _outputBaseFolder = null;          // the root path for the output document
+        private string _outputBaseFolder = null;        // the root path for the output document
+        private string _inputFullNameOriginal = null;   // the full path to the original input file name (we might translate a temp copy)
         private bool _validate = false;                 // validate the result of the transformations
         private bool _recursiveMode = false;            // go in subfolders ?
         private bool _forceOverwrite = false;			// override existing files ?
@@ -184,6 +185,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             get { return _outputBaseFolder; }
             set { _outputBaseFolder = value; }
+        }
+
+        /// <summary>
+        /// The full path to the original file to be converted. 
+        /// 
+        /// This must be a valid filename of an existing file. 
+        /// 
+        /// If ConversionMode is set to <code>ConversionMode.Batch</code> this 
+        /// property must be set to a valid directory instead.
+        /// </summary>
+        public string InputFullNameOriginal
+        {
+            get { return _inputFullNameOriginal != null ? _inputFullNameOriginal : _inputFullName; }
+            set { _inputFullNameOriginal = value; }
         }
 
         /// <summary>

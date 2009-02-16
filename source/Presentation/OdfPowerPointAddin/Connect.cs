@@ -295,6 +295,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
 
                     ConversionOptions options = new ConversionOptions();
                     options.InputFullName = sourceFileName;
+                    options.InputFullNameOriginal = doc.GetString("FullName");
                     options.OutputFullName = odfFileName;
                     options.ConversionDirection = ConversionDirection.PptxToOdp;
                     options.Generator = this.GetGenerator();

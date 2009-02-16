@@ -5,6 +5,11 @@
     exclude-result-prefixes="msxsl ooc">
 
   <msxsl:script language="C#" implements-prefix="ooc">
+    <msxsl:using namespace="System"/>
+    <msxsl:using namespace="System.IO"/>
+    <msxsl:using namespace="System.Text.RegularExpressions"/>
+    <msxsl:using namespace="System.Collections.Generic"/>
+    
     <![CDATA[
       public string ToUpper(string input)
       {
@@ -26,16 +31,45 @@
           return input.Replace(oldValue, newValue);
       }
       
-      public bool IsUriAbsolute(string uri)
+      ///<summary>
+      /// Checks whether an URI points inside a package or outside
+      /// 
+      /// cf section 17.5 of ISO 26500:
+      ///
+      /// A relative-path reference (as described in §6.5 of [RFC3987]) that occurs in a file that is contained
+      /// in a package has to be resolved exactly as it would be resolved if the whole package gets
+      /// unzipped into a directory at its current location. The base IRI for resolving relative-path references
+      /// is the one that has to be used to retrieve the (unzipped) file that contains the relative-path
+      /// reference.
+      /// All other kinds of IRI references, namely the ones that start with a protocol (like http:), an authority
+      /// (i.e., //) or an absolute-path (i.e., /) do not need any special processing. This especially means that
+      /// absolute-paths do not reference files inside the package, but within the hierarchy the package is
+      /// contained in, for instance the file system. IRI references inside a package may leave the package,
+      /// but once they have left the package, they never can return into the package or another one.
+      ///</summary>
+      public bool IsUriExternal(string path)
       {
-          Uri tmp;
-          return Uri.TryCreate(uri, UriKind.Absolute, out tmp) || uri.StartsWith("/") || uri.Contains(":");
-      }
-
-      public bool IsUriRelative(string uri)
-      {
-          Uri tmp;
-          return Uri.TryCreate(uri, UriKind.Relative, out tmp) && !uri.StartsWith("/") && !uri.Contains(":");
+          Uri result = null;
+          
+          // remove leading slash on absolute local paths (OOo uses /C:/somefolder for local paths)
+          if (Regex.Match(path, "^/[A-Za-z]:").Success)
+          {
+              path = path.Substring(1);
+          }
+          
+          if (!Uri.TryCreate(path, UriKind.Absolute, out result))
+          {
+              // check whether relative URI points into package or outside
+              string uriBase = Path.Combine(Environment.CurrentDirectory, "dummy.odt");
+              string absolutePath = Path.GetFullPath(Path.Combine(uriBase, path));
+              
+              if (absolutePath.StartsWith(uriBase))
+              {
+                  // relative path inside the package
+                  return false;
+              }
+          }
+          return true;
       }
 
       public bool IsUriValid(string uri)
@@ -44,10 +78,42 @@
           return Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out tmp);
       }
       
+      public string UriFromPath(string path)
+      {
+          Uri result = null;
+          
+          // remove leading slash on absolute local paths (OOo uses /C:/somefolder for local paths)
+          if (Regex.Match(path, "^/[A-Za-z]:").Success)
+          {
+              path = path.Substring(1);
+          }
+          
+          if (!Uri.TryCreate(path, UriKind.Absolute, out result))
+          {
+              // check whether relative URI points into package or outside
+              string uriBase = Path.Combine(Environment.CurrentDirectory, "dummy.odt");
+              string absolutePath = Path.GetFullPath(Path.Combine(uriBase, path));
+              
+              if (absolutePath.StartsWith(uriBase))
+              {
+                  // relative path inside the package
+                  absolutePath = absolutePath.Substring(uriBase.Length);
+              }
+
+              if (!Uri.TryCreate(absolutePath, UriKind.RelativeOrAbsolute, out result))
+              {
+                  // documents with invalid URIs might not open so we replace the invalid URI with one that works -->
+                  return "/";
+                  //return path;
+              }
+          }
+          return result.ToString();
+      }
+      
       ///<summary>
       /// Convert alphanumeric bookmark ids to numeric ids
       ///</summary>
-      System.Collections.Generic.Dictionary<string, int> bookmarkIds = new System.Collections.Generic.Dictionary<string, int>();
+      Dictionary<string, int> bookmarkIds = new Dictionary<string, int>();
       public string GetBookmarkId(string id)
       {
           string result = id;

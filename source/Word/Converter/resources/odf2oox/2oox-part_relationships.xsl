@@ -184,24 +184,8 @@
       </xsl:variable>
 
       <xsl:choose>
-        <!-- external OLE in folder -->
-        <xsl:when test="substring-before(@xlink:href, '/')='..'">
-
-          <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-                        Id="{$oleId}"
-                        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
-                        Target="{concat('urn:odf-converter:makeWordPath#', @xlink:href)}"
-                        TargetMode="External" />
-
-          <xsl:call-template name="HandleOlePreview">
-            <xsl:with-param name="olePicture" select="$olePicture" />
-            <xsl:with-param name="olePictureId" select="$olePictureId" />
-            <xsl:with-param name="olePictureType" select="$olePictureType" />
-          </xsl:call-template>
-
-        </xsl:when>
         <!-- internal OLE -->
-        <xsl:when test="not(contains(@xlink:href, ':')) and not (starts-with(@xlink:href, '/') and not(starts-with(@xlink:href, '../')))">
+        <xsl:when test="not(ooc:IsUriExternal(@xlink:href))">
           <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
 
           <!-- 
@@ -229,12 +213,12 @@
 
         </xsl:when>
         <!-- external OLE on network or local drive -->
-        <xsl:when test="substring-before(@xlink:href, '/')='' or contains(@xlink:href, ':') or starts-with(@xlink:href, '../')">
+        <xsl:when test="ooc:IsUriExternal(@xlink:href)">
 
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                         Id="{$oleId}"
                         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
-                        Target="{@xlink:href}"
+                        Target="{ooc:UriFromPath(@xlink:href)}"
                         TargetMode="External" />
 
           <xsl:call-template name="HandleOlePreview">
@@ -331,26 +315,14 @@
       <xsl:if test="@xlink:href and $supported = 'true' ">
         <xsl:choose>
           <!-- External IRI (either contains a protocal such as http: or starts with a slash, or a relative IRI pointing outside the package) -->
-          <xsl:when test="contains(@xlink:href, ':') or starts-with(@xlink:href, '/') or starts-with(@xlink:href, '../')">
+          <xsl:when test="ooc:IsUriExternal(@xlink:href)">
             <!-- External image : If relative path, image may not be converted. -->
             <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                           Id="{generate-id(.)}"
                           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-                          TargetMode="External">
-              <xsl:attribute name="Target">
-                <xsl:choose>
-                  <!--<xsl:when test="starts-with(@xlink:href, './')">
-                    <xsl:value-of select="concat('../../', @xlink:href)" />
-                  </xsl:when>-->
-                  <xsl:when test="starts-with(@xlink:href, '/')">
-                    <xsl:value-of select="substring-after(@xlink:href, '/')" />
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="@xlink:href" />
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-            </Relationship>
+                          Target="{ooc:UriFromPath(@xlink:href)}"
+                          TargetMode="External" />
+
             <xsl:if test="ancestor::draw:a">
               <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                             Id="{generate-id(ancestor::draw:a)}"
@@ -379,31 +351,9 @@
               <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                             Id="{generate-id(ancestor::draw:a)}"
                             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-                            TargetMode="External">
-                <xsl:attribute name="Target">
-                  <xsl:choose>
-
-                    <!-- converting relative path -->
-                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '../')">
-                      <xsl:call-template name="HandlingSpaces">
-                        <xsl:with-param name="path" select="substring-after(ancestor::draw:a/@xlink:href,'../')" />
-                      </xsl:call-template>
-                    </xsl:when>
-
-                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '/')">
-                      <xsl:call-template name="HandlingSpaces">
-                        <xsl:with-param name="path" select="substring-after(ancestor::draw:a/@xlink:href,'/')" />
-                      </xsl:call-template>
-                    </xsl:when>
-
-                    <xsl:otherwise>
-                      <xsl:call-template name="HandlingSpaces">
-                        <xsl:with-param name="path" select="ancestor::draw:a/@xlink:href" />
-                      </xsl:call-template>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
-              </Relationship>
+                            Target="{ooc:UriFromPath(ancestor::draw:a/@xlink:href)}"
+                            TargetMode="External" />
+                
             </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
@@ -412,7 +362,7 @@
   </xsl:template>
 
   <!-- Replacing spaces in paths with %20 -->
-  <xsl:template name="HandlingSpaces">
+  <!--<xsl:template name="HandlingSpaces">
     <xsl:param name="path" />
     <xsl:choose>
       <xsl:when test="contains($path,' ')">
@@ -427,7 +377,7 @@
         <xsl:value-of select="$path" />
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
+  </xsl:template>-->
 
 
 
@@ -439,29 +389,8 @@
       <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                     Id="{generate-id()}"
                     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-                    TargetMode="External">
-        <xsl:attribute name="Target">
-          <xsl:choose>
-            <xsl:when test="not(ooc:IsUriValid(@xlink:href))">
-              <!-- document with invalid URIs won't open so we replace the invalid URI with one that works -->
-              <xsl:text>/</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains(@xlink:href, './')">
-              <xsl:variable name="substring" select="substring-after(@xlink:href, '../')" />
-              <xsl:choose>
-                <xsl:when test="string-length($substring) = 0">/</xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$substring" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:when>
-            <xsl:when test="string-length(@xlink:href) &gt; 0">
-              <xsl:value-of select="@xlink:href" />
-            </xsl:when>
-            <xsl:otherwise>/</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </Relationship>
+                    Target="{ooc:UriFromPath(@xlink:href)}"
+                    TargetMode="External" />
     </xsl:for-each>
   </xsl:template>
 

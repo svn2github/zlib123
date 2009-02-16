@@ -302,6 +302,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
 
                         ConversionOptions options = new ConversionOptions();
                         options.InputFullName = sourceFileName;
+                        options.InputFullNameOriginal = doc.GetString("FullName");
                         options.OutputFullName = odfFileName;
                         options.ConversionDirection = ConversionDirection.XlsxToOds;
                         options.Generator = this.GetGenerator();

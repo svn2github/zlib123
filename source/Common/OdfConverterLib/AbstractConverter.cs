@@ -357,6 +357,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             XmlReader source = null;
             XmlWriter writer = null;
             ZipResolver zipResolver = null;
+
+            string currentDirectory = Environment.CurrentDirectory;
            
             try
             {
@@ -364,19 +366,25 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 zipResolver = new ZipResolver(inputFile);
                 XsltArgumentList parameters = new XsltArgumentList();
                 parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
-                
+
+                if (options != null)
+                {
+                    // set working directory to the input document's path
+                    // that way we can resolve references to relative links into the file system easily
+                    Environment.CurrentDirectory = Path.GetDirectoryName(options.InputFullNameOriginal);
+
+                    parameters.AddParam("documentType", "", options.DocumentType.ToString());
+                    parameters.AddParam("generator", "", options.Generator);
+                }
+                else
+                {
+                    parameters.AddParam("generator", "", "OpenXML/ODF Translator");
+                }
+
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    if (options != null)
-                    {
-                        parameters.AddParam("documentType", "", options.DocumentType.ToString());
-                        parameters.AddParam("generator", "", options.Generator);
-                    }
-                    else
-                    {
-                        parameters.AddParam("generator", "", "OpenXML/ODF Translator");
-                    }
+                    
                     XmlWriter finalWriter;
                     if (this.packaging)
                     {
@@ -392,6 +400,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     writer = new XmlTextWriter(new StringWriter());
                 }
+                
                 source = this.Source(inputFile);
                 // Apply the transformation
                 
@@ -399,6 +408,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             finally
             {
+                // restore working folder
+                Environment.CurrentDirectory = currentDirectory;
+                
                 if (writer != null)
                     writer.Close();
                 if (source != null)

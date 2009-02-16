@@ -414,6 +414,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     ConversionOptions options = new ConversionOptions();
                     options.InputFullName = sourceFileName;
                     options.OutputFullName = odfFileName;
+                    options.InputFullNameOriginal = doc.GetString("FullName");
                     options.ConversionDirection = ConversionDirection.DocxToOdt;
                     options.Generator = this.GetGenerator();
                     options.DocumentType = Path.GetExtension(sourceFileName).ToUpper().Equals(".DOTX")

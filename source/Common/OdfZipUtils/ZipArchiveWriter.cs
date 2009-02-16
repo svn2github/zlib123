@@ -542,10 +542,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     }
 
                 }
-                else if (text.StartsWith("urn:odf-converter:makeWordPath#"))
-                {
-                    text = MakeWordPath(text);
-                }
                 else if (text.StartsWith("urn:odf-converter:makeOdfPath#"))
                 {
                     text = MakeOdfPath(text);
@@ -633,16 +629,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     //
                 }
             }
-        }
-
-        private string MakeWordPath(string text)
-        {
-            int pos = "urn:odf-converter:makeWordPath#".Length;
-            string relativePath = text.Remove(0, pos);
-            DirectoryInfo outputPath = new DirectoryInfo(this._outputFile);
-
-            string absolutePath = Path.GetFullPath(outputPath.FullName + relativePath).Replace(" ", "%20");
-            return "file:///" + absolutePath;
         }
 
         private string MakeOdfPath(string text)
