@@ -86,7 +86,7 @@
   Summary: Converts picture shapes
   Author: Clever Age
   -->
-  <xsl:template match="v:shape[v:imagedata]">
+  <xsl:template match="v:shape[v:imagedata/@r:id]">
     <draw:frame>
       <xsl:call-template name="InsertCommonShapeProperties">
         <xsl:with-param name="shape" select="." />
@@ -105,7 +105,7 @@
   Summary: inserts horizontal ruler as image
   Author: Clever Age
   -->
-  <xsl:template match="v:imagedata[not(../../o:OLEObject)]">
+  <xsl:template match="v:imagedata[not(../../o:OLEObject) and @r:id]">
     <xsl:variable name="document">
       <xsl:call-template name="GetDocumentName" />
     </xsl:variable>
@@ -1000,7 +1000,7 @@
         since it is causing the crash in ODT and also this feature is not compatible in ODT.-->
       <!--
       </xsl:when>-->
-      <xsl:when test="v:imagedata">
+      <xsl:when test="v:imagedata/@r:id">
         <xsl:variable name="document">
           <xsl:call-template name="GetDocumentName" />
         </xsl:variable>
@@ -1437,7 +1437,7 @@
   Summary: inserts horizontal ruler as image
   Author: Clever Age
   -->
-  <xsl:template match="v:imagedata[not(../../o:OLEObject)]">
+  <xsl:template match="v:imagedata[not(../../o:OLEObject) and @r:id]">
     <xsl:variable name="document">
       <xsl:call-template name="GetDocumentName" />
     </xsl:variable>
