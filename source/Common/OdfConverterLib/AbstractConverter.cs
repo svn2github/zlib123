@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -59,6 +59,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         //static varibale is used for getting temporary input file name
         public static string inputTempFileName;
         
+        //Added: By Vijayeta, 
+        //Date:  1/7/2009
+        //Desc:  Formula has absolute address(sheet2)
+        //File:  Define_Name_Formulas.ods
+        public static string inputFileName;
         /// <summary>
         /// Derived classed may return a precompiled stylesheet type.
         /// </summary>
@@ -315,6 +320,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 //Added by sonata -15/11/2007              
                 inputTempFileName = tempInputFile;
                 //End
+                //Added: By Vijayeta, 
+                //Date:  1/7/2009
+                //Desc:  Formula has absolute address(sheet2)
+                //File:  Define_Name_Formulas.ods
+
+                inputFileName = inputFile;
                 _Transform(tempInputFile, tempOutputFile, options);
 
                 if (outputFile != null)
