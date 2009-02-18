@@ -189,8 +189,12 @@
         <!-- i.e. $drawing = ../drawings/drawing2.xml -->
 
         <!-- finally insert entry for each chart -->
+		  <!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+		  <!--<xsl:for-each
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">-->
         <xsl:for-each
-          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr//xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+			  <!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->        
           <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.chart"
             manifest:full-path="{concat('Object ',generate-id(.),'/')}"/>
         </xsl:for-each>

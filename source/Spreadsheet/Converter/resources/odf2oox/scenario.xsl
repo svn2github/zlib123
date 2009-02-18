@@ -345,10 +345,22 @@
                     <xsl:value-of select="$rowNumber"/>
                 </xsl:with-param>
                 <xsl:with-param name="Repeat">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->					
                     <xsl:choose>
+                        <!--<xsl:when test="@table:number-rows-repeated">
+                            <xsl:value-of select="@table:number-rows-repeated"/>
+                        </xsl:when>-->
                         <xsl:when test="@table:number-rows-repeated">
+							<xsl:choose >
+								<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+									<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                             <xsl:value-of select="@table:number-rows-repeated"/>
                         </xsl:when>
+							</xsl:choose>
+						</xsl:when>
+						<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
                         <xsl:otherwise>
                             <xsl:text>1</xsl:text>
                         </xsl:otherwise>
@@ -377,8 +389,9 @@
         <xsl:choose>
             <!-- next row is a sibling -->
             <xsl:when test="following-sibling::node()[1][name() = 'table:table-row' ]">
+				<!--Vijayeta,SP2,@table:number-rows-repeated-->
                 <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="scenario">
-                    <xsl:with-param name="rowNumber">
+                    <!--<xsl:with-param name="rowNumber">
                         <xsl:choose>
                             <xsl:when test="@table:number-rows-repeated">
                                 <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
@@ -387,7 +400,25 @@
                                 <xsl:value-of select="$rowNumber+1"/>
                             </xsl:otherwise>
                         </xsl:choose>
+                    </xsl:with-param>-->
+                    <xsl:with-param name="rowNumber">
+                        <xsl:choose>
+                            <xsl:when test="@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+                                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+                            </xsl:when>
+								</xsl:choose>
+							</xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$rowNumber+1"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
                     <xsl:with-param name="cellNumber">
                         <xsl:text>0</xsl:text>
                     </xsl:with-param>
@@ -472,9 +503,18 @@
                 <xsl:with-param name="num" select="$colNumber - 1 "/>
             </xsl:call-template>
         </xsl:variable>
-
+		<!--Vijayeta,SP2,@table:number-columns-repeated-->
+		<xsl:variable name ="tableNumberColumnsRepeated">
+			<xsl:choose >
+				<xsl:when test ="@table:number-columns-repeated &gt; 256">
+					<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+				</xsl:when>
+				<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
         <xsl:choose>
-
             <xsl:when test="text:p">
                 <inputCells>
                     <xsl:attribute name="r">
@@ -485,9 +525,10 @@
                     </xsl:attribute>
                 </inputCells>
             </xsl:when>
-
+            <!--<xsl:when
+                test="$colNumber &lt; $startCol and $colNumber +  @table:number-columns-repeated &gt; $endCol">-->
             <xsl:when
-                test="$colNumber &lt; $startCol and $colNumber +  @table:number-columns-repeated &gt; $endCol">
+			   test="$colNumber &lt; $startCol and $colNumber +  $tableNumberColumnsRepeated &gt; $endCol">
                 <xsl:call-template name="InsertInputCels">
                     <xsl:with-param name="start">
                         <xsl:value-of select="$startCol"/>
@@ -501,14 +542,17 @@
                 </xsl:call-template>
             </xsl:when>
 
+            <!--<xsl:when
+                test="$colNumber &lt; $startCol and $startCol &lt;= $colNumber + @table:number-columns-repeated and $colNumber + @table:number-columns-repeated &lt; $endCol">-->
             <xsl:when
-                test="$colNumber &lt; $startCol and $startCol &lt;= $colNumber + @table:number-columns-repeated and $colNumber + @table:number-columns-repeated &lt; $endCol">
+                test="$colNumber &lt; $startCol and $startCol &lt;= $colNumber + $tableNumberColumnsRepeated and $colNumber + $tableNumberColumnsRepeated &lt; $endCol">
                 <xsl:call-template name="InsertInputCels">
                     <xsl:with-param name="start">
                         <xsl:value-of select="$startCol"/>
                     </xsl:with-param>
                     <xsl:with-param name="end">
-                        <xsl:value-of select="$colNumber + @table:number-columns-repeated - 1"/>
+                        <!--<xsl:value-of select="$colNumber + @table:number-columns-repeated - 1"/>-->
+						<xsl:value-of select="$colNumber + $tableNumberColumnsRepeated - 1"/>
                     </xsl:with-param>
                     <xsl:with-param name="rowNumber">
                         <xsl:value-of select="$rowNumber"/>
@@ -516,8 +560,10 @@
                 </xsl:call-template>
             </xsl:when>
 
+            <!--<xsl:when
+                test="$startCol &lt; $colNumber and $endCol &gt;= $colNumber and $colNumber + @table:number-columns-repeated &gt; $endCol">-->
             <xsl:when
-                test="$startCol &lt; $colNumber and $endCol &gt;= $colNumber and $colNumber + @table:number-columns-repeated &gt; $endCol">
+			   test="$startCol &lt; $colNumber and $endCol &gt;= $colNumber and $colNumber + $tableNumberColumnsRepeated &gt; $endCol">
 
                 <xsl:call-template name="InsertInputCels">
                     <xsl:with-param name="start">
@@ -532,15 +578,18 @@
                 </xsl:call-template>
             </xsl:when>
 
+            <!--<xsl:when
+                test="$colNumber &gt;= $startCol and $colNumber +  @table:number-columns-repeated &lt;= $endCol">-->
             <xsl:when
-                test="$colNumber &gt;= $startCol and $colNumber +  @table:number-columns-repeated &lt;= $endCol">
+                test="$colNumber &gt;= $startCol and $colNumber +  $tableNumberColumnsRepeated &lt;= $endCol">
 
                 <xsl:call-template name="InsertInputCels">
                     <xsl:with-param name="start">
                         <xsl:value-of select="$colNumber"/>
                     </xsl:with-param>
                     <xsl:with-param name="end">
-                        <xsl:value-of select="$colNumber +  @table:number-columns-repeated - 1"/>
+                        <!--<xsl:value-of select="$colNumber +  @table:number-columns-repeated - 1"/>-->
+						<xsl:value-of select="$colNumber +  $tableNumberColumnsRepeated - 1"/>
                     </xsl:with-param>
                     <xsl:with-param name="rowNumber">
                         <xsl:value-of select="$rowNumber"/>
@@ -558,9 +607,14 @@
                     mode="scenario">
                     <xsl:with-param name="colNumber">
                         <xsl:choose>
-                            <xsl:when test="@table:number-columns-repeated != ''">
+                            <!--<xsl:when test="@table:number-columns-repeated != ''">
                                 <xsl:value-of
                                     select="number($colNumber) + number(@table:number-columns-repeated)"
+                                />
+                            </xsl:when>-->
+							<xsl:when test="$tableNumberColumnsRepeated != ''">
+								<xsl:value-of
+                                    select="number($colNumber) + number($tableNumberColumnsRepeated)"
                                 />
                             </xsl:when>
                             <xsl:otherwise>
@@ -587,7 +641,7 @@
 
             </xsl:when>
         </xsl:choose>
-
+		<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     </xsl:template>
 
     <xsl:template name="InsertInputCels">

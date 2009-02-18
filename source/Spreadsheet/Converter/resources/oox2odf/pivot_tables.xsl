@@ -64,7 +64,6 @@
 
     <!-- get all sheet Id's -->
     <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-
       <xsl:variable name="sheet">
         <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
         <xsl:call-template name="GetTarget">
@@ -149,14 +148,40 @@
 				  </xsl:with-param>
 			  </xsl:call-template>
 		  </xsl:variable>
+				<xsl:variable name ="isSimpleSource">
+					<xsl:choose>
+						<xsl:when test ="substring-after($OneMoreValidation,'true|')='simpleSource'">
+							<xsl:value-of select ="'true'"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="'false'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
 				<xsl:variable name ="isNamedRange">
 					<xsl:choose>
-						<xsl:when test ="starts-with($OneMoreValidation,'true')">
-							<xsl:value-of select ="substring-after($OneMoreValidation,'true|')"/>
+						<xsl:when test ="starts-with($OneMoreValidation,'true') and $isSimpleSource='false'">
+							<xsl:value-of select ="substring-before(substring-after($OneMoreValidation,'true|'),'|')"/>
 						</xsl:when>
 						<xsl:when test ="starts-with($OneMoreValidation,'false')">
 							<xsl:value-of select ="''"/>
 						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="''"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name ="tblSheetName">
+					<xsl:choose>
+						<xsl:when test ="starts-with($OneMoreValidation,'true')and $isSimpleSource='false'">
+							<xsl:value-of select ="substring-after(substring-after($OneMoreValidation,'true|'),'|')"/>
+						</xsl:when>
+						<xsl:when test ="starts-with($OneMoreValidation,'false')">
+							<xsl:value-of select ="''"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="''"/>
+						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 		  <!-- Vijayeta, 1803593,sales.xlsx-->
@@ -173,7 +198,8 @@
             </xsl:variable>
 				  <!-- Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
 						<!--<xsl:if test ="$OneMoreValidation='true' and not(starts-with($isNamedRange,'OFFSET') or starts-with($isNamedRange,'offset'))">-->
-						<xsl:if test ="starts-with($OneMoreValidation,'true') and not(starts-with($isNamedRange,'OFFSET') or starts-with($isNamedRange,'offset') or contains($isNamedRange,'OFFSET') or contains($isNamedRange,'offset'))">
+						<xsl:if test ="starts-with($OneMoreValidation,'true') and ($isSimpleSource='true' or $isNamedRange!='' or $tblSheetName!='') and not(starts-with($isNamedRange,'OFFSET') or starts-with($isNamedRange,'offset') or contains($isNamedRange,'OFFSET') or contains($isNamedRange,'offset'))">
+							
             <table:data-pilot-table table:name="{$name}">
               <xsl:for-each select="e:location">
 
@@ -315,13 +341,13 @@
 																<xsl:value-of select ="concat('true:',$isNamedRange)"/>
 									</xsl:when>
 									<xsl:otherwise>
-										<xsl:variable name ="tblSheetName">
+																<!--<xsl:variable name ="tblSheetName">
 											<xsl:call-template name ="getTableRangeSheetName">
 												<xsl:with-param name ="tblName">
 													<xsl:value-of select ="@name"/>
 												</xsl:with-param>
 											</xsl:call-template>
-										</xsl:variable>
+																</xsl:variable>-->
 																<xsl:value-of select ="concat('false:',$tblSheetName)"/>
 									</xsl:otherwise>
 								</xsl:choose>
@@ -431,16 +457,19 @@
 														<xsl:value-of select ="$sourceRange"/>
 													</xsl:when>
 													<xsl:otherwise>
+														<xsl:if test="$lastSourceAdress!=''">
                     <xsl:call-template name="GetRowNum">
                       <xsl:with-param name="cell">
                         <xsl:value-of select="$lastSourceAdress"/>
                       </xsl:with-param>
                     </xsl:call-template>
+														</xsl:if>
 													</xsl:otherwise>
 
 												</xsl:choose>
 
                   </xsl:variable>
+
                   <!--
 										   * Defect Id       :1898488
 										   * Code Changed by :Vijayeta Tilak
@@ -1365,7 +1394,7 @@
 					<xsl:value-of select="substring-after(@ref,':')"/>
 				</xsl:variable>
 				<xsl:if test ="$sheetSourceName != '' and $firstSourceAdress!='' and $lastSourceAdress!='' ">
-					<xsl:value-of select ="'true'"/>
+								<xsl:value-of select ="concat('true|','simpleSource')"/>
 				</xsl:if>
 						</xsl:when>
 						<xsl:when test ="@name">
@@ -1376,52 +1405,50 @@
 		</xsl:for-each >
 	</xsl:variable>
 		<xsl:variable name ="isNamedRange">
+			<xsl:choose>
+				<xsl:when test ="substring-after($validate,'true|')='simpleSource'">
+					<xsl:value-of select ="''"/>
+				</xsl:when>
+				<xsl:otherwise>
 			<xsl:call-template name ="CheckIfNamedRange">
 				<xsl:with-param name ="name">
 					<xsl:value-of select ="substring-after($validate,'true|')"/>
 				</xsl:with-param>
 			</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>			
 		</xsl:variable>
-		<xsl:if test ="starts-with($validate,'true')">
-			<xsl:value-of select ="concat('true','|',$isNamedRange)"/>
-	</xsl:if>
-		<xsl:if test ="not(starts-with($validate,'true'))">
-		<xsl:value-of select ="'false'"/>
-	</xsl:if>
-</xsl:template>
-	<xsl:template name ="CheckIfNamedRange">
-		<xsl:param name ="name"/>
-		<xsl:for-each select="key('Part','xl/workbook.xml')//e:definedNames/e:definedName[@name=$name]">
-			<!--<xsl:variable name ="range">
-				<xsl:value-of select ="."/>
-			</xsl:variable>
-			<xsl:variable name ="sheetName">
-				<xsl:value-of select ="substring-before(substring-before($range,':'),'!')"/>
-			</xsl:variable>
-			<xsl:choose>
-				<xsl:when test ="substring-after($range,':')!=''">
-					<xsl:variable name ="part1">
-							<xsl:value-of select ="translate(substring-after(substring-before($range,':'),'!'),'!-$#():,.+','')"/>
-						</xsl:variable>
-						<xsl:variable name ="part2">
-							<xsl:variable name ="endRange">
-								<xsl:value-of select ="substring-after($range,':')"/>
-							</xsl:variable>
+		<xsl:variable name ="tblSheetName">
 							<xsl:choose>
-								<xsl:when test ="contains($endRange,'!')">
-									<xsl:value-of select ="translate(substring-after($endRange,'!'),'!-$#():,.+','')"/>
+				<xsl:when test ="substring-after($validate,'true|')!='simpleSource' and $isNamedRange=''">					
+					<xsl:call-template name ="getTableRangeSheetName">
+						<xsl:with-param name ="tblName">
+							<xsl:value-of select ="substring-after($validate,'true|')"/>
+						</xsl:with-param>
+					</xsl:call-template>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:value-of select ="translate($endRange,'!-$#():,.+','')"/>
+					<xsl:value-of select ="''"/>
 								</xsl:otherwise>	
 							</xsl:choose>
 						</xsl:variable>
-						<xsl:value-of select ="concat($part1,':',$part2,'|',$sheetName)"/>
+		<xsl:if test ="starts-with($validate,'true')">
+			<xsl:choose>
+				<xsl:when test ="substring-after($validate,'true|')='simpleSource'">
+					<xsl:value-of select ="concat('true|','simpleSource')"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select ="concat(translate(substring-after($range,'!'),'!-$#():,.+',''),'|',$sheetName)"/>
+					<xsl:value-of select ="concat('true','|',$isNamedRange,'|',$tblSheetName)"/>
 					</xsl:otherwise>
-			</xsl:choose>-->
+			</xsl:choose>			
+		</xsl:if>
+		<xsl:if test ="not(starts-with($validate,'true'))">
+			<xsl:value-of select ="'false'"/>
+		</xsl:if>		
+	</xsl:template>
+	<xsl:template name ="CheckIfNamedRange">
+		<xsl:param name ="name"/>
+		<xsl:for-each select="key('Part','xl/workbook.xml')//e:definedNames/e:definedName[@name=$name]">
 			<xsl:call-template name="translate-expression">
 				<xsl:with-param name="isRangeAddress" select="true()"/>
 				<xsl:with-param name="cell-row-pos" select="0"/>

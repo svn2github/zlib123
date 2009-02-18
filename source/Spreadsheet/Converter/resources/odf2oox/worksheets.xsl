@@ -1393,8 +1393,8 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 
   <xsl:template name="CountRows">
     <xsl:param name="value" select="0"/>
-
-    <xsl:variable name="rows">
+	  <!--Vijayeta,SP2,@table:number-rows-repeated-->
+    <!--<xsl:variable name="rows">
       <xsl:choose>
         <xsl:when test="@table:number-rows-repeated">
           <xsl:value-of select="@table:number-rows-repeated"/>
@@ -1403,8 +1403,25 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
           <xsl:text>1</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="rows">
+      <xsl:choose>
+        <xsl:when test="@table:number-rows-repeated">
+				  <xsl:choose >
+					  <xsl:when test ="@table:number-rows-repeated &gt; 65536">
+						  <xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+					  </xsl:when>
+					  <xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+          <xsl:value-of select="@table:number-rows-repeated"/>
+        </xsl:when>
+				  </xsl:choose>
+			  </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+	  <!--Vijayeta,SP2,@table:number-rows-repeated,End-->
     <xsl:choose>
       <xsl:when test="following-sibling::table:table-row[1]">
         <xsl:for-each select="following-sibling::table:table-row[1]">
@@ -1421,8 +1438,8 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 
   <xsl:template name="CountCols">
     <xsl:param name="value" select="0"/>
-
-    <xsl:variable name="cols">
+	  <!--Vijayeta,SP2,@table:number-columns-repeated-->
+    <!--<xsl:variable name="cols">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
           <xsl:value-of select="@table:number-columns-repeated"/>
@@ -1431,8 +1448,25 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
           <xsl:text>1</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="cols">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+				  <xsl:choose >
+					  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+						  <xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+					  </xsl:when>
+					  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
+          <xsl:value-of select="@table:number-columns-repeated"/>
+        </xsl:when>
+				  </xsl:choose>
+			  </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+	  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     <xsl:choose>
       <xsl:when test="following-sibling::table:table-column[1]">
         <xsl:for-each select="following-sibling::table:table-column[1]">
@@ -1666,16 +1700,33 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
     <xsl:param name="tableId"/>
     <xsl:param name="rowNumber" select="0"/>
     <xsl:param name="rowBreakes"/>
-
-    <xsl:variable name="rows">
+	  <!--Vijayeta,SP2,@table:number-rows-repeated-->
+    <!--<xsl:variable name="rows">
       <xsl:choose>
         <xsl:when test="@table:number-rows-repeated">
           <xsl:value-of select="@table:number-rows-repeated"/>
         </xsl:when>
         <xsl:otherwise>1</xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="rows">
+      <xsl:choose>
+        <xsl:when test="@table:number-rows-repeated">
+				  <xsl:choose >
+					  <xsl:when test ="@table:number-rows-repeated &gt; 65536">
+						  <xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+					  </xsl:when>
+					  <xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+          <xsl:value-of select="@table:number-rows-repeated"/>
+        </xsl:when>
+				  </xsl:choose>
+			  </xsl:when>
+			  <xsl:otherwise>
+				  <xsl:text>1</xsl:text>
+			  </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+	  <!--Vijayeta,SP2,@table:number-rows-repeated,End-->
     <xsl:variable name="breakes">
       <xsl:choose>
         <xsl:when
@@ -1687,10 +1738,27 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
           </xsl:if>
           <xsl:value-of select="$rowNumber"/>
 
-          <xsl:if test="@table:number-rows-repeated">
+          <!--<xsl:if test="@table:number-rows-repeated">
             <xsl:call-template name="InsertRepeatedManualRowBreake">
               <xsl:with-param name="reepeat">
                 <xsl:value-of select="@table:number-rows-repeated - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber + 1"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>-->
+          <xsl:if test="@table:number-rows-repeated">
+            <xsl:call-template name="InsertRepeatedManualRowBreake">
+              <xsl:with-param name="reepeat">
+						<xsl:choose >
+							<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+								<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated) - 1"/>
+							</xsl:when>
+							<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+                <xsl:value-of select="@table:number-rows-repeated - 1"/>
+							</xsl:when>
+						</xsl:choose>
               </xsl:with-param>
               <xsl:with-param name="rowNumber">
                 <xsl:value-of select="$rowNumber + 1"/>
@@ -1766,17 +1834,45 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
     <xsl:param name="tableId"/>
     <xsl:param name="colNumber" select="0"/>
     <xsl:param name="colBreakes"/>
-
-    <xsl:variable name="cols">
+	  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
+    <!--<xsl:variable name="cols">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
           <xsl:value-of select="@table:number-columns-repeated"/>
         </xsl:when>
         <xsl:otherwise>1</xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="cols">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+				  <xsl:choose >
+					  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+						  <xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+					  </xsl:when>
+					  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
+          <xsl:value-of select="@table:number-columns-repeated"/>
+        </xsl:when>
+				  </xsl:choose>
+			  </xsl:when>
+			  <xsl:otherwise>
+				  <xsl:text>1</xsl:text>
+			  </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
+	  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
 
     <xsl:variable name="breakes">
+		<xsl:variable name ="tableNumberColumnsRepeated">
+			<xsl:choose >
+				<xsl:when test ="@table:number-columns-repeated &gt; 256">
+					<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+				</xsl:when>
+				<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
       <xsl:choose>
         <xsl:when
           test="key('style',@table:style-name)/style:table-column-properties/@fo:break-before='page' ">
@@ -1787,10 +1883,12 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
           </xsl:if>
           <xsl:value-of select="$colNumber"/>
 
-          <xsl:if test="@table:number-columns-repeated">
+          <!--<xsl:if test="@table:number-columns-repeated">-->
+			<xsl:if test="$tableNumberColumnsRepeated">
             <xsl:call-template name="InsertRepeatedManualColumnBreak">
               <xsl:with-param name="repeat">
-                <xsl:value-of select="@table:number-columns-repeated - 1"/>
+                <!--<xsl:value-of select="@table:number-columns-repeated - 1"/>-->
+				  <xsl:value-of select="$tableNumberColumnsRepeated - 1"/>
               </xsl:with-param>
               <xsl:with-param name="colNumber">
                 <xsl:value-of select="$colNumber + 1"/>

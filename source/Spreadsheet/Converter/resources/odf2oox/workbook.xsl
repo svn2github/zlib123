@@ -220,7 +220,13 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 			<xsl:for-each
 			  select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:database-ranges/table:database-range ">
 				<definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">
-					<xsl:variable name="rangeAddress">
+					<!--Changes By : Vijayeta
+						Date       : 28th Jan '09
+						Desc       : SP2,If @table:target-range-address does not contain ':'
+						File       : Uni_Chart_Privatization.ods
+					 -->
+					
+					<!--<xsl:variable name="rangeAddress">
 						<xsl:value-of select="@table:target-range-address"/>
 					</xsl:variable>
 					<xsl:variable name="partOne">
@@ -247,7 +253,48 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 						<xsl:value-of select="translate($partThree,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
 					</xsl:variable>
 					
+					<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>-->
+					<xsl:choose>
+						<xsl:when test ="contains(@table:target-range-address,':')">
+							<xsl:variable name="partOne">
+								<xsl:value-of select="substring-before(substring-before(@table:target-range-address,':'),'.')"/>
+							</xsl:variable>
+							<xsl:variable name="partTwo">
+								<xsl:value-of select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+							</xsl:variable>
+							<xsl:variable name="partThree">
+								<xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+							</xsl:variable>
+							<xsl:variable name="firstColValue">
+								<xsl:value-of select="translate($partTwo,'1234567890','')"/>
+							</xsl:variable>
+							<xsl:variable name="firstRowValue">
+								<xsl:value-of select="translate($partTwo,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
+							</xsl:variable>
+							<xsl:variable name="secondColValue">
+								<xsl:value-of select="translate($partThree,'1234567890','')"/>
+							</xsl:variable>
+							<xsl:variable name="secondRowValue">
+								<xsl:value-of select="translate($partThree,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
+							</xsl:variable>
 					<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="partOne">
+								<xsl:value-of select="substring-before(@table:target-range-address,'.')"/>
+							</xsl:variable>
+							<xsl:variable name="partTwo">
+								<xsl:value-of select="substring-after(@table:target-range-address,'.')"/>
+							</xsl:variable>
+							<xsl:variable name="firstColValue">
+								<xsl:value-of select="translate($partTwo,'1234567890','')"/>
+							</xsl:variable>
+							<xsl:variable name="firstRowValue">
+								<xsl:value-of select="translate($partTwo,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
+							</xsl:variable>
+							<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue)"/>
+						</xsl:otherwise>
+					</xsl:choose>					
 				</definedName>
 			</xsl:for-each>
 		<!--
@@ -259,7 +306,22 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 		<xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:named-expressions">
 			<xsl:for-each select ="child::node()">
 				<!--<xsl:if test ="not(contains(@table:name,'Excel_BuiltIn_Print_Area')) and not(contains(@table:name,'Excel_BuiltIn_Print_Titles_1 1'))  and @table:name!='C' and @table:name!='c' and @table:name!='R' and @table:name!='r' ">-->
-				<xsl:if test ="not(contains(@table:name,'Excel_BuiltIn_Print_Area')) and not(contains(@table:name,'Excel_BuiltIn_Print_Titles_1 1'))">
+				<xsl:variable name ="definedTableName">
+					<xsl:choose>
+						<xsl:when test ="contains(@table:name,'Excel_BuiltIn_Print_Area')">
+							<xsl:value-of select ="concat('_',position(),@table:name)"/>
+						</xsl:when>
+						<xsl:when test ="@table:name = 'C' or @table:name = 'c' or @table:name = 'R' or @table:name = 'r'">
+							<!--RefNo-2:Removed possition() from string:To replace named range C n R with _C n _R-->
+							<xsl:value-of select ="concat('_',@table:name)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="@table:name"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="not(contains(@table:name,'Excel_BuiltIn_Print_Area')) and not(contains(@table:name,'Excel_BuiltIn_Print_Titles_1 1')) and not(contains(@table:cell-range-address,'http://'))">
 					<xsl:variable name ="isFunction">
 						<xsl:choose>
 							<xsl:when test="name()='table:named-range'">
@@ -412,21 +474,7 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 					or (contains(@table:expression,'IF('))
 					or (contains(@table:expression,'OFFSET('))
                     or (contains(@table:expression,'NA('))))">
-						<definedName>
-							<xsl:variable name ="definedTableName">
-								<xsl:choose>
-									<xsl:when test ="contains(@table:name,'Excel_BuiltIn_Print_Area')">
-										<xsl:value-of select ="concat('_',position(),@table:name)"/>
-									</xsl:when>
-									<xsl:when test ="@table:name = 'C' or @table:name = 'c' or @table:name = 'R' or @table:name = 'r'">
-                    <!--RefNo-2:Removed possition() from string:To replace named range C n R with _C n _R-->
-                    <xsl:value-of select ="concat('_',@table:name)"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select ="@table:name"/>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:variable>
+						<definedName>						
 							<xsl:attribute name ="name">
 								<xsl:value-of select ="$definedTableName"/>
 							</xsl:attribute>
@@ -455,7 +503,44 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 							</xsl:choose>
 						</definedName>
 					</xsl:if>
+						</xsl:when>
+						<xsl:when test ="contains(@table:cell-range-address,'http://')">
+							<xsl:if test ="contains(@table:cell-range-address,'#')">
+								<xsl:variable name ="apos">
+									<xsl:text>&apos;</xsl:text>
+								</xsl:variable>
+								<xsl:variable name ="url">
+									<xsl:value-of select ="translate(substring-before(@table:cell-range-address,'#'),$apos,'')"/>
+								</xsl:variable>
+								<xsl:variable name ="fileName">
+									<xsl:call-template name ="getFileNameFromUrl">
+										<xsl:with-param name ="url" select ="substring-after($url,'http://')"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:variable name ="urlNoFileName">
+									<xsl:value-of select ="substring-before($url,$fileName)"/>
+								</xsl:variable>															
+								<xsl:variable name ="cellRange">
+									<xsl:value-of select ="substring-after(@table:cell-range-address,'#')"/>
+								</xsl:variable>
+								<definedName>
+									<xsl:attribute name ="name">
+										<xsl:value-of select ="$definedTableName"/>
+									</xsl:attribute>
+									<xsl:choose >
+										<xsl:when test ="contains($cellRange,':')">
+											<xsl:value-of select ="concat($apos,$urlNoFileName,'[',$fileName,']',concat(substring-before($cellRange,'.'),concat($apos,'!'),
+														  substring-before(substring-after($cellRange,'.'),':'),':',substring-after(substring-after($cellRange,':'),'.')))"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select ="concat($apos,$urlNoFileName,'[',$fileName,']',concat(substring-before($cellRange,'.'),concat($apos,'!'),substring-after($cellRange,'.')))"/>
+										</xsl:otherwise>
+									</xsl:choose>
+									
+								</definedName>
 				</xsl:if>
+						</xsl:when>
+					</xsl:choose>
 
 			</xsl:for-each>
 		</xsl:for-each>
@@ -1092,8 +1177,8 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 
   <xsl:template name="CountHeaderRowsStart">
     <xsl:param name="value" select="0"/>
-
-    <xsl:variable name="rows">
+		<!--Vijayeta,SP2,@table:number-rows-repeated-->
+		<!--<xsl:variable name="rows">
       <xsl:choose>
         <xsl:when test="@table:number-rows-repeated">
           <xsl:value-of select="@table:number-rows-repeated"/>
@@ -1102,8 +1187,25 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
           <xsl:text>1</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="rows">
+      <xsl:choose>
+        <xsl:when test="@table:number-rows-repeated">
+					<xsl:choose >
+						<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+							<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+          <xsl:value-of select="@table:number-rows-repeated"/>
+        </xsl:when>
+					</xsl:choose>
+				</xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+		<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
     <xsl:choose>
       <xsl:when test="name() = 'table:table-row' ">
         <xsl:for-each select="following-sibling::node()[1]">
@@ -1120,8 +1222,8 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 
   <xsl:template name="CountHeaderColsStart">
     <xsl:param name="value" select="0"/>
-
-    <xsl:variable name="cols">
+		<!--Vijayeta,SP2,@table:number-columns-repeated-->
+		<!--<xsl:variable name="cols">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
           <xsl:value-of select="@table:number-columns-repeated"/>
@@ -1130,8 +1232,25 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
           <xsl:text>1</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="cols">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+					<xsl:choose >
+						<xsl:when test ="@table:number-columns-repeated &gt; 256">
+							<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+          <xsl:value-of select="@table:number-columns-repeated"/>
+        </xsl:when>
+					</xsl:choose>
+				</xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+		<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     <xsl:choose>
       <xsl:when test="name() = 'table:table-column' ">
         <xsl:for-each select="following-sibling::node()[1]">
@@ -1211,7 +1330,8 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
       <!-- next row is a sibling -->
       <xsl:when test="following-sibling::table:table-row">
         <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="connection">
-          <xsl:with-param name="rowNumber">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="@table:number-rows-repeated">
                 <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
@@ -1220,7 +1340,25 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
                 <xsl:value-of select="$rowNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+              </xsl:when>
+								</xsl:choose>
+							</xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
           <xsl:with-param name="cellNumber">
             <xsl:text>0</xsl:text>
           </xsl:with-param>
@@ -1246,7 +1384,8 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
       <xsl:apply-templates
         select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]"
         mode="connection">
-        <xsl:with-param name="colNumber">
+				<!--Vijayeta,SP2,@table:number-columns-repeated-->
+				<!--<xsl:with-param name="colNumber">
           <xsl:choose>
             <xsl:when test="@table:number-columns-repeated != ''">
               <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
@@ -1255,7 +1394,26 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
               <xsl:value-of select="$colNumber + 1"/>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:with-param>-->
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated != ''">
+							<xsl:choose >
+								<xsl:when test ="@table:number-columns-repeated &gt; 256">
+									<xsl:value-of select ="number($colNumber) + number(256 - (16384 - number(@table:number-columns-repeated)))"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+									<xsl:value-of
+								select="number($colNumber) + number(@table:number-columns-repeated)"/>
+								</xsl:when>
+							</xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:with-param>
+				<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
         <xsl:with-param name="rowNumber">
           <xsl:value-of select="$rowNumber"/>
         </xsl:with-param>
@@ -1306,7 +1464,8 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
       <xsl:apply-templates
         select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]"
         mode="connection">
-        <xsl:with-param name="colNumber">
+				<!--Vijayeta,SP2,@table:number-columns-repeated-->
+				<!--<xsl:with-param name="colNumber">
           <xsl:choose>
             <xsl:when test="@table:number-columns-repeated != ''">
               <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
@@ -1315,7 +1474,26 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
               <xsl:value-of select="$colNumber + 1"/>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:with-param>-->
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated != ''">
+							<xsl:choose >
+								<xsl:when test ="@table:number-columns-repeated &gt; 256">
+									<xsl:value-of select ="number($colNumber) + number(256 - (16384 - number(@table:number-columns-repeated)))"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+									<xsl:value-of
+								select="number($colNumber) + number(@table:number-columns-repeated)"/>
+								</xsl:when>
+							</xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:with-param>
+				<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
         <xsl:with-param name="rowNumber">
           <xsl:value-of select="$rowNumber"/>
         </xsl:with-param>
@@ -1327,6 +1505,26 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
         </xsl:with-param>
       </xsl:apply-templates>
     </xsl:if>
+	</xsl:template>
+
+	<xsl:template name ="getFileNameFromUrl">
+		<xsl:param name ="url"/>
+		<xsl:variable name ="newUrl">
+			<xsl:value-of select ="$url"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test ="substring-after($newUrl,'/')!=''">
+				<xsl:call-template name ="getFileNameFromUrl">
+					<xsl:with-param name ="url">
+						<xsl:value-of select ="substring-after($newUrl,'/')"/>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select ="$newUrl"/>
+			</xsl:otherwise>
+		</xsl:choose>
+
 
   </xsl:template>
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -39,16 +39,31 @@
   <!-- Variable with Merge Style-->
   
   <xsl:template name="WriteMergeStyle">
-    
-        <xsl:variable name="rowNumber">
+		<!--Vijayeta,SP2,@table:number-rows-repeated-->
+		<!--<xsl:variable name="rowNumber">
           <xsl:choose>
             <xsl:when test="descendant::table:table-row[1]/@table:number-rows-repeated">
               <xsl:value-of select="descendant::table:table-row[1]/@table:number-rows-repeated"/>
             </xsl:when>
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>  
+        </xsl:variable>-->
+        <xsl:variable name="rowNumber">
+          <xsl:choose>
+            <xsl:when test="descendant::table:table-row[1]/@table:number-rows-repeated">
+					<xsl:choose >
+						<xsl:when test ="descendant::table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+							<xsl:value-of select ="65536 - (1048576 - descendant::table:table-row[1]/@table:number-rows-repeated)"/>
+						</xsl:when>
+						<xsl:when test ="descendant::table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+              <xsl:value-of select="descendant::table:table-row[1]/@table:number-rows-repeated"/>
+            </xsl:when>
+					</xsl:choose>
+				</xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>  
         </xsl:variable>
-        
+		<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         <xsl:apply-templates select="descendant::table:table-row[1]" mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:value-of select="$rowNumber"/>
@@ -100,7 +115,8 @@
 		    <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ])">-->
 		<xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] and following-sibling::node()[1][name() = 'table:table-row-group' ])">
         <xsl:apply-templates select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]" mode="mergestyle">
-          <xsl:with-param name="rowNumber">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
                 <xsl:value-of
@@ -111,14 +127,33 @@
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+					<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="following-sibling::table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber + 65536 - (1048576 - following-sibling::table:table-row[1]/@table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="following-sibling::table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+										<xsl:value-of select="$rowNumber + following-sibling::table:table-row[1]/@table:number-rows-repeated" />
+									</xsl:when>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber + 1"/>
+							</xsl:otherwise>
+						</xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
       <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ]">
         <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
           mode="mergestyle">
-          <xsl:with-param name="rowNumber">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when
                 test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
@@ -136,7 +171,37 @@
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+					<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when
+							  test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber + 65536 - (1048576 - following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+										<xsl:value-of select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"/>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:when
+							  test="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber + 65536 - (1048576 - following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+										<xsl:value-of select="$rowNumber + following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated" />
+									</xsl:when>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber + 1"/>
+							</xsl:otherwise>
+						</xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
@@ -144,7 +209,8 @@
         test="(parent::node()[name()='table:table-header-rows'] or parent::node()[name()='table:table-row-group']) and not(following-sibling::node()[1][name() = 'table:table-row' ])">
         <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
           mode="mergestyle">
-          <xsl:with-param name="rowNumber">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when
                 test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
@@ -156,7 +222,26 @@
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+					<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when
+							  test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber + 65536 - (1048576 - parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+										<xsl:value-of select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"/>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber + 1"/>
+							</xsl:otherwise>
+						</xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -171,7 +256,27 @@
     <!-- Merge Cell-->    
     <xsl:choose>
       <xsl:when test="@table:number-columns-spanned">
-        
+				<!--Vijayeta,SP2,@table:number-columns-spanned/@table:number-rows-spanned-->
+				<xsl:variable name ="tableNumberColumnsSpanned">
+					<xsl:choose >
+						<xsl:when test ="@table:number-columns-spanned &gt; 256">
+							<xsl:value-of select ="256 - (16384 - @table:number-columns-spanned)"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-columns-spanned &lt;= 256">
+							<xsl:value-of select="@table:number-columns-spanned"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name ="tableNumberRowsSpanned">
+					<xsl:choose >
+						<xsl:when test ="@table:number-rows-spanned &gt; 65536">
+							<xsl:value-of select ="65536 - (1048576 - @table:number-rows-spanned)"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-rows-spanned &lt;= 65536">
+							<xsl:value-of select="@table:number-rows-spanned"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
         
         <xsl:call-template name="InsertMergeStyle">
           <xsl:with-param name="rowNum">
@@ -180,17 +285,23 @@
           <xsl:with-param name="colNum">
             <xsl:value-of select="$colNumber - 1"/>
           </xsl:with-param>
-          <xsl:with-param name="rowNumEnd">
+					<!--<xsl:with-param name="rowNumEnd">
             <xsl:value-of select="$rowNumber + @table:number-rows-spanned - 1"/>
           </xsl:with-param>
           <xsl:with-param name="colNumEnd">
             <xsl:value-of select="$colNumber + @table:number-columns-spanned - 2"/>
+					</xsl:with-param>-->
+					<xsl:with-param name="rowNumEnd">
+						<xsl:value-of select="$rowNumber + $tableNumberRowsSpanned - 1"/>
+					</xsl:with-param>
+					<xsl:with-param name="colNumEnd">
+						<xsl:value-of select="$colNumber + $tableNumberColumnsSpanned - 2"/>
           </xsl:with-param>
           <xsl:with-param name="StyleName">
             <xsl:value-of select="@table:style-name"/>
           </xsl:with-param>
         </xsl:call-template>
-    
+				<!--Vijayeta,SP2,@table:number-columns-spanned/@table:number-rows-spanned,End-->
         
         
       </xsl:when>
@@ -200,8 +311,8 @@
     <!-- Check if next cell exist -->
     
     <xsl:if test="following-sibling::table:table-cell">
-      
-      <xsl:variable name="ColumnsRepeated">
+			<!--Vijayeta,SP2,@table:number-columns-repeated-->
+			<!--<xsl:variable name="ColumnsRepeated">
         <xsl:choose>
           <xsl:when test="@table:number-columns-repeated">
             <xsl:value-of select="$colNumber + @table:number-columns-repeated"/>
@@ -210,8 +321,25 @@
             <xsl:value-of select="$colNumber + 1"/>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:variable>-->
+      <xsl:variable name="ColumnsRepeated">
+        <xsl:choose>
+          <xsl:when test="@table:number-columns-repeated">
+						<xsl:choose >
+							<xsl:when test ="@table:number-columns-repeated &gt; 256">
+								<xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))"/>
+							</xsl:when>
+							<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+            <xsl:value-of select="$colNumber + @table:number-columns-repeated"/>
+          </xsl:when>        
+						</xsl:choose>
+					</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$colNumber + 1"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
-      
+			<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
       <xsl:choose>
         <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']">
           <xsl:for-each select="following-sibling::table:covered-table-cell[1]">
@@ -350,16 +478,31 @@
   <!-- Variable with Merge Cell -->
   
   <xsl:template name="WriteMergeCell">
-    
-        <xsl:variable name="rowNumber">
+		<!--Vijayeta,SP2,@table:number-rows-repeated-->
+		<!--<xsl:variable name="rowNumber">
           <xsl:choose>
             <xsl:when test="descendant::table:table-row[1]/@table:number-rows-repeated">
               <xsl:value-of select="descendant::table:table-row[1]/@table:number-rows-repeated"/>
             </xsl:when>
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>  
+        </xsl:variable>-->
+        <xsl:variable name="rowNumber">
+          <xsl:choose>
+            <xsl:when test="descendant::table:table-row[1]/@table:number-rows-repeated">
+					<xsl:choose >
+						<xsl:when test ="descendant::table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+							<xsl:value-of select ="65536 - (1048576 - descendant::table:table-row[1]/@table:number-rows-repeated)"/>
+						</xsl:when>
+						<xsl:when test ="descendant::table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+              <xsl:value-of select="descendant::table:table-row[1]/@table:number-rows-repeated"/>
+            </xsl:when>
+					</xsl:choose>
+				</xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>  
         </xsl:variable>
-        
+		<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         <xsl:apply-templates select="descendant::table:table-row[1]" mode="merge">
           <xsl:with-param name="rowNumber">
             <xsl:value-of select="$rowNumber"/>
@@ -573,7 +716,8 @@
       <!-- next row is a sibling -->
       <xsl:when test="following-sibling::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ])">
         <xsl:apply-templates select="following::table:table-row[1][generate-id(ancestor::table:table) = $tableId][1]" mode="merge">
-          <xsl:with-param name="rowNumber">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
                 <xsl:value-of select="$rowNumber + following-sibling::table:table-row[1]/@table:number-rows-repeated"/>    
@@ -582,14 +726,33 @@
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="following-sibling::table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber + 65536 - (1048576 - following-sibling::table:table-row[1]/@table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="following-sibling::table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+                <xsl:value-of select="$rowNumber + following-sibling::table:table-row[1]/@table:number-rows-repeated"/>    
+              </xsl:when>
+								</xsl:choose>
+							</xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber + 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows or in group-->
       <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
           mode="merge">
-          <xsl:with-param name="rowNumber">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when
                 test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
@@ -601,13 +764,32 @@
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+					<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber + 65536 - (1048576 - following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+										<xsl:value-of select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated" />
+									</xsl:when>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber + 1"/>
+							</xsl:otherwise>
+						</xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         </xsl:apply-templates>
       </xsl:when>
       <xsl:when test="following-sibling::node()[1][name() = 'table:table-row-group' ]">
         <xsl:apply-templates select="following-sibling::table:table-row-group[1]/descendant::table:table-row[1]"
           mode="merge">
-          <xsl:with-param name="rowNumber">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
             <xsl:choose>           
               <xsl:when
                 test="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated">
@@ -619,7 +801,25 @@
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+					<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when test="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber + 65536 - (1048576 - following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+										<xsl:value-of select="$rowNumber + following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated"/>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber + 1"/>
+							</xsl:otherwise>
+						</xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         </xsl:apply-templates>    
       </xsl:when>
       <!-- this is last row inside header rows or group, next row is outside -->
@@ -627,7 +827,8 @@
        <xsl:choose>
           <xsl:when test="parent::node()[name()='table:table-header-rows']">
             <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="merge">
-              <xsl:with-param name="rowNumber">
+							<!--Vijayeta,SP2,@table:number-rows-repeated-->
+							<!--<xsl:with-param name="rowNumber">
               <xsl:choose>
               <xsl:when
               test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
@@ -639,13 +840,34 @@
               <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
               </xsl:choose>
+							</xsl:with-param>-->
+							<xsl:with-param name="rowNumber">
+								<xsl:choose>
+									<xsl:when test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+										<xsl:choose >
+											<xsl:when test ="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+												<xsl:value-of select ="$rowNumber + 65536 - (1048576 - parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated)"/>
+											</xsl:when>
+											<xsl:when test ="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+												<xsl:value-of
+										select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"
+              />
+											</xsl:when>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$rowNumber + 1"/>
+									</xsl:otherwise>
+								</xsl:choose>
               </xsl:with-param>             
+							<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
               </xsl:apply-templates>    
           </xsl:when>
          <xsl:when test="ancestor::table:table-row-group">
           
            <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="merge">
-              <xsl:with-param name="rowNumber">
+							<!--Vijayeta,SP2,@table:number-rows-repeated-->
+							<!--<xsl:with-param name="rowNumber">
               <xsl:choose>
               <xsl:when
                 test="ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated">
@@ -657,15 +879,31 @@
               <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
               </xsl:choose>
+							</xsl:with-param>-->
+							<xsl:with-param name="rowNumber">
+								<xsl:choose>
+									<xsl:when test="ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+										<xsl:choose >
+											<xsl:when test ="ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated &gt; 65536">
+												<xsl:value-of select ="$rowNumber + 65536 - (1048576 - ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated)"/>
+											</xsl:when>
+											<xsl:when test ="ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated &lt;= 65536">
+												<xsl:value-of
+										  select="$rowNumber + ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated"
+              />
+											</xsl:when>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$rowNumber + 1"/>
+									</xsl:otherwise>
+								</xsl:choose>
               </xsl:with-param>          
-           </xsl:apply-templates>
-           
-         </xsl:when>
-         
-        </xsl:choose>
-        
-      </xsl:when>
-      
+							<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
+           </xsl:apply-templates>           
+         </xsl:when>         
+        </xsl:choose>        
+      </xsl:when>      
     </xsl:choose>
   </xsl:template>
   
@@ -678,7 +916,27 @@
     <!-- Merge Cell-->    
     <xsl:choose>
       <xsl:when test="@table:number-columns-spanned">
-        
+				<!--Vijayeta,SP2,@table:number-columns-spanned/@table:number-rows-spanned-->
+				<xsl:variable name ="tableNumberColumnsSpanned">
+					<xsl:choose >
+						<xsl:when test ="@table:number-columns-spanned &gt; 256">
+							<xsl:value-of select ="256 - (16384 - @table:number-columns-spanned)"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-columns-spanned &lt;= 256">
+							<xsl:value-of select="@table:number-columns-spanned"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name ="tableNumberRowsSpanned">
+					<xsl:choose >
+						<xsl:when test ="@table:number-rows-spanned &gt; 65536">
+							<xsl:value-of select ="65536 - (1048576 - @table:number-rows-spanned)"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-rows-spanned &lt;= 65536">
+							<xsl:value-of select="@table:number-rows-spanned"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
           <xsl:variable name="CollStartChar">
             <xsl:call-template name="NumbersToChars">
               <xsl:with-param name="num">
@@ -687,7 +945,7 @@
             </xsl:call-template>
           </xsl:variable>
           
-          <xsl:variable name="CollEndChar">
+				<!--<xsl:variable name="CollEndChar">
             <xsl:call-template name="NumbersToChars">
               <xsl:with-param name="num">
                 <xsl:value-of select="@table:number-columns-spanned + $colNumber - 2"/>
@@ -702,8 +960,24 @@
             </xsl:when>
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>          
+				</xsl:variable>-->
+				<xsl:variable name="CollEndChar">
+					<xsl:call-template name="NumbersToChars">
+						<xsl:with-param name="num">
+							<xsl:value-of select="$tableNumberColumnsSpanned + $colNumber - 2"/>
+						</xsl:with-param>
+					</xsl:call-template>
         </xsl:variable>
         
+				<xsl:variable name="rowsSpanned">
+					<xsl:choose>
+						<xsl:when test="@table:number-rows-spanned">
+							<xsl:value-of select="$tableNumberRowsSpanned"/>
+						</xsl:when>
+						<xsl:otherwise>1</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<!--Vijayeta,SP2,@table:number-columns-spanned/@table:number-rows-spanned,End-->
         <xsl:value-of select="concat(concat(concat(concat($CollStartChar,$rowNumber),':'), concat($CollEndChar, $rowNumber + $rowsSpanned - 1)), ';')"/>
         
       </xsl:when>
@@ -714,7 +988,7 @@
     
     <xsl:if test="following-sibling::table:table-cell">
       
-      <xsl:variable name="ColumnsRepeated">
+			<!--<xsl:variable name="ColumnsRepeated">
         <xsl:choose>
           <xsl:when test="@table:number-columns-repeated">
             <xsl:value-of select="$colNumber + @table:number-columns-repeated"/>
@@ -723,7 +997,26 @@
             <xsl:value-of select="$colNumber + 1"/>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:variable>-->
+			<!--Vijayeta,SP2,@table:number-columns-repeated-->
+      <xsl:variable name="ColumnsRepeated">
+        <xsl:choose>
+          <xsl:when test="@table:number-columns-repeated">
+						<xsl:choose >
+							<xsl:when test ="@table:number-columns-repeated &gt; 256">
+								<xsl:value-of select ="$colNumber + (256 - (16384 - (@table:number-columns-repeated - 1)))"/>
+							</xsl:when>
+							<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+            <xsl:value-of select="$colNumber + @table:number-columns-repeated"/>
+          </xsl:when>        
+						</xsl:choose>
+					</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$colNumber + 1"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
+			<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
       
       <xsl:choose>
         <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']">

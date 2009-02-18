@@ -360,6 +360,16 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     strOoxFormula = TranslateToOoxFormula(strOdfFormula.Substring(6));
                 }
+                //Added: By Vijayeta, 
+                //Date:  1/7/2009
+                //Desc: Crash Because of Formula, formula begins with 'msoxl:' on SP2
+                //File:  Quote.xlsx, Testfeatures M4 and M5 Datarange.ods,Testfeatures_Formula.ods,Text.ods
+                else if (strOdfFormula.StartsWith("msoxl:"))
+                {
+                   // strOoxFormula = TranslateToOoxFormula(strOdfFormula.Substring(7));
+                    // Earlier code commented to accomodate SAP.DE.EN.xlsx
+                    strOoxFormula = strOdfFormula.Substring(7);
+                }
                 else
                 {
                     strOoxFormula = strOdfFormula;
@@ -452,7 +462,16 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 strFinalFormula = strOdfFormula;
             }
-
+            strFinalFormula = TransFormulaParms(strFinalFormula);
+            //Added: By Vijayeta, 
+            //Date:  1/7/2009
+            //Desc:  Formula has absolute address(sheet2)
+            //File:  Define_Name_Formulas.ods
+            string returnInputFileWithPath = OdfConverter.OdfConverterLib.AbstractConverter.inputFileName;
+            if (returnInputFileWithPath !=null && strFinalFormula.Contains(returnInputFileWithPath))
+            {
+                strFinalFormula = strFinalFormula.Replace(String.Concat('\'', returnInputFileWithPath, '\''), "[0]!");
+            }
             return strFinalFormula = TransFormulaParms(strFinalFormula);
 
         }

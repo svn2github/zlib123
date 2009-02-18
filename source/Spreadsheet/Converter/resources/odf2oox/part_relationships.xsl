@@ -504,8 +504,9 @@
         <!-- go to bitmap-fill style -->
         <xsl:for-each
           select="document(concat($chartDirectory,'/styles.xml'))/office:document-styles/office:styles/draw:fill-image[@draw:name = $fillImage]">
-
-          <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
+          <!--Vijayeta,SP2-->
+          <!--<xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>-->
+			<xsl:variable name="imageName" select="substring-after(@xlink:href, '/')"/>
 
           <pzip:copy pzip:source="{concat($chartDirectory,'/',@xlink:href)}"
             pzip:target="xl/media/{concat($fillId,$imageName)}"/>
@@ -570,8 +571,11 @@
 
         <xsl:choose>
           <!-- embeded pictures -->
-          <xsl:when test="starts-with(@xlink:href, 'Pictures/')">
-            <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
+			<!--Vijayeta,SP2,Pictures-->
+           <!--<xsl:when test="starts-with(@xlink:href, 'Pictures/')">
+		       <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/> -->			
+			<xsl:when test="starts-with(@xlink:href, 'Pictures/') or starts-with(@xlink:href, 'media/')">
+            <xsl:variable name="imageName" select="substring-after(@xlink:href, '/')"/>
 			  <!-- Code added by vijayeta, fix for the bug 1806778
 				   check image is of type .svm, as OOX does not support image of type .svm
 				   Date:23rd Oct '07-->
@@ -586,14 +590,12 @@
           </xsl:when>
           <!-- linked pictures -->
           <xsl:otherwise>
-
             <!-- change spaces to %20 -->
             <xsl:variable name="translatedTarget">
               <xsl:call-template name="TranslateIllegalChars">
                 <xsl:with-param name="string" select="@xlink:href"/>
               </xsl:call-template>
             </xsl:variable>
-
             <xsl:choose>
               <!-- picture is located in the same disk -->
               <xsl:when test="starts-with($translatedTarget,'../')">
@@ -612,10 +614,8 @@
                   </Relationship>
                 <!--</pxsi:physicalPath>-->
               </xsl:when>
-
               <!-- when file is on another disk -->
               <xsl:otherwise>
-
                 <xsl:variable name="target">
                   <xsl:choose>
                     <!-- when file is on local disk -->
@@ -639,7 +639,6 @@
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
-
       </xsl:for-each>
 
 		<!--Defect Id     :1784784

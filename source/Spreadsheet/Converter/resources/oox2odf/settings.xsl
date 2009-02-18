@@ -46,9 +46,9 @@ RefNo-1 16-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pan
 
   <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="common.xsl"/>-->
-
+  <!--RefNo-2:ODF1.1:Added office:version="1.1" attribute:06-feb-09-->
   <xsl:template name="InsertSettings">
-    <office:document-settings>
+	  <office:document-settings office:version="1.1">
       <office:settings>
         <config:config-item-set config:name="ooo:view-settings">
           <config:config-item-map-indexed config:name="Views">

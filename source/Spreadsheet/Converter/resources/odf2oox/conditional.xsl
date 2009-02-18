@@ -57,13 +57,26 @@
       <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
       <xsl:with-param name="MergeCell" select="$MergeCell"/>
       <xsl:with-param name="tableName" select="$tableName"/>
-      <xsl:with-param name="RepetedRow">
+		<!--Vijayeta,SP2,@table:number-rows-repeated-->
+		<!--<xsl:with-param name="RepetedRow">
         <xsl:if test="@table:number-rows-repeated != ''">
           <xsl:value-of select="@table:number-rows-repeated - 1"/>
         </xsl:if>
+      </xsl:with-param>-->
+      <xsl:with-param name="RepetedRow">
+        <xsl:if test="@table:number-rows-repeated != ''">
+				<xsl:choose >
+					<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+						<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated) - 1"/>
+					</xsl:when>
+					<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+          <xsl:value-of select="@table:number-rows-repeated - 1"/>
+					</xsl:when>
+				</xsl:choose>
+        </xsl:if>
       </xsl:with-param>
     </xsl:apply-templates>
-
+	  <!--Vijayeta,SP2,@table:number-rows-repeated,End-->
     <xsl:variable name="tableId">
       <xsl:value-of select="generate-id(ancestor::table:table)"/>
     </xsl:variable>
@@ -75,7 +88,8 @@
         <xsl:apply-templates
           select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]"
           mode="conditional">
-          <xsl:with-param name="rowNumber">
+			<!--Vijayeta,SP2,@table:number-rows-repeated-->
+          <!--<xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="@table:number-rows-repeated">
                 <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
@@ -84,10 +98,28 @@
                 <xsl:value-of select="$rowNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+						<xsl:choose >
+							<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+								<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+							</xsl:when>
+							<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+              </xsl:when>
+						</xsl:choose>
+					</xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="cellNumber">
             <xsl:text>0</xsl:text>
           </xsl:with-param>
+			<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
           <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
           <xsl:with-param name="MergeCell" select="$MergeCell"/>
           <xsl:with-param name="tableName" select="$tableName"/>
@@ -107,7 +139,8 @@
       <xsl:apply-templates
         select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]"
         mode="conditional">
-        <xsl:with-param name="colNumber">
+		  <!--Vijayeta,SP2,@table:number-columns-repeated-->
+        <!--<xsl:with-param name="colNumber">
           <xsl:choose>
             <xsl:when test="@table:number-columns-repeated != ''">
               <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
@@ -116,7 +149,26 @@
               <xsl:value-of select="$colNumber + 1"/>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:with-param>-->
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated != ''">
+					  <xsl:choose >
+						  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+							  <xsl:value-of select ="number($colNumber) + number(256 - (16384 - number(@table:number-columns-repeated)))"/>
+						  </xsl:when>
+						  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
+							  <xsl:value-of
+						  select="number($colNumber) + number(@table:number-columns-repeated)"/>
+						  </xsl:when>
+					  </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:with-param>
+		  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
         <xsl:with-param name="rowNumber">
           <xsl:value-of select="$rowNumber"/>
         </xsl:with-param>
@@ -166,7 +218,8 @@
       <xsl:apply-templates
         select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]"
         mode="conditional">
-        <xsl:with-param name="colNumber">
+		  <!--Vijayeta,SP2,@table:number-columns-repeated-->
+        <!--<xsl:with-param name="colNumber">
           <xsl:choose>
             <xsl:when test="@table:number-columns-repeated != ''">
               <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
@@ -175,7 +228,26 @@
               <xsl:value-of select="$colNumber + 1"/>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:with-param>-->
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated != ''">
+					  <xsl:choose >
+						  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+							  <xsl:value-of select ="number($colNumber) + number(256 - (16384 - number(@table:number-columns-repeated)))"/>
+						  </xsl:when>
+						  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
+							  <xsl:value-of
+						  select="number($colNumber) + number(@table:number-columns-repeated)"/>
+						  </xsl:when>
+					  </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:with-param>
+		  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
         <xsl:with-param name="rowNumber">
           <xsl:value-of select="$rowNumber"/>
         </xsl:with-param>
@@ -243,7 +315,8 @@
         </xsl:call-template>
       </xsl:variable>
       
-      <xsl:variable name="ColCharEnd">
+	  <!--Vijayeta,SP2,@table:number-columns-repeated-->
+      <!--<xsl:variable name="ColCharEnd">
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
             <xsl:choose>
@@ -256,8 +329,29 @@
             </xsl:choose>
           </xsl:with-param>
         </xsl:call-template>
+      </xsl:variable>-->
+      <xsl:variable name="ColCharEnd">
+        <xsl:call-template name="NumbersToChars">
+          <xsl:with-param name="num">
+            <xsl:choose>
+              <xsl:when test="@table:number-columns-repeated != ''">
+						  <xsl:choose >
+							  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+								  <xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))- $RepetedCol + 1"/>
+							  </xsl:when>
+							  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                        <xsl:value-of select="$colNumber + @table:number-columns-repeated - $RepetedCol + 1"/>
+              </xsl:when>
+						  </xsl:choose>
+					  </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$colNumber"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:variable>
-    
+	  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     <oox:ConditionalCell>
       
       <xsl:attribute name="oox:StyleName">
@@ -295,8 +389,19 @@
     
   </xsl:when>
   <xsl:otherwise>
-    
-    <xsl:if test="@table:number-columns-repeated!= '' and @table:number-columns-repeated &gt; $RepetedCol">
+	  <!--Vijayeta,SP2,@table:number-columns-repeated-->
+	  <xsl:variable name ="tableNumberColumnsRepeated">
+		  <xsl:choose >
+			  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+				  <xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+			  </xsl:when>
+			  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
+				  <xsl:value-of select="@table:number-columns-repeated"/>
+			  </xsl:when>
+		  </xsl:choose>
+	  </xsl:variable>
+	  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
+    <xsl:if test="@table:number-columns-repeated!= '' and $tableNumberColumnsRepeated &gt; $RepetedCol">
       <xsl:call-template name="InsertConditionalCol">
         <xsl:with-param name="colNumber">
           <xsl:value-of select="$colNumber + 1"/>

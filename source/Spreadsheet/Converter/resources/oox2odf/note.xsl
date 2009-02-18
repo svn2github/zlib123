@@ -217,8 +217,13 @@ RefNo-2 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       <xsl:for-each
         select="key('Part', concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
       -->
+      <!--<xsl:for-each
+        select="key('Part', concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">-->
+      <!--xpath changed for bug no:2560646-->
       <xsl:for-each
-        select="key('Part', concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
+       select="document('xl/drawings/vmlDrawing1.vml')">
+         
+        <xsl:for-each select="//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
 
         <xsl:attribute name="office:display">
           <xsl:call-template name="GetShapeProperty">
@@ -228,6 +233,8 @@ RefNo-2 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         </xsl:attribute>
 
       </xsl:for-each>
+        </xsl:for-each>
+ 
 
       <!--RefNo-1: xpath changed to get the required node.
       <xsl:apply-templates

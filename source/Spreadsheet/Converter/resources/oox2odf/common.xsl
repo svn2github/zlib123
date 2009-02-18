@@ -1479,6 +1479,15 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
           </xsl:choose>
         </xsl:variable>
 
+        <!--added for ODF 1.1-->
+          <xsl:variable name="newHours">
+            <xsl:if test="contains($hours,'-')">
+            <xsl:value-of select="substring-after($hours,'-')"/>
+            </xsl:if>
+          </xsl:variable>
+        <!--end-->
+        
+
         <xsl:variable name="minutes">
           <xsl:choose>
             <xsl:when test="number($Scient2time)">
@@ -1500,7 +1509,50 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
+        <xsl:variable name="newSeconds">
+          <xsl:if test="contains($seconds,'-')">
+            <xsl:value-of select="substring-after($seconds,'-')"/>
+          </xsl:if>
+        </xsl:variable>
+        <!--<xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>-->
+        
+        <!--added for ODF 1.1-->
+        <!--<xsl:if test="not(contains($hours,'-'))">
         <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+        </xsl:if>
+        <xsl:if test="contains($hours,'-')">
+          <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$seconds,'S')"/>
+        </xsl:if>-->
+        <xsl:choose>
+          <xsl:when test="not(contains($hours,'-'))">
+            <xsl:choose>
+              <xsl:when test="not(contains($seconds,'-'))">
+        <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat('-','PT',$hours,'H',$minutes,'M',$newSeconds,'S')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+            <xsl:when test="not(contains($seconds,'-'))">
+              <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$seconds,'S')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$newSeconds,'S')"/>
+            </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+        <!--<xsl:if test="not(contains($hours,'-')) and not(contains($seconds,'-'))">
+          <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$seconds,'S')"/>
+        </xsl:if>
+        <xsl:if test="contains($seconds,'-')">
+          <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$newSeconds,'S')"/>
+        </xsl:if>-->
+        
+        <!--end-->
 
       </xsl:when>
       <xsl:otherwise>
@@ -1537,9 +1589,25 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
+     <!--added by sonata for ODF 1.1-->
+        <xsl:variable name="newSeconds">
+          <xsl:if test="contains($seconds,'-')">
+            <xsl:value-of select="substring-after($seconds,'-')"/>
+          </xsl:if>
+        </xsl:variable>
+        <!--end-->
 
+        <!--if condition added for ODF 1.1-->
+        <xsl:if test="not(contains($seconds,'-'))">
         <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+        </xsl:if>
 
+        <xsl:if test="contains($seconds,'-')">
+          <xsl:value-of select="concat('-','PT',$hours,'H',$minutes,'M',$newSeconds,'S')"/>
+        </xsl:if>
+        <!--commented for ODF 1.1-->
+        <!--<xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>-->
+        <!--end-->
       </xsl:otherwise>
     </xsl:choose>
 

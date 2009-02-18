@@ -120,11 +120,20 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:variable>
 
     <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
-      <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
+			<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+			<!--<xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
         <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]"/>
-      </xsl:if>
+			    </xsl:if>-->
+			<xsl:choose>
+				<xsl:when test="xdr:wsDr/xdr:twoCellAnchor">
+					<xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]"/>
+				</xsl:when>
+				<xsl:when test="xdr:wsDr/xdr:oneCellAnchor">
+					<xsl:apply-templates select="xdr:wsDr/xdr:oneCellAnchor[1]"/>
+				</xsl:when>
+			</xsl:choose>
+			<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
     </xsl:for-each>
-
   </xsl:template>
 
   <xsl:template match="e:drawing" mode="chartsheet">
@@ -214,6 +223,45 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:choose>
 
   </xsl:template>
+	<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+	<xsl:template match="xdr:oneCellAnchor">
+		<xsl:param name="PictureCell"/>
+		<xsl:variable name="PictureColStart">
+			<xsl:choose>
+				<xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+					<xsl:value-of select="xdr:to/xdr:col + 1"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="xdr:from/xdr:col + 1"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="PictureRowStart">
+			<xsl:choose>
+				<xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+					<xsl:value-of select="xdr:to/xdr:row + 1"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="xdr:from/xdr:row + 1"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="following-sibling::xdr:oneCellAnchor[1]">
+				<xsl:apply-templates select="following-sibling::xdr:oneCellAnchor[1]">
+					<xsl:with-param name="PictureCell">
+						<xsl:value-of
+						  select="concat(concat(concat(concat($PictureCell, $PictureRowStart), ':'), $PictureColStart), ';')"/>
+					</xsl:with-param>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of
+				  select="concat(concat(concat(concat($PictureCell, $PictureRowStart), ':'), $PictureColStart), ';')"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
 
   <!-- Insert picture -->
 
@@ -274,7 +322,6 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
               <xsl:value-of select="$NameSheet"/>
             </xsl:with-param>
           </xsl:call-template>
-
           <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
             <xsl:attribute name="xlink:href">
               <xsl:value-of
@@ -282,7 +329,6 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
               />
             </xsl:attribute>
           </draw:object>
-
         </draw:frame>
       </xsl:when>
 
@@ -567,42 +613,52 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
   <xsl:template name="SetPosition">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
-
-    <xsl:attribute name="table:end-cell-address">
+		<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor
+			If condition to test if'xdr:to' prsent(twoCellAnchor), which is absent in oneCellAnchor,also take care of xdr:from and xdr:to along with svg:height and svg:width-->
       <xsl:variable name="ColEnd">
+			<xsl:choose>
+				<xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1 or xdr:to/xdr:col">
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
             <xsl:choose>
               <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
                 <xsl:value-of select="xdr:to/xdr:col + (xdr:to/xdr:col - xdr:from/xdr:col) - 1"/>
               </xsl:when>
-              <xsl:otherwise>
+								<xsl:when test="xdr:to/xdr:col">
                 <xsl:value-of select="xdr:to/xdr:col"/>
-              </xsl:otherwise>
+								</xsl:when>
             </xsl:choose>
           </xsl:with-param>
         </xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="''"/>
+				</xsl:otherwise>
+			</xsl:choose>
       </xsl:variable>
       <xsl:variable name="RowEnd">
         <xsl:choose>
+				<xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1 or xdr:to/xdr:col">
+					<xsl:choose>
           <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
             <xsl:value-of select="xdr:to/xdr:row + (xdr:to/xdr:row - xdr:from/xdr:row) + 1"/>
           </xsl:when>
-          <xsl:otherwise>
+						<xsl:when test="xdr:to/xdr:col">
             <xsl:value-of select="xdr:to/xdr:row + 1"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="''"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
-
       <xsl:variable name="apos">
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
-
       <xsl:variable name="invalidChars">
         <xsl:text>&apos;!,.+$-()</xsl:text>
       </xsl:variable>
-
       <xsl:variable name="checkedName">
         <xsl:for-each
           select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($NameSheet,$apos,'')]">
@@ -619,10 +675,11 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
           </xsl:call-template>
         </xsl:for-each>
       </xsl:variable>
-
+		<xsl:if test="$RowEnd!='' and $ColEnd!=''">
+			<xsl:attribute name="table:end-cell-address">
       <xsl:value-of select="concat($apos,$checkedName,$apos, '.', $ColEnd, $RowEnd)"/>
     </xsl:attribute>
-
+		</xsl:if>
     <xsl:attribute name="svg:x">
       <xsl:choose>
         <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
@@ -645,6 +702,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
+		<xsl:if test="$RowEnd!='' and $ColEnd!=''">
     <xsl:attribute name="table:end-x">
       <xsl:choose>
         <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
@@ -661,14 +719,19 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$RowEnd!='' and $ColEnd!=''">
     <xsl:attribute name="table:end-y">
       <xsl:call-template name="ConvertEmu">
         <xsl:with-param name="length" select="xdr:to/xdr:rowOff"/>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
+		</xsl:if>
     <!-- Code added by Sateesh, fix for the bug 1840212
          Date:29th Jan '08-->
+		<xsl:choose>
+			<xsl:when test="xdr:pic">
     <xsl:attribute name="svg:width">
       <xsl:call-template name="ConvertEmu">
         <xsl:with-param name="length" select="xdr:pic/xdr:spPr/a:xfrm/a:ext/@cx"/>
@@ -681,13 +744,212 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:choose>
+					<xsl:when test="self::node()[name()='xdr:twoCellAnchor']">
+						<xsl:variable name="startrowno" select="xdr:from/xdr:row">
+						</xsl:variable>
+						<xsl:variable name="startrowoffset">
+							<xsl:value-of select="xdr:from/xdr:rowOff"/>
+						</xsl:variable>
+						<xsl:variable name="endrowno" select="xdr:to/xdr:row">
+						</xsl:variable>
+						<xsl:variable name="endrowoffset">
+							<xsl:value-of select="xdr:to/xdr:rowOff"/>
+						</xsl:variable>
+						<xsl:variable name="startrowoffsetincm">
+							<xsl:call-template name="ConvertEmu">
+								<xsl:with-param name="length" select="$startrowoffset"/>
+								<xsl:with-param name="unit" select="'cm'"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="endrowoffsetincm">
+							<xsl:call-template name="ConvertEmu">
+								<xsl:with-param name="length" select="$endrowoffset"/>
+								<xsl:with-param name="unit" select="'cm'"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="startcolno" select="xdr:from/xdr:col">
+						</xsl:variable>
+						<xsl:variable name="startcoloffset">
+							<xsl:call-template name="ConvertEmu">
+								<xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
+								<xsl:with-param name="unit" select="'cm'"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="endcolno" select="xdr:to/xdr:col">
+						</xsl:variable>
+						<xsl:variable name="endcoloffset">
+							<xsl:call-template name="ConvertEmu">
+								<xsl:with-param name="length" select="xdr:to/xdr:colOff"/>
+								<xsl:with-param name="unit" select="'cm'"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:drawing">
+							<xsl:variable name="defaultrowheight">
+								<xsl:value-of select="parent::node()/child::node()[name()='sheetFormatPr']/@defaultRowHeight"/>
+							</xsl:variable>
+							<xsl:variable name="chartrowheight">
+								<xsl:call-template name="CalculateRowHeight">
+									<xsl:with-param name="sheet" select="$sheet"/>
+									<xsl:with-param name="startrowno" select="$startrowno"/>
+									<xsl:with-param name="endrowno" select="$endrowno +1"/>
+									<xsl:with-param name="total" select="0"/>
+									<xsl:with-param name="defaultrowheight" select="$defaultrowheight"/>
+									<xsl:with-param name="countchartrow" select="$startrowno + 1"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:variable name="chartrowheightincm">
+								<xsl:call-template name="ConvertToCentimeters">
+									<xsl:with-param name="length">
+										<xsl:value-of
+										  select="concat($chartrowheight,'pt')"/>
+									</xsl:with-param>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:variable name="finalchartrowheight">
+								<xsl:value-of select="concat((substring-before($chartrowheightincm,'cm') - substring-before($startrowoffsetincm,'cm') + substring-before($endrowoffsetincm,'cm')),'cm')"/>
+							</xsl:variable>
+							<xsl:attribute name="svg:height">
+								<xsl:value-of select="$finalchartrowheight"/>
+							</xsl:attribute>
+							<!--calculating coloumnwidth-->
+							<xsl:variable name="defaultFontSize">
+								<xsl:for-each select="key('Part', 'xl/styles.xml')">
+									<xsl:choose>
+										<xsl:when test="e:styleSheet/e:fonts/e:font">
+											<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:text>11</xsl:text>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:variable name="defaultFontStyle">
+								<xsl:for-each select="key('Part', 'xl/styles.xml')">
+									<xsl:choose>
+										<xsl:when test="e:styleSheet/e:fonts/e:font">
+											<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:text>11</xsl:text>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:variable name="defaultcolWidth">
+								<xsl:choose>
+									<xsl:when test="parent::node()/child::node()[name()='sheetFormatPr']/@defaultColWidth">
+										<xsl:value-of
+										  select="parent::node()/child::node()[name()='sheetFormatPr']/@defaultColWidth"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="'null'"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name="colWidPlusdefaultColCount">
+								<!--<xsl:if test="parent::node()/child::node()[name()='cols']">-->
+								<xsl:call-template name="CalculateColWidth">
+									<xsl:with-param name="sheet" select="$sheet"/>
+									<xsl:with-param name="startcolno" select="$startcolno"/>
+									<xsl:with-param name="endcolno" select="$endcolno +1"/>
+									<xsl:with-param name="total" select="0"/>
+									<xsl:with-param name="defaultcolWidth" select="$defaultcolWidth"/>
+									<xsl:with-param name="countchartcol" select="$startcolno + 1"/>
+									<xsl:with-param name="totalDefaultColCount"/>
+									<xsl:with-param name="startcoloffset" select="$startcoloffset"/>
+									<xsl:with-param name="endcoloffset" select="$endcoloffset"/>
+								</xsl:call-template>
+								<!--</xsl:if>-->
+							</xsl:variable>
+							<xsl:variable name="customColWid">
+								<xsl:variable name="customColWidPt">
+									<xsl:value-of select="substring-before($colWidPlusdefaultColCount,'|')"/>
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test ="$customColWidPt = 0">
+										<xsl:value-of select="concat($customColWidPt,'cm')"/>
+									</xsl:when>
+									<xsl:when test ="$customColWidPt = ''">
+										<xsl:value-of select="concat(0,'cm')"/>
+									</xsl:when>
+									<xsl:when test ="$customColWidPt != 0">
+										<xsl:call-template name="ConvertToCentimeters">
+											<xsl:with-param name="length">
+												<xsl:value-of
+												  select="concat(substring-before($colWidPlusdefaultColCount,'|'),'pt')"/>
+											</xsl:with-param>
+										</xsl:call-template>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name="defaultColCount">
+								<xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|')"/>
+							</xsl:variable>
+							<xsl:attribute name="svg:width">
+								<xsl:choose>
+									<xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')=0 ">
+										<xsl:variable name="totalDefWid">
+											<xsl:value-of select="number($defaultColCount) * number($defaultcolWidth) "/>
+										</xsl:variable>
+										<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+										<!--<xsl:value-of select="concat(($defaultColCount * substring-before($defaultcolWidth,'cm')),'cm') "/>-->
+									</xsl:when>
+									<xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')!=0">
+										<xsl:variable name="totalDefWid">
+											<xsl:value-of select="number($defaultColCount) * number($defaultcolWidth)+ substring-before($colWidPlusdefaultColCount,'|')"/>
+										</xsl:variable>
+										<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')!=''">
+											<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'),'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+										</xsl:if>
+										<xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')=''">
+											<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|','0','|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+										</xsl:if>
+										<!--<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'))"/>-->
+									</xsl:otherwise>
+								</xsl:choose>
+								<!-- Call Post Processor Here-->
+							</xsl:attribute>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="self::node()[name()='xdr:oneCellAnchor']">
+						<xsl:choose>
+							<xsl:when test="number(xdr:ext/@cx)=0 and number(xdr:ext/@cy)=0">
+								<xsl:attribute name="svg:width">
+									<xsl:value-of select="'12.7cm'"/>
+								</xsl:attribute>
+								<xsl:attribute name="svg:height">
+									<xsl:value-of select="'7.62cm'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="number(xdr:ext/@cx)!=0 and number(xdr:ext/@cy)!=0">
+								<xsl:call-template name="InsertAbsoluteSize"/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:when test="self::node()[name()='xdr:absoluteAnchor']">
+						<xsl:call-template name="InsertAbsolutePosition"/>
+						<xsl:call-template name="InsertAbsoluteSize"/>
+						<xsl:attribute name="xlink:href">
+							<xsl:value-of
+							  select="concat('./Object ',generate-id(xdr:graphicFrame/a:graphic/a:graphicData/c:chart))"/>
+						</xsl:attribute>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
     <!--End-->
   </xsl:template>
-
+	<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
   <!-- Insert Picture Style -->
 
   <xsl:template name="InsertGraphicProperties">
-
     <xsl:call-template name="InsertImageFlip">
       <xsl:with-param name="atribute">
         <xsl:text>style</xsl:text>
@@ -786,12 +1048,28 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:variable>
 
     <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
-      <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
+			<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+			<!--<xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
         <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]" mode="PictureStyle">
           <xsl:with-param name="sheet" select="$sheet"/>
           <xsl:with-param name="Target" select="$Target"/>
         </xsl:apply-templates>
-      </xsl:if>
+			</xsl:if>-->
+			<xsl:choose>
+				<xsl:when test="xdr:wsDr/xdr:twoCellAnchor">
+					<xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]" mode="PictureStyle">
+						<xsl:with-param name="sheet" select="$sheet"/>
+						<xsl:with-param name="Target" select="$Target"/>
+					</xsl:apply-templates>
+				</xsl:when>
+				<xsl:when test="xdr:wsDr/xdr:oneCellAnchor">
+					<xsl:apply-templates select="xdr:wsDr/xdr:oneCellAnchor[1]" mode="PictureStyle">
+						<xsl:with-param name="sheet" select="$sheet"/>
+						<xsl:with-param name="Target" select="$Target"/>
+					</xsl:apply-templates>
+				</xsl:when>
+			</xsl:choose>
+			<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
     </xsl:for-each>
 
   </xsl:template>
@@ -903,12 +1181,107 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:apply-templates>
 
   </xsl:template>
+	<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+	<xsl:template match="xdr:oneCellAnchor" mode="PictureStyle">
+		<xsl:param name="PictureCell"/>
+		<xsl:param name="sheet"/>
+		<xsl:param name="Target"/>
+		<xsl:variable name="PictureColStart">
+			<xsl:value-of select="xdr:from/xdr:col"/>
+		</xsl:variable>
+		<xsl:variable name="PictureRowStart">
+			<xsl:value-of select="xdr:from/xdr:row"/>
+		</xsl:variable>
+		<style:style style:name="{generate-id(.)}" style:family="graphic">
+			<style:graphic-properties>
+				<!-- insert graphic properties -->
+				<xsl:choose>
+					<xsl:when test="xdr:pic">
+						<xsl:for-each select="xdr:pic/xdr:spPr">
+							<xsl:call-template name="InsertGraphicProperties"/>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="xdr:sp/xdr:spPr">
+						<xsl:for-each select="xdr:sp/xdr:spPr">
+							<xsl:call-template name="InsertGraphicProperties"/>
+						</xsl:for-each>
+					</xsl:when>
+				</xsl:choose>
+				<!--Cropping-->
+				<xsl:variable name="relationId">
+					<xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:embed"/>
+				</xsl:variable>
+				<xsl:variable name="Drawing">
+					<xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+				</xsl:variable>
+				<xsl:variable name="document">
+					<xsl:value-of select="concat($Drawing, '.rels')"/>
+				</xsl:variable>
+				<xsl:variable name="pzipsource">
+					<xsl:for-each select="key('Part', concat('xl/drawings/_rels/',$document))//node()[name() = 'Relationship']">
+						<xsl:if test="./@Id=$relationId">
+							<xsl:value-of select="./@Target"/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@l or xdr:pic/xdr:blipFill/a:srcRect/@r or xdr:pic/xdr:blipFill/a:srcRect/@t or xdr:pic/xdr:blipFill/a:srcRect/@b">
+					<xsl:variable name="left">
+						<xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@l">
+							<xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@l"/>
+						</xsl:if>
+						<xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@l)">
+							<xsl:value-of select="0"/>
+						</xsl:if>
+					</xsl:variable>
+					<xsl:variable name="right">
+						<xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@r">
+							<xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@r"/>
+						</xsl:if>
+						<xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@r)">
+							<xsl:value-of select="0"/>
+						</xsl:if>
+					</xsl:variable>
+					<xsl:variable name="top">
+						<xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@t">
+							<xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@t"/>
+						</xsl:if>
+						<xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@t)">
+							<xsl:value-of select="0"/>
+						</xsl:if>
+					</xsl:variable>
+					<xsl:variable name="bottom">
+						<xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@b">
+							<xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@b"/>
+						</xsl:if>
+						<xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@b)">
+							<xsl:value-of select="0"/>
+						</xsl:if>
+					</xsl:variable>
+					<xsl:attribute name ="fo:clip">
+						<xsl:variable name="temp">
+							<xsl:value-of select="concat('image-props:',concat('xl/',substring-after($pzipsource, '/')),':',$left,':',$right,':',$top,':',$bottom)"/>
+						</xsl:variable>
+						<xsl:value-of select="$temp"/>
+					</xsl:attribute>
+				</xsl:if>
+				<!--End-->
+			</style:graphic-properties>
+		</style:style>
+		<!--xsl:call-template name="InsertGraphicProperties"/-->
+		<xsl:apply-templates select="following-sibling::xdr:oneCellAnchor[1]" mode="PictureStyle">
+			<xsl:with-param name="PictureCell">
+				<xsl:value-of
+				  select="concat(concat(concat(concat($PictureCell, $PictureRowStart), ':'), $PictureColStart), ';')"/>
+			</xsl:with-param>
+			<xsl:with-param name="sheet" select="$sheet"/>
+			<xsl:with-param name="Target" select="$Target"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
 
   <!-- To do insert border -->
-
   <xsl:template name="InsertGraphicBorder">
     <xsl:if test="a:ln[not(a:noFill)]">
-
       <xsl:variable name="width">
         <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
@@ -990,8 +1363,8 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     <xsl:param name="Target"/>
 
     <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
-      <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
-
+			<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+			<!--<xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
         <xsl:for-each
           select="key('Part', concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">
           <xsl:call-template name="CopyPictures">
@@ -1004,9 +1377,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
             </xsl:with-param>
           </xsl:call-template>
         </xsl:for-each>
-
         <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
-
           <xsl:choose>
             <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
               <xsl:if test="(xdr:to/xdr:col + 1) = $collNum and (xdr:to/xdr:row + 1) = $rowNum">
@@ -1040,12 +1411,111 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
               </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
-
         </xsl:for-each>
-
+			</xsl:if>-->
+			<xsl:choose>
+				<xsl:when test="xdr:wsDr/xdr:twoCellAnchor">
+					<xsl:for-each
+					  select="key('Part', concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">
+						<xsl:call-template name="CopyPictures">
+							<xsl:with-param name="document">
+								<xsl:value-of
+								  select="concat(substring-after(substring-after($Target, '/'), '/'), '.rels')"/>
+							</xsl:with-param>
+							<xsl:with-param name="targetName">
+								<xsl:text>Pictures</xsl:text>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:for-each>
+					<xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
+						<xsl:choose>
+							<xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+								<xsl:if test="(xdr:to/xdr:col + 1) = $collNum and (xdr:to/xdr:row + 1) = $rowNum">
+									<xsl:call-template name="InsertPicture">
+										<xsl:with-param name="NameSheet">
+											<xsl:value-of select="$NameSheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="sheet">
+											<xsl:value-of select="$sheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="Drawing">
+											<xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+										</xsl:with-param>
+									</xsl:call-template>
+								</xsl:if>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:if test="(xdr:from/xdr:col + 1) = $collNum and (xdr:from/xdr:row + 1) = $rowNum">
+									<xsl:call-template name="InsertPicture">
+										<xsl:with-param name="NameSheet">
+											<xsl:value-of select="$NameSheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="sheet">
+											<xsl:value-of select="$sheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="Drawing">
+											<xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+										</xsl:with-param>
+									</xsl:call-template>
       </xsl:if>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+				</xsl:when>
+				<xsl:when test="xdr:wsDr/xdr:oneCellAnchor">
+					<xsl:for-each
+					  select="key('Part', concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">
+						<xsl:call-template name="CopyPictures">
+							<xsl:with-param name="document">
+								<xsl:value-of
+								  select="concat(substring-after(substring-after($Target, '/'), '/'), '.rels')"/>
+							</xsl:with-param>
+							<xsl:with-param name="targetName">
+								<xsl:text>Pictures</xsl:text>
+							</xsl:with-param>
+						</xsl:call-template>
     </xsl:for-each>
+					<xsl:for-each select="xdr:wsDr/xdr:oneCellAnchor">
+						<xsl:choose>
+							<xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+								<xsl:if test="(xdr:from/xdr:row + 1) = $rowNum">
+									<xsl:call-template name="InsertPicture">
+										<xsl:with-param name="NameSheet">
+											<xsl:value-of select="$NameSheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="sheet">
+											<xsl:value-of select="$sheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="Drawing">
+											<xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+										</xsl:with-param>
+									</xsl:call-template>
+								</xsl:if>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:if test="(xdr:from/xdr:col + 1) = $collNum and (xdr:from/xdr:row + 1) = $rowNum">
+									<xsl:call-template name="InsertPicture">
+										<xsl:with-param name="NameSheet">
+											<xsl:value-of select="$NameSheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="sheet">
+											<xsl:value-of select="$sheet"/>
+										</xsl:with-param>
+										<xsl:with-param name="Drawing">
+											<xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+										</xsl:with-param>
+									</xsl:call-template>
+								</xsl:if>
+							</xsl:otherwise>
+						</xsl:choose>
+    </xsl:for-each>
+				</xsl:when>
+				<xsl:when test="xdr:wsDr/xdr:absoluteAnchor">
 
+				</xsl:when>
+			</xsl:choose>
+			<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
+		</xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertChartsheet">
@@ -2148,13 +2618,14 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         <!-- i.e. $drawing = ../drawings/drawing2.xml -->
 
         <!-- finally insert entry for each chart -->
+						<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+						<!--<xsl:for-each select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:sp/xdr:txBody">-->
         <xsl:for-each
-          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:sp/xdr:txBody">
-
+						  select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr//xdr:sp/xdr:txBody">
+							<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
           <xsl:for-each select="a:p/a:pPr">
             <xsl:call-template name="InsertTextBoxParagraphStyle"/>
           </xsl:for-each>
-
           <xsl:for-each select="a:p/a:r/a:rPr">
             <style:style style:name="{generate-id(parent::node())}" style:family="text">
               <style:text-properties fo:font-family="Calibri" fo:font-size="11pt" fo:font-weight="normal"
@@ -3009,7 +3480,201 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         </xsl:attribute>
       </xsl:if>
     </xsl:for-each>
+	</xsl:template>
 
+	<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
+	<xsl:template name="CalculateRowHeight">
+		<xsl:param name="sheet"/>
+		<xsl:param name="startrowno"/>
+		<xsl:param name="endrowno"/>
+		<xsl:param name="total"/>
+		<xsl:param name="defaultrowheight"/>
+		<xsl:param name="countchartrow"/>
+		<xsl:variable name="totalrowheight">
+			<xsl:choose>
+				<xsl:when test="($countchartrow &gt;= $startrowno+1) and ($countchartrow &lt;= $endrowno)">
+					<xsl:choose>
+						<xsl:when test="parent::node()/child::node()[name()='sheetData']/child::node()/@r=$countchartrow">
+							<xsl:choose>
+								<xsl:when test="parent::node()/child::node()[name()='sheetData']/child::node()[@r=$countchartrow]/@ht">
+									<!--<xsl:when test="parent::node()/child::node()[name()='sheetData']/child::node()/@ht">-->
+									<!--<xsl:variable name="customrowheight" select="parent::node()/child::node()[name()='sheetData']/child::node()/@ht"/>-->
+									<xsl:variable name="customrowheight" select="parent::node()/child::node()[name()='sheetData']/child::node()[@r=$countchartrow]/@ht"/>
+									<xsl:value-of select="$total + $customrowheight"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$total+$defaultrowheight"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$total+$defaultrowheight"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$total"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="($countchartrow &gt;= $startrowno+1) and ($countchartrow &lt; $endrowno -1)">
+				<xsl:call-template name="CalculateRowHeight">
+					<xsl:with-param name="sheet" select="$sheet"/>
+					<xsl:with-param name="startrowno" select="$startrowno"/>
+					<xsl:with-param name="endrowno" select="$endrowno"/>
+					<xsl:with-param name="total" select="$totalrowheight"/>
+					<xsl:with-param name="defaultrowheight" select="$defaultrowheight"/>
+					<xsl:with-param name="countchartrow" select="$countchartrow + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$totalrowheight"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="CalculateColWidth">
+		<xsl:param name="sheet"/>
+		<xsl:param name="startcolno"/>
+		<xsl:param name="endcolno"/>
+		<xsl:param name="total"/>
+		<xsl:param name="defaultcolWidth"/>
+		<xsl:param name="countchartcol"/>
+		<xsl:param name="totalDefaultColCount"/>
+		<xsl:param name="startcoloffset"/>
+		<xsl:param name="endcoloffset"/>
+		<xsl:variable name="totalCustomColWidth">
+			<xsl:choose>
+				<xsl:when test="($countchartcol &gt;= $startcolno + 1) and ($countchartcol &lt;= $endcolno)">
+					<xsl:choose>
+						<xsl:when test="parent::node()/child::node()[name()='cols']">
+							<xsl:variable name="customColWidth">
+								<xsl:for-each select="parent::node()/child::node()[name()='cols']/child::node()[($countchartcol &gt; @min or $countchartcol=@min) and ($countchartcol &lt; @max or $countchartcol =@max)]">
+									<xsl:choose>
+										<xsl:when test="($countchartcol &gt; @min or $countchartcol=@min) and ($countchartcol &lt; @max or $countchartcol =@max)">
+											<xsl:choose>
+												<xsl:when test="@width">
+													<xsl:value-of select="@width"/>
+												</xsl:when>
+											</xsl:choose>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="$total"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:if test ="$customColWidth!=''">
+								<xsl:value-of select="$total + $customColWidth"/>
+							</xsl:if>
+							<xsl:if test ="$customColWidth = ''">
+								<xsl:value-of select="$total"/>
+							</xsl:if>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="countDefaultColWidth">
+			<xsl:variable name ="flag">
+				<xsl:choose>
+					<xsl:when test="($countchartcol &gt;= $startcolno + 1) and ($countchartcol &lt;= $endcolno)">
+						<xsl:choose>
+							<xsl:when test="parent::node()/child::node()[name()='cols']">
+								<xsl:for-each select="parent::node()/child::node()[name()='cols']/child::node()">
+									<!-- NewCode-->
+									<xsl:choose >
+										<xsl:when test="($countchartcol &gt;= @min) and ($countchartcol &lt;= @max)">
+											<xsl:value-of select ="'true'"/>
+										</xsl:when>
+										<xsl:when test="($countchartcol &lt;= @min)">
+											<xsl:value-of select ="'false'"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select ="'false'"/>
+										</xsl:otherwise>
+									</xsl:choose>
+
+									<!-- NewCode-->
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$endcolno -($startcolno)"/>
+							</xsl:otherwise>
+						</xsl:choose>
+
+					</xsl:when>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:choose>
+				<xsl:when test ="contains($flag,'true')">
+					<xsl:value-of select ="concat($totalDefaultColCount,'false|')"/>
+				</xsl:when>
+				<xsl:when test ="not(contains($flag,'true'))">
+					<xsl:value-of select ="concat($totalDefaultColCount,'true|')"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+
+			<xsl:when test="($countchartcol &gt;= $startcolno + 1) and ($countchartcol &lt; $endcolno -1)">
+				<xsl:call-template name="CalculateColWidth">
+					<xsl:with-param name="sheet" select="$sheet"/>
+					<xsl:with-param name="startcolno" select="$startcolno"/>
+					<xsl:with-param name="endcolno" select="$endcolno"/>
+					<xsl:with-param name="total">
+						<xsl:if test="$totalCustomColWidth != 0 ">
+							<xsl:value-of select="$totalCustomColWidth"/>
+						</xsl:if>
+						<xsl:if test="$totalCustomColWidth = 0 ">
+							<xsl:value-of select="0"/>
+						</xsl:if>
+					</xsl:with-param>
+					<xsl:with-param name="totalDefaultColCount" select="$countDefaultColWidth"/>
+					<xsl:with-param name="defaultcolWidth" select="$defaultcolWidth"/>
+					<xsl:with-param name="countchartcol" select="$countchartcol + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="finalCount">
+					<xsl:call-template name="increaseCount">
+						<xsl:with-param name ="totalCount" select ="0"/>
+						<xsl:with-param name="countDefaultColWidth" select ="$countDefaultColWidth"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="concat($totalCustomColWidth,'|',$finalCount)"/>
+			</xsl:otherwise>
+		</xsl:choose>
   </xsl:template>
 
+	<xsl:template name="increaseCount">
+		<xsl:param name ="totalCount"/>
+		<xsl:param name="countDefaultColWidth"/>
+		<xsl:variable name ="totalNo">
+			<xsl:value-of select ="$totalCount"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test ="$countDefaultColWidth!='' and substring-before($countDefaultColWidth,'|')='true'">
+				<xsl:call-template name ="increaseCount">
+					<xsl:with-param name ="totalCount">
+						<xsl:value-of select ="$totalNo+1"/>
+					</xsl:with-param>
+					<xsl:with-param name ="countDefaultColWidth" select ="substring-after($countDefaultColWidth,'|')"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test ="$countDefaultColWidth!='' and substring-before($countDefaultColWidth,'|')='false'">
+				<xsl:call-template name ="increaseCount">
+					<xsl:with-param name ="totalCount">
+						<xsl:value-of select ="$totalNo"/>
+					</xsl:with-param>
+					<xsl:with-param name ="countDefaultColWidth" select ="substring-after($countDefaultColWidth,'|')"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$totalNo"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
 </xsl:stylesheet>

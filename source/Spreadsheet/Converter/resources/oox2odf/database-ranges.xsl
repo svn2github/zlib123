@@ -99,10 +99,12 @@
 		<xsl:attribute name="table:display-filter-buttons">
 			<xsl:text>true</xsl:text>
 		</xsl:attribute>
-
-		<xsl:attribute name="table:name">
+    <!--added by chhavi for sp2-->
+		<!--<xsl:attribute name="table:name">
 			<xsl:value-of select="translate($checkedName,' ','_')"/>
-		</xsl:attribute>
+		</xsl:attribute>-->
+    <!--end here-->
+    
 		<xsl:attribute name="table:target-range-address">
 
 			<!-- sheet_name -->
@@ -343,10 +345,12 @@
 	<xsl:template name="InsertSort">
 		<xsl:param name="number"/>
 		<xsl:param name="checkedName"/>
-
-		<xsl:attribute name="table:name">
+<!--added by chhavi for sp2 -->
+		<!--<xsl:attribute name="table:name">
 			<xsl:value-of select="translate($checkedName,' ','_')"/>
-		</xsl:attribute>
+		</xsl:attribute>-->
+    <!--end here-->
+    
 		<!-- Code Changed by: Vijayeta 
      Bug number:1877156 
 	 Date:29thJAN 
@@ -523,6 +527,9 @@
 			</xsl:variable>
 
 			<xsl:for-each select="e:sortCondition[not(@customList)]">
+        <!--added by chhavi to fix sp2 problam (sortby is not supported by ods)-->
+        <xsl:if test ="not(@sortBy)">
+          <!--end here-->
 				<table:sort-by table:data-type="automatic">
 
 					<xsl:variable name="colNum">
@@ -547,8 +554,8 @@
 							<xsl:text>descending</xsl:text>
 						</xsl:attribute>
 					</xsl:if>
-
 				</table:sort-by>
+        </xsl:if>
 			</xsl:for-each>
 		</table:sort>
 	</xsl:template>

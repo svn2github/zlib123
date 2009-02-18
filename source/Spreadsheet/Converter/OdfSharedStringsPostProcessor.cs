@@ -275,6 +275,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 this.nextWriter.WriteString(GetColumnWidth(text.Substring(18)));
             }
+             else if(text.StartsWith("sonataChartWidth:"))
+            {
+                this.nextWriter.WriteString(GetChartWidth(text.Substring(17)));
+            }
 
              // Image Cropping   Added by Sonata
             else if (text.Contains("image-props"))
@@ -1060,6 +1064,22 @@ namespace CleverAge.OdfConverter.Spreadsheet
         }
 
         //End of RefNo-2
+        private string  GetChartWidth(string text)
+        {
+            string fontName = text.Split('|')[1].ToString(System.Globalization.CultureInfo.InvariantCulture);
+            string fontSize = text.Split('|')[2].ToString(System.Globalization.CultureInfo.InvariantCulture);           
+                double defColCount = Convert.ToDouble(text.Split('|')[3],System.Globalization.CultureInfo.InvariantCulture);
+                double customColWidth = Convert.ToDouble(text.Split('|')[4],System.Globalization.CultureInfo.InvariantCulture);
+                double startOffset = Convert.ToDouble(text.Split('|')[5],System.Globalization.CultureInfo.InvariantCulture);
+                double endOffset = Convert.ToDouble(text.Split('|')[6],System.Globalization.CultureInfo.InvariantCulture);
+            string defColumnWidth = GetColumnWidth1(false,fontName, fontSize,0.0);
+            double defColumnWidthPX = Convert.ToDouble(defColumnWidth);
+            string customColumnWidth = GetColumnWidth1(true, fontName, fontSize, customColWidth);
+            double customColumnWidthPX = Convert.ToDouble(customColumnWidth);
+            double totalWidthPX = ((defColCount * defColumnWidthPX) + customColumnWidthPX);
+            double totalWidthCM = (totalWidthPX / 96.21212121 * 2.54)+ endOffset-startOffset;
+            return totalWidthCM.ToString(System.Globalization.CultureInfo.InvariantCulture) + "cm";
+        }
 
         protected string GetColumnWidth(string text)
         {
@@ -1082,6 +1102,26 @@ namespace CleverAge.OdfConverter.Spreadsheet
             double columnWidthCM = columnWidthInch * 2.54;
             return string.Concat(System.Math.Round(columnWidthCM, 3).ToString(System.Globalization.CultureInfo.InvariantCulture), "cm");
         }
+
+        protected string GetColumnWidth1(bool isWidDefined,string fontName, string fontSize, double customWid )
+        {
+            const double CALC_DPI = 0.7874;
+            double preDefinedWidth = 0.0;               
+            char[] letters = new char[] { 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g', 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w', 'X', 'x', 'Y', 'y', 'Z', 'z' };
+            double dblFontSizePt = Convert.ToDouble(fontSize.TrimEnd(letters), System.Globalization.CultureInfo.InvariantCulture);
+            double dblMaxDigitWidth = MaxDigitWidth(fontName, dblFontSizePt);           
+            if (isWidDefined)
+            {
+                preDefinedWidth = Convert.ToDouble(customWid, System.Globalization.CultureInfo.InvariantCulture);
+            }
+            double iWidthInPixel = WidthToPixel(dblMaxDigitWidth, preDefinedWidth, isWidDefined);
+            //double dblWidthInPt = CALC_DPI * iWidthInPixel;
+            //double columnWidthInch = (dblWidthInPt / 72);
+            ////double columnWidthInch = (iWidthInPixel / 96.21212);
+            //double columnWidthCM = columnWidthInch * 2.54;
+            return iWidthInPixel.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
 
         protected double MaxDigitWidth(string fontName, double dblSizePt)
         {

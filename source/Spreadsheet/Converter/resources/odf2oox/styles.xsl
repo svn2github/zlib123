@@ -1726,15 +1726,21 @@ RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date form
       </xsl:when>
       <xsl:when test="$mode = 'fonts' or $mode='default' ">
         <xsl:choose>
+		<!-- code added to fix bug ref=SP2Compatibility, files-'Testfeatures M1.ods''Text.ods'-->
           <xsl:when test="$fontFamily != '' ">
+			  <xsl:variable name ="apos">
+				  <xsl:text >&quot;</xsl:text>
+			  </xsl:variable>
             <name>
               <xsl:attribute name="val">
                 <xsl:choose>
                   <xsl:when
                     test="not(translate($fontFamily,&quot;&apos;&quot;,&quot;&quot;) = '' )">
-                    <xsl:value-of
+                    <!--<xsl:value-of
                       select="translate($fontFamily,&quot;&apos;&quot;,&quot;&quot;)"
-                    />
+                    />-->
+					  <xsl:value-of
+						select="translate($fontFamily,$apos,'')"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="$fontFamily"/>

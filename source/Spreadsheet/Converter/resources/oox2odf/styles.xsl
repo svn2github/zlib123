@@ -39,6 +39,7 @@ RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default row style for each sheet correctly.
                                             (Bug:Row break:-Round trip Conversion not proper for xlsx sheet)
+RefNo-5 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance   
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -85,8 +86,8 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
-
-    <office:document-styles>
+	<!--RefNo-5:ODF1.1:Added office:version="1.1"-->
+	 <office:document-styles office:version="1.1">
       <office:font-face-decls>
         <xsl:call-template name="InsertFonts"/>
         <xsl:call-template name="InsertHeaderFooterFonts">
@@ -951,12 +952,22 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   </xsl:template>
 
   <!-- bold -->
+  <!--<xsl:template match="e:b" mode="style">
+    <xsl:attribute name="fo:font-weight">
+      <xsl:text>bold</xsl:text>
+    </xsl:attribute>
+  </xsl:template>-->
+<!--Vijayeta/Chavi,SP2,Font asian-->
   <xsl:template match="e:b" mode="style">
+    <!--added by chhavi for sp2-->
+    <xsl:attribute name="style:font-weight-asian">
+      <xsl:text>bold</xsl:text>
+    </xsl:attribute>    
     <xsl:attribute name="fo:font-weight">
       <xsl:text>bold</xsl:text>
     </xsl:attribute>
   </xsl:template>
-
+	<!--Vijayeta/Chavi,SP2,Font asian,End-->
   <!-- italic -->
   <xsl:template match="e:i" mode="style">
     <xsl:attribute name="fo:font-style">

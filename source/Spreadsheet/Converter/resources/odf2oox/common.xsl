@@ -47,42 +47,47 @@
   <!-- converting number of column to char name of column -->
   <xsl:template name="NumbersToChars">
     <xsl:param name="num"/>
+	  <xsl:variable name ="number">
+		  <xsl:value-of select ="translate($num,'$','')"/>
+	  </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$num = 0">A</xsl:when>
-      <xsl:when test="$num = 1">B</xsl:when>
-      <xsl:when test="$num = 2">C</xsl:when>
-      <xsl:when test="$num = 3">D</xsl:when>
-      <xsl:when test="$num = 4">E</xsl:when>
-      <xsl:when test="$num = 5">F</xsl:when>
-      <xsl:when test="$num = 6">G</xsl:when>
-      <xsl:when test="$num = 7">H</xsl:when>
-      <xsl:when test="$num = 8">I</xsl:when>
-      <xsl:when test="$num = 9">J</xsl:when>
-      <xsl:when test="$num = 10">K</xsl:when>
-      <xsl:when test="$num = 11">L</xsl:when>
-      <xsl:when test="$num = 12">M</xsl:when>
-      <xsl:when test="$num = 13">N</xsl:when>
-      <xsl:when test="$num = 14">O</xsl:when>
-      <xsl:when test="$num = 15">P</xsl:when>
-      <xsl:when test="$num = 16">Q</xsl:when>
-      <xsl:when test="$num = 17">R</xsl:when>
-      <xsl:when test="$num = 18">S</xsl:when>
-      <xsl:when test="$num = 19">T</xsl:when>
-      <xsl:when test="$num = 20">U</xsl:when>
-      <xsl:when test="$num = 21">V</xsl:when>
-      <xsl:when test="$num = 22">W</xsl:when>
-      <xsl:when test="$num = 23">X</xsl:when>
-      <xsl:when test="$num = 24">Y</xsl:when>
-      <xsl:when test="$num = 25">Z</xsl:when>
+      <xsl:when test="$number = 0">A</xsl:when>
+      <xsl:when test="$number = 1">B</xsl:when>
+      <xsl:when test="$number = 2">C</xsl:when>
+      <xsl:when test="$number = 3">D</xsl:when>
+      <xsl:when test="$number = 4">E</xsl:when>
+      <xsl:when test="$number = 5">F</xsl:when>
+      <xsl:when test="$number = 6">G</xsl:when>
+      <xsl:when test="$number = 7">H</xsl:when>
+      <xsl:when test="$number = 8">I</xsl:when>
+      <xsl:when test="$number = 9">J</xsl:when>
+      <xsl:when test="$number = 10">K</xsl:when>
+      <xsl:when test="$number = 11">L</xsl:when>
+      <xsl:when test="$number = 12">M</xsl:when>
+      <xsl:when test="$number = 13">N</xsl:when>
+      <xsl:when test="$number = 14">O</xsl:when>
+      <xsl:when test="$number = 15">P</xsl:when>
+      <xsl:when test="$number = 16">Q</xsl:when>
+      <xsl:when test="$number = 17">R</xsl:when>
+      <xsl:when test="$number = 18">S</xsl:when>
+      <xsl:when test="$number = 19">T</xsl:when>
+      <xsl:when test="$number = 20">U</xsl:when>
+      <xsl:when test="$number = 21">V</xsl:when>
+      <xsl:when test="$number = 22">W</xsl:when>
+      <xsl:when test="$number = 23">X</xsl:when>
+      <xsl:when test="$number = 24">Y</xsl:when>
+      <xsl:when test="$number = 25">Z</xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
-            <xsl:value-of select="floor($num div 26)-1"/>
+			  <!--<xsl:value-of select="floor($num div 26)-1"/>-->
+            <xsl:value-of select="floor($number div 26)-1"/>
           </xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
-            <xsl:value-of select="$num - 26*floor($num div 26)"/>
+			  <!--<xsl:value-of select="$num - 26*floor($num div 26)"/>-->
+            <xsl:value-of select="$num - 26*floor($number div 26)"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:otherwise>
@@ -286,10 +291,12 @@
   <xsl:template name="GetColNum">
     <xsl:param name="cell"/>
     <xsl:param name="columnId"/>
-
+	  <xsl:variable name ="tempCell">
+		  <xsl:value-of select ="translate($cell,'$','')"/>
+	  </xsl:variable>
     <xsl:choose>
       <!-- when whole literal column id has been extracted than convert alphabetic index to number -->
-      <xsl:when test="number($cell)">
+      <xsl:when test="number($tempCell)">
         <xsl:call-template name="GetAlphabeticPosition">
           <xsl:with-param name="literal" select="$columnId"/>
         </xsl:call-template>
@@ -297,8 +304,8 @@
       <!--  recursively extract literal column id (i.e if $cell='GH15' it will return 'GH') -->
       <xsl:otherwise>
         <xsl:call-template name="GetColNum">
-          <xsl:with-param name="cell" select="substring-after($cell,substring($cell,1,1))"/>
-          <xsl:with-param name="columnId" select="concat($columnId,substring($cell,1,1))"/>
+          <xsl:with-param name="cell" select="substring-after($cell,substring($tempCell,1,1))"/>
+          <xsl:with-param name="columnId" select="concat($columnId,substring($tempCell,1,1))"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>

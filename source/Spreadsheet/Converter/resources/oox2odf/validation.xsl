@@ -720,15 +720,27 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 		    <xsl:attribute name="table:base-cell-address">
 				<xsl:if test ="@sqref and (substring-after(@sqref,' ')!='')">
 					<!--<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(@sqref,' '))"/>-->
-					<xsl:choose>
+          <!--changed for ODF 1.1-->
+          <xsl:variable name="sqref" select="substring-before(@sqref,' ')"/>
+					<!--<xsl:choose>
 						<xsl:when test ="contains(@sqref,':')" >
-							<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(substring-before(@sqref,':'),' '))"/>
+							--><!--<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(substring-before(@sqref,':'),' '))"/>--><!--
+              <xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(substring-before(@sqref,' '),':'))"/>
 						</xsl:when>
 						<xsl:when test ="not(contains(@sqref,':'))" >
 							<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before(@sqref,' '))"/>
 						</xsl:when>
+					</xsl:choose>-->
+          <xsl:choose>
+            <xsl:when test ="contains($sqref,':')" >
+              <xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',substring-before($sqref,':'))"/>              
+						</xsl:when>
+						<xsl:when test ="not(contains($sqref,':'))" >
+							<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',$sqref)"/>
+						</xsl:when>
 					</xsl:choose>					
 				</xsl:if>
+          <!--end-->
 				<xsl:if test ="@sqref and (substring-after(@sqref,' ')='')">
 					<!--<xsl:value-of select="concat($apos,translate($sheetName,$apos,''),$apos,'.',@sqref)"/>-->
 					<xsl:choose>

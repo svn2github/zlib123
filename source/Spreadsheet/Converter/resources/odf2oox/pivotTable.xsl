@@ -479,7 +479,17 @@
 
             <xsl:choose>
               <!-- "Values" field -->
-              <xsl:when test="@table:source-field-name = '' ">
+				<!-- 
+				  Added: By Vijayeta, 
+                  Date:  1/9/2009
+                  Desc: Crash Because of Pivot Table,Some times when a 'Value' field appears as column,
+					    instead of condition table:source-field-name = "", SP2 retains as table:source-field-name = "Values"
+						In this case,code picks up all the fields from source into a container and all the fields of pivot table
+						into another container, and then compares both the containers, which reults is false and node
+						colFields is not added.  So add additional check, if @table:show-empty is 'true', other cases, it's ste to 'false'
+                  File:  Define_Name_Pivot_Table.ods(SP2 output of Define_Name_Pivot_Table.xlsx)
+				 -->
+              <xsl:when test="@table:source-field-name = '' or table:data-pilot-level[@table:show-empty='true']">
                 <field x="-2"/>
               </xsl:when>
               <xsl:when test="@table:source-field-name != '' ">
@@ -855,8 +865,8 @@
     <xsl:param name="colEnd"/>
     <xsl:param name="rowNum" select="1"/>
     <xsl:param name="sheetName"/>
-
-    <xsl:variable name="rows">
+	  <!--Vijayeta,SP2,@table:number-rows-repeated-->
+    <!--<xsl:variable name="rows">
       <xsl:choose>
         <xsl:when test="@table:number-rows-repeated">
           <xsl:value-of select="@table:number-rows-repeated"/>
@@ -865,8 +875,25 @@
           <xsl:text>1</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="rows">
+      <xsl:choose>
+        <xsl:when test="@table:number-rows-repeated">
+				  <xsl:choose >
+					  <xsl:when test ="@table:number-rows-repeated &gt; 65536">
+						  <xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+					  </xsl:when>
+					  <xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+          <xsl:value-of select="@table:number-rows-repeated"/>
+        </xsl:when>
+				  </xsl:choose>
+			  </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+	  <!--Vijayeta,SP2,@table:number-rows-repeated,End-->
     <xsl:choose>
       <!-- skip rows before start of the source -->
       <xsl:when test="$rowNum + $rows &lt;= $rowStart">
@@ -882,9 +909,20 @@
         </xsl:for-each>
       </xsl:when>
       <xsl:when test="$rowNum &lt;= $rowEnd">
-
+		  <!--Vijayeta,SP2,@table:number-rows-repeated-->
+		  <xsl:variable name ="tableNumberRowsRepeated">
         <xsl:choose>
-          <xsl:when test="@table:number-rows-repeated &gt; 1">
+			  <xsl:when test ="@table:number-rows-repeated &gt; 65536">
+				  <xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+			  </xsl:when>
+			  <xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+				  <xsl:value-of select="@table:number-rows-repeated"/>
+			  </xsl:when>
+		  </xsl:choose>
+		  </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="$tableNumberRowsRepeated &gt; 1">
+			  <!--Vijayeta,SP2,@table:number-rows-repeated,End-->
             <xsl:call-template name="InsertRepeatedCacheRow">
               <xsl:with-param name="colStart" select="$colStart"/>
               <xsl:with-param name="colEnd" select="$colEnd"/>
@@ -966,7 +1004,8 @@
     <xsl:param name="colEnd"/>
     <xsl:param name="colNum" select="1"/>
 
-    <xsl:variable name="columns">
+	  <!--Vijayeta,SP2,@table:number-columns-repeated-->
+    <!--<xsl:variable name="columns">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
           <xsl:value-of select="@table:number-columns-repeated"/>
@@ -975,8 +1014,27 @@
           <xsl:text>1</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+
+    <xsl:variable name="columns">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+				  <xsl:choose >
+					  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+						  <xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+					  </xsl:when>
+					  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
+          <xsl:value-of select="@table:number-columns-repeated"/>
+        </xsl:when>
+				  </xsl:choose>
+			  </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
+	  <!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     <xsl:choose>
       <!-- skip cells before start of the source -->
       <xsl:when test="$colNum &lt; $colStart and $colNum + $columns - 1 &lt; $colStart">
@@ -1351,10 +1409,25 @@
       <xsl:otherwise>
         <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="checkPivotCells">
           <xsl:with-param name="rowNumber">
+			  <!--Vijayeta,SP2,@table:number-rows-repeated-->
+			  <xsl:variable name ="tableNumberRowsRepeated">
             <xsl:choose>
-              <xsl:when test="@table:number-rows-repeated">
+					  <xsl:when test ="@table:number-rows-repeated &gt; 65536">
+						  <xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+					  </xsl:when>
+					  <xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+						  <xsl:value-of select="@table:number-rows-repeated"/>
+					  </xsl:when>
+				  </xsl:choose>
+			  </xsl:variable>
+            <xsl:choose>
+              <!--<xsl:when test="@table:number-rows-repeated">
                 <xsl:value-of select="$rowNumber+@table:number-rows-repeated+1"/>
+              </xsl:when>-->
+              <xsl:when test="@table:number-rows-repeated">
+					<xsl:value-of select="$rowNumber+$tableNumberRowsRepeated+1"/>
               </xsl:when>
+				<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber+1"/>
               </xsl:otherwise>
@@ -1410,7 +1483,8 @@
           <xsl:otherwise>
             <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="checkPivotCells">
               <xsl:with-param name="rowNumber" select="$rowNumber"/>
-              <xsl:with-param name="colNumber">
+				<!--Vijayeta,SP2,@table:number-columns-repeated-->
+              <!--<xsl:with-param name="colNumber">
                 <xsl:choose>
                   <xsl:when test="@table:number-columns-repeated">
                     <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
@@ -1419,7 +1493,25 @@
                     <xsl:value-of select="$colNumber+1"/>
                   </xsl:otherwise>
                 </xsl:choose>
+              </xsl:with-param>-->
+              <xsl:with-param name="colNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-columns-repeated">
+							<xsl:choose >
+								<xsl:when test ="@table:number-columns-repeated &gt; 256">
+									<xsl:value-of select ="$colNumber +1 + (256 - (16384 - @table:number-columns-repeated))"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                    <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+                  </xsl:when>
+							</xsl:choose>
+						</xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$colNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
+				<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
               <xsl:with-param name="isinPivotTable">
                 <xsl:choose>
                   <xsl:when test="$isinPivotTable='true'">true</xsl:when>
@@ -1443,7 +1535,8 @@
       <xsl:otherwise>
         <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="checkPivotCells">
           <xsl:with-param name="rowNumber" select="$rowNumber"/>
-          <xsl:with-param name="colNumber">
+			<!--Vijayeta,SP2,@table:number-columns-repeated-->
+          <!--<xsl:with-param name="colNumber">
             <xsl:choose>
               <xsl:when test="@table:number-columns-repeated">
                 <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
@@ -1452,7 +1545,25 @@
                 <xsl:value-of select="$colNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+          <xsl:with-param name="colNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-columns-repeated">
+						<xsl:choose >
+							<xsl:when test ="@table:number-columns-repeated &gt; 256">
+								<xsl:value-of select ="$colNumber +1 + (256 - (16384 - @table:number-columns-repeated))"/>
+							</xsl:when>
+							<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+              </xsl:when>
+						</xsl:choose>
+					</xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$colNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
+			<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
           <xsl:with-param name="isinPivotTable">
             <xsl:choose>
               <xsl:when test="$isinPivotTable='true'">true</xsl:when>

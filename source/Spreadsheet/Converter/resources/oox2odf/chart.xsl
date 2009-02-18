@@ -115,9 +115,15 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         </xsl:variable>
 
         <!-- go to sheet drawing file and search for charts -->
+				<!--<xsl:for-each
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">-->
+				<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,ChartLost because SP2 created xlsx has oneCellAnchor in Place of twoCellAnchor-->
         <xsl:for-each
-          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
-
+				 select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr//xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+					<!--SP2,Scenario:ods_SP2_xlsx_2.5_ods,End-->
+					<xsl:variable name="chartRelId">
+						<xsl:value-of select="@r:id"/>
+					</xsl:variable>
           <xsl:variable name="chart">
             <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->
             <xsl:call-template name="GetTarget">
@@ -143,6 +149,13 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
               <xsl:with-param name="inputChart">
                 <xsl:value-of select="concat('xl/',substring-after($chart,'/'))"/>
               </xsl:with-param>
+
+							<xsl:with-param name="sheetname" select="$sheet"/>
+							<xsl:with-param name="drawingname" select="$drawing"/>
+							<xsl:with-param name="chartRelId" select="$chartRelId"/>
+
+
+
             </xsl:call-template>
 
           </xsl:for-each>
@@ -179,7 +192,9 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <!-- go to sheet drawing file and search for charts -->
         <xsl:for-each
           select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
-
+					<xsl:variable name="chartRelId">
+						<xsl:value-of select="@r:id"/>
+					</xsl:variable>
           <xsl:variable name="chart">
             <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->
             <xsl:call-template name="GetTarget">
@@ -205,6 +220,9 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
               <xsl:with-param name="inputChart">
                 <xsl:value-of select="concat('xl/',substring-after($chart,'/'))"/>
               </xsl:with-param>
+							<xsl:with-param name="chartRelId" select="$chartRelId"/>
+							<xsl:with-param name="sheetname" select="$sheet"/>
+							<xsl:with-param name="drawingname" select="$drawing"/>
             </xsl:call-template>
 
           </xsl:for-each>
@@ -223,8 +241,20 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <xsl:param name="inputChart"/>
     <!-- (string) input chart file directory -->
 
+		<!--changed by sonata for bug no:2016060-->
+		<xsl:param name="sheetname"/>
+		<xsl:param name="drawingname"/>
+		<xsl:param name="chartRelId"/>
+		<!--end-->
+
     <xsl:call-template name="InsertChartContent">
       <xsl:with-param name="chartId" select="$chartId"/>
+			<!--changed by sonata for bug no:2016060-->
+			<xsl:with-param name="sheetname" select="$sheetname"/>
+			<xsl:with-param name="drawingname" select="$drawingname"/>
+			<xsl:with-param name="chartRelId" select="$chartRelId"/>
+			<!--end-->
+
     </xsl:call-template>
 
     <xsl:call-template name="InsertChartStyles">
@@ -240,9 +270,13 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
     <xsl:param name="chartId"/>
     <!-- (string) unique chart identifier -->
+		<xsl:param name="sheetname"/>
+		<xsl:param name="drawingname"/>
+		<xsl:param name="chartRelId"/>
 
     <pzip:entry pzip:target="{concat('Object ',$chartId,'/content.xml')}">
-      <office:document-content xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+			<!--RefNo-1:ODF1.1:Added office:version="1.1" attribute:06-feb-09-->
+			<office:document-content xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.1">
         <office:automatic-styles>
           <number:number-style style:name="N0">
             <number:number number:min-integer-digits="1"/>
@@ -552,7 +586,11 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         </office:automatic-styles>
         <office:body>
           <office:chart>
-            <xsl:call-template name="InsertChartType"/>
+						<xsl:call-template name="InsertChartType">
+							<xsl:with-param name="chartRelId" select="$chartRelId"/>
+							<xsl:with-param name="sheetname" select="$sheetname"/>
+							<xsl:with-param name="drawingname" select="$drawingname"/>
+						</xsl:call-template>
           </office:chart>
         </office:body>
       </office:document-content>
@@ -570,7 +608,8 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <!-- input chart file directory -->
 
     <pzip:entry pzip:target="{concat('Object ',$chartId,'/styles.xml')}">
-      <office:document-styles>
+			<!--RefNo-1:ODF1.1:Added office:version="1.1":06-feb-09-->
+			<office:document-styles office:version="1.1">
         <office:styles>
           <xsl:call-template name="InsertDrawFillImage">
             <xsl:with-param name="chartId" select="$chartId"/>
@@ -734,61 +773,33 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
       </xsl:call-template>
     </xsl:for-each>-->
+		<!--changed by sonata for bug no:2594979-->
+		<xsl:if test="parent::node()[name()='c:areaChart']/c:grouping[@val='standard']">
+			<xsl:for-each select="preceding-sibling::c:ser[1]">
+				<xsl:call-template name="InsertSeriesReversed">
+					<xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+				</xsl:call-template>
+			</xsl:for-each>
+		</xsl:if>
 <!--end-->
     
   </xsl:template>
    
   <xsl:template name="ConvertCellRange">
     <xsl:param name="cellRange"/>
-    <xsl:param name="finalChrtRng" select="''"/>
-    <xsl:variable name="rngToCnv">
-      <xsl:choose>
-        <xsl:when test="(starts-with($cellRange, '(') or contains(substring($cellRange,string-length($cellRange)-1),')')) and contains($cellRange,',')">
-          <xsl:value-of select="substring(substring-before($cellRange,','),1)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="contains($cellRange,')')">
-              <xsl:value-of select="substring($cellRange,0,string-length($cellRange))"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$cellRange"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <xsl:param name="finalChrtRng" select="''"/>    
 
-    <xsl:variable name="sheetname">
-      <xsl:choose>
-        <xsl:when test="starts-with(substring-before($rngToCnv,'!'), '(')">
-          <xsl:value-of select="substring(substring-before($rngToCnv,'!'),1)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="substring-before($rngToCnv,'!')"/>
-        </xsl:otherwise>
-      </xsl:choose>      
+		<!--end-->
+		<xsl:variable name ="temp">
+			<xsl:call-template name="translate-expression">
+				<xsl:with-param name="isRangeAddress" select="true()"/>
+				<xsl:with-param name="cell-row-pos" select="0"/>
+				<xsl:with-param name="cell-column-pos" select="0"/>
+				<xsl:with-param name="expression" select="$cellRange"/>
+				<xsl:with-param name="return-value" select="''"/>
+			</xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="range">
-      <xsl:value-of select="substring-after($rngToCnv,'!')"/>
-    </xsl:variable>
-    <xsl:variable name="rangeFrm">
-      <xsl:value-of select="substring-before($range,':')"/>
-    </xsl:variable>
-    <xsl:variable name="rangeTo">
-      <xsl:value-of select="substring-after($range,':')"/>
-    </xsl:variable>
-    <xsl:variable name="chartRange">
-      <xsl:choose>
-        <xsl:when test="contains($range,':')">
-          <xsl:value-of select="concat($sheetname,'.',$rangeFrm,':',$sheetname,'.',$rangeTo)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="concat($sheetname,'.',$range)"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:value-of select="$chartRange"/>
+		<xsl:value-of select="$temp"/>
   </xsl:template>
 
   <xsl:template name="InsertSeriesData">
@@ -806,21 +817,50 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <chart:series chart:style-name="{concat('series',$seriesNumber)}">
       <!--added by sonata for bug no:2107116-->
       <!--reference to the series value-->
-      <xsl:if test="c:val//c:f">
+			<!--added by chhavi for sp2-->
+			<xsl:if test="c:val//c:f or c:xVal//c:f">
        <xsl:variable name="cellRange">
+					<xsl:choose>
+						<xsl:when test="c:val//c:f">
         <xsl:value-of select="c:val//c:f"/>
+						</xsl:when>
+						<xsl:when test="c:xVal//c:f">
+							<xsl:value-of select="c:xVal//c:f"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name ="tempRangeVal">
+					<xsl:choose>
+						<xsl:when test="(starts-with($cellRange, '(') or contains(substring($cellRange,string-length($cellRange)-1),')')) and contains($cellRange,',')">
+							<xsl:value-of select="substring(substring-before($cellRange,','),1)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="contains($cellRange,')')">
+									<xsl:value-of select="substring($cellRange,0,string-length($cellRange))"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$cellRange"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
         </xsl:variable>
-
-
-
         <xsl:variable name="rangeVal">
           <xsl:call-template name="ConvertCellRange">
-            <xsl:with-param name="cellRange" select="$cellRange"/>
+						<xsl:with-param name="cellRange" select="$tempRangeVal"/>
           </xsl:call-template>
         </xsl:variable>
         <xsl:if test="not(contains($cellRange,'#REF!'))">
           <xsl:attribute name="chart:values-cell-range-address">
-            <xsl:value-of select="translate($rangeVal,'(','')"/>
+						<xsl:choose>
+							<xsl:when test="contains($rangeVal,':')">
+								<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rangeVal"/>
+							</xsl:otherwise>
+						</xsl:choose>
           </xsl:attribute>
         </xsl:if> 
           </xsl:if>
@@ -834,7 +874,23 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <xsl:variable name="cellRange">
               <xsl:value-of select="key('xNumPoints', @oox:part)//c:f"/>
             </xsl:variable>
-            
+						<xsl:variable name ="tempRangeVal">
+							<xsl:choose>
+								<xsl:when test="(starts-with($cellRange, '(') or contains(substring($cellRange,string-length($cellRange)-1),')')) and contains($cellRange,',')">
+									<xsl:value-of select="substring(substring-before($cellRange,','),1)"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:choose>
+										<xsl:when test="contains($cellRange,')')">
+											<xsl:value-of select="substring($cellRange,0,string-length($cellRange))"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="$cellRange"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
             <xsl:variable name="rangeVal">
               <xsl:call-template name="ConvertCellRange">
                 <xsl:with-param name="cellRange" select="$cellRange"/>
@@ -843,7 +899,14 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           
             <xsl:if test="not(contains($cellRange,'#REF!'))">
               <xsl:attribute name="table:cell-range-address">
+								<xsl:choose>
+									<xsl:when test="contains($rangeVal,':')">
+										<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>
+									</xsl:when>
+									<xsl:otherwise>
                 <xsl:value-of select="$rangeVal"/>
+									</xsl:otherwise>
+								</xsl:choose>
               </xsl:attribute>
             </xsl:if>
           </xsl:if>
@@ -880,6 +943,8 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         </xsl:if>
       </xsl:if>
 
+
+
       <!-- error indicator -->
       <xsl:for-each select="c:errBars">
         <xsl:if test="c:errValType/@val != 'stdErr' and c:errValType/@val != 'stdDev' ">
@@ -911,6 +976,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <xsl:if test="$seriesNumber = 0">
             <xsl:call-template name="InsertPieDataPoints">
               <xsl:with-param name="numPoints" select="$numPoints - 1"/>
+              <xsl:with-param name="countSer" select="0"/>
             </xsl:call-template>
           </xsl:if>
         </xsl:when>
@@ -963,15 +1029,26 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <!-- (int) total number of points in chart reduced by 1-->
     <xsl:param name="current" select="$numPoints"/>
     <!-- (int) number of currently processed point (zero-based) -->
+    <xsl:param name="countSer"></xsl:param>
 
-    <chart:data-point chart:style-name="{concat('data0-',$current)}"/>
+    <!--changed by sonata for bug no:2557071-->
+    <!--<chart:data-point chart:style-name="{concat('data0-',$current)}"/>-->
+    <chart:data-point chart:style-name="{concat('data0-',$countSer)}"/>
 
-    <xsl:if test="$current != 0">
+    <!--<xsl:if test="$current != 0">
       <xsl:call-template name="InsertPieDataPoints">
         <xsl:with-param name="numPoints" select="$numPoints"/>
         <xsl:with-param name="current" select="$current -1"/>
       </xsl:call-template>
+    </xsl:if>-->
+    <xsl:if test="$countSer &lt; $numPoints">
+      <xsl:call-template name="InsertPieDataPoints">
+        <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="countSer" select="$countSer +1"/>
+      </xsl:call-template>
     </xsl:if>
+    <!--end-->
+    
   </xsl:template>
 
   <xsl:template name="InsertDataPoints">
@@ -1183,10 +1260,21 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                 <text:p/>
               </table:table-cell>
               <!--changed by sonata for bug no:2107193-->
+							<!--changed by sonata for bug no:2594979-->
               <!--<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()/c:ser[last()]">-->
+							<xsl:choose>
+								<xsl:when test="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()[name()='c:areaChart']/c:grouping[@val='standard']">
+									<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()/c:ser[last()]">
+										<xsl:call-template name="InsertHeaderRowsReverse"/>
+									</xsl:for-each>
+								</xsl:when>
+								<xsl:otherwise>
               <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()/c:ser">
                 <xsl:call-template name="InsertHeaderRowsReverse"/>
               </xsl:for-each>
+								</xsl:otherwise>
+							</xsl:choose>
+
               <!--end-->
 
             </table:table-row>
@@ -1286,6 +1374,16 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         </xsl:call-template>
       </xsl:for-each>
     </xsl:if>-->
+		<!--changed by sonata for bug no:2594979-->
+		<xsl:if test="parent::node()[name()='c:areaChart']/c:grouping[@val='standard']">
+			<xsl:if test="preceding-sibling::c:ser">
+				<xsl:for-each select="preceding-sibling::c:ser[1]">
+					<xsl:call-template name="InsertHeaderRowsReverse">
+						<xsl:with-param name="count" select="$count + 1"/>
+					</xsl:call-template>
+				</xsl:for-each>
+			</xsl:if>
+		</xsl:if>
     <!--end-->
   </xsl:template>
 
@@ -1503,14 +1601,45 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <xsl:param name="point"/>
     <!-- (number) series number -->
     <xsl:param name="count" select="1"/>
+		<!--changed by sonata for bug no:2594979-->
+		<xsl:param name="positionCount" select="0"/>
+		<!--end-->
 <xsl:param name="pointIndex"/>
 
     <xsl:variable name="noOfSeries">
       <xsl:value-of select="count(key('dataSeries', c:chartSpace/@oox:part))"/>
     </xsl:variable>
 
-
+		<!--changed by sonata for bug no:2594979-->
     <!--changed by sonata for bug no:2107193-->
+		<xsl:choose>
+			<xsl:when test="key('dataSeries', c:chartSpace/@oox:part)/parent::node()[name()='c:areaChart']/c:grouping[@val='standard']">
+				<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[last() - $positionCount]">
+					<xsl:choose>
+						<xsl:when test="c:val/descendant::c:pt[@idx = $point]">
+							<table:table-cell office:value-type="float"
+							  office:value="{c:val/descendant::c:pt[@idx = $point]/c:v}">
+								<text:p>
+									<xsl:value-of select="c:val/descendant::c:pt[@idx = $point]/c:v"/>
+								</text:p>
+							</table:table-cell>
+						</xsl:when>
+						<xsl:otherwise>
+							<table:table-cell office:value-type="float" office:value="1.#NAN">
+								<text:p>1.#NAN</text:p>
+							</table:table-cell>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+
+				<xsl:if test="key('dataSeries', c:chartSpace/@oox:part)[last() - $positionCount - 1]">
+					<xsl:call-template name="InsertValuesReverse">
+						<xsl:with-param name="point" select="$point"/>
+						<xsl:with-param name="positionCount" select="$positionCount + 1"/>
+					</xsl:call-template>
+				</xsl:if>
+			</xsl:when>
+			<xsl:otherwise>
     <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[position() = $count]">   
       <xsl:choose>
         <xsl:when test="c:val/descendant::c:pt[@idx = $pointIndex]">
@@ -1543,6 +1672,10 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <xsl:with-param name="pointIndex" select="$pointIndex"/>
       </xsl:call-template>
     </xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
+		<!--end-->
+
   </xsl:template>
 
   <xsl:template name="InsertTitle">
@@ -1684,6 +1817,14 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <xsl:when test="key('xNumPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount">
             <xsl:value-of select="key('xNumPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
           </xsl:when>
+					<!--Chavi,SP2,Adding X and Y axis in Pie Chart-->
+					<xsl:when test ="c:chartSpace/c:chart/c:plotArea/c:pieChart">
+						<xsl:value-of select ="c:chartSpace/c:chart/c:plotArea/c:pieChart/c:ser/c:val/descendant::c:ptCount/@val"/>
+					</xsl:when>
+					<xsl:when test ="c:chartSpace/c:chart/c:plotArea/c:pie3DChart">
+						<xsl:value-of select ="c:chartSpace/c:chart/c:plotArea/c:pie3DChart/c:ser/c:val/descendant::c:ptCount/@val"/>
+					</xsl:when>
+					<!--Chavi,SP2,Adding X and Y axis in Pie Chart end-->
           <xsl:otherwise>
             <xsl:value-of select="key('numPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
           </xsl:otherwise>
@@ -1776,11 +1917,298 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   <xsl:template name="InsertChartType">
     <!-- @Description: Inserts desired type of chart -->
     <!-- @Context: input chart file root -->
+		<xsl:param name="chartRelId"/>
+		<xsl:param name="sheetname"/>
+		<xsl:param name="drawingname"/>
 
     <chart:chart svg:width="13.066cm" svg:height="9.279cm" chart:class="chart:bar"
       chart:style-name="chart">
 
-      <!--RefNo-1:ODF1.1-->
+			<!--calculating chart height-->
+			<!--<xsl:for-each
+         select="key('Part', concat('xl/',substring-after($drawingname,'/')))/xdr:wsDr/xdr:twoCellAnchor">-->
+			<!--<xsl:for-each
+      select="key('Part', concat('xl/',substring-after($drawingname,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">-->
+			<xsl:for-each
+		   select="key('Part', concat('xl/',substring-after($drawingname,'/')))/xdr:wsDr">
+				<xsl:choose>
+					<xsl:when test="xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
+						<xsl:for-each
+					select="xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
+							<xsl:for-each select="parent::node()/parent::node()/parent::node()/parent::node()">
+
+								<xsl:variable name="startrowno" select="xdr:from/xdr:row">
+								</xsl:variable>
+								<xsl:variable name="startrowoffset">
+									<xsl:value-of select="xdr:from/xdr:rowOff"/>
+								</xsl:variable>
+								<xsl:variable name="endrowno" select="xdr:to/xdr:row">
+								</xsl:variable>
+								<xsl:variable name="endrowoffset">
+									<xsl:value-of select="xdr:to/xdr:rowOff"/>
+								</xsl:variable>
+								<xsl:variable name="startrowoffsetincm">
+									<xsl:call-template name="ConvertEmu">
+										<xsl:with-param name="length" select="$startrowoffset"/>
+										<xsl:with-param name="unit" select="'cm'"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:variable name="endrowoffsetincm">
+									<xsl:call-template name="ConvertEmu">
+										<xsl:with-param name="length" select="$endrowoffset"/>
+										<xsl:with-param name="unit" select="'cm'"/>
+									</xsl:call-template>
+								</xsl:variable>
+
+								<xsl:variable name="startcolno" select="xdr:from/xdr:col">
+
+								</xsl:variable>
+								<xsl:variable name="startcoloffset">
+									<xsl:call-template name="ConvertEmu">
+										<xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
+										<xsl:with-param name="unit" select="'cm'"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:variable name="endcolno" select="xdr:to/xdr:col">
+								</xsl:variable>
+								<xsl:variable name="endcoloffset">
+									<xsl:call-template name="ConvertEmu">
+										<xsl:with-param name="length" select="xdr:to/xdr:colOff"/>
+										<xsl:with-param name="unit" select="'cm'"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:for-each select="key('Part', concat('xl/',$sheetname))/e:worksheet/e:drawing">
+									<xsl:variable name="defaultrowheight">
+										<xsl:value-of select="parent::node()/child::node()[name()='sheetFormatPr']/@defaultRowHeight"/>
+									</xsl:variable>
+									<xsl:variable name="chartrowheight">
+										<xsl:call-template name="CalculateRowHeight">
+											<xsl:with-param name="sheetname" select="$sheetname"/>
+											<xsl:with-param name="startrowno" select="$startrowno"/>
+											<xsl:with-param name="endrowno" select="$endrowno +1"/>
+											<xsl:with-param name="total" select="0"/>
+											<xsl:with-param name="defaultrowheight" select="$defaultrowheight"/>
+											<xsl:with-param name="countchartrow" select="$startrowno + 1"/>
+										</xsl:call-template>
+									</xsl:variable>
+									<xsl:variable name="chartrowheightincm">
+										<xsl:call-template name="ConvertToCentimeters">
+											<xsl:with-param name="length">
+												<xsl:value-of
+												  select="concat($chartrowheight,'pt')"
+                      />
+											</xsl:with-param>
+										</xsl:call-template>
+									</xsl:variable>
+									<xsl:variable name="finalchartrowheight">
+										<xsl:value-of select="concat((substring-before($chartrowheightincm,'cm') - substring-before($startrowoffsetincm,'cm') + substring-before($endrowoffsetincm,'cm')),'cm')"/>
+									</xsl:variable>
+									<xsl:attribute name="svg:height">
+										<xsl:value-of select="$finalchartrowheight"/>
+									</xsl:attribute>
+
+									<!--calculating coloumnwidth-->
+									<xsl:variable name="defaultFontSize">
+										<xsl:for-each select="key('Part', 'xl/styles.xml')">
+											<xsl:choose>
+												<xsl:when test="e:styleSheet/e:fonts/e:font">
+													<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:text>11</xsl:text>
+												</xsl:otherwise>
+											</xsl:choose>
+										</xsl:for-each>
+									</xsl:variable>
+									<xsl:variable name="defaultFontStyle">
+										<xsl:for-each select="key('Part', 'xl/styles.xml')">
+											<xsl:choose>
+												<xsl:when test="e:styleSheet/e:fonts/e:font">
+													<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:text>11</xsl:text>
+												</xsl:otherwise>
+											</xsl:choose>
+										</xsl:for-each>
+									</xsl:variable>
+
+
+
+									<xsl:variable name="defaultcolWidth">
+										<xsl:choose>
+											<xsl:when test="parent::node()/child::node()[name()='sheetFormatPr']/@defaultColWidth">
+
+												<xsl:value-of
+												   select="parent::node()/child::node()[name()='sheetFormatPr']/@defaultColWidth"/>
+
+
+
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:value-of select="'null'"/>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:variable>
+
+									<xsl:variable name="colWidPlusdefaultColCount">
+										<!--<xsl:if test="parent::node()/child::node()[name()='cols']">-->
+										<xsl:call-template name="CalculateColWidth">
+											<xsl:with-param name="sheetname" select="$sheetname"/>
+											<xsl:with-param name="startcolno" select="$startcolno"/>
+											<xsl:with-param name="endcolno" select="$endcolno +1"/>
+											<xsl:with-param name="total" select="0"/>
+											<xsl:with-param name="defaultcolWidth" select="$defaultcolWidth"/>
+											<xsl:with-param name="countchartcol" select="$startcolno + 1"/>
+											<xsl:with-param name="totalDefaultColCount"/>
+											<xsl:with-param name="startcoloffset" select="$startcoloffset"/>
+											<xsl:with-param name="endcoloffset" select="$endcoloffset"/>
+										</xsl:call-template>
+
+
+										<!--</xsl:if>-->
+
+
+									</xsl:variable>
+
+									<xsl:attribute name="test">
+										<xsl:value-of select="$colWidPlusdefaultColCount"/>
+									</xsl:attribute>
+
+									<xsl:variable name="customColWid">
+										<xsl:variable name="customColWidPt">
+											<xsl:value-of select="substring-before($colWidPlusdefaultColCount,'|')"/>
+										</xsl:variable>
+										<xsl:if test="$customColWidPt = 0">
+											<xsl:value-of select="concat($customColWidPt,'cm')"/>
+										</xsl:if>
+										<xsl:if test="$customColWidPt = ''">
+											<xsl:value-of select="concat(0,'cm')"/>
+										</xsl:if>
+										<xsl:if test="$customColWidPt != 0">
+											<xsl:call-template name="ConvertToCentimeters">
+												<xsl:with-param name="length">
+													<xsl:value-of
+													  select="concat(substring-before($colWidPlusdefaultColCount,'|'),'pt')"
+                      />
+												</xsl:with-param>
+
+											</xsl:call-template>
+										</xsl:if>
+									</xsl:variable>
+									<xsl:variable name="defaultColCount">
+										<!--<xsl:if test="substring-before($endcoloffset,'cm')!=0">
+                <xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|')"/>
+              </xsl:if>
+              <xsl:if test="substring-before($endcoloffset,'cm')=0">
+                <xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|') -1"/>
+              </xsl:if>-->
+										<xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|')"/>
+
+									</xsl:variable>
+
+									<!--<xsl:attribute name="svg:width">
+            <xsl:choose>
+              <xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')=0 ">
+                <xsl:variable name="totalDefWid">
+                  <xsl:value-of select="number($defaultColCount) * number($defaultcolWidth) "/>
+                </xsl:variable>
+                <xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+                -->
+									<!--<xsl:value-of select="concat(($defaultColCount * substring-before($defaultcolWidth,'cm')),'cm') "/>-->
+									<!--
+              </xsl:when>
+              <xsl:when test="$defaultcolWidth != 'null' and $customColWid != 0">
+                <xsl:value-of select="concat((($defaultColCount * substring-before($defaultcolWidth,'cm')) + substring-before($customColWid,'cm') - 
+                         substring-before($startcoloffset,'cm') +  substring-before($endcoloffset,'cm')),'cm')    "/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')!=''">
+                  <xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'),'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+                </xsl:if>
+                <xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')=''">
+                  <xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|','0','|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+                </xsl:if>
+                -->
+									<!--<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'))"/>-->
+									<!--
+              </xsl:otherwise>
+            </xsl:choose>
+
+
+
+            -->
+									<!-- Call Post Processor Here-->
+									<!--
+
+
+          </xsl:attribute>-->
+
+									<xsl:attribute name="svg:width">
+										<xsl:choose>
+											<xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')=0 ">
+												<xsl:variable name="totalDefWid">
+													<xsl:value-of select="number($defaultColCount) * number($defaultcolWidth) "/>
+												</xsl:variable>
+												<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+												<!--<xsl:value-of select="concat(($defaultColCount * substring-before($defaultcolWidth,'cm')),'cm') "/>-->
+											</xsl:when>
+											<xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')!=0">
+												<xsl:variable name="totalDefWid">
+													<xsl:value-of select="number($defaultColCount) * number($defaultcolWidth)+ substring-before($colWidPlusdefaultColCount,'|')"/>
+												</xsl:variable>
+												<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')!=''">
+													<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'),'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+												</xsl:if>
+												<xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')=''">
+													<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|','0','|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+												</xsl:if>
+												<!--<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'))"/>-->
+											</xsl:otherwise>
+										</xsl:choose>
+										<!-- Call Post Processor Here-->
+									</xsl:attribute>
+
+
+								</xsl:for-each>
+
+							</xsl:for-each>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="xdr:oneCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
+						<xsl:choose>
+							<xsl:when test="number(xdr:ext/@cx)=0 and number(xdr:ext/@cy)=0">
+								<xsl:attribute name="svg:width">
+									<xsl:value-of select="'12.7cm'"/>
+								</xsl:attribute>
+								<xsl:attribute name="svg:height">
+									<xsl:value-of select="'7.62cm'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="number(xdr:ext/@cx)!=0 and number(xdr:ext/@cy)!=0">
+								<xsl:call-template name="InsertAbsoluteSize"/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:when test="xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
+						<xsl:for-each select="xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
+							<xsl:for-each select="parent::node()/parent::node()/parent::node()/parent::node()">
+								<xsl:call-template name="InsertAbsoluteSize"/>
+							</xsl:for-each>
+
+						</xsl:for-each>
+
+
+
+					</xsl:when>
+				</xsl:choose>
+
+			</xsl:for-each>
+
+			<!--end-->
       <xsl:variable name="chartType">
         <xsl:choose>
           <!-- for Stock Chart type 3 and type 4-->
@@ -1838,7 +2266,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
       <!--RefNo-1:ODF1.1:removed chart:table-number-list-->
       <!--<chart:plot-area chart:style-name="plot_area" chart:table-number-list="0" svg:x="0.26cm"  svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">-->
-      <chart:plot-area chart:style-name="plot_area" svg:x="0.26cm"  svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">
+			<chart:plot-area chart:style-name="plot_area" svg:x="0.26cm"  svg:y="2.087cm">
         <!-- Axes -->
         <xsl:choose>
           <!-- stock chart type 3 and stock chart type 4 -->
@@ -1919,7 +2347,13 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             </xsl:for-each>
           </xsl:when>
           <!--end of added code-->
+					<!--Chavi,SP2,Adding X and Y axis in Pie Chart-->
+					<xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:pieChart or  key('plotArea', c:chartSpace/@oox:part)/c:pie3DChart">
+						<xsl:call-template name="InsertXAxis"/>
+						<xsl:call-template name="InsertYAxis"/>
+					</xsl:when>
           
+					<!--Chavi,SP2,Adding X and Y axis in Pie Chart,End-->
           <xsl:otherwise>
 			  <!--Condition Added By Sateesh-->
 			  <!-- Bug#: 1877279, BugDescription: XLSX Roundtrip - Failure on open -->
@@ -1961,7 +2395,17 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           </xsl:when>
           <xsl:otherwise>
             <!--chnaged by sonata for bug no:2107193-->
+						<!--changed by sonata for bug no:2594979-->
             <!--<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[last()]">-->
+						<xsl:choose>
+							<xsl:when test="key('dataSeries', c:chartSpace/@oox:part)[1]/parent::node()[name()='c:areaChart']/c:grouping[@val='standard']">
+								<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[last()]">
+									<xsl:call-template name="InsertSeriesReversed">
+										<xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+									</xsl:call-template>
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:otherwise>
             <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)">
               <xsl:call-template name="InsertSeriesReversed">
                 <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
@@ -1970,6 +2414,19 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           </xsl:otherwise>
         </xsl:choose>
 
+						<!--end-->
+						<!--<xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)">
+              <xsl:call-template name="InsertSeriesReversed">
+                <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+              </xsl:call-template>
+            </xsl:for-each>-->
+
+
+					</xsl:otherwise>
+				</xsl:choose>
+				<!--added by sonata for bug no:2571146-->
+				<chart:stock-range-line chart:style-name="stock-range"/>
+				<!--end-->
         <chart:wall chart:style-name="wall"/>
         <chart:floor chart:style-name="floor"/>
         <!--RefNo-1:ODF1.1:commented ellement chart:stock-range-line:chk for the bug fix:2015044-->
@@ -1980,6 +2437,212 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
     </chart:chart>
   </xsl:template>
+
+	<xsl:template name="CalculateRowHeight">
+		<xsl:param name="sheetname"/>
+		<xsl:param name="startrowno"/>
+		<xsl:param name="endrowno"/>
+		<xsl:param name="total"/>
+		<xsl:param name="defaultrowheight"/>
+		<xsl:param name="countchartrow"/>
+
+		<xsl:variable name="totalrowheight">
+			<xsl:choose>
+				<xsl:when test="($countchartrow &gt;= $startrowno+1) and ($countchartrow &lt;= $endrowno)">
+					<xsl:choose>
+						<xsl:when test="parent::node()/child::node()[name()='sheetData']/child::node()/@r=$countchartrow">
+							<xsl:choose>
+								<xsl:when test="parent::node()/child::node()[name()='sheetData']/child::node()[@r=$countchartrow]/@ht">
+									<!--<xsl:when test="parent::node()/child::node()[name()='sheetData']/child::node()/@ht">-->
+									<!--<xsl:variable name="customrowheight" select="parent::node()/child::node()[name()='sheetData']/child::node()/@ht"/>-->
+									<xsl:variable name="customrowheight" select="parent::node()/child::node()[name()='sheetData']/child::node()[@r=$countchartrow]/@ht"/>
+									<xsl:value-of select="$total + $customrowheight"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$total+$defaultrowheight"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$total+$defaultrowheight"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$total"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+
+			<xsl:when test="($countchartrow &gt;= $startrowno+1) and ($countchartrow &lt; $endrowno -1)">
+				<xsl:call-template name="CalculateRowHeight">
+					<xsl:with-param name="sheetname" select="$sheetname"/>
+					<xsl:with-param name="startrowno" select="$startrowno"/>
+					<xsl:with-param name="endrowno" select="$endrowno"/>
+					<xsl:with-param name="total" select="$totalrowheight"/>
+					<xsl:with-param name="defaultrowheight" select="$defaultrowheight"/>
+					<xsl:with-param name="countchartrow" select="$countchartrow + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$totalrowheight"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="CalculateColWidth">
+		<xsl:param name="sheetname"/>
+		<xsl:param name="startcolno"/>
+		<xsl:param name="endcolno"/>
+		<xsl:param name="total"/>
+		<xsl:param name="defaultcolWidth"/>
+		<xsl:param name="countchartcol"/>
+		<xsl:param name="totalDefaultColCount"/>
+		<xsl:param name="startcoloffset"/>
+		<xsl:param name="endcoloffset"/>
+
+
+		<xsl:variable name="totalCustomColWidth">
+			<xsl:choose>
+				<xsl:when test="($countchartcol &gt;= $startcolno + 1) and ($countchartcol &lt;= $endcolno)">
+					<xsl:choose>
+						<xsl:when test="parent::node()/child::node()[name()='cols']">
+							<xsl:variable name="customColWidth">
+								<xsl:for-each select="parent::node()/child::node()[name()='cols']/child::node()[($countchartcol &gt; @min or $countchartcol=@min) and ($countchartcol &lt; @max or $countchartcol =@max)]">
+									<xsl:choose>
+										<xsl:when test="($countchartcol &gt; @min or $countchartcol=@min) and ($countchartcol &lt; @max or $countchartcol =@max)">
+											<xsl:choose>
+												<xsl:when test="@width">
+													<xsl:value-of select="@width"/>
+												</xsl:when>
+											</xsl:choose>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="$total"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:if test ="$customColWidth!=''">
+								<xsl:value-of select="$total + $customColWidth"/>
+							</xsl:if>
+							<xsl:if test ="$customColWidth = ''">
+								<xsl:value-of select="$total"/>
+							</xsl:if>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+
+		<xsl:variable name="countDefaultColWidth">
+			<xsl:variable name ="flag">
+				<xsl:choose>
+					<xsl:when test="($countchartcol &gt;= $startcolno + 1) and ($countchartcol &lt;= $endcolno)">
+						<xsl:choose>
+							<xsl:when test="parent::node()/child::node()[name()='cols']">
+								<xsl:for-each select="parent::node()/child::node()[name()='cols']/child::node()">
+									<!-- NewCode-->
+									<xsl:choose >
+										<xsl:when test="($countchartcol &gt;= @min) and ($countchartcol &lt;= @max)">
+											<xsl:value-of select ="'true'"/>
+										</xsl:when>
+										<xsl:when test="($countchartcol &lt;= @min)">
+											<xsl:value-of select ="'false'"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select ="'false'"/>
+										</xsl:otherwise>
+									</xsl:choose>
+
+									<!-- NewCode-->
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$endcolno -($startcolno)"/>
+							</xsl:otherwise>
+						</xsl:choose>
+
+					</xsl:when>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:choose>
+				<xsl:when test ="contains($flag,'true')">
+					<xsl:value-of select ="concat($totalDefaultColCount,'false|')"/>
+				</xsl:when>
+				<xsl:when test ="not(contains($flag,'true'))">
+					<xsl:value-of select ="concat($totalDefaultColCount,'true|')"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+
+
+		<xsl:choose>
+
+			<xsl:when test="($countchartcol &gt;= $startcolno + 1) and ($countchartcol &lt; $endcolno -1)">
+				<xsl:call-template name="CalculateColWidth">
+					<xsl:with-param name="sheetname" select="$sheetname"/>
+					<xsl:with-param name="startcolno" select="$startcolno"/>
+					<xsl:with-param name="endcolno" select="$endcolno"/>
+					<xsl:with-param name="total">
+						<xsl:if test="$totalCustomColWidth != 0 ">
+							<xsl:value-of select="$totalCustomColWidth"/>
+						</xsl:if>
+						<xsl:if test="$totalCustomColWidth = 0 ">
+							<xsl:value-of select="0"/>
+						</xsl:if>
+					</xsl:with-param>
+					<xsl:with-param name="totalDefaultColCount" select="$countDefaultColWidth"/>
+					<xsl:with-param name="defaultcolWidth" select="$defaultcolWidth"/>
+					<xsl:with-param name="countchartcol" select="$countchartcol + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="finalCount">
+					<xsl:call-template name="increaseCount">
+						<xsl:with-param name ="totalCount" select ="0"/>
+						<xsl:with-param name="countDefaultColWidth" select ="$countDefaultColWidth"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="concat($totalCustomColWidth,'|',$finalCount)"/>
+
+			</xsl:otherwise>
+		</xsl:choose>
+
+
+	</xsl:template>
+
+	<xsl:template name="increaseCount">
+		<xsl:param name ="totalCount"/>
+		<xsl:param name="countDefaultColWidth"/>
+		<xsl:variable name ="totalNo">
+			<xsl:value-of select ="$totalCount"/>
+		</xsl:variable>
+		<xsl:choose>
+
+
+			<xsl:when test ="$countDefaultColWidth!='' and substring-before($countDefaultColWidth,'|')='true'">
+				<xsl:call-template name ="increaseCount">
+					<xsl:with-param name ="totalCount">
+						<xsl:value-of select ="$totalNo+1"/>
+					</xsl:with-param>
+					<xsl:with-param name ="countDefaultColWidth" select ="substring-after($countDefaultColWidth,'|')"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test ="$countDefaultColWidth!='' and substring-before($countDefaultColWidth,'|')='false'">
+				<xsl:call-template name ="increaseCount">
+					<xsl:with-param name ="totalCount">
+						<xsl:value-of select ="$totalNo"/>
+					</xsl:with-param>
+					<xsl:with-param name ="countDefaultColWidth" select ="substring-after($countDefaultColWidth,'|')"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$totalNo"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
   <xsl:template name="InsertChartProperties">
     <style:style style:name="chart" style:family="chart">
@@ -2627,65 +3290,6 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
               <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
               <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
            </xsl:call-template>
-          </xsl:when>
-          <!-- default title -->
-          <xsl:otherwise>
-            <xsl:call-template name="TextBoxRunProperties">
-              <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </style:text-properties>
-    </style:style>
-<!--style added for file name:Pie_Chart_Legend.xlsx-->
-    <style:style style:name="secondary_axis-y" style:family="chart">
-      <!--code added by sonata for bug no:2107205-->
-      <xsl:choose>
-        <xsl:when test="$numberformat!=''">
-          <xsl:attribute name="style:data-style-name">
-            <xsl:value-of select="$dataStyleName"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="style:data-style-name">
-            <xsl:value-of select="N0"/>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-      <!--end-->
-      <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
-        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="true"
-        text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
-        style:direction="ltr">
-
-        <xsl:call-template name="SetAxisChartProperties">
-          <xsl:with-param name="axisId" select="$axisXId"/>
-        </xsl:call-template>
-
-      </style:chart-properties>
-      <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
-        svg:stroke-color="#000000">
-        <xsl:for-each select="c:spPr">
-          <xsl:call-template name="InsertLineColor"/>
-          <xsl:call-template name="InsertLineStyle"/>
-        </xsl:for-each>
-      </style:graphic-properties>
-      <style:text-properties fo:font-family="Calibri"  style:font-family-generic="swiss"
-        style:font-pitch="variable" fo:font-size="10pt"
-        style:font-family-asian="&apos;MS Gothic&apos;"
-        style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-        style:font-size-asian="10pt" style:font-family-complex="Tahoma"
-        style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-        style:font-size-complex="10pt">
-        <xsl:choose>
-          <!-- custom title -->
-          <xsl:when test="c:tx">
-            <xsl:call-template name="TextBoxRunProperties">
-              <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
-              <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-            </xsl:call-template>
           </xsl:when>
           <!-- default title -->
           <xsl:otherwise>
@@ -3678,7 +4282,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             </xsl:for-each>
         <!--changed by sonata for bug no:2107193-->
 
-        <xsl:for-each select="c:val/c:numRef/c:numCache">
+				<!--<xsl:for-each select="c:val/c:numRef/c:numCache">
 
           <xsl:variable name="formatcode">
             <xsl:if test="c:formatCode">
@@ -3698,7 +4302,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             </xsl:otherwise>
           </xsl:choose>
 
-        </xsl:for-each>
+        </xsl:for-each>-->
         <!--end-->
 
         
@@ -4790,10 +5394,14 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
     <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
       <xsl:choose>
+        <!--changed by sonata for bug no:2557071-->
+        <!--<xsl:when
+          test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart">-->
         <xsl:when
-          test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart">
+        test="c:barChart/c:barDir/@val = 'bar' or c:ofPieChart">
           <xsl:text>true</xsl:text>
         </xsl:when>
+        <!--end-->
         <xsl:otherwise>
           <xsl:text>false</xsl:text>
         </xsl:otherwise>

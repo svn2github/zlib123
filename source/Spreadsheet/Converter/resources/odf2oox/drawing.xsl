@@ -93,11 +93,39 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <xdr:wsDr>
       <!--Insert Chart -->
       <xsl:for-each select="descendant::draw:frame">
-
         <xsl:variable name="chart">
           <xsl:for-each select="descendant::draw:object">
             <xsl:choose>
-              <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
+							<!--<xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml'))) and ((./parent::node()/@table:end-cell-address) or not((./parent::node()/@style:rel-width) and ./parent::node()/@style:rel-height))">-->
+							<xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml'))) and (./parent::node()/@table:end-cell-address)">
+								<xsl:for-each
+								  select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+									<xsl:choose>
+										<xsl:when test="office:document-content/office:body/office:chart">
+											<xsl:text>true</xsl:text>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:text>false</xsl:text>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:when>
+							<!--Vijayeta,SP2-->
+							<xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml'))) and not(./parent::node()/@table:end-cell-address) and not(ancestor::table:shapes)
+						  and not(./parent::node()/@table:end-x) and not(./parent::node()/@table:end-y) and (./parent::node()/@style:rel-width) and (./parent::node()/@style:rel-height)">
+								<xsl:for-each
+								  select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+									<xsl:choose>
+										<xsl:when test="office:document-content/office:body/office:chart">
+											<xsl:text>true|sp2</xsl:text>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:text>false</xsl:text>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml'))) and not (./parent::node()/@table:end-cell-address) and (ancestor::table:shapes)">
                 <xsl:for-each
                   select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
                   <xsl:choose>
@@ -116,11 +144,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
             </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
-
         <xsl:choose>
           <!-- insert chart -->
-          <xsl:when test="contains($chart, 'true')">
-           
+          <xsl:when test="contains($chart, 'true')">           
            <xsl:variable name="ChartStock">
              <xsl:choose>
                <xsl:when test="document(concat(substring-after(draw:object/@xlink:href,'./'),'/content.xml'))/office:document-content/office:body/office:chart/chart:chart/@chart:class = 'chart:stock'">
@@ -134,6 +160,35 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
            
            <!-- max 4 series in StockChart are supported in Excel -->
             <!--<xsl:if test="not($ChartStock = 'true')">-->
+						<!--Vijayeta,SP2
+						    When condition for files from translator and for files from sp2-->
+						<xsl:choose>
+							<xsl:when test ="$chart='true|sp2'">
+								<xdr:oneCellAnchor>
+									<xsl:call-template name="SetPositionSP2"/>
+									<xdr:graphicFrame macro="">
+										<xdr:nvGraphicFramePr>
+											<xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>
+											<xdr:cNvGraphicFramePr>
+												<a:graphicFrameLocks/>
+											</xdr:cNvGraphicFramePr>
+										</xdr:nvGraphicFramePr>
+										<xdr:xfrm>
+											<a:off x="0" y="0"/>
+											<a:ext cx="0" cy="0"/>
+										</xdr:xfrm>
+										<a:graphic>
+											<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
+												<c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
+												  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+												  r:id="{generate-id(.)}"/>
+											</a:graphicData>
+										</a:graphic>
+									</xdr:graphicFrame>
+									<xdr:clientData/>
+								</xdr:oneCellAnchor>
+							</xsl:when>
+							<xsl:when test ="$chart='true'">
            <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:graphicFrame macro="">
@@ -157,19 +212,28 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
               </xdr:graphicFrame>
               <xdr:clientData/>
             </xdr:twoCellAnchor>
+							</xsl:when>
+						</xsl:choose>
             <!--</xsl:if>-->
           </xsl:when>
-
           <!-- insert picture -->
           <xsl:when
             test="draw:image[not(name(parent::node()/parent::node()) = 'draw:g' ) and not(parent::node()/draw:object)]">
             <!-- Code added by vijayeta, fix for the bug 1806778
 				  check image is of type .svm, as OOX does not support image of type .svm
 				  Date:23rd Oct '07-->
-            <xsl:variable name ="imageExt">
+						<!--Vijayeta,SP2,Pictures-->
+						<!--<xsl:variable name ="imageExt">
               <xsl:value-of select ="substring-after(draw:image/@xlink:href,'Pictures/')"/>
+								</xsl:variable>-->
+						<xsl:variable name ="imageExt">
+							<xsl:value-of select ="substring-after(draw:image/@xlink:href,'/')"/>
             </xsl:variable>
+						<!--Vijayeta,SP2,Pictures,End-->
             <xsl:if test ="not(contains($imageExt,'.svm'))">
+							<!--Vijayeta,SP2,Pictures-->
+							<xsl:choose>
+								<xsl:when test="(@table:end-cell-address) and (@table:end-x) and (@table:end-y) ">
               <xdr:twoCellAnchor>
                 <xsl:call-template name="SetPosition"/>
                 <xdr:pic>
@@ -194,7 +258,10 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
                       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
                       <xsl:choose>
                         <!-- embeded picture -->
-                        <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
+														<!--Code Changes by: Vijayeta,SP2,Pictures
+														    Desc           : Ods By Sp2 has @xlink:href=media/image1.jpeg and not @xlink:href=Pictures/image1.jpeg -->
+														<!--<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">-->
+														<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/') or starts-with(draw:image/@xlink:href, 'media/')">
                           <xsl:attribute name="r:embed">
                             <xsl:value-of select="generate-id()"/>
                           </xsl:attribute>
@@ -258,6 +325,102 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
                 </xdr:pic>
                 <xdr:clientData/>
               </xdr:twoCellAnchor>
+								</xsl:when>
+								<xsl:when test="not(@table:end-cell-address) and not(@table:end-x) and not(@table:end-y) and (@style:rel-width) and (@style:rel-height)">
+									<xdr:oneCellAnchor>
+										<xsl:call-template name="SetPositionSP2"/>
+										<xdr:pic>
+											<xdr:nvPicPr>
+												<xdr:cNvPr>
+													<xsl:attribute name="id">
+														<xsl:value-of select="position()"/>
+													</xsl:attribute>
+													<xsl:attribute name="name">
+														<xsl:value-of select="@draw:name"/>
+													</xsl:attribute>
+													<xsl:attribute name="descr">
+														<xsl:value-of select="@draw:name"/>
+													</xsl:attribute>
+												</xdr:cNvPr>
+												<xdr:cNvPicPr>
+													<a:picLocks noChangeAspect="0"/>
+												</xdr:cNvPicPr>
+											</xdr:nvPicPr>
+											<xdr:blipFill>
+												<a:blip
+												  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+													<xsl:choose>
+														<!-- embeded picture -->
+														<!--Code Changes by: Vijayeta,SP2,Pictures
+														    Desc           : Ods By Sp2 has @xlink:href=media/image1.jpeg and not @xlink:href=Pictures/image1.jpeg -->
+														<!--<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">-->
+														<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/') or starts-with(draw:image/@xlink:href, 'media/')">
+															<xsl:attribute name="r:embed">
+																<xsl:value-of select="generate-id()"/>
+															</xsl:attribute>
+														</xsl:when>
+														<!-- linked picture -->
+														<xsl:otherwise>
+															<xsl:attribute name="r:link">
+																<xsl:value-of select="generate-id()"/>
+															</xsl:attribute>
+														</xsl:otherwise>
+													</xsl:choose>
+												</a:blip>
+												<!--Image Cropping-->
+												<xsl:variable name="graphicStyleName">
+													<xsl:value-of select="@draw:style-name"/>
+												</xsl:variable>
+												<xsl:variable name="imagePath">
+													<xsl:value-of select="draw:image/@xlink:href"/>
+												</xsl:variable>
+												<xsl:for-each select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$graphicStyleName]">
+													<xsl:if test="style:graphic-properties/@fo:clip">
+														<xsl:variable name="cropValue">
+															<xsl:value-of select="style:graphic-properties/@fo:clip"/>
+														</xsl:variable>
+														<xsl:variable name="var_Top">
+															<xsl:value-of select="substring-before(substring-after($cropValue,'rect('),' ')"/>
+														</xsl:variable>
+														<xsl:variable name="var_Right">
+															<xsl:value-of select="substring-before(substring-after(substring-after($cropValue,'rect('),' '),' ')"/>
+														</xsl:variable>
+														<xsl:variable name="var_Bottom">
+															<xsl:value-of select="substring-before(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' ')"/>
+														</xsl:variable>
+														<xsl:variable name="var_Left">
+															<xsl:value-of select="substring-before(substring-after(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' '),')')"/>
+														</xsl:variable>
+														<xsl:choose>
+															<xsl:when test="contains($var_Top,'in')">
+																<xsl:if test="not($var_Top='0in' and $var_Right='0in' and $var_Bottom='0in' and $var_Left='0in')">
+																	<a:srcRect>
+																		<xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'in'),':',substring-before($var_Right,'in'),':',substring-before($var_Bottom,'in'),':',substring-before($var_Left,'in'),':','in')"/>
+																	</a:srcRect>
+																</xsl:if>
+															</xsl:when>
+															<xsl:when test="contains($var_Top,'cm')">
+																<xsl:if test="not($var_Top='0cm' and $var_Right='0cm' and $var_Bottom='0cm' and $var_Left='0cm')">
+																	<a:srcRect>
+																		<xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'cm'),':',substring-before($var_Right,'cm'),':',substring-before($var_Bottom,'cm'),':',substring-before($var_Left,'cm'),':','cm')"/>
+																	</a:srcRect>
+																</xsl:if>
+															</xsl:when>
+														</xsl:choose>
+													</xsl:if>
+												</xsl:for-each>
+												<!--End-->
+												<a:stretch>
+													<a:fillRect/>
+												</a:stretch>
+											</xdr:blipFill>
+											<xsl:call-template name="InsertFrameProperties"/>
+										</xdr:pic>
+										<xdr:clientData/>
+									</xdr:oneCellAnchor>
+								</xsl:when>
+							</xsl:choose>
+							<!--Vijayeta,SP2,Pictures-->
             </xsl:if>
 			  <xsl:if test ="contains($imageExt,'.svm')">
 				  <!-- warn Data or Images copied from other applications will be lost and not converted. -->
@@ -265,9 +428,10 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
 			  </xsl:if>
             <!--End of Code added by vijayeta, for the bug 1806778 -->
           </xsl:when>
-
           <!-- insert text-box -->
           <xsl:when test="draw:text-box">
+						<xsl:choose>
+							<xsl:when test="(@table:end-cell-address) and (@table:end-x) and (@table:end-y) ">
             <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:sp macro="" textlink="">
@@ -314,9 +478,57 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
               <xdr:clientData/>
             </xdr:twoCellAnchor>
           </xsl:when>
+							<xsl:when test="not(@table:end-cell-address) and not(@table:end-x) and not(@table:end-y)">
+								<xdr:oneCellAnchor>
+									<xsl:call-template name="SetPositionSP2"/>
+									<xdr:sp macro="" textlink="">
+										<xdr:nvSpPr>
+											<xdr:cNvPr id="{position()}" name="{concat('TextBox ',position())}">
+												<!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+													 If the text box has Hyperlink-->
+												<xsl:if test ="draw:text-box/text:p/text:a">
+													<!-- warn Hyperlink applied to whole text box when converted to XLSX.-->
+													<xsl:message terminate="no">translation.odf2oox.hyperlinkTextbox</xsl:message>
+													<xsl:for-each select ="draw:text-box/text:p/text:a">
+														<xsl:variable name ="hlinkPos">
+															<xsl:value-of select ="generate-id(.)"/>
+														</xsl:variable>
+														<a:hlinkClick>
+															<xsl:if test="@xlink:href[ contains(.,'http://') or contains(.,'mailto:')]">
+																<xsl:attribute name="r:id">
+																	<xsl:value-of select ="concat('mailLinkTextBox',$hlinkPos)"/>
+																</xsl:attribute>
+															</xsl:if>
+															<xsl:if test="not(@xlink:href[ contains(.,'http://') or contains(.,'mailto:')]) and @xlink:href[ contains(.,':') or contains(.,'../')]">
+																<xsl:attribute name="r:id">
+																	<xsl:value-of select="concat('fileTextBox',$hlinkPos)"/>
+																</xsl:attribute>
+															</xsl:if>
+														</a:hlinkClick>
+													</xsl:for-each>
+												</xsl:if>
+												<!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07-->
+											</xdr:cNvPr>
+											<xdr:cNvSpPr txBox="1"/>
+										</xdr:nvSpPr>
+										<xsl:call-template name="InsertFrameProperties"/>
+										<!--RefNo-1:Added an if condition to chk for the presence of text-->
+										<xsl:if test="draw:text-box//text:p">
+											<xdr:txBody>
+												<xsl:call-template name="InsertTextBoxProperties"/>
+												<a:lstStyle/>
+												<!-- insert text -->
+												<xsl:apply-templates mode="text-box"/>
+											</xdr:txBody>
+										</xsl:if>
+									</xdr:sp>
+									<xdr:clientData/>
+								</xdr:oneCellAnchor>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:when>
         </xsl:choose>
       </xsl:for-each>
-
     </xdr:wsDr>
 
   </xsl:template>
@@ -444,7 +656,38 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--When Within a Chart-->
+			<xsl:when test ="parent::node()[name() = 'draw:g']">
+				<xsl:choose >
+					<xsl:when
+			       test="./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
+						<xsl:for-each select="./parent::node()/parent::node()">
+							<xsl:variable name="position">
+								<xsl:value-of
+								  select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"
+            />
+							</xsl:variable>
+							<xsl:variable name="number">
+								<xsl:for-each
+								  select="parent::node()/child::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]">
+									<xsl:call-template name="GetColNumber">
+										<xsl:with-param name="position" select="$position"/>
+									</xsl:call-template>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:value-of select="$number - 1"/>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when
+			       test="not(./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]) and ancestor::table:shapes">
+						<xsl:text>1</xsl:text>
+					</xsl:when>
+				</xsl:choose>				
+			</xsl:when>
+			<!--When Within a Chart,End-->
+			<!--Vijayeta,SP2-->
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="not(parent::node()[name() = 'draw:g']) and ancestor::table:shapes">
         <xsl:text>1</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -471,8 +714,37 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
           <xsl:value-of select="$number - 1"/>
         </xsl:for-each>
       </xsl:when>
+			<!--When Text Box Within a Chart-->
+			<xsl:when test ="parent::node()[name() = 'draw:g']">
+				<xsl:choose>
+					<xsl:when
+			       test="./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
+						<xsl:variable name="rowId">
+							<xsl:value-of select="generate-id(ancestor::table:table-row)"/>
+						</xsl:variable>
+						<!-- go to first table:table-row-->
+						<xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
+							<xsl:variable name="number">
+								<xsl:call-template name="GetRowNumber">
+									<xsl:with-param name="rowId" select="$rowId"/>
+									<xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:value-of select="$number - 1"/>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when
+			       test="not(./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]) and ancestor::table:shapes">
+						<xsl:text>31</xsl:text>
+					</xsl:when>
+
+					</xsl:choose>
+			</xsl:when>
+			<!--When Text Box Within a Chart,End-->
+			<!--Vijayeta,SP2-->
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="not(parent::node()[name() = 'draw:g']) and ancestor::table:shapes">
         <xsl:text>31</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -492,7 +764,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         <xsl:value-of select="$number - 1"/>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--Vijayeta,SP2-->
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="ancestor::table:shapes">
         <xsl:text>5</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -512,7 +786,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         <xsl:value-of select="$number - 1"/>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--Vijayeta,SP2-->
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="ancestor::table:shapes">
         <xsl:text>46</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -528,10 +804,28 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
           <xsl:with-param name="length" select="@svg:x"/>
         </xsl:call-template>
       </xsl:when>
+			<!--When Text Box Within a Chart-->
+			<xsl:when test ="parent::node()[name() = 'draw:g']">
+				<xsl:choose>
+					<xsl:when
+			       test="./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
+						<xsl:call-template name="emu-measure">
+							<xsl:with-param name="length" select="@svg:x"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when
+			       test="not(./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]) and ancestor::table:shapes">
+						<xsl:text>714375</xsl:text>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+			<!--When Text Box Within a Chart,End-->
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="not(parent::node()[name() = 'draw:g']) and ancestor::table:shapes">
         <xsl:text>714375</xsl:text>
       </xsl:when>
+			<!--Vijayeta,SP2-->
     </xsl:choose>
   </xsl:template>
 
@@ -545,8 +839,25 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
           <xsl:with-param name="length" select="@svg:y"/>
         </xsl:call-template>
       </xsl:when>
+			<!--When Text Box Within a Chart-->
+			<xsl:when test ="parent::node()[name() = 'draw:g']">
+				<xsl:choose>
+					<xsl:when
+			       test="./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
+					<xsl:call-template name="emu-measure">
+						<xsl:with-param name="length" select="@svg:y"/>
+					</xsl:call-template>
+					</xsl:when>
+					<xsl:when
+			       test="not(./parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]) and ancestor::table:shapes">
+						<xsl:text>104775</xsl:text>
+					</xsl:when>
+					</xsl:choose>
+			</xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--Vijayeta,SP2-->
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="not(parent::node()[name() = 'draw:g']) and ancestor::table:shapes">
         <xsl:text>104775</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -563,7 +874,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         </xsl:call-template>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--Vijayeta,SP2-->
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="ancestor::table:shapes">
         <xsl:text>447675</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -580,7 +893,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         </xsl:call-template>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()[name() = 'table:shapes']">
+			<!--Vijayeta,SP2-->
+			<!--<xsl:when test="parent::node()[name() = 'table:shapes']">-->
+			<xsl:when test ="ancestor::table:shapes">
         <xsl:text>104775</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -751,11 +1066,17 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <a:endParaRPr lang="en-EN" sz="1400"/>
   </xsl:template>
 
+	<!--Vijayeta,SP2-->
   <xsl:template name="InsertRunProperties">
    <!-- font-size -->
     <xsl:if test="@fo:font-size">
 	<xsl:attribute name="sz">					
-					<xsl:value-of select="number(round(substring-before(@fo:font-size,'pt')) * 100)"/>
+				<xsl:variable name ="size">
+					<xsl:call-template name="point-measure">
+						<xsl:with-param name="length" select="@fo:font-size"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="number(round($size)* 100)"/>
 				</xsl:attribute>				
  </xsl:if>
 
@@ -930,6 +1251,11 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
           <xsl:when test="contains(@style:text-position, ' ')">
             <xsl:value-of select="number(substring-before(@style:text-position,'%' )) * 1000"/>
           </xsl:when>
+<!--Fixed by : Vijayeta
+    Desc     : Crash in _1.1LinearGraph, as attribute baseline='', hence 'otherwise' condition added-->
+			<xsl:otherwise>
+				<xsl:value-of select="number(translate(@style:text-position,'%','' )) * 1000"/>
+			</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
@@ -945,15 +1271,27 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <xsl:if test="@fo:letter-spacing">
       <xsl:attribute name="spc">
         <!-- condensed -->
-        <xsl:if test="substring-before(@fo:letter-spacing, 'cm' )&lt; 0 ">
+				<!--Vijayeta,SP2-->
+				<xsl:variable name ="size">
+					<xsl:call-template name="point-measure">
+						<xsl:with-param name="length" select="@fo:letter-spacing"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<!--<xsl:if test="substring-before(@fo:letter-spacing, 'cm' )&lt; 0 ">
           <xsl:value-of
             select="format-number(substring-before(@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"/>
+				</xsl:if>-->
+				<xsl:if test="$size &lt; 0 or $size &gt; 0 ">
+					<xsl:value-of
+					  select="format-number($size * 100 ,'#')"/>
         </xsl:if>
         <!-- expanded -->
-        <xsl:if test="substring-before(@fo:letter-spacing, 'cm' ) &gt;= 0">
+				<!--<xsl:if test="substring-before(@fo:letter-spacing, 'cm' ) &gt;= 0">
           <xsl:value-of
-            select="format-number((substring-before(@fo:letter-spacing, 'cm' ) * 72 div 2.54) *100 ,'#')"
-          />
+					  select="format-number((substring-before(@fo:letter-spacing, 'cm' ) * 72 div 2.54) *100 ,'#')" />
+				</xsl:if>-->
+				<xsl:if test="$size = 0">
+					<xsl:value-of select="$size" />
         </xsl:if>
       </xsl:attribute>
     </xsl:if>
@@ -1611,7 +1949,6 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
   </xsl:template>
 
   <xsl:template name="InsertTextRotation">
-
     <!-- rotation -->
     <xsl:if test="@style:rotation-angle">
       <xsl:attribute name="rot">
@@ -1640,7 +1977,48 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         <xsl:text>wordArtVert</xsl:text>
       </xsl:attribute>
     </xsl:if>
+	</xsl:template>
 
+	<!--Vijayeta,SP2-->
+	<xsl:template name="SetPositionSP2">
+		<xsl:variable name="InsertStartColumn">
+			<xsl:call-template name="InsertStartColumn"/>
+		</xsl:variable>
+		<xsl:variable name="InsertStartColumnOffset">
+			<xsl:call-template name="InsertStartColumnOffset"/>
+		</xsl:variable>
+		<xsl:variable name="InsertStartRow">
+			<xsl:call-template name="InsertStartRow"/>
+		</xsl:variable>
+		<xsl:variable name="InsertStartRowOffset">
+			<xsl:call-template name="InsertStartRowOffset"/>
+		</xsl:variable>
+		<xdr:from>
+			<xdr:col>
+				<xsl:value-of select="$InsertStartColumn"/>
+			</xdr:col>
+			<xdr:colOff>
+				<xsl:value-of select="$InsertStartColumnOffset"/>
+			</xdr:colOff>
+			<xdr:row>
+				<xsl:value-of select="$InsertStartRow"/>
+			</xdr:row>
+			<xdr:rowOff>
+				<xsl:value-of select="$InsertStartRowOffset"/>
+			</xdr:rowOff>
+		</xdr:from>
+		<xdr:ext>
+			<xsl:attribute name="cx">
+				<xsl:call-template name="emu-measure">
+					<xsl:with-param name="length" select="@svg:width" />
+				</xsl:call-template>
+			</xsl:attribute>
+			<xsl:attribute name="cy">
+				<xsl:call-template name="emu-measure">
+					<xsl:with-param name="length" select="@svg:height" />
+				</xsl:call-template>
+			</xsl:attribute>
+		</xdr:ext>
   </xsl:template>
 
 </xsl:stylesheet>

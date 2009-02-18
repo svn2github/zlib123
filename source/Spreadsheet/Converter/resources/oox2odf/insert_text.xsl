@@ -198,7 +198,6 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <text:p>
           <xsl:choose>
             <xsl:when test="key('ref',@r)[@oox:part = $partId]">
-
               <xsl:variable name="XlinkHref">
                 <xsl:call-template name="XlinkHref">
                   <xsl:with-param name="sheetNr">
@@ -206,14 +205,13 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
-
-
-
               <!-- a postprocessor puts here strings from sharedstrings -->
+							<!--Vijayeta,SP2,Text in Hyperlink Missing-->
+							<xsl:choose>
+								<xsl:when test="translate(substring-after($XlinkHref,'#'),'.','')!=''">
               <xsl:choose>
                 <xsl:when test="contains($rSheredStrings, e:v) ">
                   <xsl:for-each select="key('SharedStrings', e:v)">
-
                     <xsl:apply-templates select="e:r[1]" mode="hyperlink">
                       <xsl:with-param name="XlinkHref">
                         <xsl:value-of select="$XlinkHref"/>
@@ -222,7 +220,6 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                         <xsl:text>1</xsl:text>
                       </xsl:with-param>
                     </xsl:apply-templates>
-
                   </xsl:for-each>
                 </xsl:when>
                 <xsl:otherwise>   
@@ -246,10 +243,28 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                     </pxsi:v>
                   </text:a>
                 </xsl:otherwise>
-
               </xsl:choose>
             </xsl:when>
-
+								<xsl:otherwise>
+									<xsl:choose>
+										<xsl:when test="contains($rSheredStrings, e:v) ">
+											<xsl:for-each select="key('SharedStrings', e:v)">
+												<xsl:apply-templates/>
+												<!--RefNo-1: Changes for fixing 1833074 XLSX: Cell Content missing-->
+												<!--<xsl:with-param name ="textp" select ="'T'"/>
+                    </xsl:apply-templates >-->
+											</xsl:for-each>
+										</xsl:when>
+										<xsl:otherwise>
+											<pxsi:v>
+												<xsl:value-of select="e:v"/>
+											</pxsi:v>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:otherwise>
+							</xsl:choose>
+							<!--Vijayeta,SP2,Text in Hyperlink Missing,End-->
+						</xsl:when>
             <xsl:otherwise>
               <!-- a postprocessor puts here strings from sharedstrings -->
               <xsl:choose>
@@ -267,7 +282,6 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                   </pxsi:v>
                 </xsl:otherwise>
               </xsl:choose>
-
             </xsl:otherwise>
           </xsl:choose>
         </text:p>

@@ -35,6 +35,7 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
 RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet not printed after conversion(issue with the sheet names)
 RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to the list (issue with the sheet names) 
 RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
+RefNo-6 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance   
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -109,8 +110,9 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
     </xsl:choose>
   </xsl:template>
 
+  <!--RefNo-6:ODF1.1:Added office:version="1.1" attribute-->
   <xsl:template name="content">
-    <office:document-content>
+	  <office:document-content office:version="1.1">
       <office:scripts/>
       <office:font-face-decls>
         <xsl:call-template name="InsertFonts"/>
@@ -405,7 +407,14 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 						  <xsl:variable name ="isFunction">
 							  <xsl:choose>
 								  <xsl:when test="not(contains($range,'(') and contains($range,')'))">
+											<xsl:choose >
+												<xsl:when test="contains($range,',')">
+													<xsl:value-of select ="'true'"/>
+												</xsl:when>
+												<xsl:otherwise>
 									  <xsl:value-of select ="'false'"/>
+												</xsl:otherwise>
+											</xsl:choose>
 								  </xsl:when>
 								  <xsl:when test="contains($range,'(') and contains($range,')')">
 									  <xsl:variable name ="parenthesisContents">
@@ -431,20 +440,32 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 									  <xsl:value-of select ="$range"/>
 								  </xsl:when>
 								  <xsl:when test="$isFunction='true'">
+											<xsl:choose >
+												<xsl:when test="contains($range,',')">
+													<xsl:value-of select ="''"/>
+												</xsl:when>
+												<xsl:otherwise>
 									  <xsl:value-of select ="concat(substring-after(substring-before($range,'!'),'('),'!',substring-before(substring-after($range,'!'),')'))"/>
+												</xsl:otherwise>
+											</xsl:choose>
 								  </xsl:when>
 							  </xsl:choose>
 						  </xsl:variable>
 						  <xsl:variable name ="NamedRange">
+									<xsl:if  test ="$cellRangeAddress!=''">
 							  <xsl:value-of select ="substring-after($cellRangeAddress,'!')"/>
+									</xsl:if>
 						  </xsl:variable>
 						  <xsl:variable name ="sheetName">
+									<xsl:if  test ="$cellRangeAddress!=''">
 							  <xsl:value-of select ="substring-before($cellRangeAddress,'!')"/>
+									</xsl:if>
 						  </xsl:variable>
 						  <xsl:variable name ="apos">
 							  <xsl:text>&apos;</xsl:text>
 						  </xsl:variable>
 						  <xsl:variable name="checkedName">
+									<xsl:if  test ="$cellRangeAddress!=''">
 							  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
 								  <xsl:call-template name="CheckSheetName">
 									  <xsl:with-param name="sheetNumber">
@@ -458,8 +479,10 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 									  </xsl:with-param>
 								  </xsl:call-template>
 							  </xsl:for-each>
+									</xsl:if>
 						  </xsl:variable>
 						  <xsl:variable name ="correctName">
+									<xsl:if  test ="$cellRangeAddress!=''">
 							  <xsl:choose>
 								  <xsl:when test="starts-with($sheetName,$apos) and $checkedName!=''">
 									  <xsl:value-of select="concat($apos,$checkedName,$apos)"/>
@@ -468,6 +491,7 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 										  <xsl:value-of select="$checkedName"/>
 								  </xsl:when>
 							  </xsl:choose>
+									</xsl:if>
 						  </xsl:variable>
 						  <xsl:if test ="$correctName != ''">							  
 						  <xsl:choose>
@@ -475,7 +499,7 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 								  <xsl:variable name ="baseAddress">
 									  <xsl:choose>
 										  <xsl:when test ="substring-after($NamedRange,':')!=''">
-														<xsl:variable name ="endColOrRow">
+														<xsl:variable name ="beginColOrRow">
 															<xsl:choose >
 																<xsl:when test ="contains(substring-after(substring-before($NamedRange,':'),'$'),'$')">
 																	<xsl:value-of select ="'RCpresent'"/>
@@ -485,30 +509,50 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 																		<xsl:value-of select ="substring-after(substring-before($NamedRange,':'),'$')"/>
 																	</xsl:variable>
 																	<xsl:choose>
-																		<xsl:when test="contains('A',$character) or contains('B',$character) or contains('C',$character) or contains('D',$character) or contains('E',$character) or contains('F',$character) or contains('G',$character) 
-							  or contains('H',$character) or contains('I',$character) or contains('J',$character) or contains('K',$character) or contains('L',$character) or contains('M',$character) or contains('N',$character) or contains('O',$character) 
-            				  or contains('P',$character) or contains('Q',$character) or contains('R',$character) or contains('S',$character) or contains('T',$character) or contains('U',$character) or contains('V',$character) or contains('W',$character) 
-							  or contains('X',$character) or contains('Y',$character) or contains('Z',$character) or contains('a',$character) or contains('b',$character) or contains('c',$character) or contains('d',$character) or contains('e',$character)
-							  or contains('f',$character) or contains('g',$character) or contains('h',$character) or contains('i',$character) or contains('j',$character) or contains('k',$character) or contains('l',$character) or contains('m',$character)
-							  or contains('n',$character) or contains('o',$character) or contains('p',$character) or contains('q',$character) or contains('r',$character) or contains('s',$character) or contains('t',$character) or contains('u',$character)
-							  or contains('v',$character) or contains('w',$character) or contains('x',$character) or contains('y',$character) or contains('z',$character)">
+                                    <xsl:when test="contains($character,'A') or contains($character,'B') or contains($character,'C') or contains($character,'D') or contains($character,'E') or contains($character,'F') or contains($character,'G') 
+							  or contains($character,'H') or contains($character,'I') or contains($character,'J') or contains($character,'K') or contains($character,'L') or contains($character,'M') or contains($character,'N') or contains($character,'O') 
+            				  or contains($character,'P') or contains($character,'Q') or contains($character,'R') or contains($character,'S') or contains($character,'T') or contains($character,'U') or contains($character,'V') or contains($character,'W') 
+							  or contains($character,'X') or contains($character,'Y') or contains($character,'Z') or contains($character,'a') or contains($character,'b') or contains($character,'c') or contains($character,'d') or contains($character,'e')
+							  or contains($character,'f') or contains($character,'g') or contains($character,'h') or contains($character,'i') or contains($character,'j') or contains($character,'k') or contains($character,'l') or contains($character,'m')
+							  or contains($character,'n') or contains($character,'o') or contains($character,'p') or contains($character,'q') or contains($character,'r') or contains($character,'s') or contains($character,'t') or contains($character,'u')
+							  or contains($character,'v') or contains($character,'w') or contains($character,'x') or contains($character,'y') or contains($character,'z')">
 																			<xsl:value-of select ="'true'"/>
 																		</xsl:when>
+																		<xsl:otherwise>
+																			<xsl:value-of select ="'false'"/>
+																		</xsl:otherwise>
 																	</xsl:choose>
 																</xsl:otherwise>
 															</xsl:choose>
 														</xsl:variable>
-														<xsl:variable name ="endRow">
+														<xsl:variable name ="beginCol">
 															<xsl:choose>
-																<xsl:when test ="$endColOrRow='RCpresent'">
-																	<xsl:value-of select ="substring-after(substring-after(substring-before($NamedRange,':'),'$'),'$')"/>
+																<xsl:when test ="$beginColOrRow='RCpresent'">
+																	<xsl:value-of select ="substring-before(substring-after(substring-before($NamedRange,':'),'$'),'$')"/>
 																</xsl:when>
-																<xsl:when test ="$endColOrRow='true'">
-																	<xsl:value-of select ="65536"/>
+																<xsl:when test ="$beginColOrRow='true'">
+																	<xsl:value-of select ="substring-after(substring-before($NamedRange,':'),'$')"/>
+																</xsl:when>
+																<xsl:when test ="$beginColOrRow='false'">
+																	<xsl:value-of select ="'A'"/>
 																</xsl:when>
 															</xsl:choose>
 														</xsl:variable>
-														<xsl:value-of select ="concat(concat(&quot;&apos;&quot;,translate($correctName,&quot;&apos;&quot;,''),&quot;&apos;&quot;),'.',substring-before($NamedRange,':'),$endRow)"/>
+														<xsl:variable name ="beginRow">
+															<xsl:choose>
+																<xsl:when test ="$beginColOrRow='RCpresent'">
+																	<xsl:value-of select ="substring-after(substring-after(substring-before($NamedRange,':'),'$'),'$')"/>
+																</xsl:when>
+																<xsl:when test ="$beginColOrRow='true'">
+																	<xsl:value-of select ="1"/>
+																</xsl:when>
+																<xsl:when test ="$beginColOrRow='false'">
+																	<xsl:value-of select ="substring-after(substring-before($NamedRange,':'),'$')"/>
+																</xsl:when>
+															</xsl:choose>
+														</xsl:variable>
+														<xsl:value-of select ="concat(concat(&quot;&apos;&quot;,translate($correctName,&quot;&apos;&quot;,''),&quot;&apos;&quot;),'.$',$beginCol,'$',$beginRow)"/>
+														<!--<xsl:value-of select ="concat(concat(&quot;&apos;&quot;,translate($correctName,&quot;&apos;&quot;,''),&quot;&apos;&quot;),'.',substring-before($NamedRange,':'),$endRow)"/>-->
 										  </xsl:when>
 										  <xsl:otherwise>
 											  <xsl:value-of select ="concat($correctName,'.',$NamedRange)"/>
@@ -532,124 +576,29 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 															<xsl:with-param name="return-value" select="''"/>
 														</xsl:call-template>
 													</xsl:variable>
-													<xsl:variable name ="PartOne">
-														<xsl:value-of select ="substring-before($FinalRange,':')"/>
+                      <!--If Multiple named ranges-->
+                      <xsl:if test ="contains($FinalRange,':')">
+                        <xsl:variable name ="beginEndRowCol">
+                          <xsl:call-template name ="translateRangetoODF">
+                            <xsl:with-param name ="range" select ="$range"/>
+                          </xsl:call-template>
 													</xsl:variable>
-													<xsl:variable name ="PartTwo">
-														<xsl:value-of select ="substring-after($FinalRange,':')"/>
-													</xsl:variable>
-													<xsl:variable name ="beginSheet">
-														<xsl:value-of select ="substring-before($PartOne,'.')"/>
-													</xsl:variable>
-													<xsl:variable name ="beginColOrRow">
-														<xsl:choose>
-															<xsl:when test ="contains(substring-after($PartOne,'$'),'$')">
-																<xsl:value-of select ="'RCpresent'"/>
-															</xsl:when>
-															<xsl:otherwise>
-																<xsl:variable name ="character">
-																	<xsl:value-of select ="substring-after($PartOne,'$')"/>
-																</xsl:variable>
-																<xsl:choose>
-																	<!--<xsl:when test="contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ',$character)"> <xsl:value-of select ="'true'"/>
-							  </xsl:when>-->
-																	<xsl:when test="contains('A',$character) or contains('B',$character) or contains('C',$character) or contains('D',$character) or contains('E',$character) or contains('F',$character) or contains('G',$character) 
-							  or contains('H',$character) or contains('I',$character) or contains('J',$character) or contains('K',$character) or contains('L',$character) or contains('M',$character) or contains('N',$character) or contains('O',$character) 
-            				  or contains('P',$character) or contains('Q',$character) or contains('R',$character) or contains('S',$character) or contains('T',$character) or contains('U',$character) or contains('V',$character) or contains('W',$character) 
-							  or contains('X',$character) or contains('Y',$character) or contains('Z',$character) or contains('a',$character) or contains('b',$character) or contains('c',$character) or contains('d',$character) or contains('e',$character)
-							  or contains('f',$character) or contains('g',$character) or contains('h',$character) or contains('i',$character) or contains('j',$character) or contains('k',$character) or contains('l',$character) or contains('m',$character)
-							  or contains('n',$character) or contains('o',$character) or contains('p',$character) or contains('q',$character) or contains('r',$character) or contains('s',$character) or contains('t',$character) or contains('u',$character)
-							  or contains('v',$character) or contains('w',$character) or contains('x',$character) or contains('y',$character) or contains('z',$character)">
-																		<xsl:value-of select ="'true'"/>
-																	</xsl:when>
-																	<xsl:otherwise>
-																		<xsl:value-of select ="'false'"/>
-																	</xsl:otherwise>
-																</xsl:choose>
-																<!--<xsl:value-of select ="substring-after($PartOne,'$')"/>-->
-															</xsl:otherwise>
-														</xsl:choose>
-													</xsl:variable>
-													<xsl:variable name ="endColOrRow">
-														<xsl:choose >
-															<xsl:when test ="contains(substring-after($PartTwo,'$'),'$')">
-																<xsl:value-of select ="'RCpresent'"/>
-															</xsl:when>
-															<xsl:otherwise >
-																<xsl:variable name ="character">
-																	<xsl:value-of select ="substring-after($PartTwo,'$')"/>
-																</xsl:variable>
-																<xsl:choose>
-																	<xsl:when test="contains('A',$character) or contains('B',$character) or contains('C',$character) or contains('D',$character) or contains('E',$character) or contains('F',$character) or contains('G',$character) 
-							  or contains('H',$character) or contains('I',$character) or contains('J',$character) or contains('K',$character) or contains('L',$character) or contains('M',$character) or contains('N',$character) or contains('O',$character) 
-            				  or contains('P',$character) or contains('Q',$character) or contains('R',$character) or contains('S',$character) or contains('T',$character) or contains('U',$character) or contains('V',$character) or contains('W',$character) 
-							  or contains('X',$character) or contains('Y',$character) or contains('Z',$character) or contains('a',$character) or contains('b',$character) or contains('c',$character) or contains('d',$character) or contains('e',$character)
-							  or contains('f',$character) or contains('g',$character) or contains('h',$character) or contains('i',$character) or contains('j',$character) or contains('k',$character) or contains('l',$character) or contains('m',$character)
-							  or contains('n',$character) or contains('o',$character) or contains('p',$character) or contains('q',$character) or contains('r',$character) or contains('s',$character) or contains('t',$character) or contains('u',$character)
-							  or contains('v',$character) or contains('w',$character) or contains('x',$character) or contains('y',$character) or contains('z',$character)">
-																		<xsl:value-of select ="'true'"/>
-																	</xsl:when>
-																	<xsl:otherwise>
-																		<xsl:value-of select ="'false'"/>
-																	</xsl:otherwise>
-																</xsl:choose>
-															</xsl:otherwise>
-														</xsl:choose>
+                        <xsl:variable name ="sheetNameCorrect">
+                          <xsl:value-of select="concat($apos,translate(substring-before($range,'!'),$apos,''),$apos)"/>
 													</xsl:variable>
 													<xsl:variable name ="beginCol">
-														<xsl:choose>
-															<xsl:when test ="$beginColOrRow='RCpresent'">
-																<xsl:value-of select ="substring-before(substring-after($PartOne,'$'),'$')"/>
-															</xsl:when>
-															<xsl:when test ="$beginColOrRow='true'">
-																<xsl:value-of select ="substring-after($PartOne,'$')"/>
-															</xsl:when>
-															<xsl:when test ="$beginColOrRow='false'">
-																<xsl:value-of select ="'A'"/>
-															</xsl:when>
-														</xsl:choose>
-													</xsl:variable>
-													<xsl:variable name ="endCol">
-														<xsl:choose>
-															<xsl:when test ="$endColOrRow='RCpresent'">
-																<xsl:value-of select ="substring-before(substring-after($PartTwo,'$'),'$')"/>
-															</xsl:when>
-															<xsl:when test ="$endColOrRow='true'">
-																<xsl:value-of select ="substring-after($PartTwo,'$')"/>
-															</xsl:when>
-															<xsl:when test ="$endColOrRow='false'">
-																<xsl:value-of select ="'IV'"/>
-															</xsl:when>
-														</xsl:choose>
+                          <xsl:value-of select ="substring-before($beginEndRowCol,'|')"/>
 													</xsl:variable>
 													<xsl:variable name ="beginRow">
-														<xsl:choose>
-															<xsl:when test ="$beginColOrRow='RCpresent'">
-																<xsl:value-of select ="substring-after(substring-after($PartOne,'$'),'$')"/>
-															</xsl:when>
-															<xsl:when test ="$beginColOrRow='true'">
-																<xsl:value-of select ="1"/>
-															</xsl:when>
-															<xsl:when test ="$beginColOrRow='false'">
-																<xsl:value-of select ="substring-after($PartOne,'$')"/>
-															</xsl:when>
-														</xsl:choose>
+                          <xsl:value-of select ="substring-before(substring-after($beginEndRowCol,concat($beginCol,'|')),'|')"/>
+                        </xsl:variable>
+                        <xsl:variable name ="endCol">
+                          <xsl:value-of select ="substring-before(substring-after($beginEndRowCol,concat($beginCol,'|',$beginRow,'|')),'|')"/>
 													</xsl:variable>
 													<xsl:variable name ="endRow">
-														<xsl:choose>
-															<xsl:when test ="$endColOrRow='RCpresent'">
-																<xsl:value-of select ="substring-after(substring-after($PartTwo,'$'),'$')"/>
-															</xsl:when>
-															<xsl:when test ="$endColOrRow='true'">
-																<xsl:value-of select ="65536"/>
-															</xsl:when>
-															<xsl:when test ="$endColOrRow='false'">
-																<xsl:value-of select ="substring-after($PartTwo,'$')"/>
-															</xsl:when>
-														</xsl:choose>
+                          <xsl:value-of select ="substring-after($beginEndRowCol,concat($beginCol,'|',$beginRow,'|',$endCol,'|'))"/>
 													</xsl:variable>
-													<xsl:if test ="contains($FinalRange,':')">
-													<xsl:value-of select ="concat(substring-before($PartOne,'$'),'$',$beginCol,'$',$beginRow,':.$',$endCol,'$',$endRow)"/>
+                        <xsl:value-of select ="concat($sheetNameCorrect,'.$',$beginCol,'$',$beginRow,':.$',$endCol,'$',$endRow)"/>
 													<!--<xsl:value-of select ="concat(substring-before($FinalRange,':'),':.',substring-after($FinalRange,':'))"/>-->
 													</xsl:if>
 													<xsl:if test ="not(contains($FinalRange,':'))">
@@ -658,10 +607,7 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 									  </xsl:attribute>
 								  </table:named-range>
 							  </xsl:when>
-							  <xsl:when test="$isFunction='true'">
-								  <xsl:variable name ="function">
-									  <xsl:value-of select ="substring-before($range,'(')"/>
-								  </xsl:variable>
+							  <xsl:when test="$isFunction='true'">								  
 								  <table:named-expression>
 									  <xsl:attribute name ="table:name">
 										  <xsl:value-of select ="@name"/>
@@ -670,6 +616,16 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 										  <xsl:value-of select ="'$Sheet1.$A$1'"/>
 									  </xsl:attribute>
 									  <xsl:attribute name ="table:expression">
+													<xsl:choose>
+														<xsl:when test ="contains($range,',')">
+															<xsl:variable name ="correctRange">
+																<xsl:call-template name ="getCorrectNamedRange">
+																	<xsl:with-param  name ="NamedRange" select="$range"/>
+																</xsl:call-template>
+															</xsl:variable>
+															<xsl:value-of select ="$correctRange"/>
+														</xsl:when>
+														<xsl:otherwise>
 													<xsl:call-template name="translate-expression">
 														<xsl:with-param name="isRangeAddress" select="true()"/>
 														<xsl:with-param name="cell-row-pos" select="0"/>
@@ -677,14 +633,31 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 														<xsl:with-param name="expression" select="."/>
 														<xsl:with-param name="return-value" select="''"/>
 													</xsl:call-template>
-													<!--<xsl:value-of select ="concat($function,'([$',$correctName,'.',$NamedRange,'])')"/>-->
-										  <!--<xsl:value-of select ="concat($function,'([$',$cellRangeAddress,'])')"/>-->
-										  <!--<xsl:value-of select ="concat('sonataOoxFormula',$function,'([$',$cellRangeAddress,'])','##shtName##',$sheetNames)"/>-->
+														</xsl:otherwise>
+													</xsl:choose>
 									  </xsl:attribute>
 								  </table:named-expression>
 							  </xsl:when>
 						  </xsl:choose>							  
 						  </xsl:if>						 
+								<xsl:if test ="$correctName = '' and contains($range,',') ">
+									<table:named-expression>
+										<xsl:attribute name ="table:name">
+											<xsl:value-of select ="@name"/>
+										</xsl:attribute>
+										<xsl:attribute name ="table:base-cell-address">
+											<xsl:value-of select ="'$Sheet1.$A$1'"/>
+										</xsl:attribute>
+										<xsl:attribute name ="table:expression">
+											<xsl:variable name ="correctRange">
+												<xsl:call-template name ="getCorrectNamedRange">
+													<xsl:with-param  name ="NamedRange" select="$range"/>
+												</xsl:call-template>
+											</xsl:variable>
+											<xsl:value-of select ="$correctRange"/>											
+										</xsl:attribute>
+									</table:named-expression>
+								</xsl:if>
 					  </xsl:if>
 				  </xsl:if>
 			  </xsl:for-each>
@@ -1080,9 +1053,84 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
           <xsl:if test="($sheetNamePrntRnge = concat($apostrof, $strSheetName,$apostrof) or $sheetNamePrntRnge = $strSheetName) and (@name = '_xlnm.Print_Area')">
             <!-- one print range with apostrophes -->
             <xsl:choose>
+								<!--Vijayeta,SP2,PrintArea-->
+								<!-- multiple print ranges with apostrophes -->
+								<!--RefNo-3:Replaced $checkedName with $strSheetName(contains the original sheet name.)-->
+								<xsl:when test="contains(./self::node(),concat(',', $apostrof, $strSheetName))">
+									<!--<xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">-->
+									<xsl:variable name ="GetPrintRange">
+										<xsl:value-of select="./self::node()"/>
+									</xsl:variable>
+									<xsl:variable name ="newRange">
+										<!--Start of RefNo-3: Replace the sheet name with special charecters with checked name.-->
+										<xsl:choose>
+											<xsl:when test="$strSheetName != $checkedName">
+												<xsl:if test="not(contains($strSheetName, '!') or contains($strSheetName, ','))">
+													<xsl:variable name="strReplaceSheetName">
+														<xsl:call-template name="tmpReplaceSheetName">
+															<xsl:with-param name="GetPrintRange" select="$GetPrintRange"/>
+															<xsl:with-param name="checkedName" select="concat($apostrof,$checkedName,$apostrof,'.')"/>
+															<xsl:with-param name="strBuildPrtRng" select="''"/>
+														</xsl:call-template>
+													</xsl:variable>
+													<xsl:value-of select ="translate($strReplaceSheetName,'$','')"/>
+												</xsl:if>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>
+											</xsl:otherwise>
+										</xsl:choose>
+										<!--<xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>-->
+										<!--End fo RefNo-3-->
+									</xsl:variable>
+									<xsl:attribute name="table:print-ranges">
+										<xsl:value-of select ="$newRange"/>
+									</xsl:attribute>
+									<!--</xsl:if>-->
+								</xsl:when>
+								<!-- multiple print ranges with apostrophes -->
+								<!--RefNo-3:Replaced $checkedName with $strSheetName(contains the original sheet name.)-->
+								<xsl:when test="contains(./self::node(),concat(',',$strSheetName))">
+									<!--<xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">-->
+									<xsl:variable name ="GetPrintRange">
+										<xsl:value-of select="./self::node()"/>
+									</xsl:variable>
+									<xsl:variable name ="newRange">
+										<!--Start of RefNo-3: Replace the sheet name with special charecters with checked name.-->
+										<xsl:choose>
+											<xsl:when test="$strSheetName != $checkedName">
+												<xsl:if test="not(contains($strSheetName, '!') or contains($strSheetName, ','))">
+													<xsl:variable name="strReplaceSheetName">
+														<xsl:call-template name="tmpReplaceSheetName">
+															<xsl:with-param name="GetPrintRange" select="$GetPrintRange"/>
+															<xsl:with-param name="checkedName" select="concat($apostrof,$checkedName,$apostrof,'.')"/>
+															<xsl:with-param name="strBuildPrtRng" select="''"/>
+														</xsl:call-template>
+													</xsl:variable>
+													<xsl:value-of select ="translate($strReplaceSheetName,'$','')"/>
+												</xsl:if>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:variable name ="correctRange">
+													<xsl:call-template name ="getCorrectRange">
+														<xsl:with-param  name ="PrintRange" select="$GetPrintRange"/>
+													</xsl:call-template>
+												</xsl:variable>
+												<xsl:value-of select ="$correctRange"/>
+												<!--<xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>-->
+											</xsl:otherwise>
+										</xsl:choose>
+										<!--<xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>-->
+										<!--End fo RefNo-3-->
+									</xsl:variable>
+									<xsl:attribute name="table:print-ranges">
+										<xsl:value-of select ="$newRange"/>
+									</xsl:attribute>
+									<!--</xsl:if>-->
+								</xsl:when>
               <!--RefNo-3:Replaced $checkedName with $strSheetName(contains the original sheet name.)-->
               <!--<xsl:when test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">-->
-              <xsl:when test="not(contains(./self::node(),concat(',', $apostrof, $strSheetName)))">     
+								<xsl:when test="not(contains(./self::node(),concat(',', $apostrof, $strSheetName))) or not(contains(./self::node(),concat(',', $strSheetName)))">
                 <!--<xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">-->
 				<xsl:variable name ="prntRnge">
 					<xsl:call-template name="recursive">
@@ -1226,40 +1274,7 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 				</xsl:attribute>
                 <!--</xsl:if>-->
               </xsl:when>
-            <!-- multiple print ranges with apostrophes -->            
-              <!--RefNo-3:Replaced $checkedName with $strSheetName(contains the original sheet name.)-->
-              <xsl:when test="contains(./self::node(),concat(',', $apostrof, $strSheetName))">
-                <!--<xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">-->
-              <xsl:variable name ="GetPrintRange">
-                <xsl:value-of select="./self::node()"/>
-              </xsl:variable>
-              <xsl:variable name ="newRange">
-                  <!--Start of RefNo-3: Replace the sheet name with special charecters with checked name.-->
-                  <xsl:choose>
-                    <xsl:when test="$strSheetName != $checkedName">
-                      <xsl:if test="not(contains($strSheetName, '!') or contains($strSheetName, ','))">
-                        <xsl:variable name="strReplaceSheetName">
-                          <xsl:call-template name="tmpReplaceSheetName">
-                            <xsl:with-param name="GetPrintRange" select="$GetPrintRange"/>
-                            <xsl:with-param name="checkedName" select="concat($apostrof,$checkedName,$apostrof,'.')"/>
-                            <xsl:with-param name="strBuildPrtRng" select="''"/>
-                          </xsl:call-template>                        
-                        </xsl:variable>
-                        <xsl:value-of select ="translate($strReplaceSheetName,'$','')"/>
-                      </xsl:if>
-                    </xsl:when>
-                    <xsl:otherwise>
-                <xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                  <!--<xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>-->
-                  <!--End fo RefNo-3-->
-              </xsl:variable>
-              <xsl:attribute name="table:print-ranges">
-                <xsl:value-of select ="$newRange"/>
-              </xsl:attribute>
-                <!--</xsl:if>-->
-              </xsl:when>
+								<!--Vijayeta,SP2,PrintArea,End-->
             </xsl:choose>
             <!-- End of fix for Bug 1803593, for the file U S Extreme Temperature, on round trip-->
           </xsl:if>
@@ -2615,9 +2630,11 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
           <xsl:value-of select="$ConditionalCellMultiple"/>
         </xsl:with-param>
         <xsl:with-param name="sheetNr" select="$sheetNr"/>
+        <!--value changed to 65536 from 65535 for file name Testfeatures XLSX V2.0 all.xlsx: bug no:2559854 -->
         <xsl:with-param name="EndRow">
-          <xsl:value-of select="65535"/>
+          <xsl:value-of select="65536"/>
         </xsl:with-param>
+        <!--end-->
         <xsl:with-param name="prevRow">
           <xsl:value-of select="@r"/>
         </xsl:with-param>
@@ -4128,7 +4145,230 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1    Changes done for ODF1.1 conformance
 			<xsl:otherwise/>
 		</xsl:choose>
 	</xsl:template>
-	<!-- Vijayeta-->
+	<!-- Vijayeta ODF 1.1 for table:cell-range-address and table:base-cell-address -->
+	<xsl:template name ="getCorrectRange">
+		<xsl:param name ="PrintRange"/>
+		<xsl:param name ="finalRange"/>
+		<xsl:variable name ="tempPrintRange">
+			<xsl:value-of select ="$PrintRange"/>
+		</xsl:variable>
+		<xsl:variable name ="FinalPrintRange">
+			<xsl:value-of select ="$finalRange"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test ="$tempPrintRange !=''">
+				<xsl:variable name ="tempFinalRange">
+					<xsl:variable name ="range">
+						<xsl:choose>
+							<xsl:when test ="contains($tempPrintRange,',')">
+								<xsl:value-of select ="substring-before($tempPrintRange,',')"/>
+							</xsl:when>
+							<xsl:when test ="not(contains($tempPrintRange,','))">
+								<xsl:value-of select ="$tempPrintRange"/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="contains($range,':')">
+							<xsl:value-of select ="concat(substring-before($range,':'),':.',substring-after($range,':'))"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="$range"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:call-template name ="getCorrectRange">
+					<xsl:with-param  name ="PrintRange" select="substring-after($tempPrintRange,',')"/>
+					<xsl:with-param name ="finalRange" select ="concat($FinalPrintRange,' ',$tempFinalRange)"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select ="translate(translate(substring-after($FinalPrintRange,' '),'$',''),'!','.')"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+  <!--for ODF 1.1-->
+	<xsl:template name ="getCorrectNamedRange">
+		<xsl:param name ="NamedRange"/>
+		<xsl:param name ="finalRange"/>
+		<xsl:variable name ="tempNamedRange">
+			<xsl:value-of select ="$NamedRange"/>
+		</xsl:variable>
+		<xsl:variable name ="FinalNamedRange">
+			<xsl:value-of select ="$finalRange"/>
+		</xsl:variable>
+		<xsl:variable name ="apos">
+			<xsl:text>&apos;</xsl:text>
+		</xsl:variable>
+		<xsl:choose>
 	
+			<xsl:when test ="$tempNamedRange !=''">
+				<xsl:variable name ="tempFinalRange">
+					<xsl:variable name ="range">
+						<xsl:choose>
+							<xsl:when test ="contains($tempNamedRange,';')">
+								<xsl:value-of select ="substring-before($tempNamedRange,';')"/>
+							</xsl:when>
+							<xsl:when test ="not(contains($tempNamedRange,';'))">
+								<xsl:value-of select ="$tempNamedRange"/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="contains($range,':')">
+							<xsl:variable name ="beginEndRowCol">
+								<xsl:call-template name ="translateRangetoODF">
+									<xsl:with-param name ="range" select ="$range"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:variable name ="sheetName">
+								<xsl:value-of select="translate(substring-before($range,'.'),$apos,'')"/>
+							</xsl:variable>
+							<xsl:variable name ="beginCol">
+								<xsl:value-of select ="substring-before($beginEndRowCol,'|')"/>
+							</xsl:variable>
+							<xsl:variable name ="beginRow">
+								<xsl:value-of select ="substring-before(substring-after($beginEndRowCol,concat($beginCol,'|')),'|')"/>
+							</xsl:variable>
+							<xsl:variable name ="endCol">
+								<xsl:value-of select ="substring-before(substring-after($beginEndRowCol,concat($beginCol,'|',$beginRow,'|')),'|')"/>
+							</xsl:variable>
+							<xsl:variable name ="endRow">
+								<xsl:value-of select ="substring-after($beginEndRowCol,concat($beginCol,'|',$beginRow,'|',$endCol,'|'))"/>
+							</xsl:variable>
+							<xsl:value-of select ="concat('[$',$sheetName,'.$',$beginCol,'$',$beginRow,':.$',$endCol,'$',$endRow,']')"/>
+						</xsl:when>
+						<xsl:otherwise>
 	
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:call-template name ="getCorrectNamedRange">
+					<xsl:with-param  name ="NamedRange" select="substring-after($tempNamedRange,';')"/>
+					<xsl:with-param name ="finalRange" select ="concat($FinalNamedRange,';',$tempFinalRange)"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<!--<xsl:value-of select ="translate(translate(substring-after($FinalPrintRange,' '),'$',''),'!','.')"/>-->
+				<xsl:value-of select ="substring-after($FinalNamedRange,';')"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+  <!--for ODF 1.1-->
+	<xsl:template name ="translateRangetoODF">
+		<xsl:param name ="range"/>
+		<xsl:variable name ="PartOne">
+			<xsl:value-of select ="substring-before($range,':')"/>
+		</xsl:variable>
+		<xsl:variable name ="PartTwo">
+			<xsl:value-of select ="substring-after($range,':')"/>
+		</xsl:variable>
+		<xsl:variable name ="beginColOrRow">
+			<xsl:choose>
+				<xsl:when test ="contains(substring-after($PartOne,'$'),'$')">
+					<xsl:value-of select ="'RCpresent'"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:variable name ="character">
+						<xsl:value-of select ="substring-after($PartOne,'$')"/>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="contains($character,'A') or contains($character,'B') or contains($character,'C') or contains($character,'D') or contains($character,'E') or contains($character,'F') or contains($character,'G') 
+                                            or contains($character,'H') or contains($character,'I') or contains($character,'J') or contains($character,'K') or contains($character,'L') or contains($character,'M') or contains($character,'N') or contains($character,'O') 
+                                            or contains($character,'P') or contains($character,'Q') or contains($character,'R') or contains($character,'S') or contains($character,'T') or contains($character,'U') or contains($character,'V') or contains($character,'W') 
+                                            or contains($character,'X') or contains($character,'Y') or contains($character,'Z') or contains($character,'a') or contains($character,'b') or contains($character,'c') or contains($character,'d') or contains($character,'e')
+                                            or contains($character,'f') or contains($character,'g') or contains($character,'h') or contains($character,'i') or contains($character,'j') or contains($character,'k') or contains($character,'l') or contains($character,'m')
+                                            or contains($character,'n') or contains($character,'o') or contains($character,'p') or contains($character,'q') or contains($character,'r') or contains($character,'s') or contains($character,'t') or contains($character,'u')
+                                            or contains($character,'v') or contains($character,'w') or contains($character,'x') or contains($character,'y') or contains($character,'z')">
+							<xsl:value-of select ="'true'"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="'false'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					<!--<xsl:value-of select ="substring-after($PartOne,'$')"/>-->
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="endColOrRow">
+			<xsl:choose >
+				<xsl:when test ="contains(substring-after($PartTwo,'$'),'$')">
+					<xsl:value-of select ="'RCpresent'"/>
+				</xsl:when>
+				<xsl:otherwise >
+					<xsl:variable name ="character">
+						<xsl:value-of select ="substring-after($PartTwo,'$')"/>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="contains($character,'A') or contains($character,'B') or contains($character,'C') or contains($character,'D') or contains($character,'E') or contains($character,'F') or contains($character,'G') 
+                                            or contains($character,'H') or contains($character,'I') or contains($character,'J') or contains($character,'K') or contains($character,'L') or contains($character,'M') or contains($character,'N') or contains($character,'O') 
+                                            or contains($character,'P') or contains($character,'Q') or contains($character,'R') or contains($character,'S') or contains($character,'T') or contains($character,'U') or contains($character,'V') or contains($character,'W') 
+                                            or contains($character,'X') or contains($character,'Y') or contains($character,'Z') or contains($character,'a') or contains($character,'b') or contains($character,'c') or contains($character,'d') or contains($character,'e')
+                                            or contains($character,'f') or contains($character,'g') or contains($character,'h') or contains($character,'i') or contains($character,'j') or contains($character,'k') or contains($character,'l') or contains($character,'m')
+                                            or contains($character,'n') or contains($character,'o') or contains($character,'p') or contains($character,'q') or contains($character,'r') or contains($character,'s') or contains($character,'t') or contains($character,'u')
+                                            or contains($character,'v') or contains($character,'w') or contains($character,'x') or contains($character,'y') or contains($character,'z')">
+							<xsl:value-of select ="'true'"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="'false'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="beginCol">
+			<xsl:choose>
+				<xsl:when test ="$beginColOrRow='RCpresent'">
+					<xsl:value-of select ="substring-before(substring-after($PartOne,'$'),'$')"/>
+				</xsl:when>
+				<xsl:when test ="$beginColOrRow='true'">
+					<xsl:value-of select ="substring-after($PartOne,'$')"/>
+				</xsl:when>
+				<xsl:when test ="$beginColOrRow='false'">
+					<xsl:value-of select ="'A'"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="endCol">
+			<xsl:choose>
+				<xsl:when test ="$endColOrRow='RCpresent'">
+					<xsl:value-of select ="substring-before(substring-after($PartTwo,'$'),'$')"/>
+				</xsl:when>
+				<xsl:when test ="$endColOrRow='true'">
+					<xsl:value-of select ="substring-after($PartTwo,'$')"/>
+				</xsl:when>
+				<xsl:when test ="$endColOrRow='false'">
+					<xsl:value-of select ="'IV'"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="beginRow">
+			<xsl:choose>
+				<xsl:when test ="$beginColOrRow='RCpresent'">
+					<xsl:value-of select ="substring-after(substring-after($PartOne,'$'),'$')"/>
+				</xsl:when>
+				<xsl:when test ="$beginColOrRow='true'">
+					<xsl:value-of select ="1"/>
+				</xsl:when>
+				<xsl:when test ="$beginColOrRow='false'">
+					<xsl:value-of select ="substring-after($PartOne,'$')"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="endRow">
+			<xsl:choose>
+				<xsl:when test ="$endColOrRow='RCpresent'">
+					<xsl:value-of select ="substring-after(substring-after($PartTwo,'$'),'$')"/>
+				</xsl:when>
+				<xsl:when test ="$endColOrRow='true'">
+					<xsl:value-of select ="65536"/>
+				</xsl:when>
+				<xsl:when test ="$endColOrRow='false'">
+					<xsl:value-of select ="substring-after($PartTwo,'$')"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:value-of select ="concat($beginCol,'|',$beginRow,'|',$endCol,'|',$endRow)"/>
+	</xsl:template>
 </xsl:stylesheet>

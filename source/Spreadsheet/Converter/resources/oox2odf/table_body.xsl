@@ -44,6 +44,7 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" 
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e oox r v">
 
@@ -414,6 +415,50 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <xsl:choose>
             <xsl:when
               test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = '' and $CheckIfBigMergeAfter != 'true' and $PictureCell = '' and $ConditionalCell = '' and $NoteCell = ''">
+				<xsl:variable name="Target">
+					<xsl:for-each select="key('Part', concat('xl/', $sheet))/e:worksheet/e:drawing">
+						<xsl:call-template name="GetTargetPicture">
+							<xsl:with-param name="sheet">
+								<xsl:value-of select="substring-after($sheet, '/')"/>
+							</xsl:with-param>
+							<xsl:with-param name="id">
+								<xsl:value-of select="@r:id"/>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name ="isAbsoluteAnchor">					
+					<xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
+						<xsl:if test="xdr:wsDr/xdr:absoluteAnchor">
+							<xsl:value-of select ="true()"/>
+						</xsl:if>
+					</xsl:for-each>					
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="$isAbsoluteAnchor='true'">
+              <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
+                <!-- if there is a default cell style for the row -->
+                <xsl:if test="@s">
+                  <xsl:attribute name="table:style-name">
+                    <xsl:value-of select="generate-id(key('Xf', @s))"/>
+                  </xsl:attribute>
+                </xsl:if>
+						<xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))//xdr:wsDr/xdr:absoluteAnchor">
+							<xsl:call-template name="InsertPicture">
+								<xsl:with-param name="NameSheet">
+									<xsl:value-of select="$NameSheet"/>
+								</xsl:with-param>
+								<xsl:with-param name="sheet">
+									<xsl:value-of select="$sheet"/>
+								</xsl:with-param>
+								<xsl:with-param name="Drawing">
+									<xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+								</xsl:with-param>
+							</xsl:call-template>
+						</xsl:for-each>
+						</table:table-cell>
+					</xsl:when>
+          <xsl:otherwise>
               <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
@@ -422,6 +467,8 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                   </xsl:attribute>
                 </xsl:if>
               </table:table-cell>
+          </xsl:otherwise>
+			   </xsl:choose>				
             </xsl:when>
             <xsl:when
               test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c) and $PictureCell = '' and $ConditionalCell = '' and $NoteCell = ''">
@@ -1165,6 +1212,9 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
               <xsl:with-param name="rSheredStrings">
                 <xsl:value-of select="$rSheredStrings"/>
               </xsl:with-param>
+              <!--RefNo-1:ODF1.1-->
+              <!--added by sonata for bug no:2560646-->
+              <xsl:with-param name="CheckIfNote" select="$CheckIfNote"/>
             </xsl:call-template>
           </xsl:if>
 

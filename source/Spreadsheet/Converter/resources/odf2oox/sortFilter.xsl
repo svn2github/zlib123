@@ -442,39 +442,75 @@
 
   <xsl:template name="InsertRowSort">
     <sortState>
-
       <xsl:if test="table:sort/@table:case-sensitive = 'true' ">
         <xsl:attribute name="caseSensitive">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
       </xsl:if>
-
+		<!--Vijayeta,SP2,Uni_Chart_Privatization.ods-->
+        <!--
       <xsl:variable name="row1">
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell"
             select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
         </xsl:call-template>
       </xsl:variable>
-
+		-->
+		<xsl:variable name="row1">
+		  <xsl:call-template name="GetRowNum">
+			  <xsl:with-param name="cell">
+				  <xsl:choose>
+					  <xsl:when test ="contains(@table:target-range-address,':')">
+						  <xsl:value-of select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+					  </xsl:when>
+					  <xsl:otherwise>
+						  <xsl:value-of select="substring-after(@table:target-range-address,'.')"/>
+					  </xsl:otherwise>
+				  </xsl:choose>
+			  </xsl:with-param>
+		  </xsl:call-template>		 
+      </xsl:variable>		
+      <!--<xsl:variable name="col1">-->
+		<!-- substring-before rowNum in cell coordinates-->
+		<!--<xsl:value-of
+          select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$row1)"/>-->
+      <!--</xsl:variable>-->
       <xsl:variable name="col1">
         <!-- substring-before rowNum in cell coordinates-->
-        <xsl:value-of
-          select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$row1)"
-        />
+			<xsl:choose>
+				<xsl:when test ="contains(@table:target-range-address,':')">
+					<xsl:value-of select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$row1)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="substring-before(substring-after(@table:target-range-address,'.'),$row1)"/>
+				</xsl:otherwise>
+			</xsl:choose>
       </xsl:variable>
-
-      <xsl:variable name="row2">
+      <!--<xsl:variable name="row2">
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell"
             select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
         </xsl:call-template>
+      </xsl:variable>-->
+      <xsl:variable name="row2">
+			<xsl:choose>
+				<xsl:when test ="contains(@table:target-range-address,':')">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell"
+            select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+        </xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="''"/>
+				</xsl:otherwise>
+			</xsl:choose>
       </xsl:variable>
-
       <xsl:variable name="col2">
         <xsl:value-of
           select="substring-before(substring-after(substring-after(@table:target-range-address,':'),'.'),$row2)"
         />
       </xsl:variable>
+		<!--Vijayeta,SP2,Uni_Chart_Privatization.ods,End-->
 	 <!-- 
 	 Code Changed by: Vijayeta 
      Bug number:1803593, performance 
@@ -489,90 +525,148 @@
 			<xsl:when test="@table:contains-header = 'false' or not(@table:contains-header) ">
             <xsl:value-of select="$row1"/>
           </xsl:when>
-
           <!-- make range one row shorter-->
           <xsl:otherwise>
             <xsl:value-of select="$row1 + 1"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
       <!-- sort range -->
+	  <!--Vijayeta,SP2,Uni_Chart_Privatization.ods-->
+      <!--<xsl:attribute name="ref">
+			<xsl:value-of select="concat($col1,$startRow,':', $col2, $row2)"/>-->
+        <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
+	  <!--</xsl:attribute>-->		
       <xsl:attribute name="ref">
+			<xsl:choose>
+				<xsl:when test ="$col2!='' and $row2!=''">
         <xsl:value-of select="concat($col1,$startRow,':', $col2, $row2)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="concat($col1,$startRow)"/>
+				</xsl:otherwise>
+			</xsl:choose>			
         <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
       </xsl:attribute>
-
       <xsl:for-each
         select="table:sort/table:sort-by[position()=1 or (@table:field-number!=preceding-sibling::table:sort-by/@table:field-number) or (@table:data-type-number!=preceding-sibling::table:sort-by/@table:data-type)]">
         <sortCondition>
-
           <!-- field selection -->
-          <xsl:attribute name="ref">
-
+          <!--<xsl:attribute name="ref">
             <xsl:variable name="colNum">
               <xsl:call-template name="GetAlphabeticPosition">
                 <xsl:with-param name="literal" select="$col1"/>
               </xsl:call-template>
             </xsl:variable>
-
             <xsl:variable name="fieldCol">
               <xsl:call-template name="NumbersToChars">
                 <xsl:with-param name="num" select="$colNum - 1  + @table:field-number"/>
               </xsl:call-template>
             </xsl:variable>
-
             <xsl:value-of select="concat($fieldCol,$startRow,':',$fieldCol,$row2)"/>
+          </xsl:attribute>-->
+          <xsl:attribute name="ref">
+            <xsl:variable name="colNum">
+              <xsl:call-template name="GetAlphabeticPosition">
+                <xsl:with-param name="literal" select="$col1"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="fieldCol">
+              <xsl:call-template name="NumbersToChars">
+                <xsl:with-param name="num" select="$colNum - 1  + @table:field-number"/>
+              </xsl:call-template>
+            </xsl:variable>
+				<xsl:choose>
+					<xsl:when test ="$col2!='' and $row2!=''">
+            <xsl:value-of select="concat($fieldCol,$startRow,':',$fieldCol,$row2)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="concat($fieldCol,$startRow)"/>
+					</xsl:otherwise>
+				</xsl:choose>				
           </xsl:attribute>
-
+			<!--Vijayeta,SP2,Uni_Chart_Privatization.ods,End-->
           <!-- descending order -->
           <xsl:if test="@table:order = 'descending' ">
             <xsl:attribute name="descending">
               <xsl:text>1</xsl:text>
             </xsl:attribute>
           </xsl:if>
-
         </sortCondition>
       </xsl:for-each>
     </sortState>
   </xsl:template>
 
   <xsl:template name="InsertColumnSort">
-
     <sortState columnSort="1">
-
       <xsl:if test="table:sort/@table:case-sensitive = 'true' ">
         <xsl:attribute name="caseSensitive">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
       </xsl:if>
-
-      <xsl:variable name="row1">
+	  <!--Vijayeta,SP2,Uni_Chart_Privatization.ods-->
+      <!--<xsl:variable name="row1">
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell"
             select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
         </xsl:call-template>
+      </xsl:variable>-->
+		<xsl:variable name="row1">
+			<xsl:call-template name="GetRowNum">
+				<xsl:with-param name="cell">
+					<xsl:choose>
+						<xsl:when test ="contains(@table:target-range-address,':')">
+							<xsl:value-of select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring-after(@table:target-range-address,'.')"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
+			</xsl:call-template>
       </xsl:variable>
-
-      <xsl:variable name="col1">
+      <!--<xsl:variable name="col1">-->
         <!-- substring-before rowNum in cell coordinates-->
-        <xsl:value-of
+		<!--<xsl:value-of
           select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$row1)"
         />
+      </xsl:variable>-->
+		<xsl:variable name="col1">
+			<!-- substring-before rowNum in cell coordinates-->
+			<xsl:choose>
+				<xsl:when test ="contains(@table:target-range-address,':')">
+					<xsl:value-of select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$row1)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="substring-before(substring-after(@table:target-range-address,'.'),$row1)"/>
+				</xsl:otherwise>
+			</xsl:choose>
       </xsl:variable>
-
-      <xsl:variable name="row2">
+      <!--<xsl:variable name="row2">
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell"
             select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
         </xsl:call-template>
+      </xsl:variable>-->
+      <xsl:variable name="row2">
+			<xsl:choose>
+				<xsl:when test ="contains(@table:target-range-address,':')">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell"
+            select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+        </xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="''"/>
+				</xsl:otherwise>
+			</xsl:choose>
       </xsl:variable>
-
       <xsl:variable name="col2">
         <xsl:value-of
           select="substring-before(substring-after(substring-after(@table:target-range-address,':'),'.'),$row2)"
         />
       </xsl:variable>
+		<!--Vijayeta,SP2,Uni_Chart_Privatization.ods,End-->
 	 <!-- 
 	 Code Changed by: Vijayeta 
      Bug number:1803593, performance 
@@ -605,30 +699,47 @@
       </xsl:variable>
 
       <!-- sort range -->
+	  <!--Vijayeta,SP2,Uni_Chart_Privatization.ods-->
+      <!--<xsl:attribute name="ref">
+        <xsl:value-of select="concat($startCol,$row1,':', $col2, $row2)"/>       
+      </xsl:attribute>-->
       <xsl:attribute name="ref">
+			<xsl:choose>
+				<xsl:when test ="$col2!='' and $row2!=''">
         <xsl:value-of select="concat($startCol,$row1,':', $col2, $row2)"/>
-        <!--xsl:value-of select="concat($col1,$startRow,':', $col2, $row2)"/-->
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="concat($startCol,$row1)"/>
+				</xsl:otherwise>
+			</xsl:choose>
         <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
       </xsl:attribute>
-
       <xsl:for-each
         select="table:sort/table:sort-by[position()=1 or (@table:field-number!=preceding-sibling::table:sort-by/@table:field-number) or (@table:data-type-number!=preceding-sibling::table:sort-by/@table:data-type)]">
         <sortCondition>
-
           <!-- field selection -->
-          <xsl:attribute name="ref">
+          <!--<xsl:attribute name="ref">
             <xsl:value-of
               select="concat($startCol,$row1 + @table:field-number,':',$col2,$row1 + @table:field-number)"
             />
+          </xsl:attribute>-->
+			<xsl:attribute name="ref">
+				<xsl:choose>
+					<xsl:when test ="$col2!=''">
+						<xsl:value-of select="concat($startCol,$row1 + @table:field-number,':',$col2,$row1 + @table:field-number)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="concat($startCol,$row1 + @table:field-number)"/>
+					</xsl:otherwise>
+				</xsl:choose>				
           </xsl:attribute>
-
+			<!--Vijayeta,SP2,Uni_Chart_Privatization.ods,End-->
           <!-- descending order -->
           <xsl:if test="@table:order = 'descending' ">
             <xsl:attribute name="descending">
               <xsl:text>1</xsl:text>
             </xsl:attribute>
           </xsl:if>
-
         </sortCondition>
       </xsl:for-each>
     </sortState>

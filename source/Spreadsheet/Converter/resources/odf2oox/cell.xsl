@@ -68,7 +68,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
       <xsl:value-of select="generate-id(ancestor::table:table)"/>
     </xsl:variable>
 
-    <xsl:variable name="max">
+		<!--Vijayeta,SP2,@table:number-columns-repeated-->
+		<!--<xsl:variable name="max">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated &gt; 0">
           <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
@@ -77,7 +78,25 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
           <xsl:value-of select="$colNumber"/>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="max">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated &gt; 0">
+					<xsl:choose >
+						<xsl:when test ="@table:number-columns-repeated &gt; 256">
+							<xsl:value-of select ="$colNumber + (256 - ((16384 - @table:number-columns-repeated) - 1))"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+          <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
+        </xsl:when>
+					</xsl:choose>
+				</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$colNumber"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
+		<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
 
     <xsl:if test="not($max = '256' and @table:visibility = 'collapse')">
       <col min="{$colNumber}">
@@ -125,22 +144,28 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         <xsl:if test="@table:visibility = 'collapse'">
           <xsl:attribute name="hidden">1</xsl:attribute>
         </xsl:if>
+        <!--commented by sonata for bug no:2559854-->
 
-        <xsl:if test="@table:default-cell-style-name != 'Default' ">
+        <!--<xsl:if test="@table:default-cell-style-name != 'Default' ">
           
-          <!--added by sonata for bug no:2165930-->
+          --><!--by sonata for bug no:2165930--><!--
+          <xsl:if test="@table:default-cell-style-name != 'Default' and @table:number-columns-repeated">
           <xsl:for-each select="key('style',@table:default-cell-style-name)">
             <xsl:attribute name="style">
               <xsl:value-of
                 select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
             </xsl:attribute>
           </xsl:for-each>
+          </xsl:if>
+        </xsl:if>-->
           <!--end-->
           
           <!--commented by sonata for bug no:2165930-->
           
           <!-- column style is when in all posible rows there is a cell in this column -->
-          <!--<xsl:variable name="checkColumnStyle">
+        <!--changed by sonata for bug no:2559854-->
+        <xsl:if test="@table:default-cell-style-name != 'Default' ">
+          <xsl:variable name="checkColumnStyle">
             <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
               <xsl:call-template name="CheckIfColumnStyle">
                 <xsl:with-param name="number" select="$colNumber"/>
@@ -156,7 +181,7 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                   select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:attribute>
             </xsl:for-each>
-          </xsl:if>-->
+          </xsl:if>
           <!--end-->
           
         </xsl:if>
@@ -166,7 +191,9 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
     <!-- insert next column -->
     <xsl:choose>
       <!-- next column is sibling of this one -->
-      <xsl:when test="following::table:table-column[generate-id(ancestor::table:table) = $tableId]">
+			<!--Vijayeta,SP2,@table:number-columns-repeated-->
+
+			<!--<xsl:when test="following::table:table-column[generate-id(ancestor::table:table) = $tableId]">
         <xsl:apply-templates
           select="following::table:table-column[generate-id(ancestor::table:table) = $tableId][1]"
           mode="sheet">
@@ -182,14 +209,40 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
           </xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
+      </xsl:when>-->
+      <xsl:when test="following::table:table-column[generate-id(ancestor::table:table) = $tableId]">
+        <xsl:apply-templates
+          select="following::table:table-column[generate-id(ancestor::table:table) = $tableId][1]"
+          mode="sheet">
+          <xsl:with-param name="colNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-columns-repeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-columns-repeated &gt; 256">
+										<xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+              </xsl:when>
+								</xsl:choose>
+							</xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$colNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+        </xsl:apply-templates>
       </xsl:when>
+
+			<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
 
       <!-- this is the last column inside header -->
       <xsl:when
         test="not(following-sibling::node()[1][name() = 'table:table-column' ]) and parent::node()[name() = 'table:table-header-columns' ] and parent::node()/following-sibling::table:table-column[1]">
         <xsl:apply-templates select="parent::node()/following-sibling::table:table-column[1]"
           mode="sheet">
-          <xsl:with-param name="colNumber">
+					<!--<xsl:with-param name="colNumber">
             <xsl:choose>
               <xsl:when test="@table:number-columns-repeated">
                 <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
@@ -198,7 +251,26 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                 <xsl:value-of select="$colNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
+          </xsl:with-param>-->
+          <xsl:with-param name="colNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-columns-repeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-columns-repeated &gt; 256">
+										<xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+              </xsl:when>
+								</xsl:choose>
+							</xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$colNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
+
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
       </xsl:when>
@@ -211,8 +283,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
   <xsl:template match="table:table-column" mode="defaultColWidth">
     <xsl:param name="colNumber"/>
     <xsl:param name="result"/>
-
-    <xsl:variable name="max">
+		<!--Vijayeta,SP2,@table:number-columns-repeated-->
+		<!--<xsl:variable name="max">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
           <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
@@ -221,8 +293,25 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
           <xsl:value-of select="$colNumber"/>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="max">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+					<xsl:choose >
+						<xsl:when test ="@table:number-columns-repeated &gt; 256">
+							<xsl:value-of select ="$colNumber + (256 - (16384 - (@table:number-columns-repeated - 1)))"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+          <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
+        </xsl:when>
+					</xsl:choose>
+				</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$colNumber"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+		<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     <xsl:choose>
       <xsl:when test="not($max = '256' and @table:visibility = 'collapse')">
         <!-- insert next column -->
@@ -231,7 +320,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
           <xsl:when test="following-sibling::node()[1][name() = 'table:table-column' ]">
             <xsl:apply-templates select="following-sibling::table:table-column[1]"
               mode="defaultColWidth">
-              <xsl:with-param name="colNumber">
+							<!--Vijayeta,SP2,@table:number-columns-repeated-->
+							<!--<xsl:with-param name="colNumber">
                 <xsl:choose>
                   <xsl:when test="@table:number-columns-repeated">
                     <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
@@ -240,7 +330,25 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                     <xsl:value-of select="$colNumber+1"/>
                   </xsl:otherwise>
                 </xsl:choose>
+              </xsl:with-param>-->
+              <xsl:with-param name="colNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-columns-repeated">
+										<xsl:choose >
+											<xsl:when test ="@table:number-columns-repeated &gt; 256">
+												<xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))"/>
+											</xsl:when>
+											<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                    <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+                  </xsl:when>
+										</xsl:choose>
+									</xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$colNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
+							<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
               <xsl:with-param name="result">
                 <xsl:text>false</xsl:text>
               </xsl:with-param>
@@ -255,7 +363,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
           <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-columns' ]">
             <xsl:apply-templates select="following-sibling::node()[1]/table:table-column[1]"
               mode="defaultColWidth">
-              <xsl:with-param name="colNumber">
+							<!--Vijayeta,SP2,@table:number-columns-repeated-->
+							<!--<xsl:with-param name="colNumber">
                 <xsl:choose>
                   <xsl:when test="@table:number-columns-repeated">
                     <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
@@ -264,7 +373,25 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                     <xsl:value-of select="$colNumber+1"/>
                   </xsl:otherwise>
                 </xsl:choose>
+              </xsl:with-param>-->
+              <xsl:with-param name="colNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-columns-repeated">
+										<xsl:choose >
+											<xsl:when test ="@table:number-columns-repeated &gt; 256">
+												<xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))"/>
+											</xsl:when>
+											<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                    <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+                  </xsl:when>
+										</xsl:choose>
+									</xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$colNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
+							<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
               <xsl:with-param name="result">
                 <xsl:text>false</xsl:text>
               </xsl:with-param>
@@ -275,7 +402,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
             test="not(following-sibling::node()[1][name() = 'table:table-column' ]) and parent::node()[name() = 'table:table-header-columns' ]">
             <xsl:apply-templates select="parent::node()/following-sibling::table:table-column[1]"
               mode="defaultColWidth">
-              <xsl:with-param name="colNumber">
+							<!--Vijayeta,SP2,@table:number-columns-repeated-->
+							<!--<xsl:with-param name="colNumber">
                 <xsl:choose>
                   <xsl:when test="@table:number-columns-repeated">
                     <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
@@ -284,7 +412,25 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                     <xsl:value-of select="$colNumber+1"/>
                   </xsl:otherwise>
                 </xsl:choose>
+              </xsl:with-param>-->
+              <xsl:with-param name="colNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-columns-repeated">
+										<xsl:choose >
+											<xsl:when test ="@table:number-columns-repeated &gt; 256">
+												<xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))"/>
+											</xsl:when>
+											<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+                    <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+                  </xsl:when>
+										</xsl:choose>
+									</xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$colNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
+							<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
               <xsl:with-param name="result">
                 <xsl:text>false</xsl:text>
               </xsl:with-param>
@@ -310,9 +456,21 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
 
     <xsl:param name="Tag"/>
     <xsl:param name="repeat"/>
-
+		<!--Vijayeta,SP2,@table:number-columns-repeated-->
+		<xsl:variable name ="tableNumberColumnsRepeated">
+			<xsl:choose >
+				<xsl:when test ="@table:number-columns-repeated &gt; 256">
+					<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+				</xsl:when>
+				<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     <xsl:choose>
-      <xsl:when test="@table:number-columns-repeated &gt; $repeat">
+			<!--<xsl:when test="@table:number-columns-repeated &gt; $repeat">-->
+			<xsl:when test="$tableNumberColumnsRepeated &gt; $repeat">
         <xsl:call-template name="CreateDefaultTag">
           <xsl:with-param name="colNumber">
             <xsl:value-of select="$colNumber + 1"/>
@@ -374,8 +532,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
     <xsl:variable name="TagNumber">
       <xsl:value-of select="concat('Tag', position())"/>
     </xsl:variable>
-
-    <xsl:variable name="NextColl">
+		<!--Vijayeta,SP2,@table:number-columns-repeated-->
+		<!--<xsl:variable name="NextColl">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
           <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
@@ -384,8 +542,25 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
           <xsl:value-of select="$colNumber+1"/>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+    <xsl:variable name="NextColl">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+					<xsl:choose >
+						<xsl:when test ="@table:number-columns-repeated &gt; 256">
+							<xsl:value-of select ="$colNumber + (256 - (16384 - @table:number-columns-repeated))"/>
+						</xsl:when>
+						<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+          <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+        </xsl:when>
+					</xsl:choose>
+				</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$colNumber+1"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+		<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
     <!-- style char for this table:table-column tag -->
     <xsl:variable name="TagChar">
       <xsl:choose>
@@ -403,7 +578,17 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
               <xsl:value-of select="$Tag"/>
             </xsl:with-param>
             <xsl:with-param name="repeat">
+							<!--Vijayeta,SP2,@table:number-columns-repeated-->
+							<xsl:choose >
+								<xsl:when test ="@table:number-columns-repeated &gt; 256">
+									<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-columns-repeated &lt;= 256">
               <xsl:value-of select="@table:number-columns-repeated"/>
+								</xsl:when>
+							</xsl:choose>
+							<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
+							<!--<xsl:value-of select="@table:number-columns-repeated"/>-->
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
@@ -484,7 +669,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
     <xsl:choose>
       <xsl:when
         test="not(following-sibling::table:table-row or following-sibling::table:table-header-rows or following-sibling::table:table-row-group) and @table:visibility='collapse'">
-        <xsl:variable name="CheckNumber">
+				<!--Vijayeta,SP2,@table:number-rows-repeated-->
+				<!--<xsl:variable name="CheckNumber">
           <xsl:choose>
             <xsl:when test="@table:number-rows-repeated">
               <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
@@ -493,7 +679,25 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
               <xsl:value-of select="$rowNumber+1"/>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:variable>-->
+        <xsl:variable name="CheckNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-rows-repeated">
+							<xsl:choose >
+								<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+									<xsl:value-of select ="$rowNumber + (65536 - (1048576 - @table:number-rows-repeated))"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
+              <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+            </xsl:when>
+							</xsl:choose>
+						</xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$rowNumber+1"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
+				<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         <xsl:choose>
           <xsl:when test="$CheckNumber = '65536'">
             <xsl:text>true</xsl:text>
@@ -508,16 +712,35 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         <xsl:choose>
           <xsl:when test="name(following-sibling::node()[1]) = 'table:table-row'">
             <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="zeroHeight">
+							<!--Vijayeta,SP2,@table:number-rows-repeated-->
+							<!--<xsl:with-param name="rowNumber">
+									<xsl:choose>
+									  <xsl:when test="@table:number-rows-repeated">
+										<xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+									  </xsl:when>
+									  <xsl:otherwise>
+										<xsl:value-of select="$rowNumber+1"/>
+									  </xsl:otherwise>
+									</xsl:choose>
+								  </xsl:with-param>-->
               <xsl:with-param name="rowNumber">
                 <xsl:choose>
                   <xsl:when test="@table:number-rows-repeated">
+										<xsl:choose >
+											<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+												<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+											</xsl:when>
+											<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                     <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
                   </xsl:when>
+										</xsl:choose>
+									</xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="$rowNumber+1"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
+							<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
             </xsl:apply-templates>
           </xsl:when>
           <xsl:when
@@ -525,32 +748,70 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
             <xsl:apply-templates
               select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
               mode="zeroHeight">
+							<!--Vijayeta,SP2,@table:number-rows-repeated-->
+							<!--<xsl:with-param name="rowNumber">
+								<xsl:choose>
+									<xsl:when test="@table:number-rows-repeated">
+										<xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$rowNumber+1"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:with-param>-->
               <xsl:with-param name="rowNumber">
                 <xsl:choose>
                   <xsl:when test="@table:number-rows-repeated">
+										<xsl:choose >
+											<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+												<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+											</xsl:when>
+											<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                     <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
                   </xsl:when>
+										</xsl:choose>
+									</xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="$rowNumber+1"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
+							<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
             </xsl:apply-templates>
           </xsl:when>
           <xsl:when
             test="(name(parent::node()) = 'table:table-header-rows' or name(parent::node()) = 'table:table-row-group') and parent::node()/following-sibling::table:table-row">
             <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
               mode="zeroHeight">
+							<!--Vijayeta,SP2,@table:number-rows-repeated-->
+							<!--<xsl:with-param name="rowNumber">
+								<xsl:choose>
+									<xsl:when test="@table:number-rows-repeated">
+										<xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$rowNumber+1"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:with-param>-->
               <xsl:with-param name="rowNumber">
                 <xsl:choose>
                   <xsl:when test="@table:number-rows-repeated">
+										<xsl:choose >
+											<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+												<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+											</xsl:when>
+											<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                     <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
                   </xsl:when>
+										</xsl:choose>
+									</xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="$rowNumber+1"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
+							<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
             </xsl:apply-templates>
           </xsl:when>
         </xsl:choose>
@@ -620,14 +881,37 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         </xsl:if>
         </xsl:if>
         <!--changed by sonata for bug no:2165930-->
-        <xsl:if test="table:table-cell/@table:style-name">
-          <xsl:attribute name="customFormat">
-            <xsl:value-of select="1"/>
-          </xsl:attribute>
-        </xsl:if>
-        <!--end-->
-        <!--changed by sonata for bug no:2165930--> 
+        <!--changed by sonata for regression bug no:2559854-->
+        <xsl:variable name="checkStyle">
+          <xsl:for-each select="table:table-cell">
+            <xsl:choose>
+              <xsl:when test="@table:style-name or @table:number-columns-repeated">
+                <xsl:value-of select="'true'"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'false'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="totalCell">
+          <xsl:value-of select="count(table:table-cell)"/>
+        </xsl:variable>
+        <xsl:variable name="countColRepeted">
+          <xsl:value-of select="count(table:table-cell[@table:number-columns-repeated])"/>
+        </xsl:variable>
+        <xsl:variable name="sumColRepeted">
+          <xsl:value-of select="sum(table:table-cell/@table:number-columns-repeated)"/>
+        </xsl:variable>
       
+        <xsl:variable name="totalColCount">
+          <xsl:value-of select=" $totalCell + $sumColRepeted - $countColRepeted"/>
+        </xsl:variable>
+       
+      
+        <!--<xsl:if test="table:table-cell[last()]/@table:style-name and table:table-cell[last()]/@table:number-columns-repeated">-->
+        <xsl:if test="not(contains($checkStyle,'false')) and $totalColCount =256">
+          <xsl:if test="table:table-cell[last()]/@table:style-name">
           <xsl:variable name="stylerepeated">
             <xsl:value-of select="table:table-cell[last()]/@table:style-name"/>
           </xsl:variable>
@@ -637,6 +921,11 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                 select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
             </xsl:attribute>
           </xsl:for-each>
+          <xsl:attribute name="customFormat">
+            <xsl:value-of select="1"/>
+          </xsl:attribute>
+        </xsl:if>
+        </xsl:if>
 
 
         <!--end-->
@@ -714,12 +1003,34 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         <xsl:if
           test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true')">
           <xsl:call-template name="InsertRepeatedRows">
+							<!--Vijayeta,SP2,@table:number-rows-repeated-->
+							<!--<xsl:with-param name="numberRowsRepeated">
+								<xsl:value-of select="@table:number-rows-repeated"/>
+							</xsl:with-param>-->
             <xsl:with-param name="numberRowsRepeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
               <xsl:value-of select="@table:number-rows-repeated"/>
+									</xsl:when>
+								</xsl:choose>
             </xsl:with-param>
+							<!--<xsl:with-param name="numberOfAllRowsRepeated">
+								<xsl:value-of select="@table:number-rows-repeated"/>
+							</xsl:with-param>-->
             <xsl:with-param name="numberOfAllRowsRepeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
               <xsl:value-of select="@table:number-rows-repeated"/>
+									</xsl:when>
+								</xsl:choose>
             </xsl:with-param>
+							<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
             <xsl:with-param name="rowNumber">
               <xsl:value-of select="$rowNumber + 1"/>
             </xsl:with-param>
@@ -786,16 +1097,35 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         <xsl:apply-templates
           select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]"
           mode="sheet">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when test="@table:number-rows-repeated">
+								<xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber+1"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>-->
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                 <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
               </xsl:when>
+								</xsl:choose>
+							</xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
@@ -854,16 +1184,35 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         <xsl:apply-templates
           select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
           mode="sheet">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when test="@table:number-rows-repeated">
+								<xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber+1"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>-->
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                 <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
               </xsl:when>
+								</xsl:choose>
+							</xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
@@ -921,16 +1270,35 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         test="(parent::node()[name()='table:table-header-rows'] or parent::node()[name()='table:table-row-group']) and not(following-sibling::node()[1][name() = 'table:table-row' ])">
         <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
           mode="sheet">
+					<!--Vijayeta,SP2,@table:number-rows-repeated-->
+					<!--<xsl:with-param name="rowNumber">
+						<xsl:choose>
+							<xsl:when test="@table:number-rows-repeated">
+								<xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rowNumber+1"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>-->
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="@table:number-rows-repeated">
+								<xsl:choose >
+									<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+										<xsl:value-of select ="$rowNumber+(65536 - (1048576 - @table:number-rows-repeated))"/>
+									</xsl:when>
+									<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                 <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
               </xsl:when>
+								</xsl:choose>
+							</xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
+					<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
@@ -1111,9 +1479,21 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
+								<!--Vijayeta,SP2,@table:number-rows-repeated-->
+								<!--<xsl:with-param name="numberOfAllRowsRepeated">
+									<xsl:value-of select="@table:number-rows-repeated"/>
+								</xsl:with-param>-->
               <xsl:with-param name="numberOfAllRowsRepeated">
+									<xsl:choose >
+										<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+											<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+										</xsl:when>
+										<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
                 <xsl:value-of select="@table:number-rows-repeated"/>
+										</xsl:when>
+									</xsl:choose>
               </xsl:with-param>
+								<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
               <xsl:with-param name="rowNumber">
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:with-param>
@@ -1207,7 +1587,21 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
     <!--End of RefNo-4-->
     <!--RefNo-4:added columnCellStyle condition-->
     <!--RefNo-6: or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'-->
-    <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name or $columnCellStyle != '') or (256 = ($colNumber + @table:number-columns-repeated)))) or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'">
+		<!--Vijayeta,SP2,@table:number-columns-repeated-->
+		<xsl:variable name ="tableNumberColumnsRepeated">
+			<xsl:choose >
+				<xsl:when test ="@table:number-columns-repeated &gt; 256">
+					<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+				</xsl:when>
+				<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
+		<xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name or $columnCellStyle != '')
+			or (256 = ($colNumber + $tableNumberColumnsRepeated)))) 
+			or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'">
     
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
@@ -1506,9 +1900,17 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         <xsl:value-of select="$pivotCells"/>
       </xsl:with-param>
     </xsl:call-template>
-
-
-
+		<!--Vijayeta,SP2-->
+		<xsl:variable name ="tableNumberColumnsRepeated">
+			<xsl:choose >
+				<xsl:when test ="@table:number-columns-repeated &gt; 256">
+					<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+				</xsl:when>
+				<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
     <!-- Insert cells if "@table:number-columns-repeated"  > 1 -->
     <xsl:choose>
       <!-- do not output unnecessary last cells in a row (when last cell is table:table-cell with default style, repeated columns and without content)  -->
@@ -1518,10 +1920,11 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                   in $TableColumnTagNum there should be 'K' ($TableColumnTagNum contains listed default-cell-style-name from backward) -->
       <xsl:when test="not(@table:style-name) and not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') 
         or contains($TableColumnTagNum,concat('K',$colNumber))) and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p)"> </xsl:when>
+			<!--Vijayeta,SP2End-->
       <!--RefNo-4:added $columnCellStyle-->
       <!--RefNo-6:added condition or name()='table:covered-table-cell'-->
       <xsl:when
-        test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p or $columnCellStyle != '' or name()='table:covered-table-cell')">
+			  test="@table:number-columns-repeated and number($tableNumberColumnsRepeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p or $columnCellStyle != '' or name()='table:covered-table-cell')">
    
         <!--RefNo-1-->
         <!--RefNo-6: added or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'-->
@@ -2210,7 +2613,7 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
 
     <xsl:choose>
       <xsl:when test="$count &lt; $position">
-        <xsl:variable name="columns">
+				<!--<xsl:variable name="columns">
           <xsl:choose>
             <xsl:when test="@table:number-columns-repeated">
               <xsl:value-of select="@table:number-columns-repeated"/>
@@ -2219,8 +2622,26 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
               <xsl:text>1</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:variable>-->
+				<!--Vijayeta,SP2,@table:number-columns-repeated-->
+        <xsl:variable name="columns">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated">
+							<xsl:choose >
+								<xsl:when test ="@table:number-columns-repeated &gt; 256">
+									<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+              <xsl:value-of select="@table:number-columns-repeated"/>
+            </xsl:when>
+							</xsl:choose>
+						</xsl:when>
+            <xsl:otherwise>
+              <xsl:text>1</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
-
+				<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
         <xsl:for-each
           select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]">
           <xsl:call-template name="GetColNumber">
@@ -2252,9 +2673,21 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
       <xsl:when test="generate-id(.) != $rowId">
         <xsl:variable name="rows">
           <xsl:choose>
+						<!--Vijayeta,SP2,@table:number-rows-repeated-->
+						<!--<xsl:when test="@table:number-rows-repeated">
+							<xsl:value-of select="@table:number-rows-repeated"/>
+						</xsl:when>-->
             <xsl:when test="@table:number-rows-repeated">
+							<xsl:choose >
+								<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+									<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
               <xsl:value-of select="@table:number-rows-repeated"/>
             </xsl:when>
+							</xsl:choose>
+						</xsl:when>
+						<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
             <xsl:otherwise>
               <xsl:text>1</xsl:text>
             </xsl:otherwise>
@@ -2324,18 +2757,35 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
 
     <xsl:choose>
       <xsl:when test="$newValue != 'end' ">
-
+				<!--Vijayeta,SP2,@table:number-rows-repeated-->
+				<!--<xsl:variable name="rows">
+					<xsl:choose>
+						<xsl:when test="@table:number-rows-repeated">
+							<xsl:value-of select="@table:number-rows-repeated"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:text>1</xsl:text>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>-->
         <xsl:variable name="rows">
           <xsl:choose>
             <xsl:when test="@table:number-rows-repeated">
+							<xsl:choose >
+								<xsl:when test ="@table:number-rows-repeated &gt; 65536">
+									<xsl:value-of select ="65536 - (1048576 - @table:number-rows-repeated)"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-rows-repeated &lt;= 65536">
               <xsl:value-of select="@table:number-rows-repeated"/>
             </xsl:when>
+							</xsl:choose>
+						</xsl:when>
             <xsl:otherwise>
               <xsl:text>1</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
+				<!--Vijayeta,SP2,@table:number-rows-repeated,End-->
         <xsl:variable name="table2">
           <xsl:for-each select="following::table:table-row[1]">
             <xsl:value-of select="generate-id(ancestor::table:table)"/>
@@ -2383,7 +2833,7 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
 
     <xsl:choose>
       <xsl:when test="$count &lt; $number">
-        <xsl:variable name="columns">
+				<!--<xsl:variable name="columns">
           <xsl:choose>
             <xsl:when test="@table:number-columns-repeated">
               <xsl:value-of select="@table:number-columns-repeated"/>
@@ -2392,7 +2842,26 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
               <xsl:text>1</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:variable>-->
+				<!--Vijayeta,SP2,@table:number-columns-repeated-->
+        <xsl:variable name="columns">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated">
+							<xsl:choose >
+								<xsl:when test ="@table:number-columns-repeated &gt; 256">
+									<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+								</xsl:when>
+								<xsl:when test ="@table:number-columns-repeated &lt;= 256">
+              <xsl:value-of select="@table:number-columns-repeated"/>
+            </xsl:when>
+							</xsl:choose>
+						</xsl:when>
+            <xsl:otherwise>
+              <xsl:text>1</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
+				<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
 
         <xsl:variable name="newValue">
           <xsl:choose>
