@@ -61,7 +61,7 @@ exclude-result-prefixes="p a r xlink rels">
   <xsl:template name="content">
     <xsl:message terminate="no">progress:a:p</xsl:message>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
-    <office:document-content>
+    <office:document-content office:version="1.1">
       <office:automatic-styles>
         <!-- automatic styles for document body -->
          <xsl:call-template name ="DateFormats"/>
@@ -553,12 +553,22 @@ exclude-result-prefixes="p a r xlink rels">
         <xsl:attribute name ="draw:name">
           <xsl:value-of select ="concat('page',position())"/>
         </xsl:attribute>
+        <!--Office 2007 SP2-->
+        <xsl:for-each select ="document(concat('ppt/slides/slide',$slidePos,'.xml'))/p:sld/p:cSld/p:spTree/p:sp">
+          <!--<xsl:for-each select ="p:cSld/p:spTree/p:sp">-->
+          <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'ftr')]">
         <xsl:attribute name ="presentation:use-footer-name">
-          <xsl:value-of select ="concat('ftr',position())"/>
+              <xsl:value-of select ="concat('ftr',$slidePos)"/>
         </xsl:attribute>
+          </xsl:if>
+          <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt')]">
         <xsl:attribute name ="presentation:use-date-time-name">
-          <xsl:value-of select ="concat('dtd',position())"/>
+              <xsl:value-of select ="concat('dtd',$slidePos)"/>
         </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
+        <!--Office 2007 SP2-->
+
 		  <!--code added for draw:id attribute in OpenOffice.org 2.3-->
 		  <xsl:variable name="dpageid">
 			  <xsl:value-of select="concat('pid',position())"/>
@@ -1831,6 +1841,8 @@ exclude-result-prefixes="p a r xlink rels">
               <xsl:if test="./a:graphic/a:graphicData/a:tbl">
                 <xsl:call-template name="tmpCreateTable">
                   <xsl:with-param name ="TypeId" select="$SlideID" />
+                  <!--parameter added by yeswanth.s : for getting hyperlink from the .rels file using rId-->
+                  <xsl:with-param name ="slideRel" select="$slideRel"/>
                 </xsl:call-template>
               </xsl:if>
             </xsl:when>
@@ -1988,6 +2000,7 @@ exclude-result-prefixes="p a r xlink rels">
   </xsl:template>
   <xsl:template name ="tmpCreateTable">
     <xsl:param name ="TypeId" />
+    <xsl:param name ="slideRel"/>
     <draw:g>
       <xsl:for-each select="./a:graphic/a:graphicData/a:tbl/a:tr">
         <xsl:variable name="rowPosition" select="position()"/>
@@ -2005,6 +2018,8 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:with-param name="rowPosition" select ="$rowPosition" />
                   <xsl:with-param name="grID" select ="$GraphicId" />
                   <xsl:with-param name="TypeId" select ="$TypeId" />
+                  <xsl:with-param name="sldId" select ="$TypeId" />
+                  <xsl:with-param name ="SlideRelationId" select="$slideRel"/>
                 </xsl:call-template>
               </draw:frame>
             </xsl:otherwise>
@@ -2045,8 +2060,8 @@ exclude-result-prefixes="p a r xlink rels">
    <!-- parameter added by chhavi:for ODF1.1 conformance-->
    <xsl:param name ="layId"/>
    <draw:g>
-
-     <xsl:if test="$multiple='0'">
+     <!-- condition added by chhavi:for ODF1.1 conformance-->
+     <xsl:if test="$multiple='0' and $layId!='true'">
           <xsl:attribute name ="draw:id" >
 				<xsl:value-of  select ="$drawAnimId"/>
 			  </xsl:attribute>

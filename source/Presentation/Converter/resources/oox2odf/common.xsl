@@ -49,6 +49,7 @@ xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
 xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
+xmlns:msxsl="urn:schemas-microsoft-com:xslt"
 exclude-result-prefixes="p a r xlink ">
 	<xsl:template name="getColorCode">
 		<xsl:param name="color"/>
@@ -1827,12 +1828,10 @@ exclude-result-prefixes="p a r xlink ">
             <xsl:call-template name="tmpSolidColor">
               <xsl:with-param name="SMName" select="$SMName"/>
             </xsl:call-template>
-          </xsl:attribute>
-          
+          </xsl:attribute>          
             <xsl:call-template name="tmpLineFillTransperancy">
               <xsl:with-param name="SMName" select="$SMName"/>
-            </xsl:call-template>
-         
+            </xsl:call-template>         
         </xsl:for-each>
       </xsl:when>
       <xsl:when test ="p:style/a:lnRef[@idx=0]">
@@ -2079,8 +2078,7 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:attribute name="draw:auto-grow-width">
           <xsl:value-of select ="'false'"/>
         </xsl:attribute>
-        </xsl:if>
-     
+        </xsl:if>     
       </xsl:otherwise>
     </xsl:choose>
     <!--Wrap text in shape -->
@@ -2354,6 +2352,11 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:when test="contains($Target,'file:///')">
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('file:///',translate(substring-after($Target,'file:///'),'\','/'))"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="contains($type,'hyperlink') and (contains($Target,'http:') or contains($Target,'https:'))">
+          <xsl:attribute name="xlink:href">
+            <xsl:value-of select="$Target"/>
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="contains($type,'hyperlink') and not(contains($Target,'http:')) and not(contains($Target,'https:'))">
@@ -3905,7 +3908,8 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:choose>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$grpRot > 0 ">
+      <!--change made by chhavi for odf conformance v1.1-->
+      <xsl:when test="$grpRot != 0 ">
         <xsl:value-of select="concat($grpX,':',$grpY,':',$grpCX,':',$grpCY,':',$grpChX,':',$grpChY,':',$grpChCX,':',$grpChCY,':',$grpRot,':',$grpflipH,':',$grpflipV,':','YESROTATION','@')"/>
       </xsl:when>
       <xsl:otherwise>

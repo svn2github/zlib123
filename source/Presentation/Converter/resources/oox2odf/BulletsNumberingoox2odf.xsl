@@ -380,11 +380,16 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                               </xsl:call-template>
                             </xsl:for-each >
                           </xsl:variable>
+                          <!--added by chhavi for conformance-->
+                          <xsl:if test="$levelColor !=''">
+                            <xsl:attribute name ="fo:color">
                           <xsl:call-template name ="getColorCode">
                             <xsl:with-param name ="color">
                               <xsl:value-of select="$levelColor"/>
                             </xsl:with-param>
                           </xsl:call-template >
+                            </xsl:attribute>
+                          </xsl:if>
                         </xsl:if>
 											</xsl:if>
 											<!-- Code added by vijayeta, bug fix 1746350-->
@@ -637,11 +642,16 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                               </xsl:call-template>
                             </xsl:for-each >
                           </xsl:variable>
+                          <!--added by chhavi for conformance-->
+                          <xsl:if test="$levelColor !=''">
+                            <xsl:attribute name ="fo:color">
                           <xsl:call-template name ="getColorCode">
                             <xsl:with-param name ="color">
                               <xsl:value-of select="$levelColor"/>
                             </xsl:with-param>
                           </xsl:call-template >
+                            </xsl:attribute>
+                          </xsl:if>
 												</xsl:if>
 											</xsl:if>
 											<!-- Code added by vijayeta, bug fix 1746350-->
@@ -949,7 +959,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 										</xsl:if>
 										<xsl:if test ="a:pPr/a:buSzPct">
 											<xsl:attribute name ="fo:font-size">
-												<xsl:value-of select ="concat((/a:pPr/a:buSzPct/@val div 1000),'%')"/>
+                        <!--changed by chhavi to fix v1.1 conformance-->
+												<xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
 											</xsl:attribute>
 										</xsl:if>
 										<xsl:if test ="not(a:pPr/a:buSzPct)">
@@ -972,11 +983,17 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                             </xsl:call-template>
                           </xsl:for-each >
                         </xsl:variable>
+                        <!--added by chhavi for conformance-->
+                        <xsl:if test="$levelColor !=''">
+                          <xsl:attribute name ="fo:color">
                         <xsl:call-template name ="getColorCode">
                           <xsl:with-param name ="color">
                             <xsl:value-of select="$levelColor"/>
                           </xsl:with-param>
                         </xsl:call-template >
+                          </xsl:attribute>
+                        </xsl:if>
+                     
                       </xsl:if>
 										</xsl:if>
 										<!-- Code added by vijayeta, bug fix 1746350-->
@@ -995,9 +1012,11 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                               <xsl:with-param name ="textColor" select="$textColor" />
 														</xsl:call-template>
 													</xsl:variable>
+                          <xsl:if test="$levelColor !=''">
 													<xsl:attribute name ="fo:color">
 														<xsl:value-of select ="$levelColor"/>
 													</xsl:attribute>
+                          </xsl:if>
 												</xsl:for-each>
 											</xsl:if>
 											<!-- Vijayeta,Custom Bullet Colour-->

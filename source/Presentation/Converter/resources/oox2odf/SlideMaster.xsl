@@ -537,6 +537,10 @@ Copyright (c) 2007, Sonata Software Limited
              </xsl:choose>
 
            </xsl:for-each>
+           
+           <!--code changed by yeswanth : For Font name in Title : 4-Feb-09-->
+           <xsl:choose>
+             <xsl:when test="./p:txBody/a:p/a:r">
         <xsl:for-each select="./p:txBody/a:p/a:r">
           <xsl:if test="position()=1">
             <xsl:call-template name="tmpTitleCommonTextProp">
@@ -545,6 +549,15 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:call-template>
           </xsl:if>
         </xsl:for-each>
+             </xsl:when>
+             <xsl:otherwise>
+               <xsl:call-template name="tmpTitleCommonTextProp">
+                 <xsl:with-param name="fontType" select="'major'"/>
+                 <xsl:with-param name="SlideMasterFile" select="$SlideMasterFile"/>
+               </xsl:call-template>
+             </xsl:otherwise>             
+           </xsl:choose>
+        
       </style:text-properties>
   </xsl:template>
    <xsl:template name="tmpTitleCommonTextProp">
@@ -954,7 +967,8 @@ Copyright (c) 2007, Sonata Software Limited
                        <draw:text-box>
                             <xsl:for-each select ="p:txBody/a:p">
                               <xsl:variable name="flagFooter">
-                                <xsl:if test="count(a:r) > 1">
+                                <!--condition changed by yeswanth.s : 9-Feb-09 : to retain footer in slide master-->
+                                <xsl:if test="count(a:r) &gt; 1">
                                   <xsl:value-of select="'1'"/>
                                 </xsl:if>
                               </xsl:variable>
@@ -962,21 +976,13 @@ Copyright (c) 2007, Sonata Software Limited
                                       <xsl:attribute name ="text:style-name">
                                         <xsl:value-of select ="concat($ParaId,position())"/>
                                       </xsl:attribute>
-                        
-                                      <xsl:for-each select ="node()">
-
-                                        <xsl:if test ="name()='a:r'">
+                                <!--changes made by yeswanth.s : 10-Feb-09 : For footer-->
+                                      <xsl:for-each select ="node()">                                        
                                           <xsl:choose>
-                                            <xsl:when test="$flagFooter !='1'">
-                                                <!--Conformance Test-->
-                                          <!--<text:span>-->
-                                            <xsl:attribute name="text:style-name">
-                                              <xsl:value-of select="concat($slideMasterName,generate-id())"/>
-                                            </xsl:attribute>
-                                                <presentation:footer/>
-                                              <!--</text:span>-->
+                                      <xsl:when test ="name()='a:br'">
+                                        <text:line-break/>
                                                     </xsl:when>
-                                            <xsl:when test="$flagFooter ='1'">
+                                      <xsl:when test="$flagFooter = '1' and ./a:t/child::node() != ''">
                                               <text:span>
                                                 <xsl:attribute name="text:style-name">
                                                   <xsl:value-of select="concat($slideMasterName,generate-id())"/>
@@ -984,13 +990,12 @@ Copyright (c) 2007, Sonata Software Limited
                                                 <xsl:call-template name="tmpFooterText"/>
                                                 </text:span>
                                                     </xsl:when>
-                                                                                            </xsl:choose>
-                                          
-                                        </xsl:if >
-                                        <xsl:if test ="name()='a:br'">
-                                          <text:line-break/>
+                                      <xsl:otherwise>
+                                        <xsl:if test="$flagFooter !='1' and (position() = last())">
+                                          <presentation:footer/>
                                         </xsl:if>
-                        
+                                      </xsl:otherwise>
+                                    </xsl:choose>
                                       </xsl:for-each>
                                     </text:p>
                             </xsl:for-each>
@@ -2002,6 +2007,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:call-template name="tmpSMDatePageNoFooterStyle">
                   <xsl:with-param name="SMName" select="$slideMasterPath"/>
                   <xsl:with-param name="shapePhType" select="'Footer'"/>
+                  <xsl:with-param name="spType" select="'Footer'"/>
                 </xsl:call-template>
               </style:style>
                   <xsl:call-template name="tmpFtrSlNoDtStyle">
@@ -2737,7 +2743,7 @@ Copyright (c) 2007, Sonata Software Limited
                    <xsl:call-template name ="getColorCode">
           <xsl:with-param name ="color">
                   <xsl:choose>
-                    <xsl:when test="$shapeType='PageNo'">
+                    <xsl:when test="$shapeType='PageNo' or $shapeType='DateTime' or $shapeType='Footer' ">
                       <xsl:for-each select="document(concat('ppt/slideMasters/',$SLMName))//p:clrMap">
                         <xsl:call-template name="tmpThemeClr">
                           <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>

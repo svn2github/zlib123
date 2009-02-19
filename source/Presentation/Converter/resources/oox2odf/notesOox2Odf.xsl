@@ -859,11 +859,16 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                               </xsl:call-template>
                             </xsl:for-each >
                           </xsl:variable>
+                          <!--added by chhavi for conformance-->
+                          <xsl:if test="$levelColor !=''">
+                            <xsl:attribute name ="fo:color">
                           <xsl:call-template name ="getColorCode">
                             <xsl:with-param name ="color">
                               <xsl:value-of select="$levelColor"/>
                             </xsl:with-param>
                           </xsl:call-template >
+                            </xsl:attribute>
+                          </xsl:if>
                         </xsl:if>
                       </xsl:if>
                       <xsl:if test ="not(a:pPr/a:buClr)">
@@ -950,11 +955,16 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                               </xsl:call-template>
                             </xsl:for-each >
                           </xsl:variable>
+                          <!--added by chhavi for conformance-->
+                          <xsl:if test="$levelColor !=''">
+                            <xsl:attribute name ="fo:color">
                           <xsl:call-template name ="getColorCode">
                             <xsl:with-param name ="color">
                               <xsl:value-of select="$levelColor"/>
                             </xsl:with-param>
                           </xsl:call-template >
+                            </xsl:attribute>
+                          </xsl:if>
                         </xsl:if>
                       </xsl:if>
                       <!-- Code added by vijayeta, bug fix 1746350-->

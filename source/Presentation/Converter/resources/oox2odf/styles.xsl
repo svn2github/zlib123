@@ -72,7 +72,7 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:variable>	
 	<xsl:template name="styles">
     <xsl:message terminate="no">progress:a:p</xsl:message>
-		<office:document-styles>
+		<office:document-styles office:version="1.1">			
 		<office:styles>
         <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
           <xsl:variable name ="pageSlide">

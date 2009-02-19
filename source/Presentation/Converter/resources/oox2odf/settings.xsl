@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -34,7 +34,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0">
 
   <xsl:template name="settings">
-    <office:document-settings>
+    <office:document-settings office:version="1.1">
       <office:settings>
         <config:config-item-set config:name="ooo:view-settings">
           <xsl:choose>

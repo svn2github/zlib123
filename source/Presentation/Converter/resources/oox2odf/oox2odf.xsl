@@ -75,19 +75,8 @@ Copyright (c) 2007, Sonata Software Limited
 			<!-- Manifest -->
 			<pzip:entry pzip:target="META-INF/manifest.xml">
 				<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
-					<manifest:file-entry manifest:full-path="/">
-            <xsl:attribute name="manifest:media-type">
-              <xsl:choose>
-                <xsl:when test="$documentType = 'Template'">
-                  <xsl:value-of select="'application/vnd.oasis.opendocument.presentation-template'" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="'application/vnd.oasis.opendocument.presentation'" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </manifest:file-entry>
-          
+					<manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.presentation"
+					  manifest:full-path="/"/>
           <manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/statusbar/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/accelerator/current.xml"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/accelerator/"/>
@@ -105,12 +94,18 @@ Copyright (c) 2007, Sonata Software Limited
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Thumbnails/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Thumbnails/thumbnail.png"/>
 					<manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
-					<xsl:for-each select="document('ppt/presentation.xml')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+                                         <!--Conformance Test-->
+                                         <manifest:file-entry manifest:media-type="" manifest:full-path="mimetype"/>
+					<xsl:for-each
+					  select="document('ppt/presentation.xml')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
 						<xsl:call-template name="InsertManifestFileEntry"/>
 					</xsl:for-each >
           <xsl:call-template name="tmpMenifestEntryForOLEobject" />
 				</manifest:manifest>
 			</pzip:entry>
+                                 <!--Conformance Test-->
+      <pzip:copy pzip:source="#CER#PresentationConverter.dll#Sonata.OdfConverter.Presentation.resources.mimetype#"
+             pzip:target="mimetype"/>
 			<pzip:entry pzip:target="content.xml">
 				<xsl:call-template name="content" />
 			</pzip:entry >

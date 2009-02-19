@@ -45,7 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="app-version"/>
     <!-- The application version -->
     
-    <office:document-meta>
+    <office:document-meta office:version="1.1">
       <office:meta>
         <!-- generator -->
         <meta:generator>
