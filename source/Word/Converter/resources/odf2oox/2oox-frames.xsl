@@ -26,6 +26,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in case of text inside shape
+                                 implemetation    
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -983,7 +991,8 @@
       <xsl:when test="(not($frameStyle/style:graphic-properties/@fo:wrap-option) or $frameStyle/style:graphic-properties/@fo:wrap-option='wrap')
                 and not(draw:frame) 
                 and not(parent::draw:frame)">
-        <xsl:text>mso-wrap-style:none;</xsl:text>
+        <!--RefNo-1:Commented as shapes were getting resiszed according to text inside shape.-->
+        <!--<xsl:text>mso-wrap-style:none;</xsl:text>-->
       </xsl:when>
       <!--<xsl:when test="not($frameStyle/@style:parent-style-name) and (draw:frame or parent::draw:frame)">
         <xsl:text>mso-wrap-style:none;</xsl:text>
@@ -2592,7 +2601,7 @@
     <xsl:param name="addUnit">true</xsl:param>
     <!-- (string) If set to true, wil append 'cm' to the result -->
 
-    <xsl:variable name="newlength">
+    <xsl:variable name="tmplength">
       <!-- The convertion's result -->
       <xsl:choose>
         <xsl:when test="contains($length, 'cm')">
@@ -2629,7 +2638,16 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+	<xsl:variable name ="newlength">
+		  <xsl:choose >
+			  <xsl:when test ="contains($tmplength,'NaN') or $tmplength=''">
+				  <xsl:value-of select ="'0'"/>	  
+			  </xsl:when>
+			  <xsl:otherwise >
+				  <xsl:value-of select ="$tmplength"/>
+			  </xsl:otherwise>
+		  </xsl:choose>		  
+	</xsl:variable>
     <xsl:variable name="roundLength">
       <!-- The result of the rounding -->
       <xsl:choose>
