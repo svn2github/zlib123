@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Resources;
 using System.Windows.Forms;
+using System.Net;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -121,6 +122,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 converter.ComputeSize(this.inputFile);
                 this.progressBar1.Maximum = this.size;
                 this.computeSize = false;
+                //Code Added on 19 Feb 2009 by Achougle@Xandros.com
+                this.options.InputFullName = this.inputFile;
+                this.options.InputFullNameOriginal = this.inputFile;
+                //Code Added on 19 Feb 2009 by Achougle@Xandros.com
                 converter.Transform(this.inputFile, this.outputFile, this.options);
                 WorkComplete(null);
             }
@@ -221,6 +226,32 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void ConverterForm_Load(object sender, EventArgs e)
         {
+            //Code Added on 19 Feb 2009 by Achougle@Xandros.com
+            String fileurl = inputFile;
+            //Chcking whether the inputFile is url of ODF document
+            if (fileurl.Contains("http:") || fileurl.Contains("ftp:"))
+            {
+                //Extracting the Filename from the url.
+                String filename = fileurl.Substring(fileurl.LastIndexOf("/"), (fileurl.Length - fileurl.LastIndexOf("/")));
+                filename = filename.Remove(0, 1);
+                string tempPath = Path.GetTempPath().ToString();
+                String str = tempPath + filename;
+                /*Using WebClient class provides common methods for sending data to or receiving data from
+                any local, intranet, or Internet resource identified by a URI.*/
+                WebClient wc = new WebClient();
+                try
+                {
+                    //Downloading the ODF document to the user's local temp directory.
+                    wc.DownloadFile(inputFile, str);
+                }
+                catch (Exception e1)
+                {
+                    this.exception = e1;
+                }
+                //Assigning the local temp path filename to the inputFile.
+                inputFile = str;
+            }
+            //Code Added on 19 Feb 2009 by Achougle@Xandros.com
             FileInfo file = new FileInfo(inputFile);
             this.Text = manager.GetString("ConversionFormTitle").Replace("%1", file.Name);
         }
