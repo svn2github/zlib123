@@ -25,12 +25,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/*
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 16-Feb-2009 Sandeep S     New feature   Changes for custom-shape implementation.
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+*/
 
 using System.Xml;
 using System.Collections;
 using System;
 using System.IO;
 using System.Globalization;
+using System.Text.RegularExpressions;
+using OdfConverter.CSharpEval;
 
 
 namespace CleverAge.OdfConverter.OdfConverterLib
@@ -1255,6 +1264,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         }
                     }
                 }
+                //Start of RefNo-1
+                else if (text.Contains("CustShpWrdFreFrm"))
+                {
+                    text= getSahpePath(text.Substring(16));
+                }
+                //End of RefNo-1
                 attr.Value += text;
             }
         }
@@ -1818,5 +1833,354 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return newRPr;
         }
 
+        //Start of RefNo-1
+        private string getSahpePath(string strOdfEnhancedPath)
+        {
+            //adj$modifiers,'###eqn',$drawEqn,'###box',$viewBox,'###path',$enhPath
+            
+                string[] stringSeparators = new string[] { "###" };
+                string[] strArrShpPth = strOdfEnhancedPath.Split(stringSeparators, StringSplitOptions.None);
+                char[] arrOperators = { '*', '/', '+', '-', '(', ')',','};
+
+                string strModifiers = strArrShpPth[0].Trim();
+                string strDrawEqn = strArrShpPth[1].Trim();
+                string strViewBox = strArrShpPth[2].Trim();
+                string strEnhPath = strArrShpPth[3].Trim();
+
+                strDrawEqn = strDrawEqn.Replace("cos(", "Math.cos(");
+                strDrawEqn = strDrawEqn.Replace("abs(", "Math.abs(");
+                strDrawEqn = strDrawEqn.Replace("sqrt(", "Math.sqrt(");
+                strDrawEqn = strDrawEqn.Replace("sin(", "Math.sin(");
+                strDrawEqn = strDrawEqn.Replace("tan(", "Math.tan(");
+                strDrawEqn = strDrawEqn.Replace("atan(", "Math.atan(");
+                strDrawEqn = strDrawEqn.Replace("atan2(", "Math.atan2(");
+                strDrawEqn = strDrawEqn.Replace("min(", "Math.min(");
+                strDrawEqn = strDrawEqn.Replace("max(", "Math.max(");
+                strDrawEqn = strDrawEqn.Replace("pi", "Math.PI");
+
+                string[] strArrAdj = strModifiers.Split(' ');
+
+                string[] strArrBox = strViewBox.Split(' ');
+
+                if (strArrBox.Length == 4)
+                {
+                    //replace L T R B. W H
+                    strDrawEqn = strDrawEqn.Replace("left", strArrBox[0].Trim());
+                    strDrawEqn = strDrawEqn.Replace("top", strArrBox[1].Trim());
+                    strDrawEqn = strDrawEqn.Replace("right", strArrBox[2].Trim());
+                    strDrawEqn = strDrawEqn.Replace("bottom", strArrBox[3].Trim());
+                    strDrawEqn = strDrawEqn.Replace("width", strArrBox[2].Trim());
+                    strDrawEqn = strDrawEqn.Replace("height", strArrBox[3].Trim());
+                    //TO DO : replace 'xstretch'|'ystretch'|'hasstroke'|'hasfill'|'logwidth'|'logheight'
+                }
+
+                string[] strArrEqn = strDrawEqn.Split('|');
+                string[] strEqnSlvd = { "" };
+                string strFinalPath = "";
+
+                strEnhPath = Regex.Replace(strEnhPath, @"[M]\b", "m");
+                strEnhPath = Regex.Replace(strEnhPath, @"[L]\b", "l");
+                strEnhPath = Regex.Replace(strEnhPath, @"[C]\b", "c");
+                strEnhPath = Regex.Replace(strEnhPath, @"[Z]\b", "x");
+                strEnhPath = Regex.Replace(strEnhPath, @"[N]\b", "e");
+                strEnhPath = Regex.Replace(strEnhPath, @"[F]\b", "nf");
+                strEnhPath = Regex.Replace(strEnhPath, @"[S]\b", "ns");
+                strEnhPath = Regex.Replace(strEnhPath, @"[A]\b", "at");
+                strEnhPath = Regex.Replace(strEnhPath, @"[T]\b", "ae");
+                strEnhPath = Regex.Replace(strEnhPath, @"[U]\b", "al");
+                strEnhPath = Regex.Replace(strEnhPath, @"[B]\b", "ar");
+                strEnhPath = Regex.Replace(strEnhPath, @"[W]\b", "wa");
+                strEnhPath = Regex.Replace(strEnhPath, @"[V]\b", "wr");
+                strEnhPath = Regex.Replace(strEnhPath, @"[Q]\b", "qb");
+                strEnhPath = Regex.Replace(strEnhPath, @"[X]\b", "qx");
+                strEnhPath = Regex.Replace(strEnhPath, @"[Y]\b", "qy");
+
+                strEnhPath = strEnhPath.Replace("  ", " ");    
+                string[] strArrPath = strEnhPath.Split(' ');
+
+                if (strEnhPath != "" && (strEnhPath.Contains("$") || strEnhPath.Contains("?")))
+                {
+                    strEqnSlvd = getEquationVals(strArrAdj, strArrEqn);
+                }
+                for (int intPathCnt = 0; intPathCnt < strArrPath.Length; intPathCnt++)
+                {
+                    string strElement = strArrPath[intPathCnt].ToString().Trim();
+                    if ((Regex.IsMatch(strArrPath[intPathCnt].ToString().Trim(), @"[^0-9.]")))
+                    {
+                        if (strElement.StartsWith("$"))
+                        {
+                            strFinalPath = strFinalPath +
+                                Convert.ToInt64(
+                                    Convert.ToDouble(
+                                        strArrAdj[
+                                            Convert.ToInt16(
+                                                strElement.Remove(0, 1), System.Globalization.CultureInfo.InvariantCulture)].Trim(), 
+                                                System.Globalization.CultureInfo.InvariantCulture)
+                                            ,System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture) + ",";
+                        }
+                        else if (strElement.StartsWith("?"))
+                        {
+                            while (strElement.Contains("?"))
+                            {
+                                strElement = strEqnSlvd[Convert.ToInt16(strElement.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture)];
+
+                               if (strElement.Contains("if"))
+                               {
+                                   strElement = GetIfCmdVal(strElement, strEqnSlvd);
+                               }
+                               else if (strElement.Contains("?") && strElement.IndexOfAny(arrOperators) >= 0)
+                               {
+                                   strElement = GetEqnVal(strElement, strEqnSlvd);
+                               }
+                            }
+                            strElement = strElement.Replace("(", "").Replace(")", "").Trim();
+                            strElement = Convert.ToInt64(Convert.ToDouble(strElement, System.Globalization.CultureInfo.InvariantCulture), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            strFinalPath = strFinalPath + strElement + ",";
+                        }
+                        else
+                        {
+                            if (strFinalPath.EndsWith(","))
+                            {
+                                strFinalPath = strFinalPath.Substring(0, strFinalPath.Length - 1) + strElement;
+                            }
+                            else
+                            {
+                                strFinalPath = strFinalPath + strElement;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        strFinalPath = strFinalPath + strElement + ",";
+                    }
+                }
+                return strFinalPath;
+        }
+
+        private string[] getEquationVals(string[] strArrAdj, string[] strArrEqn)
+        {
+            char[] arrOperators = { '*', '/', '+', '-', '(', ')',','};
+            string[] strArrEqnResult = new string[strArrEqn.Length];
+
+            for (int intCnt = 0; intCnt < strArrEqn.Length; intCnt++)
+            {
+                ArrayList arlEqnPrts = new ArrayList();
+                ArrayList arlEqnRplPrts = new ArrayList();
+                string strCurEqn = strArrEqn[intCnt].Trim();
+                string[] strArrExpElements = strCurEqn.Split(arrOperators, StringSplitOptions.RemoveEmptyEntries);
+                
+                for (int i = 0; i < strArrExpElements.Length; i++)
+                {
+                    if (Regex.IsMatch(strArrExpElements[i].ToString().Trim(), @"[^0-9.]"))
+                    {
+                        string strElement = strArrExpElements[i].ToString().Trim();                        
+                        if(strElement.StartsWith("$"))
+                        {
+                            if (!arlEqnPrts.Contains(strElement))
+                            {
+                                if (Convert.ToInt16(strElement.Remove(0, 1), System.Globalization.CultureInfo.InvariantCulture) < strArrAdj.Length)
+                                {
+                                    string strEqnRpl = strArrAdj[Convert.ToInt16(strElement.Remove(0, 1), System.Globalization.CultureInfo.InvariantCulture)].Trim();
+                                    if (strEqnRpl.Contains("-"))
+                                    {
+                                        arlEqnRplPrts.Add("("+strEqnRpl+")");
+                                    }
+                                    else
+                                    {
+                                        arlEqnRplPrts.Add(strEqnRpl);
+                                    }
+                                }
+                                else
+                                {
+                                    arlEqnRplPrts.Add("0");
+                                }
+                                arlEqnPrts.Add(strElement);
+                            }
+                        }
+                        else if (strElement.StartsWith("?"))
+                        {
+                            if (!arlEqnPrts.Contains(strElement))
+                            {
+                                if (Convert.ToInt16(strElement.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture) < strArrEqnResult.Length)
+                                {
+                                    if (Convert.ToInt16(strElement.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture) < intCnt)
+                                    {
+                                        string strEqnRpl = strArrEqnResult[Convert.ToInt16(strElement.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture)];
+                                        if (strEqnRpl.Contains("-"))
+                                        {
+                                            arlEqnRplPrts.Add("(" + strEqnRpl + ")");
+                                        }
+                                        else
+                                        {
+                                            arlEqnRplPrts.Add(strEqnRpl);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        arlEqnRplPrts.Add(strElement);
+                                    }
+                                }
+                                else
+                                {
+                                    arlEqnRplPrts.Add("0");
+                                }
+                                arlEqnPrts.Add(strElement);
+                            }
+                        }                      
+                    }                   
+                }
+
+                for (int intReplace = 0; intReplace < arlEqnPrts.Count; intReplace++)
+                {
+                    strCurEqn = Regex.Replace(strCurEqn, arlEqnPrts[intReplace].ToString().Replace("$","\\$").Replace("?","\\?") + "\\b", arlEqnRplPrts[intReplace].ToString());
+                }
+                if (strCurEqn.Contains("if"))
+                {
+                    strArrEqnResult[intCnt] = resolveIfCmd(strCurEqn);
+                }
+                else
+                {
+                    if (strCurEqn.Contains("?"))
+                    {
+                        strArrEqnResult[intCnt] = strCurEqn;
+                    }
+                    else
+                    {
+                        if (strCurEqn.StartsWith("*"))
+                        {
+                            strArrEqnResult[intCnt] = Convert.ToInt64(Evaluator.EvalToDouble(strCurEqn.Substring(1)), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        }
+                        else
+                        {
+                            strArrEqnResult[intCnt] = Convert.ToInt64(Evaluator.EvalToDouble(strCurEqn), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        }
+                    }
+                    
+                }         
+            }
+            return strArrEqnResult;
+        }
+
+        private string resolveIfCmd(string strIfCmd)
+        {
+            string[] strIf = strIfCmd.Substring(3, strIfCmd.Length - 4).Split(',');
+            string strIfChk = strIf[0].Replace("(", "").Replace(")", "").Trim();
+            string strResult = "";
+
+            if (strIfChk.Contains("?"))
+            {
+                strResult = strIfCmd;
+            }
+            else
+            {
+                if (Convert.ToDouble(strIfChk, System.Globalization.CultureInfo.InvariantCulture) > 0)
+                {
+                    strResult = strIf[1].Trim();
+                }
+                else
+                {
+                    strResult = strIf[2].Trim();
+                }
+            }
+            return strResult;
+        }
+
+        private string GetIfCmdVal(string strIfCmd, string[] strEqnSlvd)
+        {
+            string[] strIf = strIfCmd.Substring(3, strIfCmd.Length - 4).Split(',');
+            string strIfChk = strIf[0].Replace("(", "").Replace(")", "").Trim();
+            string strResult = strIfChk;
+
+            if (strIfChk.Contains("?"))
+            {
+                do
+                {
+                    strResult = strEqnSlvd[Convert.ToInt16(strResult.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture)];
+                    
+                    while (strResult.Contains("if"))
+                    {
+                        strResult = GetIfCmdVal(strResult, strEqnSlvd);
+                        
+                        while (strResult.Contains("?"))
+                        {
+                            strResult = strEqnSlvd[Convert.ToInt16(strResult.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture)];
+                        }
+                    }
+                }
+                while (strResult.Contains("?"));
+            }
+
+            if (Convert.ToDouble(strResult.Trim(), System.Globalization.CultureInfo.InvariantCulture) > 0)
+            {
+                strResult = strIf[1].Trim();
+            }
+            else
+            {
+                strResult = strIf[2].Trim();
+            }
+            return strResult.Trim();
+        }
+
+        private string GetEqnVal(string strEqn, string[] strEqnSlvd)
+        {
+            char[] arrOperators = { '*', '/', '+', '-', '(', ')', ',' };
+            ArrayList arlEqnPrts = new ArrayList();
+            ArrayList arlEqnRplPrts = new ArrayList();
+            string strCurEqn = strEqn;
+            string strResult = "";
+            string[] strArrExpElements = strCurEqn.Split(arrOperators, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < strArrExpElements.Length; i++)
+            {
+                if (Regex.IsMatch(strArrExpElements[i].ToString().Trim(), @"[^0-9.]"))
+                {
+                    string strElement = strArrExpElements[i].ToString().Trim();
+                    if (strElement.StartsWith("?"))
+                    {
+                        if (!arlEqnPrts.Contains(strElement))
+                        {
+                            if (Convert.ToInt16(strElement.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture) < strEqnSlvd.Length)
+                            {
+                                string strEqnRpl = strEqnSlvd[Convert.ToInt16(strElement.Remove(0, 2), System.Globalization.CultureInfo.InvariantCulture)];
+                                if (strEqnRpl.Contains("-"))
+                                {
+                                     arlEqnRplPrts.Add("(" + strEqnRpl + ")");
+                                }
+                                else
+                                {
+                                    arlEqnRplPrts.Add(strEqnRpl);
+                                }                                
+                            }
+                            else
+                            {
+                                arlEqnRplPrts.Add("0");
+                            }
+                            arlEqnPrts.Add(strElement);
+                        }
+                    }
+                }
+            }
+
+            for (int intReplace = 0; intReplace < arlEqnPrts.Count; intReplace++)
+            {
+                strCurEqn = Regex.Replace(strCurEqn, arlEqnPrts[intReplace].ToString().Replace("$", "\\$").Replace("?", "\\?") + "\\b", arlEqnRplPrts[intReplace].ToString());
+            }
+            if (strCurEqn.Contains("if"))
+            {
+                strResult = resolveIfCmd(strCurEqn);
+            }
+            else
+            {
+                if (strCurEqn.Contains("?"))
+                {
+                    strResult = strCurEqn;
+                }
+                else
+                {
+                    strResult = Convert.ToInt64(Evaluator.EvalToDouble(strCurEqn), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                }
+            }
+            return strResult;
+        }      
+        //End of RefNo-1
     }
 }

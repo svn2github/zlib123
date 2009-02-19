@@ -46,6 +46,7 @@
     <AssemblyOriginatorKeyFile>..\..\OdfConverter.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.JScript" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -56,6 +57,7 @@
     <Compile Include="AbstractPostProcessor.cs" />
     <Compile Include="ConversionOptions.cs" />
     <Compile Include="ConversionReport.cs" />
+    <Compile Include="CSharpEval.cs" />
     <Compile Include="EmbeddedResourceResolver.cs" />
     <Compile Include="EncryptedDocumentException.cs" />
     <Compile Include="Matrix.cs" />

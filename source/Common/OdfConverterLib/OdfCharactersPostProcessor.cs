@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Text;
+using System.Text.RegularExpressions;
 using OdfConverter.Transforms;
 using OdfConverter.Transforms.Test;
 using System.Globalization;
@@ -160,6 +161,25 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.nextWriter.WriteString(EvalRotationExpression(text));
 
             }
+//sonata: Word free from shapes
+            else if (text.Contains("WordshapesEnhance-Path"))
+            {
+
+                this.nextWriter.WriteString(EvalWordEnhacePath(text));
+
+            }
+            else if (text.Contains("Wordshapes-draw-modifier"))
+            {
+
+                this.nextWriter.WriteString(EvalWordModifier(text));
+
+            }
+            else if (text.Contains("WordshapesFormula"))
+            {
+
+                this.nextWriter.WriteString(EvalWordShapesFormula(text));
+
+            }
             else if (text.Contains("TableCord"))
             {
 
@@ -239,6 +259,305 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         /*
          * General methods */
+//sonata: Word free from shapes
+
+        private string EvalWordModifier(string text)
+        {
+            string[] arrPart = text.Split(':');
+            string strModf = string.Empty;
+            if (arrPart.Length == 2)
+            {
+                strModf = arrPart[1];
+                strModf = strModf.Replace(",,,,,", ",0,0,0,0,");
+                strModf = strModf.Replace(",,,,", ",0,0,0,");
+                strModf = strModf.Replace(",,,", ",0,0,");
+                strModf = strModf.Replace(",,", ",0,");
+                strModf = strModf.Replace(",", " ");
+               
+            }
+
+
+            return strModf;
+        }
+        private string EvalWordEnhacePath(string text)
+        {
+            string[] arrPart = text.Split(':');
+            string strPath = string.Empty;
+            if (arrPart.Length == 2)
+            {
+                strPath = arrPart[1];
+                strPath = strPath.Replace(",,,,,", ",0,0,0,0,");
+                strPath = strPath.Replace(",,,,", ",0,0,0,");
+                strPath = strPath.Replace(",,,", ",0,0,");
+                strPath = strPath.Replace(",,", ",0,");
+                strPath = strPath.Replace("h", "");
+                strPath = strPath.Replace("d", "");
+                strPath = strPath.Replace("at", "A");
+                strPath = strPath.Replace("ar", "B");
+                strPath = strPath.Replace("v", "E");
+                strPath = strPath.Replace("c", "C");
+                strPath = strPath.Replace("nf", "F");
+                strPath = strPath.Replace("al", "U");
+                strPath = strPath.Replace("wr", "V");
+                strPath = strPath.Replace("wa", "W");
+                strPath = strPath.Replace("ae", "T");
+                strPath = strPath.Replace("qx", "X");
+                strPath = strPath.Replace("qy", "Y");
+                strPath = strPath.Replace("l", "L");
+                strPath = strPath.Replace("x", "Z");
+                strPath = strPath.Replace("m", "M");
+                strPath = strPath.Replace("ns", "S");
+                strPath = strPath.Replace("e", "N");
+                strPath = strPath.Replace("r", "R");
+                strPath = strPath.Replace("t", "P");
+
+
+
+                strPath = Translate_CommandComma(strPath);
+                strPath = Translate_CommaCommand(strPath);
+                strPath = regexpres(strPath);
+
+
+
+                strPath = strPath.Replace("@", " ?f");
+                strPath = strPath.Replace("N", "N ");
+                strPath = strPath.Replace("A", "A ");
+                strPath = strPath.Replace("B", "B ");
+                strPath = strPath.Replace("X", "X ");
+                strPath = strPath.Replace("Y", "Y ");
+                strPath = strPath.Replace("M", "M ");
+                strPath = strPath.Replace("L", "L ");
+                strPath = strPath.Replace("T", "T ");
+                strPath = strPath.Replace("U", "U ");
+                strPath = strPath.Replace("F", "F ");
+                strPath = strPath.Replace("S", "S ");
+                strPath = strPath.Replace("C", "C ");
+                strPath = strPath.Replace("Z", "Z ");
+                strPath = strPath.Replace("V", "V ");
+                strPath = strPath.Replace("W", "W ");
+                strPath = strPath.Replace("R", "R ");
+                strPath = strPath.Replace("E", "E ");
+                strPath = strPath.Replace("P", "P ");
+                strPath = strPath.Replace(",", " ");
+                strPath = TranslateRCommand(strPath);
+                strPath = TranslateVCommand(strPath);
+               
+              
+            }
+
+       
+            return strPath.Trim();
+        }
+        private string TranslateRCommand(string strpath)
+        {
+
+            return Regex.Replace(strpath, "[-0-9]+[ ]+[-0-9]+[ ]+[RP]+[ ]+[-0-9]+[ ]+[-0-9]+[ ]", delegate(Match match)
+            {
+                string strMatch = match.ToString();
+                string[] arrRValues = strMatch.Split(' ');
+                long dblX = long.Parse(arrRValues[0], System.Globalization.CultureInfo.InvariantCulture) + long.Parse(arrRValues[3], System.Globalization.CultureInfo.InvariantCulture);
+                long dblY = long.Parse(arrRValues[1], System.Globalization.CultureInfo.InvariantCulture) + long.Parse(arrRValues[4], System.Globalization.CultureInfo.InvariantCulture);
+                if (strMatch.Contains("R"))
+                {
+                    strMatch = arrRValues[0] + " " + arrRValues[1] + " L " + dblX.ToString(System.Globalization.CultureInfo.InvariantCulture) + " " + dblY.ToString(System.Globalization.CultureInfo.InvariantCulture) + " ";
+                }
+                else if (strMatch.Contains("P"))
+                {
+                    strMatch = arrRValues[0] + " " + arrRValues[1] + " M" + dblX.ToString(System.Globalization.CultureInfo.InvariantCulture) + " " + dblY.ToString(System.Globalization.CultureInfo.InvariantCulture) + " ";
+                }
+
+                return strMatch;
+            });
+        }
+        private string TranslateVCommand(string strpath)
+        {
+
+            return Regex.Replace(strpath, "[-0-9]+[ ]+[-0-9]+[ ]+[E]+[ ]+[-0-9]+[ ]+[-0-9]+[ ]+[-0-9]+[ ]+[-0-9]+[ ]+[-0-9]+[ ]+[-0-9]+[ ]", delegate(Match match)
+            {
+                string strMatch = match.ToString();
+                string[] arrVValues = strMatch.Split(' ');
+                long dblX0 = Convert.ToInt64(arrVValues[0], System.Globalization.CultureInfo.InvariantCulture);
+                long dblY0 = Convert.ToInt64(arrVValues[1], System.Globalization.CultureInfo.InvariantCulture);
+                long dblX1 = Convert.ToInt64(arrVValues[3], System.Globalization.CultureInfo.InvariantCulture);
+                long dblY1 = Convert.ToInt64(arrVValues[4], System.Globalization.CultureInfo.InvariantCulture);
+                long dblX2 = Convert.ToInt64(arrVValues[5], System.Globalization.CultureInfo.InvariantCulture);
+                long dblY2 = Convert.ToInt64(arrVValues[6], System.Globalization.CultureInfo.InvariantCulture);
+                long dblX3 = Convert.ToInt64(arrVValues[7], System.Globalization.CultureInfo.InvariantCulture);
+                long dblY3 = Convert.ToInt64(arrVValues[8], System.Globalization.CultureInfo.InvariantCulture);
+
+                strMatch = arrVValues[0] + " " + arrVValues[1] + " C " +
+                                 (dblX0 + dblX1).ToString(System.Globalization.CultureInfo.InvariantCulture) + " " +
+                                (dblY0 + dblY1).ToString(System.Globalization.CultureInfo.InvariantCulture) + " " +
+                                (dblX0 + dblX2).ToString(System.Globalization.CultureInfo.InvariantCulture) + " " +
+                                (dblY0 + dblY2).ToString(System.Globalization.CultureInfo.InvariantCulture) + " " +
+                                (dblX0 + dblX3).ToString(System.Globalization.CultureInfo.InvariantCulture) + " " +
+                                (dblY0 + dblY3).ToString(System.Globalization.CultureInfo.InvariantCulture) + " ";
+
+
+                return strMatch;
+            });
+        }
+        private string Translate_CommandComma(string strpath)
+        {
+            char[] arrCommands = { 'A', 'B', 'C', 'F', 'L', 'M', 'N', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'R', 'E','P' };
+            return Regex.Replace(strpath, "[ABCFLMNSTUVWXYZREP]+[,]", delegate(Match match)
+            {
+                string strMatch = match.ToString();
+                strMatch = strMatch.Substring(0, strMatch.IndexOf(',')) + "0,";
+                return strMatch;
+            });
+        }
+        private string Translate_CommaCommand(string strpath)
+        {
+            char[] arrCommands = { 'A', 'B', 'C', 'F', 'L', 'M', 'N', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'R', 'E','P' };
+            return Regex.Replace(strpath, "[,]+[ABCFLMNSTUVWXYZREP]", delegate(Match match)
+            {
+                string strMatch = match.ToString();
+                strMatch = ",0 " + strMatch.Substring(strMatch.IndexOfAny(arrCommands));
+                return strMatch;
+            });
+        }
+        private string regexpres(string strpath)
+        {
+            char[] arrCommands = { 'A', 'B', 'C', 'F', 'L', 'M', 'N', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'R', 'E','P' };
+            return Regex.Replace(strpath, "[-0-9]+[ABCFLMNSTUVWXYZREP]", delegate(Match match)
+            {
+                string strMatch = match.ToString();
+                strMatch = strMatch.Substring(0, strMatch.IndexOfAny(arrCommands)) + " " + strMatch.Substring(strMatch.IndexOfAny(arrCommands));
+                return strMatch;
+            });
+        }
+        private string EvalWordShapesFormula(string text)
+        {
+            
+           string[] arrPart = text.Split(':');
+           string strFormula = string.Empty;
+           string[] strShapeSize = arrPart[2].Split(',');
+           string width = strShapeSize[0];
+           string height = strShapeSize[1];
+            string[] arrFormulaVals = arrPart[1].Split(' ');
+           
+            if (arrPart.Length == 3)
+            {
+                if (arrFormulaVals[0] == "sum")
+                {
+                    strFormula = arrFormulaVals[1] + " + " + arrFormulaVals[2] + " - " + arrFormulaVals[3];
+                }
+                else if (arrFormulaVals[0] == "if")
+                {
+                    strFormula = "if(" + arrFormulaVals[1] + ", " + arrFormulaVals[2] + " , " + arrFormulaVals[3]+")";
+                }
+                else if (arrFormulaVals[0] == "prod")
+                {
+                    strFormula = arrFormulaVals[1] + " * " + arrFormulaVals[2] + " / " + arrFormulaVals[3];
+                }
+                else if (arrFormulaVals[0] == "abs")
+                {
+                    strFormula = "abs(" + arrFormulaVals[1] + ")";
+                }
+                else if (arrFormulaVals[0] == "val")
+                {
+                    strFormula = arrFormulaVals[1];
+                }
+                else if (arrFormulaVals[0] == "mid")
+                {
+
+                    strFormula = "(" + arrFormulaVals[1] + " + " + arrFormulaVals[2] + ") / " + 2;
+                }
+                else if (arrFormulaVals[0] == "sqrt")
+                {
+
+                    strFormula = "sqrt(abs(" + arrFormulaVals[1] + "))";
+                }
+                else if (arrFormulaVals[0] == "max")
+                {
+
+                    strFormula = "max(" + arrFormulaVals[1] + ", " + arrFormulaVals[2] + ")";
+                }
+                else if (arrFormulaVals[0] == "min")
+                {
+
+                    strFormula = "min(" + arrFormulaVals[1] + ", " + arrFormulaVals[2] + ")";
+                }
+                else if (arrFormulaVals[0] == "cos")
+                {
+
+                    strFormula = arrFormulaVals[1] + " * " + "cos(" + arrFormulaVals[2] + ")";
+                }
+
+                else if (arrFormulaVals[0] == "sin")
+                {
+
+                    strFormula = arrFormulaVals[1] + " * " + "sin(" + arrFormulaVals[2] + ")";
+                }
+
+                else if (arrFormulaVals[0] == "tan")
+                {
+
+                    strFormula = arrFormulaVals[1] + " * " + "tan(" + arrFormulaVals[2] + ")";
+                }
+                else if (arrFormulaVals[0] == "mod")
+                {
+
+                    strFormula = "sqrt(abs((" + arrFormulaVals[1] + " *" + arrFormulaVals[1] + ")+(" +
+                                  arrFormulaVals[2] + " *" + arrFormulaVals[2] + ")+(" +
+                                  arrFormulaVals[3] + " *" + arrFormulaVals[3] + ")))";
+                }
+                else if (arrFormulaVals[0] == "sumangle")
+                {
+                   
+                    strFormula = arrFormulaVals[1] + " + " +  arrFormulaVals[2] + " * 65536 - " +
+                                  arrFormulaVals[3] + " *65536";
+                }
+
+                else if (arrFormulaVals[0] == "sinatan2")
+                {
+                    strFormula = arrFormulaVals[1] + " * sin(atan2(" + arrFormulaVals[2] + "," + arrFormulaVals[3] + "))";
+                }
+                else if (arrFormulaVals[0] == "cosatan2")
+                {
+                    strFormula = arrFormulaVals[1] + " * cos(atan2(" + arrFormulaVals[2] + "," + arrFormulaVals[3] + "))";
+                }
+
+                else if (arrFormulaVals[0] == "ellipse")
+                {
+
+                    strFormula = arrFormulaVals[3] + " *sqrt( abs(1-((" +
+                                  arrFormulaVals[1] + " *"+ arrFormulaVals[1] +")/(" +
+                                   arrFormulaVals[2] + " *" + arrFormulaVals[2] + "))))";
+                }
+                    
+                else if (arrFormulaVals[0] == "atan2")
+                {
+                    strFormula = "atan2(" + arrFormulaVals[2] + "," + arrFormulaVals[1] + ")";
+                }
+            }
+            strFormula = strFormula.Replace("#", "$");
+            
+            strFormula = strFormula.Replace("pixelwidth", "width");
+            strFormula = strFormula.Replace("pixellinewidth", "width");
+            strFormula = strFormula.Replace("pixelheight", "height");
+            strFormula = strFormula.Replace("pixellineheight", "height");
+
+            strFormula = strFormula.Replace("pixelWidth", "width");
+            strFormula = strFormula.Replace("pixellineWidth", "width");
+            strFormula = strFormula.Replace("pixelHeight", "height");
+            strFormula = strFormula.Replace("pixellineHeight", "height");
+
+            strFormula = strFormula.Replace("pixelLineWidth", "width");
+            strFormula = strFormula.Replace("pixelLineHeight", "height");
+            strFormula = strFormula.Replace("linedrawn", "1");
+            strFormula = strFormula.Replace("lineDrawn", "1");
+
+            strFormula = strFormula.Replace("emuwidth", "width");
+            strFormula = strFormula.Replace("emuheight", "height");
+            strFormula = strFormula.Replace("emuwidth2", "width");
+            strFormula = strFormula.Replace("emuheight2", "height");
+
+            strFormula = strFormula.Replace("@", "?f");
+         
+            return strFormula;
+        }
         private string EvalTableCord(string text)
         {
             string[] arrPart = text.Split('@');
@@ -1463,6 +1782,26 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 else if (text.Contains("svg-x") || text.Contains("svg-y"))
                 {
                     attr.Value += EvalExpression(text);
+                }
+//sonata: Word free from shapes
+
+                else if (text.Contains("WordshapesEnhance-Path"))
+                {
+
+                    attr.Value += EvalWordEnhacePath(text);
+
+                }
+                else if (text.Contains("WordshapesFormula"))
+                {
+
+                    attr.Value +=EvalWordShapesFormula(text);
+
+                }
+                else if (text.Contains("Wordshapes-draw-modifier"))
+                {
+
+                    attr.Value +=EvalWordModifier(text);
+
                 }
                 else
                 {
