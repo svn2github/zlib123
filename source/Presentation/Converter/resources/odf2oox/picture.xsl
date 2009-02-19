@@ -447,11 +447,11 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:variable>
     <pzip:copy pzip:source="{'Thumbnails/thumbnail.png'}"
 				   pzip:target="{concat('ppt/media/thumbnail.png','')}"/>
-    <xsl:if test="@xlink:href">
+    <xsl:if test="@xlink:href !=''">
       <pzip:copy pzip:source="{@xlink:href}"
        pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
     </xsl:if>
-    <xsl:if test="./draw:image/@xlink:href">
+    <xsl:if test="./draw:image/@xlink:href !=''">
       <pzip:copy pzip:source="{./draw:image/@xlink:href}"
          pzip:target="{concat('ppt/media/',substring-after(./draw:image/@xlink:href,'/'))}"/>
     </xsl:if>
@@ -468,7 +468,8 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:if>
     <p:pic>
       <p:nvPicPr>
-        <p:cNvPr id="4" name="sound1">
+        <!--change made by chhavi for odf conformance 1.1-->
+        <p:cNvPr id="{$AudNo + 1 }" name="sound1">
           <a:hlinkClick r:id="" action="ppaction://media"/>
         </p:cNvPr>
         <p:cNvPicPr>

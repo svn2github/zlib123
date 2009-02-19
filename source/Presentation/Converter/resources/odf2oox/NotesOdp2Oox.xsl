@@ -779,11 +779,19 @@ Copyright (c) 2007, Sonata Software Limited
   
     <xsl:for-each  select ="document('content.xml')//office:automatic-styles/style:style[@style:name =$TextStyleID ]">
       <!-- Added by lohith :substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0  because sz(font size) shouldnt be zero - 16filesbug-->
-      <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
+<!--Office 2007 Sp2-->
+
+      <xsl:variable name="fontSize">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="$fontSize &gt; 0 ">
+       
         <xsl:attribute name ="sz">
           <xsl:call-template name ="convertToPoints">
             <xsl:with-param name ="unit" select ="'pt'"/>
-            <xsl:with-param name ="length" select ="style:text-properties/@fo:font-size"/>
+            <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>

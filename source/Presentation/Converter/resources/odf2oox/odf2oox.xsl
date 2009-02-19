@@ -111,17 +111,20 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:call-template name="content"/>
 			</pzip:entry>
       <!--NotesMaster-->
+      <xsl:variable name="noOfMaster">
+        <xsl:value-of select="count(document('styles.xml')//office:master-styles/style:master-page)"/>
+      </xsl:variable>
       <xsl:for-each select="document('styles.xml')//office:master-styles/style:master-page">
          <xsl:if test="position()=1">
             <pzip:entry pzip:target="ppt/notesMasters/notesMaster1.xml">
               <xsl:call-template name="NotesMasters"/>
             </pzip:entry>
-            <pzip:entry pzip:target="{concat('ppt/theme/theme',position()+10,'.xml')}">
+            <pzip:entry pzip:target="{concat('ppt/theme/theme',$noOfMaster + 1,'.xml')}">
               <xsl:call-template name="theme"/>
             </pzip:entry>
             <pzip:entry pzip:target="ppt/notesMasters/_rels/notesMaster1.xml.rels">
               <xsl:call-template name ="notesMasterRel">
-                <xsl:with-param name ="ThemeId" select ="position()+10"/>
+                <xsl:with-param name ="ThemeId" select ="$noOfMaster + 1"/>
               </xsl:call-template>
             </pzip:entry>
          </xsl:if>
@@ -207,10 +210,10 @@ Copyright (c) 2007, Sonata Software Limited
         </pzip:entry>
         <pzip:entry pzip:target="{concat('ppt/handoutMasters/_rels/',$handoutMaster,'.xml.rels')}">
           <xsl:call-template name="handoutMaster1Rel">
-            <xsl:with-param name ="ThemeId" select ="$themeNumber"/>
+            <xsl:with-param name ="ThemeId" select ="$noOfMaster + 2"/>
           </xsl:call-template >
         </pzip:entry>
-        <pzip:entry pzip:target="{concat('ppt/theme/theme',$themeNumber,'.xml')}">
+        <pzip:entry pzip:target="{concat('ppt/theme/theme',$noOfMaster + 2,'.xml')}">
           <xsl:call-template name="theme"/>
         </pzip:entry>
       </xsl:for-each>
@@ -439,12 +442,16 @@ Copyright (c) 2007, Sonata Software Limited
       <Default Extension="pptx" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation"/>
       <Default Extension="docx" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
       <Default Extension="doc" ContentType="application/msword"/>
+
+      <xsl:variable name="noOfMaster">
+        <xsl:value-of select="count(document('styles.xml')//office:master-styles/style:master-page)"/>
+      </xsl:variable>
         <!--NotesMaster-->
         <Override PartName="/ppt/notesMasters/notesMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml"/>
         <xsl:if test="document('styles.xml')//style:master-page/presentation:notes">
           <Override>
             <xsl:attribute name ="PartName">
-              <xsl:value-of select ="concat('/ppt/theme/theme',position()+ 9,'.xml')"/>
+              <xsl:value-of select ="concat('/ppt/theme/theme',$noOfMaster + 1,'.xml')"/>
             </xsl:attribute>
             <xsl:attribute name ="ContentType">
               <xsl:value-of select ="'application/vnd.openxmlformats-officedocument.theme+xml'"/>
@@ -594,6 +601,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:attribute>
 				</Override>
         <!--added by vipul for notes-->
+        <xsl:if test="presentation:notes/draw:page-thumbnail">
         <Override >
           <xsl:attribute name ="PartName">
             <xsl:value-of select ="concat('/ppt/notesSlides/notesSlide',position(),'.xml')"/>
@@ -602,6 +610,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:value-of select ="'application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml'"/>
           </xsl:attribute>
         </Override>
+        </xsl:if>
 			</xsl:for-each>
 <!-- Inserted by vijayeta
        Add handoutmaster and theme ofr handoutmaster in content types 
@@ -612,7 +621,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:variable >
         <Override>
           <xsl:attribute name ="PartName">
-            <xsl:value-of select ="concat('/ppt/theme/theme',$themeNumber,'.xml')"/>
+            <xsl:value-of select ="concat('/ppt/theme/theme',$noOfMaster + 2,'.xml')"/>
           </xsl:attribute>
           <xsl:attribute name ="ContentType">
             <xsl:value-of select ="'application/vnd.openxmlformats-officedocument.theme+xml'"/>

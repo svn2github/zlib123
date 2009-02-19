@@ -515,10 +515,17 @@ Copyright (c) 2007, Sonata Software Limited
               <a:buNone/>
               <a:defRPr>
                 <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                  <xsl:variable name="fontSize">
+                    <xsl:call-template name="point-measure">
+                      <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                   <xsl:attribute name="sz">
                     <xsl:call-template name ="convertToPoints">
                       <xsl:with-param name ="unit" select ="'pt'"/>
-                      <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                      <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                     </xsl:call-template>
                   </xsl:attribute>
                 </xsl:if>
@@ -746,10 +753,17 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -1006,10 +1020,17 @@ Copyright (c) 2007, Sonata Software Limited
                 <!--End-->
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -1309,10 +1330,17 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -1612,10 +1640,17 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -1902,10 +1937,17 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -2197,10 +2239,17 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -2491,10 +2540,17 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -2785,10 +2841,17 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -3079,10 +3142,18 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
                 <a:defRPr>
                   <xsl:if test="./style:text-properties/@fo:font-size">
+<!--Office 2007 Sp2-->
+
+                    <xsl:variable name="fontSize">
+                      <xsl:call-template name="point-measure">
+                        <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                      </xsl:call-template>
+                    </xsl:variable>
+
                     <xsl:attribute name="sz">
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:attribute>
                   </xsl:if>
@@ -4416,6 +4487,25 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:when>
                         </xsl:choose>
                       </xsl:when >
+                      <!--<xsl:otherwise>
+                        <xsl:if test="string-length(.) != 0">
+                          <a:r>
+                            <a:rPr  dirty="0" smtClean="0">
+                              <xsl:variable name ="textId">
+                                <xsl:value-of select ="@text:style-name"/>
+                              </xsl:variable>
+                              <xsl:if test ="not($textId ='')">
+                                <xsl:call-template name ="tmpSMfontStyles">
+                                  <xsl:with-param name ="TextStyleID" select ="$textId" />
+                                </xsl:call-template>
+                              </xsl:if>
+                            </a:rPr>
+                            <a:t>
+                              <xsl:call-template name ="insertTab" />
+                            </a:t>
+                          </a:r>
+                        </xsl:if>
+                      </xsl:otherwise>-->
                     </xsl:choose>
                   </xsl:for-each>
                 </xsl:if>
@@ -4471,9 +4561,16 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                 <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                  <xsl:variable name="fontSize">
+                    <xsl:call-template name="point-measure">
+                      <xsl:with-param name="length" select="@fo:font-size"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -4482,9 +4579,16 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -4492,9 +4596,17 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="document('styles.xml')//style:style[@style:name=$prId]/style:text-properties/@fo:font-size">
               <xsl:attribute name="sz">
                 <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$prId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                  <xsl:variable name="fontSize">
+                    <xsl:call-template name="point-measure">
+                      <!--changed by yeswanth.s : 6-Feb-09-->
+                      <xsl:with-param name="length" select="@fo:font-size"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                   <xsl:call-template name ="convertToPoints">
                     <xsl:with-param name ="unit" select ="'pt'"/>
-                    <xsl:with-param name ="length" select ="@fo:font-size"/>
+                    <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                   </xsl:call-template>
                 </xsl:for-each>
               </xsl:attribute>
@@ -5471,7 +5583,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:value-of select ="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'"/>
                         </xsl:attribute>
                         <xsl:attribute name ="Target">
-                          <xsl:if test="./draw:image/@xlink:href">
+                          <xsl:if test="./draw:image/@xlink:href !=''">
                             <xsl:value-of select ="concat('../media/',substring-after(./draw:image/@xlink:href,'/'))"/>
                           </xsl:if>
                           <xsl:if test="not(./draw:image/@xlink:href)">
@@ -5494,7 +5606,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:value-of select="concat('text-box',$PostionCount)"/>
                         </xsl:variable>
                         <xsl:for-each select="text:p">
-                          <xsl:if test="text:a/@xlink:href">
+                          <xsl:if test="text:a/@xlink:href !=''">
                             <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -5546,7 +5658,7 @@ Copyright (c) 2007, Sonata Software Limited
                               </xsl:choose>
                             </Relationship>
                           </xsl:if>
-                          <xsl:if test="text:span/text:a/@xlink:href">
+                          <xsl:if test="text:span/text:a/@xlink:href !=''">
                             <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -5680,7 +5792,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:variable>
                       <xsl:for-each select="draw:text-box">
                         <xsl:for-each select="text:p">
-                          <xsl:if test="text:a/@xlink:href">
+                          <xsl:if test="text:a/@xlink:href !=''">
                             <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat('TextHLAtchFileId',$PostionCount,'Link',position())"/>
@@ -5732,7 +5844,7 @@ Copyright (c) 2007, Sonata Software Limited
                               </xsl:choose>
                             </Relationship>
                           </xsl:if>
-                          <xsl:if test="text:span/text:a/@xlink:href">
+                          <xsl:if test="text:span/text:a/@xlink:href !=''">
                             <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat('TextHLAtchFileId',$PostionCount,'Link',position())"/>
@@ -5872,7 +5984,7 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:variable>
                         <xsl:if test="$PresentationClass = 0">
                           <xsl:for-each select ="office:event-listeners/presentation:event-listener">
-                            <xsl:if test="@xlink:href">
+                            <xsl:if test="@xlink:href != ''">
 
                               <xsl:choose>
                                 <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
@@ -5895,7 +6007,7 @@ Copyright (c) 2007, Sonata Software Limited
                                     </Relationship>
                                   </xsl:if>
                                 </xsl:when>
-                                <xsl:when test="@xlink:href">
+                                <xsl:when test="@xlink:href != ''">
                                   <Relationship>
                                     <xsl:attribute name="Id">
                                       <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
@@ -5966,7 +6078,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:for-each>
                       <xsl:for-each select="./@presentation:class">
                         <xsl:for-each select ="parent::node()/office:event-listeners/presentation:event-listener">
-                          <xsl:if test="@xlink:href">
+                          <xsl:if test="@xlink:href != ''">
 
                             <xsl:choose>
                               <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
@@ -5990,7 +6102,7 @@ Copyright (c) 2007, Sonata Software Limited
                                 </xsl:if>
 
                               </xsl:when>
-                              <xsl:when test="@xlink:href">
+                              <xsl:when test="@xlink:href != ''">
                                 <Relationship>
                                   <xsl:attribute name="Id">
                                     <xsl:value-of select="concat('AtchFileId',$PostionCount)"/>
@@ -6100,7 +6212,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:value-of select="$var_pos"/>
                     </xsl:variable>
                     <xsl:for-each select ="office:event-listeners/presentation:event-listener">
-                      <xsl:if test="@xlink:href">
+                      <xsl:if test="@xlink:href != ''">
                         <Relationship>
                           <xsl:choose>
                             <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
@@ -6121,7 +6233,7 @@ Copyright (c) 2007, Sonata Software Limited
                                 </xsl:attribute>
                               </xsl:if>
                             </xsl:when>
-                            <xsl:when test="@xlink:href">
+                            <xsl:when test="@xlink:href != ''">
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat('ShapeFileId',$ShapePostionCount)"/>
                               </xsl:attribute>
@@ -6195,7 +6307,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:value-of select="concat('custom-shape',$var_pos)"/>
                     </xsl:variable>
                     <xsl:for-each select="text:p">
-                      <xsl:if test="text:a/@xlink:href">
+                      <xsl:if test="text:a/@xlink:href !=''">
                         <Relationship>
                           <xsl:attribute name="Id">
                             <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -6247,7 +6359,7 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:choose>
                         </Relationship>
                       </xsl:if>
-                      <xsl:if test="text:span/text:a/@xlink:href">
+                      <xsl:if test="text:span/text:a/@xlink:href !=''">
                         <Relationship>
                           <xsl:attribute name="Id">
                             <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -6391,7 +6503,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:value-of select="$var_pos"/>
                     </xsl:variable>
                     <xsl:for-each select ="office:event-listeners/presentation:event-listener">
-                      <xsl:if test="@xlink:href">
+                      <xsl:if test="@xlink:href != ''">
 
                         <xsl:choose>
                           <!--<xsl:when test="@xlink:href[contains(.,'#page')]">
@@ -6422,7 +6534,7 @@ Copyright (c) 2007, Sonata Software Limited
                               </Relationship>
                             </xsl:if>
                           </xsl:when>
-                          <xsl:when test="@xlink:href">
+                          <xsl:when test="@xlink:href != ''">
                             <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat('RectAtachFileId',$ShapePostionCount)"/>
@@ -6495,7 +6607,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:value-of select="concat('rect',$var_pos)"/>
                     </xsl:variable>
                     <xsl:for-each select="text:p">
-                      <xsl:if test="text:a/@xlink:href">
+                      <xsl:if test="text:a/@xlink:href !=''">
                         <Relationship>
                           <xsl:attribute name="Id">
                             <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -6547,7 +6659,7 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:choose>
                         </Relationship>
                       </xsl:if>
-                      <xsl:if test="text:span/text:a/@xlink:href">
+                      <xsl:if test="text:span/text:a/@xlink:href !=''">
                         <Relationship>
                           <xsl:attribute name="Id">
                             <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -6695,7 +6807,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select="concat('ellipse',$var_pos)"/>
                 </xsl:variable>
                 <xsl:for-each select="text:p">
-                  <xsl:if test="text:a/@xlink:href">
+                  <xsl:if test="text:a/@xlink:href !=''">
                     <Relationship>
                       <xsl:attribute name="Id">
                         <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -6747,7 +6859,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:choose>
                     </Relationship>
                   </xsl:if>
-                  <xsl:if test="text:span/text:a/@xlink:href">
+                  <xsl:if test="text:span/text:a/@xlink:href !=''">
                     <Relationship>
                       <xsl:attribute name="Id">
                         <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -6894,7 +7006,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select="$var_pos"/>
                   </xsl:variable>
                   <xsl:for-each select ="office:event-listeners/presentation:event-listener">
-                    <xsl:if test="@xlink:href">
+                    <xsl:if test="@xlink:href != ''">
 
                       <xsl:choose>
                         <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
@@ -6917,7 +7029,7 @@ Copyright (c) 2007, Sonata Software Limited
                             </Relationship>
                           </xsl:if>
                         </xsl:when>
-                        <xsl:when test="@xlink:href">
+                        <xsl:when test="@xlink:href != ''">
                           <Relationship>
                             <xsl:attribute name="Id">
                               <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
@@ -6999,7 +7111,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select="$var_pos"/>
                   </xsl:variable>
                   <xsl:for-each select ="office:event-listeners/presentation:event-listener">
-                    <xsl:if test="@xlink:href">
+                    <xsl:if test="@xlink:href != ''">
 
                       <xsl:choose>
                         <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
@@ -7022,7 +7134,7 @@ Copyright (c) 2007, Sonata Software Limited
                             </Relationship>
                           </xsl:if>
                         </xsl:when>
-                        <xsl:when test="@xlink:href">
+                        <xsl:when test="@xlink:href != ''">
                           <Relationship>
                             <xsl:attribute name="Id">
                               <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>

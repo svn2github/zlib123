@@ -149,6 +149,16 @@
         </a:buBlip>
         <xsl:call-template name="copyPictures">
           <xsl:with-param name ="level" select ="$level"/>
+          <xsl:with-param name="sourceFolder">
+            <xsl:choose>
+              <xsl:when test="contains(text:list-level-style-image/@xlink:href,'media/')">
+                <xsl:value-of select="'media'"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'Pictures'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
         </xsl:call-template>
       </xsl:if>
     </xsl:for-each>
@@ -246,7 +256,14 @@
     <xsl:for-each select="document('content.xml')//office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
       <xsl:if test ="@text:level=$level">
         <xsl:variable name="pzipsource">
+          <xsl:choose>
+            <xsl:when test="substring-after(@xlink:href,'Pictures/') != ''">
           <xsl:value-of select="substring-after(@xlink:href,'Pictures/')"/>
+            </xsl:when>
+            <xsl:when test="substring-after(@xlink:href,'media/') != ''">
+              <xsl:value-of select="substring-after(@xlink:href,'media/')"/>
+            </xsl:when>
+          </xsl:choose>          
           <!-- image1.gif-->
         </xsl:variable>
         <pzip:copy pzip:source="{concat($sourceFolder,'/',$pzipsource)}" pzip:target="{concat($destFolder,'/',$pzipsource)}"/>

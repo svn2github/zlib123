@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <!-- 
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -162,9 +162,16 @@ Copyright (c) 2007, Sonata Software Limited
             <!--End-->
             <a:defRPr>
               <xsl:attribute name="sz">
+<!--Office 2007 Sp2-->
+
+                <xsl:variable name="fontSize">
+                  <xsl:call-template name="point-measure">
+                    <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                  </xsl:call-template>
+                </xsl:variable>
                 <xsl:call-template name ="convertToPoints">
                   <xsl:with-param name ="unit" select ="'pt'"/>
-                  <xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
+                  <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                 </xsl:call-template>
               </xsl:attribute>
               <!--Font Bold attribute-->
@@ -483,9 +490,17 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -494,9 +509,16 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -759,9 +781,16 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -770,9 +799,16 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -1117,9 +1153,17 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -1128,9 +1172,16 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -1393,9 +1444,16 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -1404,9 +1462,17 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:when test="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-size">
                   <xsl:attribute name="sz">
                     <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties">
+<!--Office 2007 Sp2-->
+
+                      <xsl:variable name="fontSize">
+                        <xsl:call-template name="point-measure">
+                          <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+
                       <xsl:call-template name ="convertToPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
-                        <xsl:with-param name ="length" select ="@fo:font-size"/>
+                        <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:attribute>
@@ -1625,7 +1691,6 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:for-each>
     </a:bodyPr>
   </xsl:template>
-
   <xsl:template name ="tmpNMLineStyle">
     <xsl:param name ="parentStyle" />
     <a:ln>
@@ -1777,7 +1842,6 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
     </a:ln>
   </xsl:template>
-
   <xsl:template name ="tmpNMgetFillColor">
     <xsl:param name ="fill-color" />
     <xsl:param name ="opacity" />
@@ -1804,7 +1868,6 @@ Copyright (c) 2007, Sonata Software Limited
       </a:solidFill>
     </xsl:if>
   </xsl:template>
-
   <xsl:template name="tmpNMUnderline">
     <!-- Font underline-->
     <xsl:param name="uStyle"/>
@@ -1884,7 +1947,6 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-
   <xsl:template name ="notesMasterRel" match ="/office:document-content/office:body/office:presentation/draw:page">
     <xsl:param name ="ThemeId"/>
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">

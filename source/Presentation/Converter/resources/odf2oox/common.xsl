@@ -232,7 +232,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:value-of select="concat(format-number($lengthVal div 72,'#.###'),'in')"/>
 			</xsl:when>
 			<xsl:when test="$unit = 'pt'">
-				<xsl:value-of select="concat(format-number($lengthVal,'#') * 100 ,'')"/>
+				<xsl:value-of select="concat(round($lengthVal * 100) ,'')"/>
 				<!--Added by lohith - format-number($lengthVal,'#') to make sure that pt will be a int not a real value-->
 			</xsl:when>
 			<xsl:when test="$unit = 'pica'">
@@ -485,11 +485,18 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:otherwise>
         </xsl:choose>
 			<!-- Added by lohith :substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0  because sz(font size) shouldnt be zero - 16filesbug-->
-			<xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
+<!--Office 2007 Sp2-->
+        <xsl:variable name="fontSize">
+          <xsl:call-template name="point-measure">
+            <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:if test="$fontSize &gt; 0 ">
 				<xsl:attribute name ="sz">
 					<xsl:call-template name ="convertToPoints">
 						<xsl:with-param name ="unit" select ="'pt'"/>
-						<xsl:with-param name ="length" select ="style:text-properties/@fo:font-size"/>
+						<xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
 					</xsl:call-template>
 				</xsl:attribute>
 			</xsl:if>
@@ -1696,12 +1703,19 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:choose>
         </xsl:when>
           <xsl:when test="$attrName='Fontsize'">
+<!--Office 2007 Sp2-->
+            <xsl:variable name="fontSize">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="@fo:font-size"/>
+              </xsl:call-template>
+            </xsl:variable>
+
           <xsl:choose>
-            <xsl:when test="substring-before(@fo:font-size,'pt') > 0">
+            <xsl:when test="$fontSize > 0">
               <xsl:attribute name ="sz">
                 <xsl:call-template name ="convertToPoints">
                   <xsl:with-param name ="unit" select ="'pt'"/>
-                  <xsl:with-param name ="length" select ="@fo:font-size"/>
+                  <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                 </xsl:call-template>
               </xsl:attribute>
             </xsl:when>
@@ -2723,11 +2737,18 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name="getFontSizeFamilyFromContentEndPara">
     <xsl:param name="Tid" />
     <xsl:for-each select="document('content.xml')//office:automatic-styles/style:style[@style:name =$Tid ]">
-      <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')> 0">
+<!--Office 2007 Sp2-->
+
+      <xsl:variable name="fontSize">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="$fontSize > 0">
         <xsl:attribute name="sz">
           <xsl:call-template name="convertToPoints">
             <xsl:with-param name="unit" select="'pt'" />
-            <xsl:with-param name="length" select="style:text-properties/@fo:font-size" />
+            <xsl:with-param name="length" select="concat($fontSize,'pt')" />
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
@@ -2764,11 +2785,18 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:choose>
       <xsl:message terminate="no">progress:text:p</xsl:message>
       <!-- Added by lohith :substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0  because sz(font size) shouldnt be zero - 16filesbug-->
-      <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
+<!--Office 2007 Sp2-->
+
+        <xsl:variable name="fontSize">
+          <xsl:call-template name="point-measure">
+            <xsl:with-param name ="length" select ="style:text-properties/@fo:font-size"/>
+          </xsl:call-template>
+        </xsl:variable>
+      <xsl:if test="$fontSize &gt; 0 ">
         <xsl:attribute name ="sz">
           <xsl:call-template name ="convertToPoints">
             <xsl:with-param name ="unit" select ="'pt'"/>
-            <xsl:with-param name ="length" select ="style:text-properties/@fo:font-size"/>
+            <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
@@ -2894,11 +2922,18 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
-      <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
+<!--Office 2007 Sp2-->
+
+        <xsl:variable name="fontSize">
+          <xsl:call-template name="point-measure">
+            <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
+          </xsl:call-template>
+        </xsl:variable>
+      <xsl:if test="$fontSize &gt; 0 ">
         <xsl:attribute name ="sz">
           <xsl:call-template name ="convertToPoints">
             <xsl:with-param name ="unit" select ="'pt'"/>
-            <xsl:with-param name ="length" select ="style:text-properties/@fo:font-size"/>
+            <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
@@ -3650,7 +3685,7 @@ Copyright (c) 2007, Sonata Software Limited
             or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
             or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
             or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
-                    <xsl:if test="not(./@xlink:href[contains(.,'../')])">
+                    <xsl:if test="not(./@xlink:href[contains(.,'../')]) and ./@xlink:href != ''">
                       <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
                         <xsl:attribute name="Id">
                           <xsl:value-of select="concat('slgrpImage',$slideNo,'-',$NvPrId,$UniqueID)" />
@@ -3665,7 +3700,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <!--added by chhavi for picture hyperlink relationship-->
                       <xsl:if test="./following-sibling::node()[name() = 'office:event-listeners']">
                         <xsl:for-each select ="./parent::node()/office:event-listeners/presentation:event-listener">
-                          <xsl:if test="@xlink:href">
+                          <xsl:if test="@xlink:href !=''">
                             <xsl:choose>
                               <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
                                 <xsl:variable name="pageID">
@@ -3687,7 +3722,7 @@ Copyright (c) 2007, Sonata Software Limited
                                   </Relationship>
                                 </xsl:if>
                               </xsl:when>
-                              <xsl:when test="@xlink:href">
+                              <xsl:when test="@xlink:href !=''">
                                 <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships" >
                                   <xsl:attribute name="Id">
                                     <xsl:value-of select="concat('picture',generate-id())"/>
@@ -4106,7 +4141,16 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1] and $isNumberingEnabled='true' and text:list-level-style-image[@text:level=$blvl+1]/@xlink:href">
               <!--<xsl:variable name ="rId" select ="concat('buImage',$listId,$blvl+1,$forCount,$PostionCount)"/>-->
               <xsl:variable name ="rId" select ="concat('buImage',$grpFlag,$listId,$BuImgRel,generate-id())"/>
-              <xsl:variable name ="imageName" select ="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'Pictures/')"/>
+              <xsl:variable name ="imageName">
+                <xsl:choose>
+                  <xsl:when test="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'Pictures/') != ''">
+                    <xsl:value-of select="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'Pictures/')"/>
+                  </xsl:when>
+                  <xsl:when test="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'media/') != ''">
+                    <xsl:value-of select="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'media/')"/>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:variable>
 
               <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
                 <xsl:attribute name ="Id">
@@ -4304,7 +4348,10 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:choose>
               <xsl:when test="@draw:transform">
               <xsl:variable name ="var_rot">
-                <xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
+                <xsl:call-template name="tmpGetGroupRotXYVals">
+                  <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+                  <xsl:with-param name="XY" select="'ROT'"/>
+                </xsl:call-template>
                             </xsl:variable>
               <xsl:value-of select="$var_rot"/>
                           </xsl:when>
@@ -4364,7 +4411,16 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:when>
                   <xsl:when test="@draw:transform">
                     <xsl:variable name ="x">
-                      <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+                      <xsl:variable name="tmp_X">
+                        <xsl:call-template name="tmpGetGroupRotXYVals">
+                          <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+                          <xsl:with-param name="unit" select="$convertUnit"/>
+                          <xsl:with-param name="XY" select="'X'"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:call-template name="convertUnitsToCm">
+                        <xsl:with-param name="length" select="concat($tmp_X,$convertUnit)" />
+                        </xsl:call-template>
                     </xsl:variable>
                     <xsl:if test="$x=''">
                       <xsl:value-of select="'0'"/>
@@ -4398,7 +4454,16 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:when>
                           <xsl:when test="@draw:transform">
                             <xsl:variable name ="y">
-                              <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+                              <xsl:variable name="tmp_Y">
+                                <xsl:call-template name="tmpGetGroupRotXYVals">
+                                  <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+                                  <xsl:with-param name="unit" select="$convertUnit"/>
+                                  <xsl:with-param name="XY" select="'Y'"/>
+                                </xsl:call-template>
+                              </xsl:variable>
+                              <xsl:call-template name="convertUnitsToCm">
+                                <xsl:with-param name="length" select="concat($tmp_Y,$convertUnit)" />
+                              </xsl:call-template>
                             </xsl:variable>
                             <xsl:if test="$y=''">
                               <xsl:value-of select="'0'"/>
@@ -4416,7 +4481,10 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:choose>
                       <xsl:when test="@draw:transform">
               <xsl:variable name ="var_rot">
-                <xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
+                <xsl:call-template name="tmpGetGroupRotXYVals">
+                  <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+                  <xsl:with-param name="XY" select="'ROT'"/>
+                </xsl:call-template>
                         </xsl:variable>
                         <xsl:if test="$var_rot=''">
                           <xsl:value-of select="'0'"/>
@@ -4434,6 +4502,43 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:value-of select="concat($X,':',$Y,':',$Width,':',$Height,':',$Rot,'@')"/>
       </xsl:otherwise>
                 </xsl:choose>
+  </xsl:template>
+  <xsl:template name="tmpGetGroupRotXYVals">
+    <xsl:param name="drawTranformVal"/>
+    <xsl:param name="unit"/>
+    <xsl:param name="XY"/>
+    
+    <xsl:variable name="tmp_XY">
+      <xsl:value-of select="substring-after(@draw:transform,'translate')"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$XY='X'">
+        <xsl:choose>
+          <xsl:when test="contains($tmp_XY,'translate')">
+            <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after($tmp_XY,'translate'),'('),')'),' '),$unit)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after($drawTranformVal,'translate'),'('),')'),' '),$unit)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$XY='Y'">
+        <xsl:choose>
+          <xsl:when test="contains($tmp_XY,'translate')">
+            <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after($tmp_XY,'translate'),'('),')'),' '),$unit)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after($drawTranformVal,'translate'),'('),')'),' '),$unit)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$XY='ROT'">
+        <xsl:value-of select="substring-before(substring-after(substring-after(@draw:transform,'rotate'),'('),')')" />
+        <!--<xsl:value-of select="substring-after(substring-before(substring-before($drawTranformVal,'translate'),')'),'(')" />-->
+      </xsl:when>
+    </xsl:choose>
+
+
   </xsl:template>
   <xsl:template name ="tmpdrawCordinates">
     <xsl:param name="OLETAB"/>
@@ -4487,16 +4592,34 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:call-template>
     </xsl:variable>
         <xsl:variable name ="angle">
-        <xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
+          <!--<xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />-->
+          <xsl:call-template name="tmpGetGroupRotXYVals">
+            <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+            <xsl:with-param name="XY" select="'ROT'"/>
+          </xsl:call-template>
       </xsl:variable>
       <xsl:variable name ="x2">
+        <xsl:variable name="tmp_X">
+          <xsl:call-template name="tmpGetGroupRotXYVals">
+            <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+            <xsl:with-param name="unit" select="$convertUnit"/>
+            <xsl:with-param name="XY" select="'X'"/>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:call-template name="convertUnitsToCm">
-          <xsl:with-param name="length" select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+          <xsl:with-param name="length" select="concat($tmp_X,$convertUnit)" />
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name ="y2">
+        <xsl:variable name="tmp_Y">
+          <xsl:call-template name="tmpGetGroupRotXYVals">
+            <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+            <xsl:with-param name="unit" select="$convertUnit"/>
+            <xsl:with-param name="XY" select="'Y'"/>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:call-template name="convertUnitsToCm">
-          <xsl:with-param name="length" select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+          <xsl:with-param name="length" select="concat($tmp_Y,$convertUnit)" />
         </xsl:call-template>
       </xsl:variable>
       <xsl:if test="@draw:transform">
@@ -4667,7 +4790,10 @@ Copyright (c) 2007, Sonata Software Limited
          <xsl:variable name ="angle">
        
         <xsl:variable name ="var_rot">
-        <xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
+          <xsl:call-template name="tmpGetGroupRotXYVals">
+            <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+            <xsl:with-param name="XY" select="'ROT'"/>
+          </xsl:call-template>
         </xsl:variable>
         <xsl:if test="$var_rot=''">
           <xsl:value-of select="'0'"/>
@@ -4677,28 +4803,36 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:if>
         </xsl:variable>
       <xsl:variable name ="x2">
-        <xsl:variable name ="tmpx">
-        <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+        <xsl:variable name="tmp_X">
+          <xsl:call-template name="tmpGetGroupRotXYVals">
+            <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+            <xsl:with-param name="unit" select="$convertUnit"/>
+            <xsl:with-param name="XY" select="'X'"/>
+          </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="$tmpx=''">
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name="length" select="concat($tmp_X,$convertUnit)" />
+        </xsl:call-template>
+        <!--<xsl:if test="$tmp_X=''">
           <xsl:value-of select="'0'"/>
         </xsl:if>
-        <xsl:if test="$tmpx!=''">
-          <xsl:value-of select="$tmpx"/>
-        </xsl:if>
+        <xsl:if test="$tmp_X!=''">
+          <xsl:value-of select="$tmp_X"/>
+        </xsl:if>-->
       </xsl:variable>
     
       <xsl:variable name ="y2">
        
-        <xsl:variable name ="tmpy">
-        <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+        <xsl:variable name="tmp_Y">
+          <xsl:call-template name="tmpGetGroupRotXYVals">
+            <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+            <xsl:with-param name="unit" select="$convertUnit"/>
+            <xsl:with-param name="XY" select="'Y'"/>
+          </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="$tmpy=''">
-          <xsl:value-of select="'0'"/>
-        </xsl:if>
-        <xsl:if test="$tmpy!=''">
-          <xsl:value-of select="$tmpy"/>
-        </xsl:if>
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name="length" select="concat($tmp_Y,$convertUnit)" />
+        </xsl:call-template>
         </xsl:variable>
       <xsl:if test="@draw:transform">
         <xsl:attribute name ="rot">
@@ -5511,7 +5645,10 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:variable name ="angle">
 			<xsl:choose>
 				<xsl:when test="@draw:transform">
-					<xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
+          <xsl:call-template name="tmpGetGroupRotXYVals">
+            <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+            <xsl:with-param name="XY" select="'ROT'"/>
+          </xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="'0'"/>
@@ -5521,7 +5658,17 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:variable name ="x">
 			<xsl:choose>
 				<xsl:when test="@draw:transform">
-					<xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+
+          <xsl:variable name="tmp_X">
+            <xsl:call-template name="tmpGetGroupRotXYVals">
+              <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+              <xsl:with-param name="unit" select="$convertUnit"/>
+              <xsl:with-param name="XY" select="'X'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length" select="concat($tmp_X,$convertUnit)" />
+          </xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name="convertUnitsToCm">
@@ -5533,7 +5680,17 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:variable name ="y">
 			<xsl:choose>
 				<xsl:when test="@draw:transform">
-					<xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+          <xsl:variable name="tmp_Y">
+            <xsl:call-template name="tmpGetGroupRotXYVals">
+              <xsl:with-param name="drawTranformVal" select="@draw:transform"/>
+              <xsl:with-param name="unit" select="$convertUnit"/>
+              <xsl:with-param name="XY" select="'Y'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length" select="concat($tmp_Y,$convertUnit)" />
+          </xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name="convertUnitsToCm">
@@ -5704,7 +5861,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="UniqueId" />
     <xsl:for-each select ="node()">
       <xsl:if test ="name()='text:p'" >
-        <xsl:if test="text:a/@xlink:href">
+        <xsl:if test="text:a/@xlink:href !=''">
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
             <xsl:attribute name="Id">
               <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -5760,7 +5917,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:choose>
           </Relationship>
         </xsl:if>
-        <xsl:if test="text:span/text:a/@xlink:href">
+        <xsl:if test="text:span/text:a/@xlink:href !=''">
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
             <xsl:attribute name="Id">
               <xsl:value-of select="concat($shapeId,'Link',position())"/>
@@ -6001,12 +6158,23 @@ Copyright (c) 2007, Sonata Software Limited
             <pzip:copy pzip:source="{translate(@xlink:href,'/','')}" pzip:target="{concat('ppt/embeddings/',translate(translate(@xlink:href,' ',''),'/',''),'.bin')}" />
           </xsl:otherwise>
           </xsl:choose>
-          <xsl:if test="./parent::node()/draw:image/@xlink:href">
+          <xsl:if test="./parent::node()/draw:image/@xlink:href !=''">
             <xsl:choose>
               <xsl:when test="starts-with(./parent::node()/draw:image/@xlink:href,'./')">
                 <xsl:variable name="olePictureType">
                   <xsl:call-template name="GetOLEPictureType">
                     <xsl:with-param name="olePicture" select="substring-after(./parent::node()/draw:image/@xlink:href,'./')" />
+                    <xsl:with-param name="oleType">
+                      <xsl:choose>
+                        <xsl:when test="starts-with(@xlink:href,'./')">
+                          <xsl:value-of select="'embed'"/>
+                        </xsl:when>
+                        <xsl:when test="starts-with(@xlink:href,'/') or starts-with(@xlink:href,'../') or starts-with(@xlink:href,'//')
+                                            or starts-with(@xlink:href,'file:///')">
+                          <xsl:value-of select="'link'"/>
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:with-param>
                   </xsl:call-template>
                 </xsl:variable>
                 <xsl:choose>
@@ -6032,6 +6200,8 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <xsl:template name="GetOLEPictureType">
     <xsl:param name="olePicture" />
+    <xsl:param name="oleType" />
+    
     <xsl:variable name="allManifestEntries" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry" />
     <xsl:variable name="type" select="$allManifestEntries[@manifest:full-path=$olePicture]/@manifest:media-type" />
 
@@ -6040,7 +6210,9 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:text>GDIMetaFile</xsl:text>
       </xsl:when>
       <xsl:when test="$type=''">
+        <xsl:if test="$oleType='link'">
         <xsl:text>GDIMetaFile</xsl:text>
+        </xsl:if>
       </xsl:when>
       <!-- picture is a WMF -->
       <xsl:when test="$type='application/x-openoffice-wmf;windows_formatname=&quot;Image WMF&quot;'">
