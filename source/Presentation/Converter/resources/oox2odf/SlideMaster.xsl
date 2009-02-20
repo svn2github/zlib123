@@ -1098,6 +1098,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                     <xsl:with-param name ="ParaId" select="$ParaId" />
                     <xsl:with-param name ="TypeId" select="$slideMasterName" />
+                    <xsl:with-param name ="SlideRelationId" select="concat('ppt/slideMasters/_rels/',$slideMasterPath,'.rels')" />                    
                   </xsl:call-template>
                 </xsl:when>
               </xsl:choose>
@@ -1117,6 +1118,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                   <xsl:with-param name ="ParaId" select="$ParaId" />
                   <xsl:with-param name ="TypeId" select="$slideMasterName" />
+                  <xsl:with-param name ="SlideRelationId" select="concat('ppt/slideMasters/_rels/',$slideMasterPath,'.rels')" />                 
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
