@@ -518,12 +518,16 @@ Copyright (c) 2007, Sonata Software Limited
              <xsl:choose>
                <xsl:when test="../a:r[1]/a:rPr/@lang">
                  <xsl:for-each select="../a:r[1]/a:rPr">
-                   <xsl:call-template name="tmpTextLanguage"/>
+                   <xsl:call-template name="tmpTextLanguage">
+                     <xsl:with-param name="lang" select="@lang"/>
+                   </xsl:call-template>
                  </xsl:for-each>
                </xsl:when>
                <xsl:when test="../a:endParaRPr/@lang">
                  <xsl:for-each select="../a:endParaRPr">
-                   <xsl:call-template name="tmpTextLanguage"/>
+                   <xsl:call-template name="tmpTextLanguage">
+                     <xsl:with-param name="lang" select="@lang"/>
+                   </xsl:call-template>
                  </xsl:for-each>
                </xsl:when>
                <xsl:otherwise>
@@ -572,7 +576,9 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:if test ="not(@lang)">
       <xsl:if test="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@lang">
         <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
-          <xsl:call-template name="tmpTextLanguage"/>
+          <xsl:call-template name="tmpTextLanguage">
+            <xsl:with-param name="lang" select="@lang"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
     </xsl:if>
@@ -602,7 +608,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test ="not(a:rPr/@strike)">
       <xsl:if test="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@strike">
         <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
-          <xsl:call-template name="tmpstrike"/>
+          <xsl:call-template name="tmpstrike">
+            <xsl:with-param name="strike" select="@strike"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
     </xsl:if>
@@ -610,7 +618,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test ="not(a:rPr/@kern)">
       <xsl:if test="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@kern">
         <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
-          <xsl:call-template name="tmpKerning"/>
+          <xsl:call-template name="tmpKerning">
+            <xsl:with-param name="kern" select="@kern"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:if >
     </xsl:if>
@@ -618,7 +628,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test ="not(a:rPr/@b)">
         <xsl:if test="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@b">
           <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
-            <xsl:call-template name="tmpFontWeight"/>
+            <xsl:call-template name="tmpFontWeight">
+          <xsl:with-param name="b" select="@b"/>
+        </xsl:call-template>
         </xsl:for-each>
       </xsl:if >
       </xsl:if >
@@ -627,7 +639,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@u">
         <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
           <xsl:call-template name="tmpUnderLine">
-            <xsl:with-param name="SMName" select="$SlideMasterFile"/>
+            <xsl:with-param name="u" select="@u"/>
           </xsl:call-template>
         </xsl:for-each>
       </xsl:if >
@@ -636,7 +648,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test ="not(a:rPr/@i)">
       <xsl:if test="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@i">
         <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
-          <xsl:call-template name="tmpFontItalic"/>
+          <xsl:call-template name="tmpFontItalic">
+            <xsl:with-param name="i" select="@i"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:if >
     </xsl:if>
@@ -644,7 +658,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test ="not(a:rPr/@spc)">
       <xsl:if test="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@spc">
         <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
-          <xsl:call-template name="tmpletterSpacing"/>
+          <xsl:call-template name="tmpletterSpacing">
+            <xsl:with-param name="spc" select="@spc"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
     </xsl:if>
@@ -652,6 +668,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select="/.//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr">
           <xsl:call-template name="tmpFontColor">
             <xsl:with-param name="SMName" select="$SlideMasterFile"/>
+            <xsl:with-param name="varCurrentNode" select="."/>
           </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
@@ -699,7 +716,9 @@ Copyright (c) 2007, Sonata Software Limited
         <style:text-properties>
     <xsl:for-each select="p:txBody/a:p/a:r/a:rPr | p:txBody/a:p/a:fld/a:rPr">
       <xsl:if test="position()=1">
-        <xsl:call-template name="tmpTextLanguage"/>
+        <xsl:call-template name="tmpTextLanguage">
+          <xsl:with-param name="lang" select="@lang"/>
+        </xsl:call-template>
       </xsl:if>
     </xsl:for-each>
     <xsl:for-each select="p:txBody/a:lstStyle/a:lvl1pPr">
@@ -999,8 +1018,7 @@ Copyright (c) 2007, Sonata Software Limited
                                       </xsl:for-each>
                                     </text:p>
                             </xsl:for-each>
-                          </draw:text-box >
-                  
+                          </draw:text-box >                  
                   </draw:frame>
                 </xsl:when>
                 <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='sldNum'">
@@ -1812,12 +1830,16 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:choose>
             <xsl:when test="../a:r[1]/a:rPr/@lang">
               <xsl:for-each select="../a:r[1]/a:rPr">
-                <xsl:call-template name="tmpTextLanguage"/>
+                <xsl:call-template name="tmpTextLanguage">
+                  <xsl:with-param name="lang" select="@lang"/>
+                </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="../a:endParaRPr/@lang">
               <xsl:for-each select="../a:endParaRPr">
-                <xsl:call-template name="tmpTextLanguage"/>
+                <xsl:call-template name="tmpTextLanguage">
+                  <xsl:with-param name="lang" select="@lang"/>
+                </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
@@ -2816,7 +2838,9 @@ Copyright (c) 2007, Sonata Software Limited
     <!--UnderLine-->
     <xsl:if test ="./a:defRPr/@u">
       <xsl:for-each select ="./a:defRPr">
-        <xsl:call-template name="tmpUnderLine"/>
+        <xsl:call-template name="tmpUnderLine">
+          <xsl:with-param name="u" select="@u"/>
+        </xsl:call-template>
       </xsl:for-each>
     </xsl:if >
     <xsl:if test ="not(./a:defRPr/@u)">
@@ -5524,12 +5548,16 @@ Copyright (c) 2007, Sonata Software Limited
     <!--UnderLine-->
     <xsl:if test ="a:rPr/@u">
       <xsl:for-each select ="a:rPr">
-        <xsl:call-template name="tmpUnderLine"/>
+        <xsl:call-template name="tmpUnderLine">
+          <xsl:with-param name="u" select="@u"/>
+        </xsl:call-template>
       </xsl:for-each>
     </xsl:if >
     <xsl:if test ="not(a:rPr/@u)">
       <xsl:if test ="parent::node()/parent::node()/a:lstStyle/a:lvl1pPr/a:defRPr/@u">
-        <xsl:call-template name="tmpUnderLine"/>
+        <xsl:call-template name="tmpUnderLine">
+          <xsl:with-param name="u" select="parent::node()/parent::node()/a:lstStyle/a:lvl1pPr/a:defRPr/@u"/>
+        </xsl:call-template>
       </xsl:if >
     </xsl:if>
     <!-- Italic-->

@@ -1244,53 +1244,166 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:param name="index"/>
     <xsl:param name="SMName"/>
     <xsl:param name="DefFontMinor"/>
+    <xsl:param name="varCurrentNode" select="."/>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
 
-    <xsl:if test ="@lang">
-      <xsl:call-template name="tmpTextLanguage"/>
-            </xsl:if>
-    <xsl:if test ="@sz">
+    <xsl:choose>
+      <xsl:when test ="@lang">
+        <xsl:call-template name="tmpTextLanguage">
+          <xsl:with-param name="lang" select="@lang"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@lang">
+        <xsl:call-template name="tmpTextLanguage">
+          <xsl:with-param name="lang" select="$varCurrentNode/@lang"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+    
+    <xsl:choose>
+      <xsl:when test ="@sz">
       <xsl:call-template name="tmpFontSize">
         <xsl:with-param name="fontscale" select="$fontscale"/>
         <xsl:with-param name="sz" select="@sz"/>
       </xsl:call-template>
-            </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@sz">
+        <xsl:call-template name="tmpFontSize">
+          <xsl:with-param name="fontscale" select="$fontscale"/>
+          <xsl:with-param name="sz" select="$varCurrentNode/@sz"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
+    <xsl:choose>
+      <xsl:when test="./child::node()[name() = 'a:latin' or name() = 'a:ea' or name() = 'a:cs']">
+        <xsl:attribute name ="fo:font-family">
+          <xsl:choose>
+            <xsl:when test="./a:latin/@typeface">
+              <xsl:value-of select="./a:latin/@typeface"/>
+            </xsl:when>
+            <xsl:when test="./a:ea/@typeface">
+              <xsl:value-of select="./a:ea/@typeface"/>
+            </xsl:when>
+            <xsl:when test="./a:cs/@typeface">
+              <xsl:value-of select="./a:cs/@typeface"/>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$varCurrentNode/child::node()[name() = 'a:latin' or name() = 'a:ea' or name() = 'a:cs']">
+        <xsl:attribute name ="fo:font-family">
+          <xsl:choose>
+            <xsl:when test="$varCurrentNode/a:latin/@typeface">
+              <xsl:value-of select="$varCurrentNode/a:latin/@typeface"/>
+            </xsl:when>
+            <xsl:when test="$varCurrentNode/a:ea/@typeface">
+              <xsl:value-of select="$varCurrentNode/a:ea/@typeface"/>
+            </xsl:when>
+            <xsl:when test="$varCurrentNode/a:cs/@typeface">
+              <xsl:value-of select="$varCurrentNode/a:cs/@typeface"/>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
     <xsl:call-template name="tmpFontName">
       <xsl:with-param name="DefFont" select="$DefFont"/>
       <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
     </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+    
 	  <!-- strike style:text-line-through-style-->
-    <xsl:if test ="@strike">
-      <xsl:call-template name="tmpstrike"/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test ="@strike">
+        <xsl:call-template name="tmpstrike">
+          <xsl:with-param name="strike" select="@strike"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@strike">
+        <xsl:call-template name="tmpstrike">
+          <xsl:with-param name="strike" select="$varCurrentNode/@strike"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
     <!-- Kening Property-->
-    <xsl:if test ="@kern">
-      <xsl:call-template name="tmpKerning"/>
-    </xsl:if >
+    <xsl:choose>
+      <xsl:when test ="@kern">
+        <xsl:call-template name="tmpKerning">
+          <xsl:with-param name="kern" select="@kern"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@kern">
+        <xsl:call-template name="tmpKerning">
+          <xsl:with-param name="kern" select="$varCurrentNode/@kern"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
     <!-- Bold Property-->
-    <xsl:if test ="@b">
-      <xsl:call-template name="tmpFontWeight"/>
-    </xsl:if >
+    <xsl:choose>
+      <xsl:when test ="@b">
+        <xsl:call-template name="tmpFontWeight">
+          <xsl:with-param name="b" select="@b"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@b">
+        <xsl:call-template name="tmpFontWeight">
+          <xsl:with-param name="b" select="$varCurrentNode/@b"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+    
     
     <!--UnderLine-->
-    <xsl:if test ="@u">
+    <xsl:choose>
+      <xsl:when test ="@u">
       <xsl:call-template name="tmpUnderLine">
         <xsl:with-param name="SMName" select="$SMName"/>
+          <xsl:with-param name="u" select="@u"/>
       </xsl:call-template>
-    </xsl:if >
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@u">
+        <xsl:call-template name="tmpUnderLine">
+          <xsl:with-param name="SMName" select="$SMName"/>
+          <xsl:with-param name="u" select="$varCurrentNode/@u"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
     <!-- Italic-->
     <!-- Fix for the bug 1780908, by vijayeta, date 24th Aug '07-->
-    <xsl:if test ="@i">
-      <xsl:call-template name="tmpFontItalic"/>
-    </xsl:if >
+     <xsl:choose>
+      <xsl:when test ="@i">
+        <xsl:call-template name="tmpFontItalic">
+          <xsl:with-param name="i" select="@i"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@i">
+        <xsl:call-template name="tmpFontItalic">
+          <xsl:with-param name="i" select="$varCurrentNode/@i"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
     <!-- Fix for the bug 1780908, by vijayeta, date 24th Aug '07-->
     <!-- Character Spacing -->
-    <xsl:if test ="@spc">
-      <xsl:call-template name="tmpletterSpacing"/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test ="@spc">
+        <xsl:call-template name="tmpletterSpacing">
+          <xsl:with-param name="spc" select="@spc"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$varCurrentNode/@spc">
+        <xsl:call-template name="tmpletterSpacing">
+          <xsl:with-param name="spc" select="$varCurrentNode/@spc"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
    
     <xsl:call-template name="tmpFontColor">
       <xsl:with-param name="SMName" select="$SMName"/>
+      <xsl:with-param name="varCurrentNode" select="$varCurrentNode"/>
             </xsl:call-template>
 
        <!--Shadow fo:text-shadow-->
@@ -1427,11 +1540,12 @@ exclude-result-prefixes="p a r xlink ">
 		</xsl:choose>
 	</xsl:template>
   <xsl:template name="tmpTextLanguage">
+    <xsl:param name="lang"/>
     <xsl:attribute name ="style:language-asian">
-      <xsl:value-of select="substring-before(@lang,'-')"/>
+      <xsl:value-of select="substring-before($lang,'-')"/>
     </xsl:attribute>
     <xsl:attribute name ="style:country-asian">
-      <xsl:value-of select="substring-after(@lang,'-')"/>
+      <xsl:value-of select="substring-after($lang,'-')"/>
     </xsl:attribute>
   </xsl:template>
   <xsl:template name="tmpTextOuterShdw">
@@ -1440,18 +1554,20 @@ exclude-result-prefixes="p a r xlink ">
     </xsl:attribute>
   </xsl:template>
   <xsl:template name="tmpletterSpacing">
+    <xsl:param name="spc"/>
     <xsl:attribute name ="fo:letter-spacing">
-      <xsl:value-of select="concat(format-number(@spc * 2.54 div 7200,'#.###'),'cm')"/>
+      <xsl:value-of select="concat(format-number($spc * 2.54 div 7200,'#.###'),'cm')"/>
     </xsl:attribute>
   </xsl:template>
   <xsl:template name="tmpFontWeight">
+    <xsl:param name="b"/>
     <xsl:choose>
-      <xsl:when test ="@b='1'">
+      <xsl:when test ="$b='1'">
         <xsl:attribute name ="fo:font-weight">
           <xsl:value-of select ="'bold'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="@b='0'">
+      <xsl:when test ="$b='0'">
         <xsl:attribute name ="fo:font-weight">
           <xsl:value-of select ="'normal'"/>
         </xsl:attribute>
@@ -1459,25 +1575,27 @@ exclude-result-prefixes="p a r xlink ">
     </xsl:choose>
   </xsl:template>
   <xsl:template name="tmpFontItalic">
+    <xsl:param name="i"/>
     <xsl:attribute name ="fo:font-style">
       <xsl:choose>
-        <xsl:when test ="@i='1'">
+        <xsl:when test ="$i='1'">
           <xsl:value-of select ="'italic'"/>
         </xsl:when >
-        <xsl:when test ="@i='0'">
+        <xsl:when test ="$i='0'">
           <xsl:value-of select ="'normal'"/>
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
   <xsl:template name="tmpKerning">
+    <xsl:param name="kern"/>
     <xsl:choose >
-      <xsl:when test ="@kern = '0'">
+      <xsl:when test ="$kern = '0'">
         <xsl:attribute name ="style:letter-kerning">
           <xsl:value-of select ="'false'"/>
         </xsl:attribute >
       </xsl:when >
-      <xsl:when test ="format-number(@kern,'#.##') &gt; 0">
+      <xsl:when test ="format-number($kern,'#.##') &gt; 0">
         <xsl:attribute name ="style:letter-kerning">
           <xsl:value-of select ="'true'"/>
         </xsl:attribute >
@@ -1485,17 +1603,18 @@ exclude-result-prefixes="p a r xlink ">
     </xsl:choose>
   </xsl:template>
   <xsl:template name="tmpstrike">
-    <xsl:if test ="@strike!='noStrike'">
+    <xsl:param name="strike"/>
+    <xsl:if test ="$strike!='noStrike'">
       <xsl:attribute name ="style:text-line-through-style">
         <xsl:value-of select ="'solid'"/>
       </xsl:attribute>
       <xsl:choose >
-        <xsl:when test ="@strike='dblStrike'">
+        <xsl:when test ="$strike='dblStrike'">
           <xsl:attribute name ="style:text-line-through-type">
             <xsl:value-of select ="'double'"/>
           </xsl:attribute>
         </xsl:when>
-        <xsl:when test ="@strike='sngStrike'">
+        <xsl:when test ="$strike='sngStrike'">
           <xsl:attribute name ="style:text-line-through-type">
             <xsl:value-of select ="'single'"/>
           </xsl:attribute>
@@ -2389,6 +2508,7 @@ exclude-result-prefixes="p a r xlink ">
   <!-- End of template - GenerateGUIDForFolderName -->
   <xsl:template name="tmpUnderLine">
     <xsl:param name="SMName"/>
+    <xsl:param name="u"/>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:if test ="./a:uFill/a:solidFill">
       <xsl:for-each select ="./a:uFill/a:solidFill">
@@ -2400,7 +2520,7 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:for-each>
     </xsl:if>
     <xsl:choose >
-      <xsl:when test ="./@u='dbl'">
+      <xsl:when test ="$u='dbl'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'solid'"/>
         </xsl:attribute>
@@ -2411,7 +2531,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='heavy'">
+      <xsl:when test ="$u='heavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'solid'"/>
         </xsl:attribute>
@@ -2419,7 +2539,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'bold'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dotted'">
+      <xsl:when test ="$u='dotted'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dotted'"/>
         </xsl:attribute>
@@ -2428,7 +2548,7 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:attribute>
       </xsl:when>
       <!-- dottedHeavy-->
-      <xsl:when test ="./@u='dottedHeavy'">
+      <xsl:when test ="$u='dottedHeavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dotted'"/>
         </xsl:attribute>
@@ -2436,7 +2556,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'bold'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dash'">
+      <xsl:when test ="$u='dash'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dash'"/>
         </xsl:attribute>
@@ -2444,7 +2564,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dashHeavy'">
+      <xsl:when test ="$u='dashHeavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dash'"/>
         </xsl:attribute>
@@ -2452,7 +2572,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'bold'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dashLong'">
+      <xsl:when test ="$u='dashLong'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'long-dash'"/>
         </xsl:attribute>
@@ -2460,7 +2580,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dashLongHeavy'">
+      <xsl:when test ="$u='dashLongHeavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'long-dash'"/>
         </xsl:attribute>
@@ -2468,7 +2588,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'bold'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dotDash'">
+      <xsl:when test ="$u='dotDash'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dot-dash'"/>
         </xsl:attribute>
@@ -2476,7 +2596,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dotDashHeavy'">
+      <xsl:when test ="$u='dotDashHeavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dot-dash'"/>
         </xsl:attribute>
@@ -2485,7 +2605,7 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:attribute>
       </xsl:when>
       <!-- dot-dot-dash-->
-      <xsl:when test ="./@u='dotDotDash'">
+      <xsl:when test ="$u='dotDotDash'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dot-dot-dash'"/>
         </xsl:attribute>
@@ -2493,7 +2613,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='dotDotDashHeavy'">
+      <xsl:when test ="$u='dotDotDashHeavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'dot-dot-dash'"/>
         </xsl:attribute>
@@ -2502,7 +2622,7 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:attribute>
       </xsl:when>
       <!-- Wavy and Heavy-->
-      <xsl:when test ="./@u='wavy'">
+      <xsl:when test ="$u='wavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'wave'"/>
         </xsl:attribute>
@@ -2510,7 +2630,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='wavyHeavy'">
+      <xsl:when test ="$u='wavyHeavy'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'wave'"/>
         </xsl:attribute>
@@ -2520,7 +2640,7 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:when>
       <!-- wavyDbl-->
       <!-- style:text-underline-style="wave" style:text-underline-type="double"-->
-      <xsl:when test ="./@u='wavyDbl'">
+      <xsl:when test ="$u='wavyDbl'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'wave'"/>
         </xsl:attribute>
@@ -2531,7 +2651,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='sng'">
+      <xsl:when test ="$u='sng'">
         <xsl:attribute name ="style:text-underline-type">
           <xsl:value-of select ="'single'"/>
         </xsl:attribute>
@@ -2539,7 +2659,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:value-of select ="'auto'"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="./@u='none'">
+      <xsl:when test ="$u='none'">
         <xsl:attribute name ="style:text-underline-style">
           <xsl:value-of select ="'none'"/>
         </xsl:attribute>
@@ -3385,7 +3505,9 @@ exclude-result-prefixes="p a r xlink ">
     <!--UnderLine-->
     <xsl:if test ="a:rPr/@u">
       <xsl:for-each select ="a:rPr">
-        <xsl:call-template name="tmpUnderLine"/>
+        <xsl:call-template name="tmpUnderLine">
+          <xsl:with-param name="u" select="@u"/>
+        </xsl:call-template>
       </xsl:for-each>
     </xsl:if >
     <!-- Italic-->
@@ -3531,6 +3653,7 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:for-each select="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr">
           <xsl:call-template name="tmpUnderLine">
             <xsl:with-param name="SMName" select="$SMName"/>
+            <xsl:with-param name="u" select="@u"/>
           </xsl:call-template>
             </xsl:for-each>
           </xsl:if>

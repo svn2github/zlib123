@@ -4079,6 +4079,42 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:variable>
 
         <xsl:choose>
+          <!--Added to retain text boxes-->
+          <xsl:when test="$enhancePath='M f0 f0 L f1 f0 L f1 f1 L f0 f1 L f0 f0 Z N '">
+            <draw:custom-shape draw:layer="layout" >
+              <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+                <xsl:with-param name ="layId" select="$layId"/>
+                <xsl:with-param name="sldId" select="$slideId" />
+                <xsl:with-param name="grID" select ="$GraphicId"/>
+                <xsl:with-param name ="prID" select="$ParaId" />
+                <xsl:with-param name="TypeId" select ="$TypeId" />
+                <xsl:with-param name="grpBln" select ="$grpBln" />
+                <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+                <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+                <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+              </xsl:call-template>
+              <draw:enhanced-geometry draw:type="non-primitive" svg:viewBox="0 0 21600 21600" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" draw:enhanced-path="M ?f8 ?f8 L ?f9 ?f8 ?f9 ?f9 ?f8 ?f9 ?f8 ?f8 Z N" draw:text-areas="?f10 ?f12 ?f11 ?f13">
+                <draw:equation draw:name="f0" draw:formula="left" />
+                <draw:equation draw:name="f1" draw:formula="right" />
+                <draw:equation draw:name="f2" draw:formula="top" />
+                <draw:equation draw:name="f3" draw:formula="bottom" />
+                <draw:equation draw:name="f4" draw:formula="?f3 - ?f2" />
+                <draw:equation draw:name="f5" draw:formula="?f1 - ?f0" />
+                <draw:equation draw:name="f6" draw:formula="?f5 / 21600" />
+                <draw:equation draw:name="f7" draw:formula="?f4 / 21600" />
+                <draw:equation draw:name="f8" draw:formula="0" />
+                <draw:equation draw:name="f9" draw:formula="21600" />
+                <draw:equation draw:name="f10" draw:formula="?f0 / ?f6" />
+                <draw:equation draw:name="f11" draw:formula="?f1 / ?f6" />
+                <draw:equation draw:name="f12" draw:formula="?f2 / ?f7" />
+                <draw:equation draw:name="f13" draw:formula="?f3 / ?f7" />
+              </draw:enhanced-geometry>
+            </draw:custom-shape>
+          </xsl:when>
           <!--Isosceles Triangle-->
           <xsl:when test="$enhancePath='M f32 f39 L f50 f32 L f40 f39 Z N ' or
                           $enhancePath='M f15 f6 L f7 f7 L f6 f7 Z N '">
@@ -4160,7 +4196,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <!--Down Arrow-->
           <xsl:when test="$enhancePath='M f18 f7 L f18 f19 L f7 f19 L f9 f8 L f8 f19 L f20 f19 L f20 f7 Z N ' or
-                          $enhancePath='M f5 f11 L f12 f11 L f12 f4 L f4 f6 L f12 f5 L f12 f13 L f5 f13 Z N '">
+                          $enhancePath='M f11 f4 L f11 f12 L f4 f12 L f6 f5 L f5 f12 L f13 f12 L f13 f4 Z N '">
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -4230,6 +4266,66 @@ Copyright (c) 2007, Sonata Software Limited
                 <draw:handle draw:handle-position="10800 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800" />
               </draw:enhanced-geometry>
             </draw:custom-shape>  
+          </xsl:when>
+          <!--Left Bracket-->
+          <xsl:when test="$enhancePath='M f7 f6 C f10 f6 f6 f28 f6 f17 L f6 f18 C f6 f29 f10 f7 f7 f7 '">
+            <draw:custom-shape draw:layer="layout" >
+              <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
+                <xsl:with-param name="sldId" select="$slideId" />
+                <xsl:with-param name ="grID" select ="$GraphicId" />
+                <xsl:with-param name ="prID" select ="$ParaId" />
+                <xsl:with-param name="TypeId" select ="$TypeId" />
+                <xsl:with-param name="grpBln" select ="$grpBln" />
+                <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+                <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+                <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+              </xsl:call-template>
+              <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="21600 0 0 10800 21600 21600" draw:text-areas="6350 ?f3 21600 ?f4" draw:type="left-bracket" draw:modifiers="1800"
+                draw:enhanced-path="M 21600 0 C 10800 0 0 ?f3 0 ?f1 L 0 ?f2 C 0 ?f4 10800 21600 21600 21600 N">
+                <xsl:call-template name="tmpFlip"/>
+                <draw:equation draw:name="f0" draw:formula="$0 /2"/>
+                <draw:equation draw:name="f1" draw:formula="top+$0 "/>
+                <draw:equation draw:name="f2" draw:formula="bottom-$0 "/>
+                <draw:equation draw:name="f3" draw:formula="top+?f0 "/>
+                <draw:equation draw:name="f4" draw:formula="bottom-?f0 "/>
+                <draw:handle draw:handle-position="left $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
+              </draw:enhanced-geometry>
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
+            </draw:custom-shape>
+          </xsl:when>
+          <!--Right Bracket-->
+          <xsl:when test ="$enhancePath='M f6 f6 C f10 f6 f7 f28 f7 f17 L f7 f18 C f7 f29 f10 f7 f6 f7 '">
+            <draw:custom-shape draw:layer="layout" >
+              <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
+                <xsl:with-param name="sldId" select="$slideId" />
+                <xsl:with-param name ="grID" select ="$GraphicId" />
+                <xsl:with-param name ="prID" select ="$ParaId" />
+                <xsl:with-param name="TypeId" select ="$TypeId" />
+                <xsl:with-param name="grpBln" select ="$grpBln" />
+                <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+                <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+                <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+              </xsl:call-template>
+              <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="0 0 0 21600 21600 10800" draw:text-areas="0 ?f3 15150 ?f4" draw:type="right-bracket" draw:modifiers="1800"
+                draw:enhanced-path="M 0 0 C 10800 0 21600 ?f3 21600 ?f1 L 21600 ?f2 C 21600 ?f4 10800 21600 0 21600 N">
+                <xsl:call-template name="tmpFlip"/>
+                <draw:equation draw:name="f0" draw:formula="$0 /2"/>
+                <draw:equation draw:name="f1" draw:formula="top+$0 "/>
+                <draw:equation draw:name="f2" draw:formula="bottom-$0 "/>
+                <draw:equation draw:name="f3" draw:formula="top+?f0 "/>
+                <draw:equation draw:name="f4" draw:formula="bottom-?f0 "/>
+                <draw:handle draw:handle-position="right $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
+              </draw:enhanced-geometry>
+              <!--<xsl:copy-of select="$varHyperLinksForShapes" />-->
+            </draw:custom-shape>
           </xsl:when>
           <!--Left Brace-->
           <xsl:when test="$enhancePath='S M f44 f45 A f54 f61 f3 f3 L f57 f64 A f54 f61 f8 f10 A f54 f61 f3 f10 L f57 f61 A f54 f61 f2 f3 Z N F M f44 f45 A f54 f61 f3 f3 L f57 f64 A f54 f61 f8 f10 A f54 f61 f3 f10 L f57 f61 A f54 f61 f2 f3 ' or
@@ -4312,7 +4408,8 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <!--Round Rectangle-->
           <xsl:when test="$enhancePath='M f30 f29 A f39 f40 f73 f56 L f29 f36 A f40 f57 f82 f60 L f37 f31 A f61 f62 f83 f78 L f32 f30 A f67 f39 f79 f80 Z N ' or
-                          $enhancePath='M f30 f29 A f39 f40 f73 f56 L f29 f36 A f40 f57 f82 f60 L f37 f31 A f61 f62 f83 f78 L f32 f30 A f67 f39 f79 f80 Z N '">
+                          $enhancePath='M f30 f29 A f39 f40 f73 f56 L f29 f36 A f40 f57 f82 f60 L f37 f31 A f61 f62 f83 f78 L f32 f30 A f67 f39 f79 f80 Z N ' or
+                          $enhancePath='M l x1 A x1 x1 cd2 cd4 L x2 t A x1 x1 3cd4 cd4 L r y2 A x1 x1 0 cd4 L x1 b A x1 x1 cd4 cd4 Z N '">
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -4571,7 +4668,8 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <!--Oval-->
           <xsl:when test="$enhancePath='M f28 f43 A f40 f41 f0 f1 A f40 f41 f2 f1 A f40 f41 f7 f1 A f40 f41 f1 f1 Z N ' or
-                          $enhancePath='M f52 f53 A f9 f9 f33 f36 Z N '">
+                          $enhancePath='M f52 f53 A f9 f9 f33 f36 Z N ' or
+                          $enhancePath='M l vc A wd2 hd2 cd2 cd4 A wd2 hd2 3cd4 cd4 A wd2 hd2 0 cd4 A wd2 hd2 cd4 cd4 Z N '">
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -5580,7 +5678,8 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <!--Cloud-->
           <xsl:when test="$enhancePath='M f20 f21 A f22 f23 f7 f24 A f25 f26 f8 f27 A f28 f29 f9 f30 A f31 f32 f10 f33 A f25 f34 f11 f35 A f36 f37 f12 f38 A f39 f40 f41 f42 A f43 f44 f45 f46 A f47 f48 f49 f50 A f51 f52 f13 f53 A f54 f29 f14 f55 Z N F M f56 f57 A f54 f29 f58 f59 M f60 f61 A f51 f52 f62 f63 M f64 f65 A f43 f44 f66 f67 M f68 f69 A f43 f44 f70 f71 M f72 f73 A f39 f40 f15 f74 M f75 f76 A f25 f34 f77 f78 M f79 f80 A f31 f32 f16 f81 M f82 f83 A f31 f32 f17 f84 M f85 f86 A f28 f29 f18 f87 M f88 f89 A f22 f23 f19 f90 M f91 f92 A f22 f23 f93 f94 ' or
-                          $enhancePath='M f3 f4 L f5 f6 L f7 f8 L f9 f10 L f9 f11 L f5 f12 L f13 f14 L f15 f16 L f17 f18 L f19 f20 L f21 f18 L f22 f18 L f23 f24 L f25 f16 L f26 f18 L f27 f28 L f29 f30 L f31 f2 L f32 f30 L f33 f28 L f34 f18 L f35 f16 L f36 f37 L f38 f24 L f39 f24 L f40 f18 L f41 f24 L f42 f16 L f43 f44 L f45 f46 L f47 f48 L f49 f48 L f49 f48 L f49 f48 L f50 f48 L f51 f52 L f53 f11 L f54 f10 L f55 f56 L f0 f57 L f55 f58 L f59 f60 L f61 f62 L f63 f64 L f63 f64 L f63 f64 L f65 f64 L f66 f67 L f68 f69 L f70 f71 L f70 f72 L f68 f73 L f74 f75 L f76 f77 L f78 f79 L f80 f81 L f82 f77 L f83 f84 L f85 f86 L f87 f86 L f87 f86 L f88 f86 L f88 f86 L f88 f86 L f40 f86 L f40 f86 L f89 f84 L f90 f91 L f92 f77 L f93 f81 L f35 f81 L f34 f77 L f33 f91 L f94 f91 L f95 f91 L f95 f91 L f95 f91 L f95 f77 L f96 f97 L f98 f99 L f25 f55 L f100 f0 L f101 f55 L f102 f54 L f103 f77 L f104 f86 L f105 f106 L f105 f107 L f105 f107 L f105 f108 L f105 f109 L f110 f109 L f15 f109 L f111 f109 L f111 f109 L f3 f112 L f113 f114 L f115 f116 L f117 f64 L f1 f118 L f117 f58 L f115 f119 L f113 f120 L f3 f4 '">
+                          $enhancePath='M f3 f4 L f5 f6 L f7 f8 L f9 f10 L f9 f11 L f5 f12 L f13 f14 L f15 f16 L f17 f18 L f19 f20 L f21 f18 L f22 f18 L f23 f24 L f25 f16 L f26 f18 L f27 f28 L f29 f30 L f31 f2 L f32 f30 L f33 f28 L f34 f18 L f35 f16 L f36 f37 L f38 f24 L f39 f24 L f40 f18 L f41 f24 L f42 f16 L f43 f44 L f45 f46 L f47 f48 L f49 f48 L f49 f48 L f49 f48 L f50 f48 L f51 f52 L f53 f11 L f54 f10 L f55 f56 L f0 f57 L f55 f58 L f59 f60 L f61 f62 L f63 f64 L f63 f64 L f63 f64 L f65 f64 L f66 f67 L f68 f69 L f70 f71 L f70 f72 L f68 f73 L f74 f75 L f76 f77 L f78 f79 L f80 f81 L f82 f77 L f83 f84 L f85 f86 L f87 f86 L f87 f86 L f88 f86 L f88 f86 L f88 f86 L f40 f86 L f40 f86 L f89 f84 L f90 f91 L f92 f77 L f93 f81 L f35 f81 L f34 f77 L f33 f91 L f94 f91 L f95 f91 L f95 f91 L f95 f91 L f95 f77 L f96 f97 L f98 f99 L f25 f55 L f100 f0 L f101 f55 L f102 f54 L f103 f77 L f104 f86 L f105 f106 L f105 f107 L f105 f107 L f105 f108 L f105 f109 L f110 f109 L f15 f109 L f111 f109 L f111 f109 L f3 f112 L f113 f114 L f115 f116 L f117 f64 L f1 f118 L f117 f58 L f115 f119 L f113 f120 L f3 f4 ' or
+                          $enhancePath='M f12 f13 C f14 f15 f16 f17 f18 f17 C f19 f20 f21 f22 f23 f24 C f25 f26 f27 f28 f29 f28 C f30 f31 f32 f33 f34 f35 C f36 f37 f38 f7 f39 f7 C f40 f7 f41 f42 f43 f44 C f45 f46 f47 f7 f48 f7 C f49 f7 f50 f51 f52 f53 C f54 f55 f56 f57 f56 f58 C f56 f59 f60 f61 f62 f63 C f64 f65 f8 f66 f8 f67 C f8 f68 f69 f70 f71 f72 C f71 f73 f74 f75 f76 f75 C f77 f75 f78 f79 f80 f81 C f82 f54 f83 f8 f84 f8 C f85 f8 f86 f87 f88 f89 C f90 f91 f92 f93 f94 f93 C f95 f93 f96 f97 f98 f99 C f100 f101 f102 f103 f102 f104 C f102 f105 f31 f106 f107 f108 C f109 f110 f7 f34 f7 f111 C f7 f112 f113 f114 f12 f13 Z N F M f12 f13 C f20 f115 f116 f117 f118 f119 F M f23 f24 C f61 f120 f121 f122 f123 f124 F M f34 f35 C f125 f126 f127 f128 f129 f130 F M f43 f44 C f131 f132 f133 f134 f135 f136 F M f52 f53 C f137 f138 f139 f140 f141 f142 F M f62 f63 C f143 f144 f145 f146 f147 f148 F M f149 f72 C f150 f151 f152 f153 f154 f155 F M f80 f81 C f156 f157 f158 f159 f160 f161 F M f162 f89 C f163 f164 f165 f166 f167 f168 F M f98 f99 C f169 f101 f170 f171 f172 f173 F M f107 f108 C f132 f174 f175 f176 f177 f178 M f286 f287 A f182 f182 f211 f215 Z N M f288 f289 A f184 f184 f211 f215 Z N M f260 f261 A f186 f186 f211 f215 Z N '">
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -5963,6 +6062,66 @@ Copyright (c) 2007, Sonata Software Limited
                 <draw:handle draw:handle-position="$0 $1" draw:handle-range-x-minimum="12427" draw:handle-range-x-maximum="21600" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="6079" />
               </draw:enhanced-geometry>
             </draw:custom-shape>
+          </xsl:when>
+          <!--Circular Arrow-->
+          <xsl:when test="$enhancePath='M f247 f248 A f50 f50 f211 f229 L f249 f250 A f35 f35 f213 f232 L f119 f118 L f184 f183 L f121 f120 Z N '">
+              <draw:custom-shape draw:layer="layout" >
+                <xsl:call-template name ="CreateShape">
+                  <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                  <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                  <xsl:with-param name ="layId" select="$layId"/>
+                  <xsl:with-param name="sldId" select="$slideId" />
+                  <xsl:with-param name ="grID" select ="$GraphicId" />
+                  <xsl:with-param name ="prID" select ="$ParaId" />
+                  <xsl:with-param name="TypeId" select ="$TypeId" />
+                  <xsl:with-param name="grpBln" select ="$grpBln" />
+                  <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                  <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+                  <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+                  <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+                </xsl:call-template>
+                <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="0 0 21600 21600" draw:modifiers="180 0 5500" draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N" draw:type="circular-arrow">
+                  <draw:equation draw:name="f0" draw:formula="$0" />
+                  <draw:equation draw:name="f1" draw:formula="$1" />
+                  <draw:equation draw:name="f2" draw:formula="$2" />
+                  <draw:equation draw:name="f3" draw:formula="10800+$2" />
+                  <draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))" />
+                  <draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))" />
+                  <draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))" />
+                  <draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))" />
+                  <draw:equation draw:name="f8" draw:formula="?f4 +10800" />
+                  <draw:equation draw:name="f9" draw:formula="?f5 +10800" />
+                  <draw:equation draw:name="f10" draw:formula="?f6 +10800" />
+                  <draw:equation draw:name="f11" draw:formula="?f7 +10800" />
+                  <draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))" />
+                  <draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))" />
+                  <draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))" />
+                  <draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))" />
+                  <draw:equation draw:name="f16" draw:formula="?f12 +10800" />
+                  <draw:equation draw:name="f17" draw:formula="?f13 +10800" />
+                  <draw:equation draw:name="f18" draw:formula="?f14 +10800" />
+                  <draw:equation draw:name="f19" draw:formula="?f15 +10800" />
+                  <draw:equation draw:name="f20" draw:formula="21600-?f3" />
+                  <draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))" />
+                  <draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))" />
+                  <draw:equation draw:name="f23" draw:formula="?f21 +10800" />
+                  <draw:equation draw:name="f24" draw:formula="?f22 +10800" />
+                  <draw:equation draw:name="f25" draw:formula="$2 -2700" />
+                  <draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))" />
+                  <draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))" />
+                  <draw:equation draw:name="f28" draw:formula="?f26 +10800" />
+                  <draw:equation draw:name="f29" draw:formula="?f27 +10800" />
+                  <draw:equation draw:name="f30" draw:formula="($1+45)*pi/180" />
+                  <draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))" />
+                  <draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31" />
+                  <draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)" />
+                  <draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)" />
+                  <draw:equation draw:name="f35" draw:formula="?f28+?f33" />
+                  <draw:equation draw:name="f36" draw:formula="?f29+?f34" />
+                  <draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800" />
+                  <draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800" />
+                </draw:enhanced-geometry>
+              </draw:custom-shape>
           </xsl:when>
           <!--U-Turn Arrow-->
           <xsl:when test="$enhancePath='M f43 f50 L f43 f67 A f67 f67 f5 f6 L f86 f43 A f67 f67 f7 f6 L f82 f72 L f49 f72 L f73 f62 L f78 f72 L f83 f72 L f83 f84 A f79 f79 f12 f13 L f84 f68 A f79 f79 f7 f13 L f68 f50 Z N '">
@@ -6806,7 +6965,8 @@ Copyright (c) 2007, Sonata Software Limited
             </draw:custom-shape>
           </xsl:when>
           <!-- Oval Callout -->
-          <xsl:when test="$enhancePath='M f143 f144 A f33 f33 f125 f135 L f97 f98 Z N '">
+          <xsl:when test="$enhancePath='M f143 f144 A f33 f33 f125 f135 L f97 f98 Z N ' or
+                          $enhancePath='M f141 f142 A f29 f29 f123 f133 L f95 f96 Z N '">
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -6964,7 +7124,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <!-- Rounded Rectangular Callout-->
           <xsl:when test="$enhancePath='M f13 f8 A f40 f41 f80 f65 L f96 f97 L f8 f14 L f8 f15 L f98 f99 L f8 f16 A f41 f46 f81 f68 L f100 f101 L f14 f9 L f15 f9 L f102 f103 L f16 f9 A f46 f51 f82 f71 L f104 f105 L f9 f15 L f9 f14 L f106 f107 L f9 f13 A f51 f40 f83 f74 L f108 f109 L f15 f8 L f14 f8 L f110 f111 Z N ' or
-                          $enhancePath='M f12 f7 a f35 f36 f71 f59 L f87 f88 L f7 f13 L f7 f14 L f89 f90 L f7 f15 A f36 f41 f72 f62 L f91 f92 L f13 f8 l f14 f8 L f93 f94 L f15 f8 A f41 f46 f73 f65 L f95 f96 L f8 f14 L f8 f13 L f97 f98 L f8 f12 A f46 f35 f74 f68 L f99 f100 L f14 f7 L f13 f7 L f101 f102 Z N '">
+                          $enhancePath='M f12 f7 A f35 f36 f71 f59 L f87 f88 L f7 f13 L f7 f14 L f89 f90 L f7 f15 A f36 f41 f72 f62 L f91 f92 L f13 f8 L f14 f8 L f93 f94 L f15 f8 A f41 f46 f73 f65 L f95 f96 L f8 f14 L f8 f13 L f97 f98 L f8 f12 A f46 f35 f74 f68 L f99 f100 L f14 f7 L f13 f7 L f101 f102 Z N '">
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -7076,7 +7236,8 @@ Copyright (c) 2007, Sonata Software Limited
             </draw:custom-shape>
           </xsl:when>
           <!-- Line Callout 2 -->
-          <xsl:when test="$enhancePath='M f26 f26 L f29 f26 L f29 f30 L f26 f30 Z N F M f51 f52 L f53 f54 L f55 f56 '">
+          <xsl:when test="$enhancePath='M f26 f26 L f29 f26 L f29 f30 L f26 f30 Z N F M f51 f52 L f53 f54 L f55 f56 ' or
+                          $enhancePath='M f10 f10 L f11 f10 L f11 f11 L f10 f11 Z N M f22 f23 L f24 f25 M f24 f25 L f26 f27 '">
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->

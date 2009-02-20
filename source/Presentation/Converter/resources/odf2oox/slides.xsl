@@ -1281,23 +1281,7 @@ Copyright (c) 2007, Sonata Software Limited
         </a:p >
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
-  <xsl:template name ="processBR">
-    <xsl:param name ="T" />
-    <a:br>
-      <a:rPr smtClean="0">
-        <!--Font Size -->
-        <xsl:if test ="$T !=''">
-          <xsl:call-template name ="fontStyles">
-            <xsl:with-param name ="Tid" select ="$T" />
-          </xsl:call-template>
-        </xsl:if>
-        <xsl:if test ="$T =''">
-          <a:latin charset="0" typeface="Arial" />
-        </xsl:if >
-      </a:rPr >
-    </a:br>
-  </xsl:template>
+  </xsl:template>  
   <xsl:template name ="footer">
     <xsl:param name ="footerId"></xsl:param>
     <xsl:param name ="SMName"/>

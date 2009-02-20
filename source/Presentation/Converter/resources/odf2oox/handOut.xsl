@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <!-- 
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -1211,7 +1211,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:when test ="style:paragraph-properties/@fo:text-align='center'">
             <xsl:value-of select ="'ctr'"/>
           </xsl:when>
-          <xsl:when test ="style:paragraph-properties/@fo:text-align='end'">
+          <xsl:when test ="style:paragraph-properties/@fo:text-align='end' or style:paragraph-properties/@fo:text-align='right'">
             <xsl:value-of select ="'r'"/>
           </xsl:when>
           <xsl:when test ="style:paragraph-properties/@fo:text-align='justify'">

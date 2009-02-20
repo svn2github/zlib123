@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -3349,7 +3349,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when>
       </xsl:choose>
       </xsl:when>
-      <xsl:when test="./a:defRPr/@strike">
+      <xsl:when test="(./a:defRPr/@strike) and (./a:defRPr/@strike != 'noStrike')">
       <xsl:attribute name ="style:text-line-through-style">
         <xsl:value-of select ="'solid'"/>
       </xsl:attribute>
@@ -3455,7 +3455,9 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <xsl:when test="./a:defRPr/@u">
         <xsl:for-each select ="./a:defRPr">
-          <xsl:call-template name="tmpUnderLine"/>
+          <xsl:call-template name="tmpUnderLine">
+            <xsl:with-param name="u" select="@u"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>

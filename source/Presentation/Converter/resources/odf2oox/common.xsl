@@ -924,7 +924,7 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:when test ="style:paragraph-properties/@fo:text-align='center'">
 								<xsl:value-of select ="'ctr'"/>
 							</xsl:when>
-							<xsl:when test ="style:paragraph-properties/@fo:text-align='end'">
+							<xsl:when test ="style:paragraph-properties/@fo:text-align='end' or style:paragraph-properties/@fo:text-align='right'">
 								<xsl:value-of select ="'r'"/>
 							</xsl:when>
 							<xsl:when test ="style:paragraph-properties/@fo:text-align='justify'">
@@ -1947,7 +1947,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:when test ="@fo:text-align='center'">
                     <xsl:value-of select ="'ctr'"/>
                   </xsl:when>
-                  <xsl:when test ="@fo:text-align='end'">
+                  <xsl:when test ="@fo:text-align='end' or @fo:text-align='right'">
                     <xsl:value-of select ="'r'"/>
                   </xsl:when>
                   <xsl:when test ="@fo:text-align='justify'">
@@ -2655,6 +2655,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:call-template name ="processBR">
             <xsl:with-param name ="T" select ="@text:style-name" />
             <xsl:with-param name ="prClassName" select ="$prClassName"/>
+            <xsl:with-param name ="inSideSpan" select ="'Yes'"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:if>
@@ -2721,6 +2722,25 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <xsl:template name ="processBR">
     <xsl:param name ="T" />
+    <xsl:param name ="inSideSpan" />
+    <xsl:if test="$inSideSpan='Yes'">
+      <xsl:if test="./node()">
+    <a:r>
+      <a:rPr smtClean="0">
+        <!--Font Size -->
+            <xsl:if test ="not($T ='')">
+          <xsl:call-template name ="fontStyles">
+            <xsl:with-param name ="Tid" select ="$T" />
+          </xsl:call-template>
+        </xsl:if>
+      </a:rPr >
+      <a:t>
+        <xsl:call-template name ="insertTab" />
+            <!--<xsl:value-of select="./node()"/>-->
+      </a:t>
+    </a:r>
+      </xsl:if>
+    </xsl:if>
     <a:br>
       <a:rPr smtClean="0">
         <!--Font Size -->
@@ -2729,6 +2749,9 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="Tid" select ="$T" />
           </xsl:call-template>
         </xsl:if>
+        <xsl:if test ="$T =''">
+          <a:latin charset="0" typeface="Arial" />
+        </xsl:if >
       </a:rPr >
 
     </a:br>
@@ -2992,7 +3015,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:when test ="style:paragraph-properties/@fo:text-align='center'">
                 <xsl:value-of select ="'ctr'"/>
               </xsl:when>
-              <xsl:when test ="style:paragraph-properties/@fo:text-align='end'">
+              <xsl:when test ="style:paragraph-properties/@fo:text-align='end' or style:paragraph-properties/@fo:text-align='right'">
                 <xsl:value-of select ="'r'"/>
               </xsl:when>
               <xsl:when test ="style:paragraph-properties/@fo:text-align='justify'">
@@ -4958,157 +4981,270 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name="tmpgetCustShapeType">
     <xsl:choose>
       <!-- Text Box -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt202') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt202' and 
+                      draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
         <xsl:value-of select ="'TextBox Custom '"/>
       </xsl:when>
       <!-- Oval -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='ellipse')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='ellipse'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Oval')) ">
         <xsl:value-of select ="'Oval Custom '"/>
       </xsl:when>
+
+      
+      
+      <!--#####################Arrows#############################-->
       <!-- U-Turn Arrow (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 877824 L 0 384048 W 0 0 768096 768096 0 384048 384049 0 L 393192 0 W 9144 0 777240 768096 393192 0 777240 384049 L 777240 438912 L 886968 438912 L 667512 658368 L 448056 438912 L 557784 438912 L 557784 384048 A 228600 219456 557784 548640 557784 384048 393192 219456 L 384048 219456 A 219456 219456 548640 548640 384048 219456 219456 384048 L 219456 877824 Z N')">
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100' and draw:enhanced-geometry/@draw:enhanced-path='M 0 877824 L 0 384048 W 0 0 768096 768096 0 384048 384049 0 L 393192 0 W 9144 0 777240 768096 393192 0 777240 384049 L 777240 438912 L 886968 438912 L 667512 658368 L 448056 438912 L 557784 438912 L 557784 384048 A 228600 219456 557784 548640 557784 384048 393192 219456 L 384048 219456 A 219456 219456 548640 548640 384048 219456 219456 384048 L 219456 877824 Z N')
+                        or draw:enhanced-geometry/@draw:enhanced-path = 'M ?f3 ?f6 L ?f3 ?f24 A ?f72 ?f73 ?f74 ?f75 ?f3 ?f24 ?f69 ?f71  W ?f76 ?f77 ?f78 ?f79 ?f3 ?f24 ?f69 ?f71 L ?f31 ?f5 A ?f115 ?f116 ?f117 ?f118 ?f31 ?f5 ?f112 ?f114  W ?f119 ?f120 ?f121 ?f122 ?f31 ?f5 ?f112 ?f114 L ?f22 ?f21 ?f4 ?f21 ?f28 ?f19 ?f29 ?f21 ?f30 ?f21 ?f30 ?f27 A ?f162 ?f163 ?f164 ?f165 ?f30 ?f27 ?f159 ?f161  W ?f166 ?f167 ?f168 ?f169 ?f30 ?f27 ?f159 ?f161 L ?f27 ?f15 A ?f198 ?f199 ?f200 ?f201 ?f27 ?f15 ?f195 ?f197  W ?f202 ?f203 ?f204 ?f205 ?f27 ?f15 ?f195 ?f197 L ?f15 ?f6 Z N'">
         <xsl:value-of select ="'U-Turn Arrow'"/>
       </xsl:when>
       <!-- Isosceles Triangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='isosceles-triangle')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='isosceles-triangle' 
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f3 L ?f11 ?f2 ?f1 ?f3 Z N')">
         <xsl:value-of select ="'Isosceles Triangle '"/>
       </xsl:when>
-      <!-- Right Arrow (Added by Mathi as on 4/7/2007 -->
-      <xsl:when test = "(draw:enhanced-geometry/@draw:type='right-arrow')">
-        <xsl:value-of select ="'Right Arrow '"/>
-      </xsl:when>
-      <!-- Left Arrow (Added by Mathi as on 5/7/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-arrow')">
-        <xsl:value-of select ="'Left Arrow '"/>
-      </xsl:when>
-      <!-- Up Arrow (Added by Mathi as on 19/7/2007)-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='up-arrow')">
-        <xsl:value-of select ="'Up Arrow '"/>
-      </xsl:when>
-      <!-- Down Arrow (Added by Mathi as on 19/7/2007)-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='down-arrow')">
-        <xsl:value-of select ="'Down Arrow '"/>
-      </xsl:when>
-      <!-- Left-Right Arrow (Added by Mathi as on 19/7/2007)-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-right-arrow')">
-        <xsl:value-of select ="'Left-Right Arrow '"/>
-      </xsl:when>
-      <!-- Up-Down Arrow (Added by Mathi as on 19/7/2007)-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='up-down-arrow')">
-        <xsl:value-of select ="'Up-Down Arrow '"/>
-      </xsl:when>
-      <!-- Right Triangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='right-triangle')">
-        <xsl:value-of select ="'Right Triangle '"/>
-      </xsl:when>
-      <!-- Parallelogram -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='parallelogram')">
-        <xsl:value-of select ="'Parallelogram '"/>
-      </xsl:when>
-      <!-- Trapezoid (Added by A.Mathi as on 24/07/2007) -->
-      <xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
-									(draw:enhanced-geometry/@draw:enhanced-path='M 0 1216152 L 228600 0 L 685800 0 L 914400 1216152 Z N')">
-        <xsl:value-of select ="'Trapezoid '"/>
-      </xsl:when>
-      <xsl:when test="(draw:enhanced-geometry/@draw:type='trapezoid')">
-        <xsl:value-of select ="'flowchart-manual-operation '"/>
-      </xsl:when>
-      <!-- Diamond -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='diamond')and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N')">
-        <xsl:value-of select ="'Diamond '"/>
-      </xsl:when>
-      <!-- Regular Pentagon -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='pentagon') and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N')">
-        <xsl:value-of select ="'Regular Pentagon '"/>
-      </xsl:when>
-      <!-- Hexagon -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='hexagon')">
-        <xsl:value-of select ="'Hexagon '"/>
-      </xsl:when>
-      <!-- Octagon -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='octagon')">
-        <xsl:value-of select ="'Octagon '"/>
-      </xsl:when>
-      <!-- Cube -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='cube')">
-        <xsl:value-of select ="'Cube '"/>
-      </xsl:when>
-      <!-- Can -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='can')">
-        <xsl:value-of select ="'Can '"/>
-      </xsl:when>
-      <!-- Circular Arrow -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='circular-arrow')">
-        <xsl:value-of select ="'circular-arrow'"/>
-      </xsl:when>
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedUpArrow')">
-        <xsl:value-of select ="'curvedUpArrow'"/>
-      </xsl:when>
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedRightArrow')">
-        <xsl:value-of select ="'curvedRightArrow'"/>
-      </xsl:when>
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedDownArrow')">
-        <xsl:value-of select ="'curvedDownArrow'"/>
-      </xsl:when>
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedLeftArrow')">
-        <xsl:value-of select ="'curvedLeftArrow'"/>
-      </xsl:when>
-      <!-- Chord -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
-                       (draw:enhanced-geometry/@draw:enhanced-path='M 780489 780489 W 0 0 914400 914400 780489 780489 457200 0 Z N')">
-        <xsl:value-of select ="'Chord'"/>
-      </xsl:when>
       <!-- LeftUp Arrow -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt89') and
-								 (draw:enhanced-geometry/@draw:enhanced-path='M 0 ?f5 L ?f2 ?f0 ?f2 ?f7 ?f7 ?f7 ?f7 ?f2 ?f0 ?f2 ?f5 0 21600 ?f2 ?f1 ?f2 ?f1 ?f1 ?f2 ?f1 ?f2 21600 Z N')">
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt89' and
+								    draw:enhanced-geometry/@draw:enhanced-path='M 0 ?f5 L ?f2 ?f0 ?f2 ?f7 ?f7 ?f7 ?f7 ?f2 ?f0 ?f2 ?f5 0 21600 ?f2 ?f1 ?f2 ?f1 ?f1 ?f2 ?f1 ?f2 21600 Z N')
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path ='M ?f0 ?f16 L ?f10 ?f13 ?f10 ?f20 ?f18 ?f20 ?f18 ?f10 ?f12 ?f10 ?f15 ?f2 ?f1 ?f10 ?f19 ?f10 ?f19 ?f21 ?f10 ?f21 ?f10 ?f3 Z N')">
         <xsl:value-of select ="'leftUpArrow'"/>
       </xsl:when>
       <!-- BentUp Arrow -->
       <!-- Fix for the bug 24, Internal Defects.xls, date 9th Aug '07, by vijayeta-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
-								 (draw:enhanced-geometry/@draw:enhanced-path='M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N')">
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100' and
+								 draw:enhanced-geometry/@draw:enhanced-path='M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N')
+                 or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f19 L ?f16 ?f19 ?f16 ?f10 ?f12 ?f10 ?f14 ?f2 ?f1 ?f10 ?f17 ?f10 ?f17 ?f3 ?f0 ?f3 Z N')">
         <xsl:value-of select ="'bentUpArrow'"/>
       </xsl:when>
-      <!--End of Fix for the bug 24, Internal Defects.xls, date 9th Aug '07, by vijayeta-->
-      <!-- Cross (Added by Mathi on 19/7/2007)-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='cross')">
-        <xsl:value-of select ="'plus '"/>
+      <!-- Quad Arrow -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='quad-arrow' 
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f6 L ?f14 ?f22 ?f14 ?f24 ?f19 ?f24 ?f19 ?f14 ?f16 ?f14 ?f9 ?f2 ?f17 ?f14 ?f20 ?f14 ?f20 ?f24 ?f21 ?f24 ?f21 ?f22 ?f1 ?f6 ?f21 ?f23 ?f21 ?f25 ?f20 ?f25 ?f20 ?f26 ?f17 ?f26 ?f9 ?f3 ?f16 ?f26 ?f19 ?f26 ?f19 ?f25 ?f14 ?f25 ?f14 ?f23 Z N')">
+        <xsl:value-of select ="'Quad Arrow '"/>
       </xsl:when>
-      <!-- "No Symbol" (Added by A.Mathi as on 19/07/2007)-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='forbidden')">
-        <xsl:value-of select ="'noSmoking '"/>
+      <!-- Notched Right Arrow -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='notched-right-arrow'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f14 L ?f12 ?f14 ?f12 ?f2 ?f1 ?f6 ?f12 ?f3 ?f12 ?f15 ?f0 ?f15 ?f16 ?f6 Z N')	">
+        <xsl:value-of select ="'notchedRightArrow'"/>
+      </xsl:when>
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='curvedUpArrow'
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Curved Up Arrow'))">
+        <xsl:value-of select ="'curvedUpArrow'"/>
+      </xsl:when>
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='curvedRightArrow' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f3 ?f17 A ?f99 ?f100 ?f101 ?f102 ?f3 ?f17 ?f96 ?f98  W ?f103 ?f104 ?f105 ?f106 ?f3 ?f17 ?f96 ?f98 L ?f40 ?f36 ?f4 ?f39 ?f40 ?f37 ?f40 ?f33 A ?f146 ?f147 ?f148 ?f149 ?f40 ?f33 ?f143 ?f145  W ?f150 ?f151 ?f152 ?f153 ?f40 ?f33 ?f143 ?f145 Z N S M ?f4 ?f14 A ?f193 ?f194 ?f195 ?f196 ?f4 ?f14 ?f190 ?f192  W ?f197 ?f198 ?f199 ?f200 ?f4 ?f14 ?f190 ?f192 A ?f240 ?f241 ?f242 ?f243 ?f190 ?f192 ?f237 ?f239  W ?f244 ?f245 ?f246 ?f247 ?f190 ?f192 ?f237 ?f239 Z N F M ?f3 ?f17 A ?f99 ?f100 ?f101 ?f102 ?f3 ?f17 ?f96 ?f98  W ?f103 ?f104 ?f105 ?f106 ?f3 ?f17 ?f96 ?f98 L ?f40 ?f36 ?f4 ?f39 ?f40 ?f37 ?f40 ?f33 A ?f146 ?f147 ?f148 ?f149 ?f40 ?f33 ?f143 ?f145  W ?f150 ?f151 ?f152 ?f153 ?f40 ?f33 ?f143 ?f145 L ?f3 ?f17 A ?f268 ?f269 ?f270 ?f271 ?f3 ?f17 ?f265 ?f267  W ?f272 ?f273 ?f274 ?f275 ?f3 ?f17 ?f265 ?f267 L ?f4 ?f14 A ?f193 ?f194 ?f195 ?f196 ?f4 ?f14 ?f190 ?f192  W ?f197 ?f198 ?f199 ?f200 ?f4 ?f14 ?f190 ?f192 N')">
+        <xsl:value-of select ="'curvedRightArrow'"/>
+      </xsl:when>
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='curvedDownArrow' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f38 ?f6 L ?f35 ?f39 ?f31 ?f39 A ?f99 ?f100 ?f101 ?f102 ?f31 ?f39 ?f96 ?f98  W ?f103 ?f104 ?f105 ?f106 ?f31 ?f39 ?f96 ?f98 L ?f25 ?f5 A ?f146 ?f147 ?f148 ?f149 ?f25 ?f5 ?f143 ?f145  W ?f150 ?f151 ?f152 ?f153 ?f25 ?f5 ?f143 ?f145 L ?f36 ?f39 Z N S M ?f48 ?f47 A ?f193 ?f194 ?f195 ?f196 ?f48 ?f47 ?f190 ?f192  W ?f197 ?f198 ?f199 ?f200 ?f48 ?f47 ?f190 ?f192 L ?f3 ?f6 A ?f240 ?f241 ?f242 ?f243 ?f3 ?f6 ?f237 ?f239  W ?f244 ?f245 ?f246 ?f247 ?f3 ?f6 ?f237 ?f239 Z N F M ?f48 ?f47 A ?f193 ?f194 ?f195 ?f196 ?f48 ?f47 ?f190 ?f192  W ?f197 ?f198 ?f199 ?f200 ?f48 ?f47 ?f190 ?f192 L ?f3 ?f6 A ?f268 ?f269 ?f270 ?f271 ?f3 ?f6 ?f265 ?f267  W ?f272 ?f273 ?f274 ?f275 ?f3 ?f6 ?f265 ?f267 L ?f25 ?f5 A ?f146 ?f147 ?f148 ?f149 ?f25 ?f5 ?f143 ?f145  W ?f150 ?f151 ?f152 ?f153 ?f25 ?f5 ?f143 ?f145 L ?f36 ?f39 ?f38 ?f6 ?f35 ?f39 ?f31 ?f39 A ?f99 ?f100 ?f101 ?f102 ?f31 ?f39 ?f96 ?f98  W ?f103 ?f104 ?f105 ?f106 ?f31 ?f39 ?f96 ?f98 N')">
+        <xsl:value-of select ="'curvedDownArrow'"/>
+      </xsl:when>
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='curvedLeftArrow' 
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f3 ?f39 L ?f40 ?f36 ?f40 ?f32 A ?f97 ?f98 ?f99 ?f100 ?f40 ?f32 ?f94 ?f96  W ?f101 ?f102 ?f103 ?f104 ?f40 ?f32 ?f94 ?f96 A ?f144 ?f145 ?f146 ?f147 ?f94 ?f96 ?f141 ?f143  W ?f148 ?f149 ?f150 ?f151 ?f94 ?f96 ?f141 ?f143 L ?f40 ?f37 Z N S M ?f4 ?f26 A ?f191 ?f192 ?f193 ?f194 ?f4 ?f26 ?f188 ?f190  W ?f195 ?f196 ?f197 ?f198 ?f4 ?f26 ?f188 ?f190 L ?f3 ?f5 A ?f238 ?f239 ?f240 ?f241 ?f3 ?f5 ?f235 ?f237  W ?f242 ?f243 ?f244 ?f245 ?f3 ?f5 ?f235 ?f237 Z N F M ?f4 ?f26 A ?f191 ?f192 ?f193 ?f194 ?f4 ?f26 ?f188 ?f190  W ?f195 ?f196 ?f197 ?f198 ?f4 ?f26 ?f188 ?f190 L ?f3 ?f5 A ?f238 ?f239 ?f240 ?f241 ?f3 ?f5 ?f235 ?f237  W ?f242 ?f243 ?f244 ?f245 ?f3 ?f5 ?f235 ?f237 L ?f4 ?f26 A ?f266 ?f267 ?f268 ?f269 ?f4 ?f26 ?f263 ?f265  W ?f270 ?f271 ?f272 ?f273 ?f4 ?f26 ?f263 ?f265 L ?f40 ?f37 ?f3 ?f39 ?f40 ?f36 ?f40 ?f32 A ?f97 ?f98 ?f99 ?f100 ?f40 ?f32 ?f94 ?f96  W ?f101 ?f102 ?f103 ?f104 ?f40 ?f32 ?f94 ?f96 N')">
+        <xsl:value-of select ="'curvedLeftArrow'"/>
+      </xsl:when>
+      <!-- Left-Right Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='left-right-arrow' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f6 L ?f13 ?f2 ?f13 ?f16 ?f14 ?f16 ?f14 ?f2 ?f1 ?f6 ?f14 ?f3 ?f14 ?f17 ?f13 ?f17 ?f13 ?f3 Z N')">
+        <xsl:value-of select ="'Left-Right Arrow '"/>
+      </xsl:when>
+      <!-- Up-Down Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='up-down-arrow' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Up-Down Arrow'))">
+        <xsl:value-of select ="'Up-Down Arrow '"/>
+      </xsl:when>
+      <!-- Right Arrow (Added by Mathi as on 4/7/2007 -->
+      <xsl:when test = "draw:enhanced-geometry/@draw:type='right-arrow' 
+                         or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 ?f0 L ?f1 ?f0 ?f1 0 21600 10800 ?f1 21600 ?f1 ?f2 0 ?f2 Z N') ">
+        <xsl:value-of select ="'Right Arrow '"/>
+      </xsl:when>
+      <!-- Left Arrow (Added by Mathi as on 5/7/2007) -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='left-arrow' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 21600 ?f0 L ?f1 ?f0 ?f1 0 0 10800 ?f1 21600 ?f1 ?f2 21600 ?f2 Z N')">
+        <xsl:value-of select ="'Left Arrow '"/>
+      </xsl:when>
+      <!-- Up Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='up-arrow' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 21600 L ?f0 ?f1 0 ?f1 10800 0 21600 ?f1 ?f2 ?f1 ?f2 21600 Z N')">
+        <xsl:value-of select ="'Up Arrow '"/>
+      </xsl:when>
+      <!-- Down Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='down-arrow' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 0 L ?f0 ?f1 0 ?f1 10800 21600 21600 ?f1 ?f2 ?f1 ?f2 0 Z N')">
+        <xsl:value-of select ="'Down Arrow '"/>
+      </xsl:when>
+
+      <!-- Circular Arrow -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='circular-arrow'
+           or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Circular Arrow'))">
+        <xsl:value-of select ="'circular-arrow'"/>
       </xsl:when>
       <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 868680 L 0 457772 W 0 101727 712090 813817 0 457772 356046 101727 L 610362 101727 L 610362 0 L 813816 203454 L 610362 406908 L 610362 305181 L 356045 305181 A 203454 305181 508636 610363 356045 305181 203454 457772 L 203454 868680 Z N')">
         <xsl:value-of select ="'bentArrow '"/>
       </xsl:when>
-		<!-- Quad Arrow -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='quad-arrow')">
-			<xsl:value-of select ="'Quad Arrow '"/>
-		</xsl:when>
-		<!-- Block Arc -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='block-arc')">
-			<xsl:value-of select ="'Block Arc '"/>
-		</xsl:when>
-		<!-- Notched Right Arrow -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='notched-right-arrow')">
-			<xsl:value-of select ="'notchedRightArrow'"/>
-		</xsl:when>
-		<!-- Pentagon -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='pentagon-right')">
-			<xsl:value-of select ="'Pentagon '"/>
-		</xsl:when>
-		<!-- Chevron -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='chevron')">
-			<xsl:value-of select ="'Chevron '"/>
-		</xsl:when>
-		
       <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
       <xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
         <xsl:value-of select ="'bentUpArrow '"/>
       </xsl:when>
+
+
+
+
+
+
+      <!--#####################         BASIC SHAPES     #############################-->
+
+      <!-- Right Triangle -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='right-triangle' 
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f3 L ?f0 ?f2 ?f1 ?f3 Z N')">
+        <xsl:value-of select ="'Right Triangle '"/>
+      </xsl:when>
+      <!-- Parallelogram -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='parallelogram'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f3 L ?f14 ?f2 ?f1 ?f2 ?f16 ?f3 Z N')">
+        <xsl:value-of select ="'Parallelogram '"/>
+      </xsl:when>
+      <!-- Trapezoid (Added by A.Mathi as on 24/07/2007) -->
+      <xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt100' and 
+									draw:enhanced-geometry/@draw:enhanced-path='M 0 1216152 L 228600 0 L 685800 0 L 914400 1216152 Z N')
+                   or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f3 L ?f14 ?f2 ?f15 ?f2 ?f1 ?f3 Z N')">
+        <xsl:value-of select ="'Trapezoid '"/>
+      </xsl:when>
+      <xsl:when test="draw:enhanced-geometry/@draw:type='trapezoid'">
+        <xsl:value-of select ="'flowchart-manual-operation '"/>
+      </xsl:when>
+      <!-- Diamond -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='diamond' and
+									 draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N')
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f7 L ?f11 ?f2 ?f1 ?f7 ?f11 ?f3 Z N')	">
+        <xsl:value-of select ="'Diamond '"/>
+      </xsl:when>
+
+      <!-- Cube -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='cube'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f0 ?f8 L ?f12 ?f8 ?f12 ?f3 ?f0 ?f3 Z N S M ?f12 ?f8 L ?f1 ?f2 ?f1 ?f9 ?f12 ?f3 Z N S M ?f0 ?f8 L ?f8 ?f2 ?f1 ?f2 ?f12 ?f8 Z N F M ?f0 ?f8 L ?f8 ?f2 ?f1 ?f2 ?f1 ?f9 ?f12 ?f3 ?f0 ?f3 Z M ?f0 ?f8 L ?f12 ?f8 ?f1 ?f2 M ?f12 ?f8 L ?f12 ?f3 N')	">
+        <xsl:value-of select ="'Cube '"/>
+      </xsl:when>
+      <!-- Can -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='can'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f2 ?f13 A ?f55 ?f56 ?f57 ?f58 ?f2 ?f13 ?f52 ?f54  W ?f59 ?f60 ?f61 ?f62 ?f2 ?f13 ?f52 ?f54 L ?f3 ?f15 A ?f102 ?f103 ?f104 ?f105 ?f3 ?f15 ?f99 ?f101  W ?f106 ?f107 ?f108 ?f109 ?f3 ?f15 ?f99 ?f101 Z N S M ?f2 ?f13 A ?f126 ?f127 ?f128 ?f129 ?f2 ?f13 ?f123 ?f125  W ?f130 ?f131 ?f132 ?f133 ?f2 ?f13 ?f123 ?f125 A ?f142 ?f143 ?f144 ?f145 ?f123 ?f125 ?f140 ?f141  W ?f146 ?f147 ?f148 ?f149 ?f123 ?f125 ?f140 ?f141 Z N F M ?f3 ?f13 A ?f102 ?f154 ?f104 ?f155 ?f3 ?f13 ?f99 ?f153  W ?f106 ?f156 ?f108 ?f157 ?f3 ?f13 ?f99 ?f153 A ?f166 ?f167 ?f168 ?f169 ?f99 ?f153 ?f164 ?f165  W ?f170 ?f171 ?f172 ?f173 ?f99 ?f153 ?f164 ?f165 L ?f3 ?f15 A ?f102 ?f103 ?f104 ?f105 ?f3 ?f15 ?f99 ?f101  W ?f106 ?f107 ?f108 ?f109 ?f3 ?f15 ?f99 ?f101 L ?f2 ?f13 N')	">
+        <xsl:value-of select ="'Can '"/>
+      </xsl:when>
+
+
+      <!-- Chord -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100' and 
+                       draw:enhanced-geometry/@draw:enhanced-path='M 780489 780489 W 0 0 914400 914400 780489 780489 457200 0 Z N')
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f51 ?f52 A ?f122 ?f123 ?f124 ?f125 ?f51 ?f52 ?f119 ?f121  W ?f126 ?f127 ?f128 ?f129 ?f51 ?f52 ?f119 ?f121 Z N')	">
+        <xsl:value-of select ="'Chord'"/>
+      </xsl:when>
+
+      <!--End of Fix for the bug 24, Internal Defects.xls, date 9th Aug '07, by vijayeta-->
+      <!-- Cross (Added by Mathi on 19/7/2007)-->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='cross'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f8 L ?f8 ?f8 ?f8 ?f2 ?f9 ?f2 ?f9 ?f8 ?f1 ?f8 ?f1 ?f10 ?f9 ?f10 ?f9 ?f3 ?f8 ?f3 ?f8 ?f10 ?f0 ?f10 Z N')	">
+        <xsl:value-of select ="'plus '"/>
+      </xsl:when>
+      <!-- "No Symbol" (Added by A.Mathi as on 19/07/2007)-->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='forbidden'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'No Smoking'))	">
+        <xsl:value-of select ="'noSmoking '"/>
+      </xsl:when>     
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='block-arc')">
+			<xsl:value-of select ="'Block Arc '"/>
+		</xsl:when>		
+		<!-- Pentagon -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='pentagon-right'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f34 ?f38 L ?f11 ?f4 ?f37 ?f38 ?f36 ?f39 ?f35 ?f39 Z N')	">
+			<xsl:value-of select ="'Pentagon '"/>
+		</xsl:when>
+		<!-- Chevron -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='chevron'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Chevron'))	">
+			<xsl:value-of select ="'Chevron '"/>
+		</xsl:when>
+		
+      <!-- Heptagon -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='HEPTAGON'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f19 ?f26 L ?f20 ?f25 ?f9 ?f2 ?f23 ?f25 ?f24 ?f26 ?f22 ?f27 ?f21 ?f27 Z N')">
+        <xsl:value-of select="'Heptagon '"/>
+      </xsl:when>
+      <!-- Regular Pentagon -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='pentagon' and
+									 draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N')
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f34 ?f38 L ?f11 ?f4 ?f37 ?f38 ?f36 ?f39 ?f35 ?f39 Z N')">
+        <xsl:value-of select ="'Regular Pentagon '"/>
+      </xsl:when>
+      <!-- Hexagon -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='hexagon'
+                         or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f2 ?f8 L ?f15 ?f23 ?f16 ?f23 ?f3 ?f8 ?f16 ?f24 ?f15 ?f24 Z N')">
+        <xsl:value-of select ="'Hexagon '"/>
+      </xsl:when>
+      <!-- Octagon -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='octagon'
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f8 L ?f8 ?f2 ?f9 ?f2 ?f1 ?f8 ?f1 ?f10 ?f9 ?f3 ?f8 ?f3 ?f0 ?f10 Z N')">
+        <xsl:value-of select ="'Octagon '"/>
+      </xsl:when>
+      <!-- Decagon -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='DECAGON'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Decagon'))">
+        <xsl:value-of select="'Decagon '"/>
+      </xsl:when>
+      <!-- Dodecagon -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='DODECAGON'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Dodecagon'))">
+        <xsl:value-of select="'Dodecagon '"/>
+      </xsl:when>
+      <!-- Half Frame -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='HALFFRAME'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f2 L ?f1 ?f2 ?f12 ?f10 ?f8 ?f10 ?f8 ?f14 ?f0 ?f3 Z N')">
+        <xsl:value-of select="'Half Frame '"/>
+      </xsl:when>
+      <!-- Pie -->
+      <xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt100' and 
+						draw:enhanced-geometry/@draw:enhanced-path='V 0 0 21600 21600 ?f5 ?f7 ?f1 ?f3 L 10800 10800 Z N')
+             or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f35 ?f36 A ?f120 ?f121 ?f122 ?f123 ?f35 ?f36 ?f117 ?f119  W ?f124 ?f125 ?f126 ?f127 ?f35 ?f36 ?f117 ?f119 L ?f11 ?f8 Z N')">
+        <xsl:value-of select="'Pie '"/>
+      </xsl:when>
+      <!-- Frame -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='frame'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z M ?f8 ?f8 L ?f8 ?f10 ?f9 ?f10 ?f9 ?f8 Z N')">
+        <xsl:value-of select="'Frame '"/>
+      </xsl:when>
+      <!-- L-Shape -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='CORNER'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f2 L ?f9 ?f2 ?f9 ?f11 ?f1 ?f11 ?f1 ?f3 ?f0 ?f3 Z N')">
+        <xsl:value-of select="'L-Shape '"/>
+      </xsl:when>
+      <!-- Diagonal Stripe -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='diagstripe'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f14 L ?f11 ?f2 ?f1 ?f2 ?f0 ?f3 Z N')">
+        <xsl:value-of select="'Diagonal Stripe '"/>
+      </xsl:when>
+      <!-- Plaque -->
+      <xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt21' and 
+						draw:enhanced-geometry/@draw:enhanced-path='M ?f0 0 Y 0 ?f1 L 0 ?f2 X ?f0 21600 L ?f3 21600 Y 21600 ?f2 L 21600 ?f1 X ?f3 0 Z N')
+            or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Plaque'))">
+        <xsl:value-of select="'Plaque '"/>
+      </xsl:when>
+      <!-- Bevel -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='quad-bevel'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f12 ?f12 L ?f13 ?f12 ?f13 ?f14 ?f12 ?f14 Z N S M ?f0 ?f2 L ?f1 ?f2 ?f13 ?f12 ?f12 ?f12 Z N S M ?f0 ?f3 L ?f12 ?f14 ?f13 ?f14 ?f1 ?f3 Z N S M ?f0 ?f2 L ?f12 ?f12 ?f12 ?f14 ?f0 ?f3 Z N S M ?f1 ?f2 L ?f1 ?f3 ?f13 ?f14 ?f13 ?f12 Z N F M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z M ?f12 ?f12 L ?f13 ?f12 ?f13 ?f14 ?f12 ?f14 Z M ?f0 ?f2 L ?f12 ?f12 M ?f0 ?f3 L ?f12 ?f14 M ?f1 ?f2 L ?f13 ?f12 M ?f1 ?f3 L ?f13 ?f14 N')">
+        <xsl:value-of select="'Bevel '"/>
+      </xsl:when>
+      <!-- Donut -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='ring'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f3 ?f9 A ?f79 ?f80 ?f81 ?f82 ?f3 ?f9 ?f76 ?f78  W ?f83 ?f84 ?f85 ?f86 ?f3 ?f9 ?f76 ?f78 A ?f122 ?f123 ?f124 ?f125 ?f76 ?f78 ?f119 ?f121  W ?f126 ?f127 ?f128 ?f129 ?f76 ?f78 ?f119 ?f121 A ?f165 ?f166 ?f167 ?f168 ?f119 ?f121 ?f162 ?f164  W ?f169 ?f170 ?f171 ?f172 ?f119 ?f121 ?f162 ?f164 A ?f208 ?f209 ?f210 ?f211 ?f162 ?f164 ?f205 ?f207  W ?f212 ?f213 ?f214 ?f215 ?f162 ?f164 ?f205 ?f207 Z M ?f17 ?f9 A ?f248 ?f249 ?f250 ?f251 ?f17 ?f9 ?f245 ?f247  W ?f252 ?f253 ?f254 ?f255 ?f17 ?f9 ?f245 ?f247 A ?f284 ?f285 ?f286 ?f287 ?f245 ?f247 ?f281 ?f283  W ?f288 ?f289 ?f290 ?f291 ?f245 ?f247 ?f281 ?f283 A ?f320 ?f321 ?f322 ?f323 ?f281 ?f283 ?f317 ?f319  W ?f324 ?f325 ?f326 ?f327 ?f281 ?f283 ?f317 ?f319 A ?f356 ?f357 ?f358 ?f359 ?f317 ?f319 ?f353 ?f355  W ?f360 ?f361 ?f362 ?f363 ?f317 ?f319 ?f353 ?f355 Z N')">
+        <xsl:value-of select="'Donut '"/>
+      </xsl:when>
+      <!-- TearDrop -->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='TEARDROP'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Teardrop')) ">
+        <xsl:value-of select="'Teardrop '"/>
+      </xsl:when>
+      
+     
       <!--End of bug fix code-->
       
       <!--  Folded Corner (Added by A.Mathi as on 19/07/2007) -->
@@ -5116,301 +5252,326 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:value-of select ="'foldedCorner '"/>
       </xsl:when>
 		<!--  Lightning Bolt (Added by A.Mathi as on 20/07/2007) -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N') or 
-					     (draw:enhanced-geometry/@draw:enhanced-path='M 8458 0 L 0 3923 7564 8416 4993 9720 12197 13904 9987 14934 21600 21600 14768 12911 16558 12016 11030 6840 12831 6120 8458 0 Z N')">
+		<xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N' or 
+					     draw:enhanced-geometry/@draw:enhanced-path='M 8458 0 L 0 3923 7564 8416 4993 9720 12197 13904 9987 14934 21600 21600 14768 12911 16558 12016 11030 6840 12831 6120 8458 0 Z N')
+               or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 8472 0 L 12860 6080 11050 6797 16577 12007 14767 12877 21600 21600 10012 14915 12222 13987 5022 9705 7602 8382 0 3890 Z N') ">
 			<xsl:value-of select ="'lightningBolt '"/>
 		</xsl:when>
 		<!--  Explosion 1 (Modified by A.Mathi) -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt71') and 
-					   (draw:enhanced-geometry/@draw:enhanced-path='M 10901 5905 L 8458 2399 7417 6425 476 2399 4732 7722 106 8718 3828 11880 243 14689 5772 14041 4868 17719 7819 15730 8590 21600 10637 15038 13349 19840 14125 14561 18248 18195 16938 13044 21600 13393 17710 10579 21198 8242 16806 7417 18482 4560 14257 5429 14623 106 10901 5905 Z N')">
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt71' and
+					   draw:enhanced-geometry/@draw:enhanced-path='M 10901 5905 L 8458 2399 7417 6425 476 2399 4732 7722 106 8718 3828 11880 243 14689 5772 14041 4868 17719 7819 15730 8590 21600 10637 15038 13349 19840 14125 14561 18248 18195 16938 13044 21600 13393 17710 10579 21198 8242 16806 7417 18482 4560 14257 5429 14623 106 10901 5905 Z N')
+            or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 10800 5800 L 14522 0 14155 5325 18380 4457 16702 7315 21097 8137 17607 10475 21600 13290 16837 12942 18145 18095 14020 14457 13247 19737 10532 14935 8485 21600 7715 15627 4762 17617 5667 13937 135 14587 3722 11775 0 8615 4627 7617 370 2295 7312 6320 8352 2295 Z N') ">
 			<xsl:value-of select ="'irregularSeal1 '"/>
 		</xsl:when>
       <!-- Left Bracket (Added by A.Mathi as on 20/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-bracket')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='left-bracket'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Left Bracket')) ">
         <xsl:value-of select ="'Left Bracket '"/>
       </xsl:when>
       <!-- Right Bracket (Added by A.Mathi as on 20/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='right-bracket')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='right-bracket'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Right Bracket')) ">
         <xsl:value-of select ="'Right Bracket '"/>
       </xsl:when>
       <!-- Left Brace (Added by A.Mathi as on 20/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-brace')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='left-brace'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f3 ?f5 A ?f68 ?f69 ?f70 ?f71 ?f3 ?f5 ?f65 ?f67  W ?f72 ?f73 ?f74 ?f75 ?f3 ?f5 ?f65 ?f67 L ?f9 ?f16 A ?f115 ?f116 ?f117 ?f118 ?f9 ?f16 ?f112 ?f114  W ?f119 ?f120 ?f121 ?f122 ?f9 ?f16 ?f112 ?f114 A ?f145 ?f146 ?f147 ?f148 ?f112 ?f114 ?f142 ?f144  W ?f149 ?f150 ?f151 ?f152 ?f112 ?f114 ?f142 ?f144 L ?f9 ?f14 A ?f188 ?f189 ?f190 ?f191 ?f9 ?f14 ?f185 ?f187  W ?f192 ?f193 ?f194 ?f195 ?f9 ?f14 ?f185 ?f187 Z N F M ?f3 ?f5 A ?f68 ?f69 ?f70 ?f71 ?f3 ?f5 ?f65 ?f67  W ?f72 ?f73 ?f74 ?f75 ?f3 ?f5 ?f65 ?f67 L ?f9 ?f16 A ?f115 ?f116 ?f117 ?f118 ?f9 ?f16 ?f112 ?f114  W ?f119 ?f120 ?f121 ?f122 ?f9 ?f16 ?f112 ?f114 A ?f145 ?f146 ?f147 ?f148 ?f112 ?f114 ?f142 ?f144  W ?f149 ?f150 ?f151 ?f152 ?f112 ?f114 ?f142 ?f144 L ?f9 ?f14 A ?f188 ?f189 ?f190 ?f191 ?f9 ?f14 ?f185 ?f187  W ?f192 ?f193 ?f194 ?f195 ?f9 ?f14 ?f185 ?f187 N') ">
         <xsl:value-of select ="'Left Brace '"/>
       </xsl:when>
       <!-- Right Brace (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='right-brace')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='right-brace'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f3 ?f5 A ?f70 ?f71 ?f72 ?f73 ?f3 ?f5 ?f67 ?f69  W ?f74 ?f75 ?f76 ?f77 ?f3 ?f5 ?f67 ?f69 L ?f10 ?f17 A ?f117 ?f118 ?f119 ?f120 ?f10 ?f17 ?f114 ?f116  W ?f121 ?f122 ?f123 ?f124 ?f10 ?f17 ?f114 ?f116 A ?f147 ?f148 ?f149 ?f150 ?f114 ?f116 ?f144 ?f146  W ?f151 ?f152 ?f153 ?f154 ?f114 ?f116 ?f144 ?f146 L ?f10 ?f18 A ?f190 ?f191 ?f192 ?f193 ?f10 ?f18 ?f187 ?f189  W ?f194 ?f195 ?f196 ?f197 ?f10 ?f18 ?f187 ?f189 Z N F M ?f3 ?f5 A ?f70 ?f71 ?f72 ?f73 ?f3 ?f5 ?f67 ?f69  W ?f74 ?f75 ?f76 ?f77 ?f3 ?f5 ?f67 ?f69 L ?f10 ?f17 A ?f117 ?f118 ?f119 ?f120 ?f10 ?f17 ?f114 ?f116  W ?f121 ?f122 ?f123 ?f124 ?f10 ?f17 ?f114 ?f116 A ?f147 ?f148 ?f149 ?f150 ?f114 ?f116 ?f144 ?f146  W ?f151 ?f152 ?f153 ?f154 ?f114 ?f116 ?f144 ?f146 L ?f10 ?f18 A ?f190 ?f191 ?f192 ?f193 ?f10 ?f18 ?f187 ?f189  W ?f194 ?f195 ?f196 ?f197 ?f10 ?f18 ?f187 ?f189 N') ">
         <xsl:value-of select ="'Right Brace '"/>
       </xsl:when>
       <!-- Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangular-callout')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='rectangular-callout'
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 0 L 0 3590 ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 0 21600 3590 21600 ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 21600 21600 21600 18010 ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 21600 0 18010 0 ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 3590 0 0 0 Z N') ">
         <xsl:value-of select ="'Rectangular Callout '"/>
       </xsl:when>
       <!-- Rounded Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='round-rectangular-callout')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='round-rectangular-callout'
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 3590 0 X 0 3590 L ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 Y 3590 21600 L ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 X 21600 18010 L ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 Y 18010 0 L ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 Z N') ">
         <xsl:value-of select ="'wedgeRoundRectCallout '"/>
       </xsl:when>
       <!-- Oval Callout (Added by A.Mathi as on 23/07/2007) -->
-	  <xsl:when test ="(draw:enhanced-geometry/@draw:type='round-callout') and not(draw:enhanced-geometry/@draw:enhanced-path='V 0 0 21600 21600 ?f2 ?f3 ?f2 ?f4 N')">
+	  <xsl:when test ="(draw:enhanced-geometry/@draw:type='round-callout' and draw:enhanced-geometry[@draw:enhanced-path != 'V 0 0 21600 21600 ?f2 ?f3 ?f2 ?f4 N'])
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'W 0 0 21600 21600 ?f22 ?f23 ?f18 ?f19 L ?f14 ?f15 Z N')">
 		  <xsl:value-of select ="'wedgeEllipseCallout '"/>
 	  </xsl:when>
       <!-- Cloud Callout (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='cloud-callout')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='cloud-callout'
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 1930 7160 C 1530 4490 3400 1970 5270 1970 5860 1950 6470 2210 6970 2600 7450 1390 8340 650 9340 650 10004 690 10710 1050 11210 1700 11570 630 12330 0 13150 0 13840 0 14470 460 14870 1160 15330 440 16020 0 16740 0 17910 0 18900 1130 19110 2710 20240 3150 21060 4580 21060 6220 21060 6720 21000 7200 20830 7660 21310 8460 21600 9450 21600 10460 21600 12750 20310 14680 18650 15010 18650 17200 17370 18920 15770 18920 15220 18920 14700 18710 14240 18310 13820 20240 12490 21600 11000 21600 9890 21600 8840 20790 8210 19510 7620 20000 7930 20290 6240 20290 4850 20290 3570 19280 2900 17640 1300 17600 480 16300 480 14660 480 13900 690 13210 1070 12640 380 12160 0 11210 0 10120 0 8590 840 7330 1930 7160 Z N M 1930 7160 C 1950 7410 2040 7690 2090 7920 F N M 6970 2600 C 7200 2790 7480 3050 7670 3310 F N M 11210 1700 C 11130 1910 11080 2160 11030 2400 F N M 14870 1160 C 14720 1400 14640 1720 14540 2010 F N M 19110 2710 C 19130 2890 19230 3290 19190 3380 F N M 20830 7660 C 20660 8170 20430 8620 20110 8990 F N M 18660 15010 C 18740 14200 18280 12200 17000 11450 F N M 14240 18310 C 14320 17980 14350 17680 14370 17360 F N M 8220 19510 C 8060 19250 7960 18950 7860 18640 F N M 2900 17640 C 3090 17600 3280 17540 3460 17450 F N M 1070 12640 C 1400 12900 1780 13130 2330 13040 F N U ?f17 ?f18 1800 1800 0 23592960 Z N U ?f19 ?f20 1200 1200 0 23592960 Z N U ?f13 ?f14 700 700 0 23592960 Z N')">
         <xsl:value-of select ="'Cloud Callout '"/>
       </xsl:when>
 		<!-- Line Callout 1) -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='line-callout-1' or draw:enhanced-geometry/@draw:type='line-callout-3')">
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='line-callout-1' or draw:enhanced-geometry/@draw:type='line-callout-3')
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z N F M ?f9 ?f2 Z L ?f9 ?f3 N F M ?f9 ?f8 L ?f11 ?f10 ?f13 ?f12 ?f15 ?f14 N') ">
 			<xsl:value-of select ="'borderCallout1'"/>
 		</xsl:when>
 		<!--Line Callout 2)-->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='line-callout-2')">
+		<xsl:when test ="draw:enhanced-geometry/@draw:type='line-callout-2'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z N F M ?f9 ?f8 L ?f11 ?f10 ?f13 ?f12 N') ">
 			<xsl:value-of select ="'borderCallout2'"/>
 		</xsl:when>
 		<!--Line Callout 3)-->
 		<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt49') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M ?f6 ?f7 F L ?f4 ?f5 ?f2 ?f3 ?f0 ?f1 N')">
 			<xsl:value-of select ="'borderCallout3'"/>
 		</xsl:when>	
-      <!-- Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangle') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
-        <xsl:value-of select ="'Rectangle Custom '"/>
-      </xsl:when>
+
+      
+      
+      
+      <!--#####################         RECTANGLE     #############################-->
+
       <!-- Rounded Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='round-rectangle')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='round-rectangle' 
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N') ">
         <xsl:value-of select ="'Rounded Rectangle '"/>
       </xsl:when>
       <!-- Snip Single Corner Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-card') and 
-									 (draw:enhanced-geometry/@draw:mirror-horizontal='true') and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N')">
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-card' and 
+									    draw:enhanced-geometry/@draw:mirror-horizontal='true' and
+									 draw:enhanced-geometry/@draw:enhanced-path='M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N') 
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f2 L ?f9 ?f2 ?f1 ?f8 ?f1 ?f3 ?f0 ?f3 Z N') ">
         <xsl:value-of select ="'Snip Single Corner Rectangle '"/>
       </xsl:when>
-		
-		<!--Equation Shapes-->
-		<!--Not Equal-->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathnotequal')">
-			<xsl:value-of select="'Not Equal '"/>
-		</xsl:when>
-		<!--Equal-->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathequal')">
-			<xsl:value-of select="'Equal '"/>
-		</xsl:when>
-		<!--Plus-->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathplus')">
-			<xsl:value-of select="'Plus '"/>
-		</xsl:when>
-		<!--Minus-->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathminus')">
-			<xsl:value-of select="'Minus '"/>
-		</xsl:when>
-		<!--Multiply-->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathmultiply')">
-			<xsl:value-of select="'Multiply '"/>
-		</xsl:when>
-		<!--Division-->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathdivide')">
-			<xsl:value-of select="'Division '"/>
-		</xsl:when>
-
 		<!-- Snip Same Side Corner Rectangle -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='snip2samerect')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='snip2samerect'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f9 ?f2 L ?f10 ?f2 ?f1 ?f9 ?f1 ?f13 ?f12 ?f3 ?f11 ?f3 ?f0 ?f13 ?f0 ?f9 Z N') ">
 			<xsl:value-of select ="'Snip Same Side Corner Rectangle '"/>
 		</xsl:when>
 		<!-- Snip Diagonal Corner Rectangle -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='snip2diagrect')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='snip2diagrect'
+                         or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f9 ?f2 L ?f13 ?f2 ?f1 ?f12 ?f1 ?f11 ?f10 ?f3 ?f12 ?f3 ?f0 ?f14 ?f0 ?f9 Z N') ">
 			<xsl:value-of select ="'Snip Diagonal Corner Rectangle '"/>
 		</xsl:when>
 		<!-- Snip and Round Single Corner Rectangle -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='sniproundrect')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='sniproundrect'
+                         or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f12 ?f4 L ?f14 ?f4 ?f3 ?f13 ?f3 ?f5 ?f2 ?f5 ?f2 ?f12 A ?f56 ?f57 ?f58 ?f59 ?f2 ?f12 ?f53 ?f55  W ?f60 ?f61 ?f62 ?f63 ?f2 ?f12 ?f53 ?f55 Z N') ">
 			<xsl:value-of select ="'Snip and Round Single Corner Rectangle '"/>
 		</xsl:when>
 
 		<!-- Round Single Corner Rectangle -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='round1rect')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='round1rect'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f3 ?f5 L ?f13 ?f5 A ?f55 ?f56 ?f57 ?f58 ?f13 ?f5 ?f52 ?f54  W ?f59 ?f60 ?f61 ?f62 ?f13 ?f5 ?f52 ?f54 L ?f4 ?f6 ?f3 ?f6 Z N') ">
 			<xsl:value-of select ="'Round Single Corner Rectangle '"/>
 		</xsl:when>
 		<!-- Round Same Side Corner Rectangle -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='round2samerect')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='round2samerect'
+                          or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f13 ?f5 L ?f14 ?f5 A ?f62 ?f63 ?f64 ?f65 ?f14 ?f5 ?f59 ?f61  W ?f66 ?f67 ?f68 ?f69 ?f14 ?f5 ?f59 ?f61 L ?f4 ?f16 A ?f105 ?f106 ?f107 ?f108 ?f4 ?f16 ?f102 ?f104  W ?f109 ?f110 ?f111 ?f112 ?f4 ?f16 ?f102 ?f104 L ?f15 ?f6 A ?f148 ?f149 ?f150 ?f151 ?f15 ?f6 ?f145 ?f147  W ?f152 ?f153 ?f154 ?f155 ?f15 ?f6 ?f145 ?f147 L ?f3 ?f13 A ?f191 ?f192 ?f193 ?f194 ?f3 ?f13 ?f188 ?f190  W ?f195 ?f196 ?f197 ?f198 ?f3 ?f13 ?f188 ?f190 Z N') ">
 			<xsl:value-of select ="'Round Same Side Corner Rectangle '"/>
 		</xsl:when>
 		<!-- Round Diagonal Corner Rectangle -->
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='round2diagrect')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='round2diagrect'
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f13 ?f5 L ?f16 ?f5 A ?f62 ?f63 ?f64 ?f65 ?f16 ?f5 ?f59 ?f61  W ?f66 ?f67 ?f68 ?f69 ?f16 ?f5 ?f59 ?f61 L ?f4 ?f14 A ?f105 ?f106 ?f107 ?f108 ?f4 ?f14 ?f102 ?f104  W ?f109 ?f110 ?f111 ?f112 ?f4 ?f14 ?f102 ?f104 L ?f15 ?f6 A ?f148 ?f149 ?f150 ?f151 ?f15 ?f6 ?f145 ?f147  W ?f152 ?f153 ?f154 ?f155 ?f15 ?f6 ?f145 ?f147 L ?f3 ?f13 A ?f191 ?f192 ?f193 ?f194 ?f3 ?f13 ?f188 ?f190  W ?f195 ?f196 ?f197 ?f198 ?f3 ?f13 ?f188 ?f190 Z N') ">
 			<xsl:value-of select ="'Round Diagonal Corner Rectangle '"/>
 		</xsl:when>
-		<!-- Explosion 2 -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='bang')">
-			<xsl:value-of select="'Explosion 2 '"/>
+
+      <!-- Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangle' and draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 0 L 21600 0 21600 21600 0 21600 Z N') ">
+        <xsl:value-of select ="'Rectangle Custom '"/>
 		</xsl:when>
-		<!-- Heptagon -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='HEPTAGON')">
-			<xsl:value-of select="'Heptagon '"/>
+      
+      
+      
+      
+      
+		<!--###############   Equation Shapes   ####################-->
+		<!--Not Equal-->
+		<xsl:when test="draw:enhanced-geometry/@draw:type='mathnotequal'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f22 ?f26 L ?f39 ?f26 ?f55 ?f59 ?f54 ?f58 ?f47 ?f26 ?f23 ?f26 ?f23 ?f24 ?f48 ?f24 ?f49 ?f25 ?f23 ?f25 ?f23 ?f27 ?f50 ?f27 ?f61 ?f63 ?f60 ?f62 ?f45 ?f27 ?f22 ?f27 ?f22 ?f25 ?f43 ?f25 ?f41 ?f24 ?f22 ?f24 Z N')">
+			<xsl:value-of select="'Not Equal '"/>
 		</xsl:when>
-		<!-- Decagon -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='DECAGON')">
-			<xsl:value-of select="'Decagon '"/>
+		<!--Equal-->
+		<xsl:when test="draw:enhanced-geometry/@draw:type='mathequal'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f19 ?f17 L ?f20 ?f17 ?f20 ?f15 ?f19 ?f15 Z M ?f19 ?f16 L ?f20 ?f16 ?f20 ?f18 ?f19 ?f18 Z N')">
+			<xsl:value-of select="'Equal '"/>
 		</xsl:when>
-		<!-- Dodecagon -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='DODECAGON')">
-			<xsl:value-of select="'Dodecagon '"/>
+		<!--Plus-->
+      <xsl:when test="draw:enhanced-geometry/@draw:type='mathplus'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f15 ?f20 L ?f16 ?f20 ?f16 ?f19 ?f17 ?f19 ?f17 ?f20 ?f18 ?f20 ?f18 ?f21 ?f17 ?f21 ?f17 ?f22 ?f16 ?f22 ?f16 ?f21 ?f15 ?f21 Z N')">
+        <xsl:value-of select="'Plus '"/>
 		</xsl:when>
-		<!-- Half Frame -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='HALFFRAME')">
-			<xsl:value-of select="'Half Frame '"/>
+		<!--Minus-->
+		<xsl:when test="draw:enhanced-geometry/@draw:type='mathminus'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f15 ?f13 L ?f16 ?f13 ?f16 ?f14 ?f15 ?f14 Z N')">
+			<xsl:value-of select="'Minus '"/>
 		</xsl:when>
-		<!-- Pie -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
-						(draw:enhanced-geometry/@draw:enhanced-path='V 0 0 21600 21600 ?f5 ?f7 ?f1 ?f3 L 10800 10800 Z N')">
-			<xsl:value-of select="'Pie '"/>
+		<!--Multiply-->
+		<xsl:when test="draw:enhanced-geometry/@draw:type='mathmultiply'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f40 ?f41 L ?f42 ?f43 ?f11 ?f46 ?f47 ?f43 ?f48 ?f41 ?f51 ?f8 ?f48 ?f53 ?f47 ?f54 ?f11 ?f55 ?f42 ?f54 ?f40 ?f53 ?f52 ?f8 Z N')">
+			<xsl:value-of select="'Multiply '"/>
 		</xsl:when>
-		<!-- Frame -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='frame')">
-			<xsl:value-of select="'Frame '"/>
-		</xsl:when>
-		<!-- L-Shape -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='CORNER')">
-			<xsl:value-of select="'L-Shape '"/>
-		</xsl:when>
-		<!-- Diagonal Stripe -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='diagstripe')">
-			<xsl:value-of select="'Diagonal Stripe '"/>
-		</xsl:when>
-		<!-- Plaque -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt21') and 
-						(draw:enhanced-geometry/@draw:enhanced-path='M ?f0 0 Y 0 ?f1 L 0 ?f2 X ?f0 21600 L ?f3 21600 Y 21600 ?f2 L 21600 ?f1 X ?f3 0 Z N')">
-			<xsl:value-of select="'Plaque '"/>
-		</xsl:when>
-		<!-- Bevel -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='quad-bevel')">
-			<xsl:value-of select="'Bevel '"/>
-		</xsl:when>
-		<!-- Donut -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='ring')">
-			<xsl:value-of select="'Donut '"/>
-		</xsl:when>
-		<!-- TearDrop -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='TEARDROP')">
-			<xsl:value-of select="'Teardrop '"/>
+		<!--Division-->
+		<xsl:when test="draw:enhanced-geometry/@draw:type='mathdivide'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f12 ?f25 A ?f68 ?f69 ?f70 ?f71 ?f12 ?f25 ?f65 ?f67  W ?f72 ?f73 ?f74 ?f75 ?f12 ?f25 ?f65 ?f67 Z M ?f12 ?f26 A ?f111 ?f112 ?f113 ?f114 ?f12 ?f26 ?f108 ?f110  W ?f115 ?f116 ?f117 ?f118 ?f12 ?f26 ?f108 ?f110 Z M ?f27 ?f21 L ?f28 ?f21 ?f28 ?f22 ?f27 ?f22 Z N')">
+			<xsl:value-of select="'Division '"/>
 		</xsl:when>
 
+		
+		<!-- Explosion 2 -->
+		<xsl:when test="draw:enhanced-geometry/@draw:type='bang'
+                    or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 11462 4342 L 14790 0 14525 5777 18007 3172 16380 6532 21600 6645 16985 9402 18270 11290 16380 12310 18877 15632 14640 14350 14942 17370 12180 15935 11612 18842 9872 17370 8700 19712 7527 18125 4917 21600 4805 18240 1285 17825 3330 15370 0 12877 3935 11592 1172 8270 5372 7817 4502 3625 8550 6382 9722 1887 Z N')">
+			<xsl:value-of select="'Explosion 2 '"/>
+		</xsl:when>
+
+
+      <!--#####################         FLOW CHART SHAPES     #############################-->
       <!-- Flow Chart: Process -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-process')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-process'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 0 L 1 0 1 1 0 1 Z N')">
         <xsl:value-of select ="'Flowchart: Process '"/>
       </xsl:when>
       <!-- Flow Chart: Alternate Process -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-alternate-process')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-alternate-process'
+                         or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f3 ?f10 A ?f56 ?f57 ?f58 ?f59 ?f3 ?f10 ?f53 ?f55  W ?f60 ?f61 ?f62 ?f63 ?f3 ?f10 ?f53 ?f55 L ?f12 ?f5 A ?f99 ?f100 ?f101 ?f102 ?f12 ?f5 ?f96 ?f98  W ?f103 ?f104 ?f105 ?f106 ?f12 ?f5 ?f96 ?f98 L ?f4 ?f13 A ?f142 ?f143 ?f144 ?f145 ?f4 ?f13 ?f139 ?f141  W ?f146 ?f147 ?f148 ?f149 ?f4 ?f13 ?f139 ?f141 L ?f10 ?f6 A ?f185 ?f186 ?f187 ?f188 ?f10 ?f6 ?f182 ?f184  W ?f189 ?f190 ?f191 ?f192 ?f10 ?f6 ?f182 ?f184 Z N')">
         <xsl:value-of select ="'Flowchart: Alternate Process '"/>
       </xsl:when>
       <!-- Flow Chart: Decision -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-decision')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-decision'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 1 L 1 0 2 1 1 2 Z N')">
         <xsl:value-of select ="'Flowchart: Decision '"/>
       </xsl:when>
       <!-- Flow Chart: Data -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-data')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-data'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 5 L 1 0 5 0 4 5 Z N')">
         <xsl:value-of select ="'Flowchart: Data '"/>
       </xsl:when>
       <!-- Flow Chart: Predefined-process -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-predefined-process')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-predefined-process'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 0 L 1143000 0 1143000 990600 0 990600 Z N F M 142875 0 L 142875 990600 M 1000125 0 L 1000125 990600 N F M 0 0 L 1143000 0 1143000 990600 0 990600 Z N')">
         <xsl:value-of select ="'Flowchart: Predefined Process '"/>
       </xsl:when>
       <!-- Flow Chart: Internal-storage -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-internal-storage')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-internal-storage'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 0 L 1219200 0 1219200 990600 0 990600 Z N F M 152400 0 L 152400 990600 M 0 123825 L 1219200 123825 N F M 0 0 L 1219200 0 1219200 990600 0 990600 Z N')">
         <xsl:value-of select ="'Flowchart: Internal Storage '"/>
       </xsl:when>
       <!-- Flow Chart: Document -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-document')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-document'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 0 L 21600 0 21600 17322 C 10800 17322 10800 23922 0 20172 Z N')">
         <xsl:value-of select ="'Flowchart: Document '"/>
       </xsl:when>
       <!-- Flow Chart: Multidocument -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-multidocument')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-multidocument'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 20782 C 9298 23542 9298 18022 18595 18022 L 18595 3675 0 3675 Z M 1532 3675 L 1532 1815 20000 1815 20000 16252 C 19298 16252 18595 16352 18595 16352 L 18595 3675 Z M 2972 1815 L 2972 0 21600 0 21600 14392 C 20800 14392 20000 14467 20000 14467 L 20000 1815 Z N F M 0 3675 L 18595 3675 18595 18022 C 9298 18022 9298 23542 0 20782 Z M 1532 3675 L 1532 1815 20000 1815 20000 16252 C 19298 16252 18595 16352 18595 16352 M 2972 1815 L 2972 0 21600 0 21600 14392 C 20800 14392 20000 14467 20000 14467 N F S M 0 20782 C 9298 23542 9298 18022 18595 18022 L 18595 16352 C 18595 16352 19298 16252 20000 16252 L 20000 14467 C 20000 14467 20800 14392 21600 14392 L 21600 0 2972 0 2972 1815 1532 1815 1532 3675 0 3675 Z N')">
         <xsl:value-of select ="'Flowchart: Multi document '"/>
       </xsl:when>
       <!-- Flow Chart: Terminator -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-terminator')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-terminator'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 3475 0 L 18125 0 A ?f59 ?f60 ?f61 ?f62 18125 0 ?f56 ?f58  W ?f63 ?f64 ?f65 ?f66 18125 0 ?f56 ?f58 L 3475 21600 A ?f102 ?f103 ?f104 ?f105 3475 21600 ?f99 ?f101  W ?f106 ?f107 ?f108 ?f109 3475 21600 ?f99 ?f101 Z N')">
         <xsl:value-of select ="'Flowchart: Terminator '"/>
       </xsl:when>
       <!-- Flow Chart: Preparation -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-preparation')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-preparation'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 5 L 2 0 8 0 10 5 8 10 2 10 Z N')">
         <xsl:value-of select ="'Flowchart: Preparation '"/>
       </xsl:when>
       <!-- Flow Chart: Manual-input -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-manual-input')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-manual-input'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Manual Input'))">
         <xsl:value-of select ="'Flowchart: Manual Input '"/>
       </xsl:when>
       <!-- Flow Chart: Manual-operation -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-manual-operation')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-manual-operation'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 0 L 5 0 4 5 1 5 Z N')">
         <xsl:value-of select ="'Flowchart: Manual Operation '"/>
       </xsl:when>
       <!-- Flow Chart: Connector -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-connector')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-connector'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Connector'))">
         <xsl:value-of select ="'Flowchart: Connector '"/>
       </xsl:when>
       <!-- Flow Chart: Off-page-connector -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-off-page-connector')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-off-page-connector'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Off-page Connector'))">
         <xsl:value-of select ="'Flowchart: Off-page Connector '"/>
       </xsl:when>
       <!-- Flow Chart: Card -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-card')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-card'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Card'))">
         <xsl:value-of select ="'Flowchart: Card '"/>
       </xsl:when>
       <!-- Flow Chart: Punched-tape -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-punched-tape')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-punched-tape'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 2 A ?f63 ?f64 ?f65 ?f66 0 2 ?f60 ?f62  W ?f67 ?f68 ?f69 ?f70 0 2 ?f60 ?f62 A ?f97 ?f98 ?f99 ?f100 ?f60 ?f62 ?f94 ?f96  W ?f101 ?f102 ?f103 ?f104 ?f60 ?f62 ?f94 ?f96 L 20 18 A ?f140 ?f141 ?f142 ?f143 20 18 ?f137 ?f139  W ?f144 ?f145 ?f146 ?f147 20 18 ?f137 ?f139 A ?f170 ?f171 ?f172 ?f173 ?f137 ?f139 ?f167 ?f169  W ?f174 ?f175 ?f176 ?f177 ?f137 ?f139 ?f167 ?f169 Z N')">
         <xsl:value-of select ="'Flowchart: Punched Tape '"/>
       </xsl:when>
       <!-- Flow Chart: Summing-junction -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-summing-junction')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-summing-junction'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Summing Junction'))">
         <xsl:value-of select ="'Flowchart: Summing Junction '"/>
       </xsl:when>
       <!-- Flow Chart: Or -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-or')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-or'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Or'))">
         <xsl:value-of select ="'Flowchart: Or '"/>
       </xsl:when>
       <!-- Flow Chart: Collate -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-collate')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-collate'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 0 L 2 0 1 1 2 2 0 2 1 1 Z N')">
         <xsl:value-of select ="'Flowchart: Collate '"/>
       </xsl:when>
       <!-- Flow Chart: Sort -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-sort')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-sort'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Sort'))">
         <xsl:value-of select ="'Flowchart: Sort '"/>
       </xsl:when>
       <!-- Flow Chart: Extract -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-extract')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-extract'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Flowchart: Extract'))">
         <xsl:value-of select ="'Flowchart: Extract '"/>
       </xsl:when>
       <!-- Flow Chart: Merge -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-merge')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-merge'
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 0 L 2 0 1 2 Z N')">
         <xsl:value-of select ="'Flowchart: Merge '"/>
       </xsl:when>
       <!-- Flow Chart: Stored-data -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-stored-data')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-stored-data'
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 165100 0 L 990600 0 A ?f57 ?f58 ?f59 ?f60 990600 0 ?f54 ?f56  W ?f61 ?f62 ?f63 ?f64 990600 0 ?f54 ?f56 L 165100 914400 A ?f104 ?f105 ?f106 ?f107 165100 914400 ?f101 ?f103  W ?f108 ?f109 ?f110 ?f111 165100 914400 ?f101 ?f103 Z N')">
         <xsl:value-of select ="'Flowchart: Stored Data '"/>
       </xsl:when>
       <!-- Flow Chart: Delay-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-delay')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-delay'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f3 ?f5 L ?f12 ?f5 A ?f65 ?f66 ?f67 ?f68 ?f12 ?f5 ?f62 ?f64  W ?f69 ?f70 ?f71 ?f72 ?f12 ?f5 ?f62 ?f64 L ?f3 ?f6 Z N')">
         <xsl:value-of select ="'Flowchart: Delay '"/>
       </xsl:when>
       <!-- Flow Chart: Sequential-access -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-sequential-access')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-sequential-access'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f12 ?f6 A ?f72 ?f73 ?f74 ?f75 ?f12 ?f6 ?f69 ?f71  W ?f76 ?f77 ?f78 ?f79 ?f12 ?f6 ?f69 ?f71 A ?f115 ?f116 ?f117 ?f118 ?f69 ?f71 ?f112 ?f114  W ?f119 ?f120 ?f121 ?f122 ?f69 ?f71 ?f112 ?f114 A ?f158 ?f159 ?f160 ?f161 ?f112 ?f114 ?f155 ?f157  W ?f162 ?f163 ?f164 ?f165 ?f112 ?f114 ?f155 ?f157 A ?f205 ?f206 ?f207 ?f208 ?f155 ?f157 ?f202 ?f204  W ?f209 ?f210 ?f211 ?f212 ?f155 ?f157 ?f202 ?f204 L ?f4 ?f26 ?f4 ?f6 Z N')">
         <xsl:value-of select ="'Flowchart: Sequential Access Storage '"/>
       </xsl:when>
       <!-- Flow Chart: Direct-access-storage -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-direct-access-storage')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-direct-access-storage'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 190500 0 L 952500 0 A ?f58 ?f59 ?f60 ?f61 952500 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 952500 0 ?f55 ?f57 L 190500 685800 A ?f101 ?f102 ?f103 ?f104 190500 685800 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 190500 685800 ?f98 ?f100 Z N F M 952500 685800 A ?f113 ?f102 ?f114 ?f104 952500 685800 ?f112 ?f100  W ?f115 ?f106 ?f116 ?f108 952500 685800 ?f112 ?f100 N F M 190500 0 L 952500 0 A ?f58 ?f59 ?f60 ?f61 952500 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 952500 0 ?f55 ?f57 L 190500 685800 A ?f101 ?f102 ?f103 ?f104 190500 685800 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 190500 685800 ?f98 ?f100 Z N')">
         <xsl:value-of select ="'Flowchart: Direct Access Storage'"/>
       </xsl:when>
       <!-- Flow Chart: Magnetic-disk --> 
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-magnetic-disk')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-magnetic-disk'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 139700 A ?f58 ?f59 ?f60 ?f61 0 139700 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 139700 ?f55 ?f57 L 762000 698500 A ?f101 ?f102 ?f103 ?f104 762000 698500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 762000 698500 ?f98 ?f100 Z N F M 762000 139700 A ?f101 ?f113 ?f103 ?f114 762000 139700 ?f98 ?f112  W ?f105 ?f115 ?f107 ?f116 762000 139700 ?f98 ?f112 N F M 0 139700 A ?f58 ?f59 ?f60 ?f61 0 139700 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 139700 ?f55 ?f57 L 762000 698500 A ?f101 ?f102 ?f103 ?f104 762000 698500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 762000 698500 ?f98 ?f100 Z N')">
         <xsl:value-of select ="'Flowchart: Magnetic Disk '"/>
       </xsl:when>
       <!-- Flow Chart: Display -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-display')">
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-display'
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 0 457200 L 177800 0 889000 0 A ?f58 ?f59 ?f60 ?f61 889000 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 889000 0 ?f55 ?f57 L 177800 914400 Z N')">
         <xsl:value-of select ="'Flowchart: Display '"/>
       </xsl:when>
 		
+      
+      
+      
 		<!-- Action Buttons Back or Previous -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt194') and 
-						(draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 0 0 L 21600 0 ?f3 ?f2 ?f1 ?f2 Z N M 21600 0 L 21600 21600 ?f3 ?f4 ?f3 ?f2 Z N M 21600 21600 L 0 21600 ?f1 ?f4 ?f3 ?f4 Z N M 0 21600 L 0 0 ?f1 ?f2 ?f1 ?f4 Z N M ?f10 ?f8 L ?f14 ?f12 ?f14 ?f16 Z N')">
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt194' and 
+						           draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 0 0 L 21600 0 ?f3 ?f2 ?f1 ?f2 Z N M 21600 0 L 21600 21600 ?f3 ?f4 ?f3 ?f2 Z N M 21600 21600 L 0 21600 ?f1 ?f4 ?f3 ?f4 Z N M 0 21600 L 0 0 ?f1 ?f2 ?f1 ?f4 Z N M ?f10 ?f8 L ?f14 ?f12 ?f14 ?f16 Z N')
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z M ?f14 ?f6 L ?f15 ?f12 ?f15 ?f13 Z N S M ?f14 ?f6 L ?f15 ?f12 ?f15 ?f13 Z N F M ?f14 ?f6 L ?f15 ?f12 ?f15 ?f13 Z N F M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z N')">
 			<xsl:value-of select ="'actionButtonBackPrevious'"/>
 		</xsl:when>
 		<!-- Action Buttons Forward or Next -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt193') and 
-						(draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 0 0 L 21600 0 ?f3 ?f2 ?f1 ?f2 Z N M 21600 0 L 21600 21600 ?f3 ?f4 ?f3 ?f2 Z N M 21600 21600 L 0 21600 ?f1 ?f4 ?f3 ?f4 Z N M 0 21600 L 0 0 ?f1 ?f2 ?f1 ?f4 Z N M ?f10 ?f12 L ?f14 ?f8 ?f10 ?f16 Z N')">
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt193' and 
+						draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 0 0 L 21600 0 ?f3 ?f2 ?f1 ?f2 Z N M 21600 0 L 21600 21600 ?f3 ?f4 ?f3 ?f2 Z N M 21600 21600 L 0 21600 ?f1 ?f4 ?f3 ?f4 Z N M 0 21600 L 0 0 ?f1 ?f2 ?f1 ?f4 Z N M ?f10 ?f12 L ?f14 ?f8 ?f10 ?f16 Z N')
+            or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z M ?f15 ?f6 L ?f14 ?f12 ?f14 ?f13 Z N S M ?f15 ?f6 L ?f14 ?f12 ?f14 ?f13 Z N F M ?f15 ?f6 L ?f14 ?f13 ?f14 ?f12 Z N F M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f3 ?f0 ?f3 Z N')">
 			<xsl:value-of select ="'actionButtonForwardNext'"/>
 		</xsl:when>
 		<!-- Action Buttons Beginning -->
@@ -5429,16 +5590,16 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:value-of select ="'actionButtonHome'"/>
 		</xsl:when>
 		<!-- Action Buttons Information -->
-		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt192') and 
-						(draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 0 0 L 21600 0 ?f3 ?f2 ?f1 ?f2 Z N M 21600 0 L 21600 21600 ?f3 ?f4 ?f3 ?f2 Z N M 21600 21600 L 0 21600 ?f1 ?f4 ?f3 ?f4 Z N M 0 21600 L 0 0 ?f1 ?f2 ?f1 ?f4 Z N M ?f7 ?f12 X ?f10 ?f8 ?f7 ?f16 ?f14 ?f8 ?f7 ?f12 Z N M ?f7 ?f20 X ?f18 ?f42 ?f7 ?f24 ?f22 ?f42 ?f7 ?f20 Z N M ?f26 ?f28 L ?f30 ?f28 ?f30 ?f32 ?f34 ?f32 ?f34 ?f36 ?f26 ?f36 ?f26 ?f32 ?f38 ?f32 ?f38 ?f40 ?f26 ?f40 Z N')">
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt192' and 
+						draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 0 0 L 21600 0 ?f3 ?f2 ?f1 ?f2 Z N M 21600 0 L 21600 21600 ?f3 ?f4 ?f3 ?f2 Z N M 21600 21600 L 0 21600 ?f1 ?f4 ?f3 ?f4 Z N M 0 21600 L 0 0 ?f1 ?f2 ?f1 ?f4 Z N M ?f7 ?f12 X ?f10 ?f8 ?f7 ?f16 ?f14 ?f8 ?f7 ?f12 Z N M ?f7 ?f20 X ?f18 ?f42 ?f7 ?f24 ?f22 ?f42 ?f7 ?f20 Z N M ?f26 ?f28 L ?f30 ?f28 ?f30 ?f32 ?f34 ?f32 ?f34 ?f36 ?f26 ?f36 ?f26 ?f32 ?f38 ?f32 ?f38 ?f40 ?f26 ?f40 Z N')
+      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f3 ?f5 L ?f4 ?f5 ?f4 ?f6 ?f3 ?f6 Z M ?f12 ?f16 A ?f76 ?f77 ?f78 ?f79 ?f12 ?f16 ?f73 ?f75  W ?f80 ?f81 ?f82 ?f83 ?f12 ?f16 ?f73 ?f75 Z N S M ?f12 ?f16 A ?f76 ?f77 ?f78 ?f79 ?f12 ?f16 ?f73 ?f75  W ?f80 ?f81 ?f82 ?f83 ?f12 ?f16 ?f73 ?f75 Z M ?f12 ?f27 A ?f104 ?f105 ?f106 ?f107 ?f12 ?f27 ?f101 ?f103  W ?f108 ?f109 ?f110 ?f111 ?f12 ?f27 ?f101 ?f103 M ?f32 ?f28 L ?f32 ?f29 ?f33 ?f29 ?f33 ?f30 ?f32 ?f30 ?f32 ?f31 ?f35 ?f31 ?f35 ?f30 ?f34 ?f30 ?f34 ?f28 Z N S M ?f12 ?f27 A ?f104 ?f105 ?f106 ?f107 ?f12 ?f27 ?f101 ?f103  W ?f108 ?f109 ?f110 ?f111 ?f12 ?f27 ?f101 ?f103 M ?f32 ?f28 L ?f34 ?f28 ?f34 ?f30 ?f35 ?f30 ?f35 ?f31 ?f32 ?f31 ?f32 ?f30 ?f33 ?f30 ?f33 ?f29 ?f32 ?f29 Z N F M ?f12 ?f16 A ?f76 ?f77 ?f78 ?f79 ?f12 ?f16 ?f73 ?f75  W ?f80 ?f81 ?f82 ?f83 ?f12 ?f16 ?f73 ?f75 Z M ?f12 ?f27 A ?f104 ?f105 ?f106 ?f107 ?f12 ?f27 ?f101 ?f103  W ?f108 ?f109 ?f110 ?f111 ?f12 ?f27 ?f101 ?f103 M ?f32 ?f28 L ?f34 ?f28 ?f34 ?f30 ?f35 ?f30 ?f35 ?f31 ?f32 ?f31 ?f32 ?f30 ?f33 ?f30 ?f33 ?f29 ?f32 ?f29 Z N F M ?f3 ?f5 L ?f4 ?f5 ?f4 ?f6 ?f3 ?f6 Z N')">
 			<xsl:value-of select ="'actionButtonInformation'"/>
 		</xsl:when>
 		<!-- Action Buttons Return -->
 		<xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt197') and 
 						(draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 0 0 L 21600 0 ?f3 ?f2 ?f1 ?f2 Z N M 21600 0 L 21600 21600 ?f3 ?f4 ?f3 ?f2 Z N M 21600 21600 L 0 21600 ?f1 ?f4 ?f3 ?f4 Z N M 0 21600 L 0 0 ?f1 ?f2 ?f1 ?f4 Z N M ?f10 ?f12 L ?f14 ?f12 ?f14 ?f16 C ?f14 ?f18 ?f20 ?f22 ?f24 ?f22 L ?f7 ?f22 C ?f26 ?f22 ?f28 ?f18 ?f28 ?f16 L ?f28 ?f12 ?f7 ?f12 ?f30 ?f32 ?f34 ?f12 ?f36 ?f12 ?f36 ?f16 C ?f36 ?f38 ?f40 ?f42 ?f7 ?f42 L ?f24 ?f42 C ?f44 ?f42 ?f10 ?f38 ?f10 ?f16 Z N')">
 			<xsl:value-of select ="'actionButtonReturn'"/>
-		</xsl:when>
-		
+		</xsl:when>		
     </xsl:choose>
   </xsl:template>
  <xsl:template name="tmpSuperSubScriptForward">

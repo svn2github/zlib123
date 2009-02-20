@@ -480,7 +480,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:when test ="./style:paragraph-properties/@fo:text-align='center'">
                     <xsl:value-of select ="'ctr'"/>
                   </xsl:when>
-                  <xsl:when test ="./style:paragraph-properties/@fo:text-align='end'">
+                  <xsl:when test ="./style:paragraph-properties/@fo:text-align='end' or style:paragraph-properties/@fo:text-align='right'">
                     <xsl:value-of select ="'r'"/>
                   </xsl:when>
                   <xsl:when test ="./style:paragraph-properties/@fo:text-align='justify'">
@@ -713,7 +713,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:when test ="./style:paragraph-properties/@fo:text-align='center'">
                       <xsl:value-of select ="'ctr'"/>
                     </xsl:when>
-                    <xsl:when test ="./style:paragraph-properties/@fo:text-align='end'">
+                    <xsl:when test ="./style:paragraph-properties/@fo:text-align='end' or style:paragraph-properties/@fo:text-align='right'">
                       <xsl:value-of select ="'r'"/>
                     </xsl:when>
                     <xsl:when test ="./style:paragraph-properties/@fo:text-align='justify'">
@@ -3897,7 +3897,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test ="@fo:text-align='center'">
               <xsl:value-of select ="'ctr'"/>
             </xsl:when>
-            <xsl:when test ="@fo:text-align='end'">
+            <xsl:when test ="@fo:text-align='end' or @fo:text-align='right'">
               <xsl:value-of select ="'r'"/>
             </xsl:when>
             <xsl:when test ="@fo:text-align='justify'">

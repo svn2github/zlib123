@@ -1181,6 +1181,310 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 									</xsl:variable>
 									<!--end of code : by yeswanth-->
 									<!-- Check if layout define bullets-->
+									<xsl:variable name ="nodeName">
+										<xsl:value-of select ="concat('a:lvl',$newTextLvl,'pPr')"/>
+									</xsl:variable>
+									<xsl:choose>
+										<xsl:when test="../a:lstStyle/child::node()[name()=$nodeName][a:buChar | a:buAutoNum | a:buBlip]">
+											<xsl:for-each select ="../a:lstStyle/child::node()[name()=$nodeName]">
+												<xsl:if test ="a:buChar">
+													<text:list-style>
+														<xsl:attribute name ="style:name">
+															<xsl:value-of select ="$levelStyle"/>
+														</xsl:attribute >
+														<text:list-level-style-bullet>
+															<xsl:attribute name ="text:level">
+																<xsl:value-of select ="$newTextLvl"/>
+															</xsl:attribute >
+															<xsl:attribute name ="text:bullet-char">
+																<xsl:call-template name ="insertBulletCharacter">
+																	<xsl:with-param name ="character" select ="a:buChar/@char" />
+																</xsl:call-template>
+															</xsl:attribute >
+															<style:list-level-properties>
+																<xsl:if test ="./@indent">
+																	<xsl:choose>
+																		<xsl:when test="./@indent &lt; 0">
+																			<xsl:attribute name ="text:min-label-width">
+																				<xsl:value-of select="concat(format-number((0 - ./@indent) div 360000, '#.##'), 'cm')"/>
+																			</xsl:attribute>
+																		</xsl:when>
+																		<xsl:otherwise>
+																			<xsl:attribute name ="text:min-label-width">
+																				<xsl:value-of select="concat(format-number(./@indent div 360000, '#.##'), 'cm')"/>
+																			</xsl:attribute>
+																		</xsl:otherwise>
+																	</xsl:choose>
+																</xsl:if >
+																<xsl:if test ="./@marL">
+																	<xsl:attribute name ="text:space-before">
+																		<xsl:value-of select="concat((./@marL + ./@indent) div 360000, 'cm')"/>
+																	</xsl:attribute>
+																</xsl:if>
+															</style:list-level-properties>
+															<style:text-properties style:font-charset="x-symbol">
+																<!--code added by yeswanth.s for bug#2019519 , 17 July 2008-->
+																<xsl:attribute name="fo:font-family">
+																	<xsl:choose>
+																		<xsl:when test="./a:buFont/@typeface">
+																			<xsl:value-of select="./a:buFont/@typeface"/>
+																		</xsl:when>
+																		<xsl:otherwise>
+																			<xsl:value-of select="$textFont"/>
+																		</xsl:otherwise>
+																	</xsl:choose>
+																</xsl:attribute>
+																<!--end of code added by yeswanth.s-->
+
+																<xsl:choose>
+																	<xsl:when test="$buSize !=''">
+																		<xsl:attribute name ="fo:font-size">
+																			<xsl:value-of select ="concat(( $buSize div 1000),'%')"/>
+																		</xsl:attribute>
+																	</xsl:when>
+																	<xsl:otherwise>
+																		<xsl:if test ="a:buSzPct">
+																			<xsl:attribute name ="fo:font-size">
+																				<xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
+																			</xsl:attribute>
+																		</xsl:if>
+																		<xsl:if test ="not(a:buSzPct)">
+																			<xsl:attribute name ="fo:font-size">
+																				<xsl:value-of select ="'100%'"/>
+																			</xsl:attribute>
+																		</xsl:if>
+																	</xsl:otherwise>
+																</xsl:choose>
+
+																<xsl:if test ="a:buClr">
+																	<xsl:if test ="a:buClr/a:srgbClr">
+																		<xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
+																		<xsl:attribute name ="fo:color">
+																			<xsl:value-of select ="concat('#',$color)"/>
+																		</xsl:attribute>
+																	</xsl:if>
+																	<xsl:if test ="a:buClr/a:schemeClr">
+																		<xsl:variable name ="clrMap">
+																			<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:clrMap">
+																				<xsl:call-template name ="getColorMapSM">
+																					<xsl:with-param name ="schemeClr" select="./a:buClr/a:schemeClr/@val"/>
+																				</xsl:call-template>
+																			</xsl:if>
+																			<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:clrMap)">
+																				<xsl:value-of select="./a:buClr/a:schemeClr/@val"/>
+																			</xsl:if>
+																		</xsl:variable>
+																		<xsl:attribute name ="fo:color">
+																			<xsl:call-template name ="getColorCode">
+																				<xsl:with-param name ="color">
+																					<xsl:value-of select="$clrMap"/>
+																				</xsl:with-param>
+																			</xsl:call-template >
+																		</xsl:attribute>
+																	</xsl:if>
+																</xsl:if>
+																<xsl:if test ="not(a:buClr)">
+																	<xsl:if test ="$textColor != '0'">
+																		<xsl:attribute name ="fo:color">
+																			<xsl:value-of select ="$textColor"/>
+																		</xsl:attribute>
+																	</xsl:if>
+																	<xsl:if test ="$textColor = '0'">
+																		<xsl:if test ="./a:defRPr/a:solidFill">
+																			<xsl:if test ="./a:defRPr/a:solidFill/a:srgbClr">
+																				<xsl:attribute name ="fo:color">
+																					<xsl:value-of select ="concat('#',./a:defRPr/a:solidFill/a:srgbClr/@val)"/>
+																				</xsl:attribute>
+																			</xsl:if>
+																			<xsl:if test ="./a:defRPr/a:solidFill/a:schemeClr">
+																				<xsl:variable name ="clrMap">
+																					<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:clrMap">
+																						<xsl:call-template name ="getColorMapSM">
+																							<xsl:with-param name ="schemeClr" select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+																						</xsl:call-template>
+																					</xsl:if>
+																					<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:clrMap)">
+																						<xsl:value-of select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+																					</xsl:if>
+																				</xsl:variable>
+																				<xsl:attribute name ="fo:color">
+																					<xsl:call-template name ="getColorCode">
+																						<xsl:with-param name ="color">
+																							<xsl:value-of select="$clrMap"/>
+																						</xsl:with-param>
+																					</xsl:call-template >
+																				</xsl:attribute>
+																			</xsl:if>
+																		</xsl:if>
+																	</xsl:if>
+																</xsl:if>
+															</style:text-properties >
+														</text:list-level-style-bullet>
+													</text:list-style>
+												</xsl:if>
+												<xsl:if test ="a:buAutoNum">
+													<text:list-style>
+														<xsl:attribute name ="style:name">
+															<xsl:value-of select ="$levelStyle"/>
+														</xsl:attribute >
+														<text:list-level-style-number>
+															<xsl:attribute name ="text:level">
+																<xsl:value-of select ="$newTextLvl"/>
+															</xsl:attribute >
+															<xsl:variable name ="startAt">
+																<xsl:if test ="a:buAutoNum/@startAt">
+																	<xsl:value-of select ="a:buAutoNum/@startAt" />
+																</xsl:if>
+																<xsl:if test ="not(a:buAutoNum/@startAt)">
+																	<xsl:value-of select ="'1'" />
+																</xsl:if>
+															</xsl:variable>
+															<xsl:call-template name ="insertNumber">
+																<xsl:with-param name ="number" select ="a:buAutoNum/@type"/>
+																<xsl:with-param name ="startAt" select ="$startAt"/>
+															</xsl:call-template>
+															<style:list-level-properties>
+																<xsl:if test ="./@indent">
+																	<xsl:choose>
+																		<xsl:when test="./@indent &lt; 0">
+																			<xsl:attribute name ="text:min-label-width">
+																				<xsl:value-of select="concat(format-number((0 - ./@indent) div 360000, '#.##'), 'cm')"/>
+																			</xsl:attribute>
+																		</xsl:when>
+																		<xsl:otherwise>
+																			<xsl:attribute name ="text:min-label-width">
+																				<xsl:value-of select="concat(format-number(./@indent div 360000, '#.##'), 'cm')"/>
+																			</xsl:attribute>
+																		</xsl:otherwise>
+																	</xsl:choose>
+																</xsl:if >
+																<xsl:if test ="./@marL">
+																	<xsl:attribute name ="text:space-before">
+																		<xsl:value-of select="concat(format-number( (./@marL + ./@indent) div 360000, '#.##'), 'cm')"/>
+																	</xsl:attribute>
+																</xsl:if>
+															</style:list-level-properties>
+															<style:text-properties style:font-family-generic="swiss" style:font-pitch="variable" fo:font-size="100%">
+																<xsl:if test ="a:buFont/@typeface">
+																	<xsl:attribute name ="fo:font-family">
+																		<xsl:value-of select ="a:buFont/@typeface"/>
+																	</xsl:attribute>
+																</xsl:if>
+																<xsl:if test ="not(a:buFont/@typeface)">
+																	<xsl:attribute name ="fo:font-family">
+																		<xsl:value-of select ="'Arial'"/>
+																	</xsl:attribute>
+																</xsl:if>
+																<xsl:if test ="a:buSzPct">
+																	<xsl:attribute name ="fo:font-size">
+																		<xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
+																	</xsl:attribute>
+																</xsl:if>
+																<xsl:if test ="not(a:buSzPct)">
+																	<xsl:attribute name ="fo:font-size">
+																		<xsl:value-of select ="'100%'"/>
+																	</xsl:attribute>
+																</xsl:if>
+																<xsl:if test ="a:buClr">
+																	<xsl:if test ="a:buClr/a:srgbClr">
+																		<xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
+																		<xsl:attribute name ="fo:color">
+																			<xsl:value-of select ="concat('#',$color)"/>
+																		</xsl:attribute>
+																	</xsl:if>
+																	<xsl:if test ="a:buClr/a:schemeClr">
+																		<xsl:variable name ="clrMap">
+																			<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:clrMap">
+																				<xsl:call-template name ="getColorMapSM">
+																					<xsl:with-param name ="schemeClr" select="./a:buClr/a:schemeClr/@val"/>
+																				</xsl:call-template>
+																			</xsl:if>
+																			<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:clrMap)">
+																				<xsl:value-of select="./a:buClr/a:schemeClr/@val"/>
+																			</xsl:if>
+																		</xsl:variable>
+																		<xsl:attribute name ="fo:color">
+																			<xsl:call-template name ="getColorCode">
+																				<xsl:with-param name ="color">
+																					<xsl:value-of select="$clrMap"/>
+																				</xsl:with-param>
+																			</xsl:call-template >
+																		</xsl:attribute>
+																	</xsl:if>
+																</xsl:if>
+																<xsl:if test ="not(a:buClr)">
+																	<xsl:if test ="$textColor != '0'">
+																		<xsl:attribute name ="fo:color">
+																			<xsl:value-of select ="$textColor"/>
+																		</xsl:attribute>
+																	</xsl:if>
+																	<xsl:if test ="$textColor = '0'">
+																		<xsl:if test ="./a:defRPr/a:solidFill">
+																			<xsl:if test ="./a:defRPr/a:solidFill/a:srgbClr">
+																				<xsl:attribute name ="fo:color">
+																					<xsl:value-of select ="concat('#',./a:defRPr/a:solidFill/a:srgbClr/@val)"/>
+																				</xsl:attribute>
+																			</xsl:if>
+																			<xsl:if test ="./a:defRPr/a:solidFill/a:schemeClr">
+																				<xsl:variable name ="clrMap">
+																					<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:clrMap">
+																						<xsl:call-template name ="getColorMapSM">
+																							<xsl:with-param name ="schemeClr" select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+																						</xsl:call-template>
+																					</xsl:if>
+																					<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:clrMap)">
+																						<xsl:value-of select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+																					</xsl:if>
+																				</xsl:variable>
+																				<xsl:attribute name ="fo:color">
+																					<xsl:call-template name ="getColorCode">
+																						<xsl:with-param name ="color">
+																							<xsl:value-of select="$clrMap"/>
+																						</xsl:with-param>
+																					</xsl:call-template >
+																				</xsl:attribute>
+																			</xsl:if>
+																		</xsl:if>
+																	</xsl:if>
+																</xsl:if>
+															</style:text-properties>
+														</text:list-level-style-number>
+													</text:list-style>
+												</xsl:if>
+												<xsl:if test ="a:buBlip">
+													<xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
+													<xsl:variable name="XlinkHref">
+														<xsl:variable name="pzipsource">
+															<xsl:value-of select="document(concat('ppt/slideMasters/_rels/',$slideMaster,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+														</xsl:variable>
+														<xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+													</xsl:variable>
+													<xsl:call-template name="copyPictures">
+														<xsl:with-param name="document">
+															<xsl:value-of select="concat('ppt/slideMasters/_rels/',$slideMaster,'.rels')"/>
+														</xsl:with-param>
+														<xsl:with-param name="rId">
+															<xsl:value-of select ="$rId"/>
+														</xsl:with-param>
+													</xsl:call-template>
+													<text:list-style>
+														<xsl:attribute name ="style:name">
+															<xsl:value-of select ="$levelStyle"/>
+														</xsl:attribute >
+														<text:list-level-style-image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+															<xsl:attribute name="text:level">
+																<xsl:value-of select="$newTextLvl"/>
+															</xsl:attribute>
+															<xsl:attribute name="xlink:href">
+																<xsl:value-of select="$XlinkHref"/>
+															</xsl:attribute>
+															<style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.636cm" fo:height="0.636cm"/>
+														</text:list-level-style-image>
+													</text:list-style>
+												</xsl:if>
+											</xsl:for-each>
+										</xsl:when>
+										<xsl:otherwise>
                   <xsl:variable name ="loop">
                     <xsl:for-each select ="document(concat('ppt/slideLayouts/',$slideLayout))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
                       <xsl:if test ="./@idx">
@@ -1216,6 +1520,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							<xsl:with-param name ="textFont" select ="$textFont"/>
                     </xsl:call-template>
                   </xsl:if>
+										</xsl:otherwise>
+									</xsl:choose> 
                   <!-- Check if layout define bullets-->
 									<!--</xsl:if>-->
 								</xsl:if>
