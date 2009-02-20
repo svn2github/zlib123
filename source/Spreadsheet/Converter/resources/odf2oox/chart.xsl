@@ -3246,14 +3246,12 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                 <xsl:variable name="apos">
                   <xsl:text>&apos;</xsl:text>
                 </xsl:variable>
-
                 <xsl:variable name="refSheetNumber">
                   <xsl:for-each
                     select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name = translate($sheet,$apos,'')]">
                     <xsl:number count="table:table" level="single"/>
                   </xsl:for-each>
                 </xsl:variable>
-
                 <xsl:variable name="checkedName">
                   <xsl:for-each
                     select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name = translate($sheet,$apos,'')]">
@@ -3333,7 +3331,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 				  </xsl:variable>
                 <!--<xsl:value-of select="concat($apos,$checkedName,$apos,'!' ,substring-after($rngFrom,'!'),':',substring-after($rngTo,'!'))"/>-->
 				  <xsl:value-of select="concat($apos,$checkedName,$apos,'!$',$beginCol,'$',$beginRow ,':$',$endCol,'$',$endRow)"/>
-
               </c:f>
               <!--end-->
               </xsl:if>

@@ -654,10 +654,19 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
     <!--RefNo-1:ODF1.1:Added condition to chk variable $numTxtNode is already added.-->
     <!--<xsl:if test="$numTxtNode=''">-->
-      
+			<xsl:variable name ="quot">
+				<xsl:text>&quot;</xsl:text>
+			</xsl:variable>
     <!-- add text at the beginning -->
-    <xsl:if
-      test="contains(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;') and not($currencyFormat and $currencyFormat != '' and contains(substring-before(substring-after(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;'),$currencyFormat))">
+			<xsl:variable name="test" select="substring-before(translate($realFormatCode,'0','#'),'#')"/>
+			<xsl:variable name="test1" select="substring-before(substring-after($test,$quot),$quot)"/>
+			
+			<xsl:if test ="contains($test,$quot) and not($currencyFormat and $currencyFormat != '' and contains($test1,$currencyFormat))">				
+				<!--<xsl:if
+			  test="contains($test,'&quot;') and 
+	  not($currencyFormat and 
+	  $currencyFormat != '' and 
+	  contains($test1,$currencyFormat))">-->
       <number:text>
         <xsl:value-of
           select="substring-before(substring-after($realFormatCode,'&quot;'),'&quot;')"/>
@@ -681,15 +690,17 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             <xsl:value-of xml:space="preserve" select="' ('"/>
           </number:text>
         </xsl:when>
-        <xsl:otherwise>
+        <!--commented by sonata for bug no:2557398-->
+        <!--<xsl:otherwise>
           <number:text>(</number:text>
-        </xsl:otherwise>
+        </xsl:otherwise>-->
+        <!--end-->
       </xsl:choose>
     </xsl:if>
 
     <!-- add '-' at the beginning -->
     <xsl:if
-      test="contains($realFormatCode,'-') and not($currencyFormat and $currencyFormat!='') and not(contains(substring-after($realFormatCode,'#'),'-') or contains(substring-after($realFormatCode,'0'),'-'))">
+			  test="contains($realFormatCode,'-') and not($currencyFormat and $currencyFormat!='') and not(contains(substring-after($realFormatCode,'#'),'-') or contains(substring-after($realFormatCode,'0'),'-')) and not(contains($test,$quot) and not($currencyFormat and $currencyFormat != '' and contains($test1,$currencyFormat)))">
       <number:text>-</number:text>
     </xsl:if>
 
@@ -1999,6 +2010,15 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <number:text>:</number:text>
         <number:seconds number:style="long"/>
       </xsl:when>
+      <!--added by sonata for ODF 1.1-->
+      <xsl:when test="$ID = 46">
+        <number:hours/>
+        <number:text>:</number:text>
+        <number:minutes number:style="long"/>
+        <number:text>:</number:text>
+        <number:seconds number:style="long"/>
+      </xsl:when>
+      <!--end-->
     </xsl:choose>
   </xsl:template>
 

@@ -831,27 +831,63 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 				</xsl:variable>
 				<xsl:variable name ="tempRangeVal">
 					<xsl:choose>
-						<xsl:when test="(starts-with($cellRange, '(') or contains(substring($cellRange,string-length($cellRange)-1),')')) and contains($cellRange,',')">
-							<xsl:value-of select="substring(substring-before($cellRange,','),1)"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:choose>
-								<xsl:when test="contains($cellRange,')')">
-									<xsl:value-of select="substring($cellRange,0,string-length($cellRange))"/>
+						<xsl:when test="(starts-with($cellRange, '(') or 
+								  contains(substring($cellRange,string-length($cellRange)-1),')')) and 
+								  contains($cellRange,',') and 
+								  contains(substring-after($cellRange,'!'),',')">
+							<xsl:value-of select="substring(substring-before($cellRange,','),2)"/>							
 								</xsl:when>
 								<xsl:otherwise>
 									<xsl:value-of select="$cellRange"/>
 								</xsl:otherwise>
 							</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="apos">
+					<xsl:text>&apos;</xsl:text>
+				</xsl:variable>				
+				<xsl:variable name="sheetname">
+					<xsl:choose>
+						<xsl:when test ="starts-with($tempRangeVal,$apos)">
+							<xsl:variable name ="temp">
+								<xsl:value-of select="substring(substring-before($tempRangeVal,'!'),2)"/>
+							</xsl:variable>
+							<xsl:value-of select="substring($temp,1,string-length($temp)-1)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring-before($tempRangeVal,'!')"/>
 						</xsl:otherwise>
 					</xsl:choose>
+					
+				</xsl:variable>
+				<!--added for bug no:2557071-->
+
+				<xsl:variable name ="sheetNames">
+					<xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
+						<xsl:if test="@name = $sheetname">
+							<xsl:variable name="checkedName">
+								<xsl:call-template name="CheckSheetName">
+									<xsl:with-param name="sheetNumber">
+										<xsl:value-of select="position()"/>
+									</xsl:with-param>
+									<xsl:with-param name="name">
+										<xsl:value-of select="@name"/>
+									</xsl:with-param>
+								</xsl:call-template>
+							</xsl:variable>
+							<!--<xsl:value-of select ="concat(@name,':',$checkedName,'::')"/>-->
+							<xsl:value-of select ="$checkedName"/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name ="temp1">
+					<xsl:value-of select ="concat($apos,$sheetNames,$apos,'!',substring-after($tempRangeVal,'!'))"/>
         </xsl:variable>
         <xsl:variable name="rangeVal">
           <xsl:call-template name="ConvertCellRange">
-						<xsl:with-param name="cellRange" select="$tempRangeVal"/>
+						<xsl:with-param name="cellRange" select="$temp1"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="not(contains($cellRange,'#REF!'))">
+				<xsl:if test="not(contains($cellRange,'#REF!')) and $sheetNames!=''">
           <xsl:attribute name="chart:values-cell-range-address">
 						<xsl:choose>
 							<xsl:when test="contains($rangeVal,':')">
@@ -876,28 +912,63 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             </xsl:variable>
 						<xsl:variable name ="tempRangeVal">
 							<xsl:choose>
-								<xsl:when test="(starts-with($cellRange, '(') or contains(substring($cellRange,string-length($cellRange)-1),')')) and contains($cellRange,',')">
-									<xsl:value-of select="substring(substring-before($cellRange,','),1)"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:choose>
-										<xsl:when test="contains($cellRange,')')">
-											<xsl:value-of select="substring($cellRange,0,string-length($cellRange))"/>
+								<xsl:when test="(starts-with($cellRange, '(') or 
+								  contains(substring($cellRange,string-length($cellRange)-1),')')) and 
+								  contains($cellRange,',') and 
+								  contains(substring-after($cellRange,'!'),',')">
+									<xsl:value-of select="substring(substring-before($cellRange,','),2)"/>
 										</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select="$cellRange"/>
 										</xsl:otherwise>
 									</xsl:choose>
+						</xsl:variable>
+						<xsl:variable name="apos">
+							<xsl:text>&apos;</xsl:text>
+						</xsl:variable>
+						<xsl:variable name="sheetname">
+							<xsl:choose>
+								<xsl:when test ="starts-with($tempRangeVal,$apos)">
+									<xsl:variable name ="temp">
+										<xsl:value-of select="substring(substring-before($tempRangeVal,'!'),2)"/>
+									</xsl:variable>
+									<xsl:value-of select="substring($temp,1,string-length($temp)-1)"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="substring-before($tempRangeVal,'!')"/>
 								</xsl:otherwise>
 							</xsl:choose>
+
+						</xsl:variable>
+						<!--added for bug no:2557071-->
+
+						<xsl:variable name ="sheetNames">
+							<xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
+								<xsl:if test="@name = $sheetname">
+									<xsl:variable name="checkedName">
+										<xsl:call-template name="CheckSheetName">
+											<xsl:with-param name="sheetNumber">
+												<xsl:value-of select="position()"/>
+											</xsl:with-param>
+											<xsl:with-param name="name">
+												<xsl:value-of select="@name"/>
+											</xsl:with-param>
+										</xsl:call-template>
+									</xsl:variable>
+									<!--<xsl:value-of select ="concat(@name,':',$checkedName,'::')"/>-->
+									<xsl:value-of select ="$checkedName"/>
+								</xsl:if>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name ="temp1">
+							<xsl:value-of select ="concat($apos,$sheetNames,$apos,'!',substring-after($tempRangeVal,'!'))"/>
 						</xsl:variable>
             <xsl:variable name="rangeVal">
               <xsl:call-template name="ConvertCellRange">
-                <xsl:with-param name="cellRange" select="$cellRange"/>
+								<xsl:with-param name="cellRange" select="$temp1"/>
               </xsl:call-template>
             </xsl:variable>            
-          
-            <xsl:if test="not(contains($cellRange,'#REF!'))">
+						<xsl:if test="not(contains($cellRange,'#REF!')) and $sheetNames!=''">
               <xsl:attribute name="table:cell-range-address">
 								<xsl:choose>
 									<xsl:when test="contains($rangeVal,':')">
@@ -2070,11 +2141,6 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
 
 									</xsl:variable>
-
-									<xsl:attribute name="test">
-										<xsl:value-of select="$colWidPlusdefaultColCount"/>
-									</xsl:attribute>
-
 									<xsl:variable name="customColWid">
 										<xsl:variable name="customColWidPt">
 											<xsl:value-of select="substring-before($colWidPlusdefaultColCount,'|')"/>
