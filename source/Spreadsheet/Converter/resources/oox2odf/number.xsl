@@ -495,8 +495,14 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <xsl:choose>
 
           <!-- currency style -->
+			<!--changes By: Vijayeta,Sp2
+			    File      : Zonnepanelen_NL.ods
+			    Desc      :Earlier the condition was @formatCode,'$', now changed to @formatCode,'$$' 
+			-->
+			<!--<xsl:when
+            test="contains(@formatCode,'$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">-->
           <xsl:when
-            test="contains(@formatCode,'$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">
+            test="contains(@formatCode,'$$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">
             <number:currency-style style:name="{generate-id(.)}">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
@@ -658,6 +664,10 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 				<xsl:text>&quot;</xsl:text>
 			</xsl:variable>
     <!-- add text at the beginning -->
+		<!--changes By    : Vijayeta,Sp2
+			    File      : 2jahre_onpsx.ods
+			    Desc      :Code gets into two condition , which is prevented
+		-->
 			<xsl:variable name="test" select="substring-before(translate($realFormatCode,'0','#'),'#')"/>
 			<xsl:variable name="test1" select="substring-before(substring-after($test,$quot),$quot)"/>
 			
@@ -699,11 +709,12 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     </xsl:if>
 
     <!-- add '-' at the beginning -->
+		<!--Vijayeta,Sp2 additional condition added to prevent two conditions being executed-->
     <xsl:if
 			  test="contains($realFormatCode,'-') and not($currencyFormat and $currencyFormat!='') and not(contains(substring-after($realFormatCode,'#'),'-') or contains(substring-after($realFormatCode,'0'),'-')) and not(contains($test,$quot) and not($currencyFormat and $currencyFormat != '' and contains($test1,$currencyFormat)))">
       <number:text>-</number:text>
     </xsl:if>
-
+		<!--Vijayeta,Sp2,end-->
     <!-- add currency symbol at the beginning -->
     <xsl:if
       test="$currencyFormat and $currencyFormat!='' and not(contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">

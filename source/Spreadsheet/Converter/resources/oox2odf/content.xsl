@@ -2865,7 +2865,12 @@ RefNo-6 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="this" select="."/>
-
+<!--
+	Changes By : Vijayeta,SP2
+    File       : Testfeatures Extended Limits.xlsx, xlsx->Trans->ods->SP2->XLSX
+	Desc       : The ODS file converted contains col repeated=16379 which is not supported by ODS which hence fails in SP2 conversion
+	-->
+    <!--
     <xsl:variable name="colNum" >
       <xsl:call-template name="GetColNum2">
         <xsl:with-param name="cell">
@@ -2873,7 +2878,25 @@ RefNo-6 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+	-->
+	  <xsl:variable name="colNum" >
+		  <xsl:variable name="temp" >
+			  <xsl:call-template name="GetColNum2">
+				  <xsl:with-param name="cell">
+					  <xsl:value-of select="@oox:p"/>
+				  </xsl:with-param>
+			  </xsl:call-template>
+		  </xsl:variable>
+		  <xsl:choose >
+			  <xsl:when test ="$temp &gt; 256">
+				  <xsl:value-of select="256 - (16384 - $temp)"/>
+			  </xsl:when>
+			  <xsl:otherwise>
+				  <xsl:value-of select="$temp"/>
+			  </xsl:otherwise>
+		  </xsl:choose>
+	  </xsl:variable>
+<!--Vijayeta, SP2, End-->
     <xsl:variable name="rowNum" >
       <xsl:call-template name="GetRowNum2">
         <xsl:with-param name="cell">
