@@ -96,7 +96,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.Name = "ConverterForm";
             this.ShowIcon = false;
             this.UseWaitCursor = true;
-            this.Load += new System.EventHandler(this.ConverterForm_Load);
             this.Activated += new System.EventHandler(this.ConverterForm_Activated);
             this.ResumeLayout(false);
             this.PerformLayout();

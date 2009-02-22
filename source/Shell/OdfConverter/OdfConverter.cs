@@ -41,6 +41,8 @@ using Sonata.OdfConverter.Presentation;
 using CleverAge.OdfConverter.Spreadsheet;
 using Wordprocessing = OdfConverter.Wordprocessing;
 using System.Collections.Generic;
+using System.Net;
+using OdfConverter.OdfConverterLib;
 
 
 namespace OdfConverter.CommandLineTool
@@ -82,13 +84,26 @@ namespace OdfConverter.CommandLineTool
                     throw new InvalidConversionOptionsException("Input is missing");
                 }
 
-                FileInfo fi = new FileInfo(options.InputFullName);
-                options.InputFullName = fi.FullName;
+                if (UriLoader.IsRemote(options.InputFullName))
+                {
+                    // download document if URI has been specified as input document
+                    if (string.IsNullOrEmpty(options.OutputFullName))
+                    {
+                        throw new InvalidConversionOptionsException("Output filename or folder must be specified when converting remote files.");
+                    }
+                    
+                    options.InputFullNameOriginal = options.InputFullName;
+                    options.InputFullName = UriLoader.DownloadFile(options.InputFullName);
+                    options.InputBaseFolder = Path.GetDirectoryName(options.InputFullName);
+                }
+                else
+                {
+                    options.InputFullName = Path.GetFullPath(options.InputFullName);
+                }
 
                 if (!string.IsNullOrEmpty(options.OutputFullName))
                 {
-                    fi = new FileInfo(options.OutputFullName);
-                    options.OutputFullName = fi.FullName;
+                    options.OutputFullName = Path.GetFullPath(options.OutputFullName);
                 }
                 if (options.ConversionMode == ConversionMode.Batch)
                 {
@@ -119,6 +134,12 @@ namespace OdfConverter.CommandLineTool
                 Console.WriteLine("Incorrect or missing conversion parameters: " + ex.Message);
                 Console.WriteLine();
                 usage();
+                return;
+            }
+            catch (WebException ex)
+            {
+                Environment.ExitCode = 1;
+                Console.WriteLine("Error accessing URI: " + ex.Message);
                 return;
             }
             catch (Exception ex)
@@ -220,7 +241,7 @@ namespace OdfConverter.CommandLineTool
                 options.AutoDetectDirection = true;
                 options.ConversionDirection = batchOptions.ConversionDirection;
                 options.ConversionMode = ConversionMode.Batch;
-                
+
                 options.Validate = batchOptions.Validate;
                 options.ForceOverwrite = batchOptions.ForceOverwrite;
 
@@ -230,7 +251,7 @@ namespace OdfConverter.CommandLineTool
 
                 options.ShowUserInterface = batchOptions.ShowUserInterface;
                 options.ShowProgress = batchOptions.ShowProgress;
-                
+
                 options.XslPath = batchOptions.XslPath;
                 options.SkippedPostProcessors = batchOptions.SkippedPostProcessors;
                 options.Packaging = batchOptions.Packaging;
@@ -360,7 +381,7 @@ namespace OdfConverter.CommandLineTool
                     converter.ComputeSize(input);
                     this._computeSize = false;
                 }
-                
+
                 converter.Transform(input, output, options);
 
                 if (options.ShowProgress)
@@ -369,7 +390,7 @@ namespace OdfConverter.CommandLineTool
                     Console.CursorLeft = 0;
                     Console.Write("                                                                                ");
                     Console.CursorLeft = 0;
-                } 
+                }
                 stopwatch.Stop();
                 this._report.LogInfo(input, "Conversion succeeded");
                 this._report.LogInfo(input, "Total conversion time: {0}", stopwatch.Elapsed);
@@ -429,7 +450,7 @@ namespace OdfConverter.CommandLineTool
             else
             {
                 this._progress++;
-                drawTextProgressBar(this._progress, this._totalSize);                
+                drawTextProgressBar(this._progress, this._totalSize);
             }
         }
 
@@ -526,7 +547,7 @@ namespace OdfConverter.CommandLineTool
             Console.WriteLine("     /P                 Show conversion progress on the command line");
             Console.WriteLine("     /REPORT Filename   Name of the report file that should be generated (existing files will be replaced)");
             Console.WriteLine("     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR");
-            Console.WriteLine(); 
+            Console.WriteLine();
             Console.WriteLine("  Batch options (use one of the /BATCH-<format> options at a time):");
             Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (Note: use /F to replace existing files)");
             Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (Note: use /F to replace existing files)");
@@ -535,7 +556,7 @@ namespace OdfConverter.CommandLineTool
             Console.WriteLine("     /BATCH-ODS         Do a batch conversion over every ODS file in the input folder (Note: use /F to replace existing files)");
             Console.WriteLine("     /BATCH-XLSX        Do a batch conversion over every XLSX file in the input folder (Note: use /F to replace existing files)");
             Console.WriteLine("     /R                 Process subfolders recursively during batch conversion");
-            Console.WriteLine(); 
+            Console.WriteLine();
             Console.WriteLine("  Conversion direction options (to disable automatic file type detection):");
             Console.WriteLine("     /ODT2DOCX          Force conversion to DOCX regardless of input file extension");
             Console.WriteLine("     /DOCX2ODT          Force conversion to ODT regardless of input file extension");
@@ -543,7 +564,7 @@ namespace OdfConverter.CommandLineTool
             Console.WriteLine("     /XLSX2ODS          Force conversion to ODS regardless of input file extension");
             Console.WriteLine("     /ODP2PPTX          Force conversion to PPTX regardless of input file extension");
             Console.WriteLine("     /PPTX2ODP          Force conversion to ODP regardless of input file extension");
-            Console.WriteLine(); 
+            Console.WriteLine();
             Console.WriteLine("  Developer options:");
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
             Console.WriteLine("     /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)");

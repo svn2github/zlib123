@@ -33,6 +33,7 @@ using System.IO;
 using System.Resources;
 using System.Windows.Forms;
 using System.Net;
+using OdfConverter.OdfConverterLib;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -41,31 +42,32 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     {
         delegate void WorkCompleteCallback(Exception e);
 
-        private AbstractConverter converter;
-        private string inputFile;
-        private string outputFile;
-        private ResourceManager manager;
-        private ConversionOptions options;
-        private bool computeSize;
-        private int size;
-        private Exception exception;
-        private bool cancel;
-        private bool converting;
-        private List<string> lostElements;
+        private AbstractConverter _converter;
+        //private string _inputFile;
+        //private string _outputFile;
+        private ResourceManager _manager;
+        private ConversionOptions _options;
+        private bool _computeSize;
+        private int _size;
+        private Exception _exception;
+        private bool _cancel;
+        private bool _converting;
+        private List<string> _lostElements;
 
         public ConverterForm(AbstractConverter converter, string inputFile, string outputFile, ResourceManager manager, ConversionOptions options)
         {
             InitializeComponent();
-            this.converter = converter;
-            this.inputFile = inputFile;
-            this.outputFile = outputFile;
-            this.manager = manager;
-            this.options = options;
-            lostElements = new List<string>();
-            //this code is for displaying the label in progress bar               
-            //Code change 1 of 2
+
+            this._converter = converter;
+            this._manager = manager;
+            this._options = options;
+            this._lostElements = new List<string>();
+            
             this.lblMessage.Text = manager.GetString("ProgressBarLoadLabel");
             this.lblMessage.Visible = true;
+
+            FileInfo file = new FileInfo(options.InputFullName);
+            this.Text = _manager.GetString("ConversionFormTitle").Replace("%1", file.Name);
 
             if (this.Parent == null)
             {
@@ -80,53 +82,45 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public Exception Exception
         {
-            get
-            {
-                return this.exception;
-            }
+            get { return this._exception; }
         }
 
         public bool Canceled
         {
-            get
-            {
-                return cancel;
-            }
+            get { return _cancel; }
         }
 
         public bool HasLostElements
         {
-            get
-            {
-                return lostElements.Count > 0;
-            }
+            get { return _lostElements.Count > 0; }
         }
 
         public string[] LostElements
         {
-            get
-            {
-                return (string[])lostElements.ToArray();
-            }
+            get { return (string[])_lostElements.ToArray(); }
         }
 
         private void DoConvert()
         {
             try
             {
-                converter.RemoveMessageListeners();
-                converter.AddProgressMessageListener(new AbstractConverter.MessageListener(ProgressMessageInterceptor));
-                converter.AddFeedbackMessageListener(new AbstractConverter.MessageListener(FeedbackMessageInterceptor));
-                converter.DirectTransform = this.options.IsDirectTransform;
-                this.computeSize = true;
-                converter.ComputeSize(this.inputFile);
-                this.progressBar1.Maximum = this.size;
-                this.computeSize = false;
-                //Code Added on 19 Feb 2009 by Achougle@Xandros.com
-                this.options.InputFullName = this.inputFile;
-                this.options.InputFullNameOriginal = this.inputFile;
-                //Code Added on 19 Feb 2009 by Achougle@Xandros.com
-                converter.Transform(this.inputFile, this.outputFile, this.options);
+                _converter.RemoveMessageListeners();
+                _converter.AddProgressMessageListener(new AbstractConverter.MessageListener(ProgressMessageInterceptor));
+                _converter.AddFeedbackMessageListener(new AbstractConverter.MessageListener(FeedbackMessageInterceptor));
+                _converter.DirectTransform = this._options.IsDirectTransform;
+
+                if (UriLoader.IsRemote(this._options.InputFullName))
+                {
+                    this._options.InputFullNameOriginal = this._options.InputFullName;
+                    this._options.InputFullName = UriLoader.DownloadFile(this._options.InputFullName);
+                    this._options.InputBaseFolder = Path.GetDirectoryName(this._options.InputFullName);    
+                }
+                
+                this._computeSize = true;
+                this._converter.ComputeSize(this._options.InputFullName);
+                this.progressBar1.Maximum = this._size;
+                this._computeSize = false;
+                _converter.Transform(this._options.InputFullName, this._options.OutputFullName, this._options);
                 WorkComplete(null);
             }
             catch (Exception ex)
@@ -138,9 +132,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void ProgressMessageInterceptor(object sender, EventArgs e)
         {
-            if (this.computeSize)
+            if (this._computeSize)
             {
-                this.size++;
+                this._size++;
             }
             else
             {
@@ -157,11 +151,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 //when progress bar crosses maximum value, another message will be displayed 
                 {
                     this.lblMessage.Visible = true;
-                    this.lblMessage.Text = manager.GetString("ProgressBarExitLabel");
+                    this.lblMessage.Text = _manager.GetString("ProgressBarExitLabel");
                 }
             }
             Application.DoEvents();
-            if (cancel)
+            if (_cancel)
             {
                 // As we need to leave converter.OdfToOox, throw an exception
                 throw new CancelledException();
@@ -178,7 +172,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (index > 0)
             {
                 string[] param = messageKey.Substring(index + 1).Split(new char[] { '%' });
-                messageValue = manager.GetString(messageKey.Substring(0, index));
+                messageValue = _manager.GetString(messageKey.Substring(0, index));
 
                 if (messageValue != null)
                 {
@@ -190,12 +184,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             else
             {
-                messageValue = manager.GetString(messageKey);
+                messageValue = _manager.GetString(messageKey);
             }
 
-            if (messageValue != null && !lostElements.Contains(messageValue))
+            if (messageValue != null && !_lostElements.Contains(messageValue))
             {
-                lostElements.Add(messageValue);
+                _lostElements.Add(messageValue);
             }
         }
 
@@ -213,7 +207,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 else
                 {
-                    this.exception = e;
+                    this._exception = e;
                     DialogResult = DialogResult.Abort;
                 }
             }
@@ -221,50 +215,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            cancel = true;
-        }
-
-        private void ConverterForm_Load(object sender, EventArgs e)
-        {
-            //Code Added on 19 Feb 2009 by Achougle@Xandros.com
-            String fileurl = inputFile;
-            //Chcking whether the inputFile is url of ODF document
-            if (fileurl.Contains("http:") || fileurl.Contains("ftp:"))
-            {
-                //Extracting the Filename from the url.
-                String filename = fileurl.Substring(fileurl.LastIndexOf("/"), (fileurl.Length - fileurl.LastIndexOf("/")));
-                filename = filename.Remove(0, 1);
-                string tempPath = Path.GetTempPath().ToString();
-                String str = tempPath + filename;
-                /*Using WebClient class provides common methods for sending data to or receiving data from
-                any local, intranet, or Internet resource identified by a URI.*/
-                WebClient wc = new WebClient();
-                try
-                {
-                    //Downloading the ODF document to the user's local temp directory.
-                    wc.DownloadFile(inputFile, str);
-                }
-                catch (Exception e1)
-                {
-                    this.exception = e1;
-                }
-                //Assigning the local temp path filename to the inputFile.
-                inputFile = str;
-            }
-            //Code Added on 19 Feb 2009 by Achougle@Xandros.com
-            FileInfo file = new FileInfo(inputFile);
-            this.Text = manager.GetString("ConversionFormTitle").Replace("%1", file.Name);
+            _cancel = true;
         }
 
         private void ConverterForm_Activated(object sender, EventArgs e)
         {
             // Launch conversion
-            if (!converting)
+            if (!_converting)
             {
-                converting = true;
+                _converting = true;
                 Application.DoEvents();
                 DoConvert();
-                converting = false;
+                _converting = false;
             }
         }
     }

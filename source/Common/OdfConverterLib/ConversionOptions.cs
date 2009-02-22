@@ -28,6 +28,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -158,7 +159,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// </summary>
         public string InputBaseFolder
         {
-            get { return _inputBaseFolder; }
+            get { return _inputBaseFolder != null ? _inputBaseFolder : Path.GetDirectoryName(this.InputFullNameOriginal); }
             set { _inputBaseFolder = value; }
         }
 

@@ -382,7 +382,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     // set working directory to the input document's path
                     // that way we can resolve references to relative links into the file system easily
-                    Environment.CurrentDirectory = Path.GetDirectoryName(options.InputFullNameOriginal);
+                    Environment.CurrentDirectory = options.InputBaseFolder;
 
                     parameters.AddParam("documentType", "", options.DocumentType.ToString());
                     parameters.AddParam("generator", "", options.Generator);

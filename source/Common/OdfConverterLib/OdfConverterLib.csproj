@@ -72,6 +72,7 @@
     <Compile Include="NotAnOdfDocumentException.cs" />
     <Compile Include="OoxSpacesPostProcessor.cs" />
     <Compile Include="SharedXmlUrlResolver.cs" />
+    <Compile Include="UriLoader.cs" />
     <Compile Include="ZipResolver.cs" />
   </ItemGroup>
   <ItemGroup>
