@@ -46,6 +46,7 @@
   exclude-result-prefixes="w wp r rels b oox ooc">
 
   <xsl:key name="fieldRunsByFieldId" match="w:r" use="@oox:fid" />
+  <xsl:key name="fieldRunsByParaId" match="w:r[@oox:fid]" use="@oox:fpid" />
 
   <!-- 
   *************************************************************************
@@ -174,7 +175,7 @@
     <!-- the context is w:r -->
 
     <!-- field creating is triggered by the first w:instrText or in case the field wraps over several paragraphs -->
-    <xsl:if test="w:instrText/@oox:firstInstrText or parent::node()/w:r[1] = self::node()">
+    <xsl:if test="@oox:fStart">
       <text:span text:style-name="{generate-id(.)}">
 
         <xsl:variable name="fieldCode">
@@ -184,7 +185,7 @@
         <xsl:variable name="runParent" select="parent::node()" />
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="$fieldCode" />
-          <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByFieldId', @oox:fid)[ancestor::node() = $runParent]" />
+          <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByParaId', @oox:fpid)" />
         </xsl:call-template>
 
       </text:span>
@@ -1506,14 +1507,14 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$docName = 'document.xml'">
-        <xsl:if test="following::w:sectPr[1]/w:pgNumType/@w:chapStyle">
+        <xsl:if test="key('sectPr', number(ancestor-or-self::node()/@oox:s))/w:pgNumType/@w:chapStyle">
           <text:chapter text:display="number"
-                        text:outline-level="{following::w:sectPr[1]/w:pgNumType/@w:chapStyle}" />
+                        text:outline-level="{key('sectPr', number(ancestor-or-self::node()/@oox:s))/w:pgNumType/@w:chapStyle}" />
           <xsl:choose>
-            <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'period'">
+            <xsl:when test="key('sectPr', number(ancestor-or-self::node()/@oox:s))/w:pgNumType/@w:chapSep = 'period'">
               <xsl:text>.</xsl:text>
             </xsl:when>
-            <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'colon'">
+            <xsl:when test="key('sectPr', number(ancestor-or-self::node()/@oox:s))/w:pgNumType/@w:chapSep = 'colon'">
               <xsl:text>:</xsl:text>
             </xsl:when>
             <xsl:otherwise>-</xsl:otherwise>
@@ -1533,7 +1534,7 @@
                 <xsl:when test="w:pgNumType/@w:chapSep = 'period'">
                   <xsl:text>.</xsl:text>
                 </xsl:when>
-                <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'colon'">
+                <xsl:when test="key('sectPr', number(ancestor-or-self::node()/@oox:s))/w:pgNumType/@w:chapSep = 'colon'">
                   <xsl:text>:</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>-</xsl:otherwise>

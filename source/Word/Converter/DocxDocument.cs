@@ -153,6 +153,7 @@ namespace OdfConverter.Wordprocessing
                                             }
                                             if (xtr.Value.Equals("end"))
                                             {
+                                                fieldBegin = false;
                                                 _insideField--;
                                             }
                                             break;
@@ -184,6 +185,12 @@ namespace OdfConverter.Wordprocessing
                                         }
                                         xtw.WriteEndElement();
                                         bookmarkNode = null;
+                                    }
+
+                                    // re-trigger field translation for fields spanning across multiple paragraphs
+                                    if (_insideField > 0)
+                                    {
+                                        fieldBegin = true;
                                     }
 
                                     break;
@@ -218,20 +225,24 @@ namespace OdfConverter.Wordprocessing
                                         // add an attribute if we are inside a field definition
                                         xtw.WriteAttributeString(NS_PREFIX, "f", PACKAGE_NS, _insideField.ToString());
                                         xtw.WriteAttributeString(NS_PREFIX, "fid", PACKAGE_NS, _fieldId.ToString());
+
+                                        // also add the id of the current paragraph so we can get the display value of the 
+                                        // field for a specific paragraph easily. This is to support multi-paragraph fields.
+                                        xtw.WriteAttributeString(NS_PREFIX, "fpid", PACKAGE_NS, _paraId.ToString());
+                                        if (fieldBegin)
+                                        {
+                                            // add markup to the first run of a field so that we can trigger field 
+                                            // translation later in template InsertComplexField
+                                            // This is also used to support multi-paragraph fields.
+                                            //
+                                            xtw.WriteAttributeString(NS_PREFIX, "fStart", PACKAGE_NS, "1");
+                                            fieldBegin = false;
+                                        }
                                     }
                                     break;
                                 case "sectPr":
                                     xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
                                     _sectPrId++;
-                                    break;
-                                case "instrText":
-                                    // add markup to the first instrText so that we can trigger field 
-                                    // translation later in template InsertField
-                                    if (fieldBegin)
-                                    {
-                                        xtw.WriteAttributeString(NS_PREFIX, "firstInstrText", PACKAGE_NS, "1");
-                                        fieldBegin = false;
-                                    }
                                     break;
                                 case "fldSimple":
                                     if (!xtr.IsEmptyElement)
