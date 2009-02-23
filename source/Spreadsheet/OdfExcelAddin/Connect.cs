@@ -92,7 +92,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                             Type.Missing, Type.Missing, Type.Missing);
                     break;
 
-                default:                    
+                default:
                     doc = this._application.Invoke("Workbooks").
                     Invoke("Open", fileName, Type.Missing, readOnly, Type.Missing, Type.Missing,
                             Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
@@ -107,8 +107,8 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         {
             // prevent any popup dialogs which block the application in the background
             bool bDisplayAlerts = this._application.GetBool("DisplayAlerts");
-            this._application.SetBool("DisplayAlerts", false); 
-                    
+            this._application.SetBool("DisplayAlerts", false);
+
             switch (this._officeVersion)
             {
                 case OfficeVersion.OfficeXP:
@@ -129,8 +129,8 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                         Type.Missing, Type.Missing, Type.Missing);
                     break;
             }
-            this._application.SetBool("DisplayAlerts", bDisplayAlerts); 
-                    
+            this._application.SetBool("DisplayAlerts", bDisplayAlerts);
+
             return doc;
         }
 
@@ -141,9 +141,9 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        public override void importOdf()
+        public override bool importOdfFile(string odfFile)
         {
-            foreach (string odfFile in getOpenFileNames())
+            try
             {
                 // create a temporary file
                 string fileName = this._addinLib.GetTempFileName(odfFile, ".xlsx");
@@ -159,44 +159,42 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
 
                 this._addinLib.OdfToOox(odfFile, fileName, options);
 
-                try
+                // open the document
+                bool confirmConversions = false;
+                bool readOnly = true;
+                bool addToRecentFiles = false;
+                bool isVisible = true;
+                bool openAndRepair = false;
+
+                // conversion may have been cancelled and file deleted.
+                if (File.Exists((string)fileName))
                 {
-                    // open the document
-                    bool confirmConversions = false;
-                    bool readOnly = true;
-                    bool addToRecentFiles = false;
-                    bool isVisible = true;
-                    bool openAndRepair = false;
+                    // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
+                    System.Globalization.CultureInfo ci;
+                    ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+                    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-                    // conversion may have been cancelled and file deleted.
-                    if (File.Exists((string)fileName))
-                    {
-                        // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
-                        System.Globalization.CultureInfo ci;
-                        ci = System.Threading.Thread.CurrentThread.CurrentCulture;
-                        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+                    LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
 
-                        LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
+                    // and activate it
+                    doc.Invoke("Activate");
 
-                        // and activate it
-                        doc.Invoke("Activate");
-
-                        System.Threading.Thread.CurrentThread.CurrentCulture = ci;
-                    }
+                    System.Threading.Thread.CurrentThread.CurrentCulture = ci;
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Trace.WriteLine(ex.ToString());
-                    System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                    return;
-                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                return false;
             }
         }
 
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        public override void exportOdf()
+        public override bool ExportOdf()
         {
             System.Globalization.CultureInfo ci;
             ci = System.Threading.Thread.CurrentThread.CurrentCulture;
@@ -215,6 +213,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                     )
                 {
                     System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                    return false;
                 }
                 else
                 {
@@ -318,6 +317,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                             this._addinLib.DeleteTempPath((string)tempXlsxName);
                         }
                     }
+                    return true;
                 }
             }
             finally

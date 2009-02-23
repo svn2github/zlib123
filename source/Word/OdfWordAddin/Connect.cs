@@ -222,70 +222,68 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        public override void importOdf()
+        public override bool importOdfFile(string odfFileName)
         {
-            foreach (string odfFile in getOpenFileNames())
+            try
             {
                 // create a temporary file
-                string fileName = this._addinLib.GetTempFileName(odfFile, ".docx");
+                string outputFileName = this._addinLib.GetTempFileName(odfFileName, ".docx");
 
                 this._application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorWait);
 
                 ConversionOptions options = new ConversionOptions();
-                options.InputFullName = odfFile;
-                options.OutputFullName = fileName;
+                options.InputFullName = odfFileName;
+                options.OutputFullName = outputFileName;
                 options.ConversionDirection = ConversionDirection.OdtToDocx;
                 options.Generator = this.GetGenerator();
-                options.DocumentType = Path.GetExtension(odfFile).ToUpper().Equals(".OTT") ? DocumentType.Template : DocumentType.Document;
+                options.DocumentType = Path.GetExtension(odfFileName).ToUpper().Equals(".OTT") ? DocumentType.Template : DocumentType.Document;
                 options.ShowProgress = true;
                 options.ShowUserInterface = true;
 
-                this._addinLib.OdfToOox(odfFile, fileName, options);
-                
+                this._addinLib.OdfToOox(odfFileName, outputFileName, options);
+
                 this._application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorNormal);
 
-                try
+                // open the document
+                bool confirmConversions = false;
+                bool readOnly = true;
+                bool addToRecentFiles = false;
+                bool isVisible = true;
+                bool openAndRepair = false;
+
+                // conversion may have been cancelled and file deleted.
+                if (File.Exists((string)outputFileName))
                 {
-                    // open the document
-                    bool confirmConversions = false;
-                    bool readOnly = true;
-                    bool addToRecentFiles = false;
-                    bool isVisible = true;
-                    bool openAndRepair = false;
+                    LateBindingObject doc = OpenDocument(outputFileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
 
-                    // conversion may have been cancelled and file deleted.
-                    if (File.Exists((string)fileName))
-                    {
-                        LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
+                    // update document fields
+                    //doc.Invoke("Fields").Invoke("Update");
 
-                        // update document fields
-                        //doc.Invoke("Fields").Invoke("Update");
-
-                        // and activate it
-                        doc.Invoke("Activate");
-                        doc.Invoke("Windows").Invoke("Item", 1).Invoke("Activate");
-                    }
+                    // and activate it
+                    doc.Invoke("Activate");
+                    doc.Invoke("Windows").Invoke("Item", 1).Invoke("Activate");
                 }
-                catch (Exception ex)
-                {
-                    _application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorNormal);
-                    System.Diagnostics.Trace.WriteLine(ex.ToString());
-                    System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                    return;
-                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorNormal);
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                return false;
             }
         }
 
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        public override void exportOdf()
+        public override bool ExportOdf()
         {
             // check if Word12 converter is installed
             if (_word12SaveFormat == -1)
             {
                 System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfConverterNotInstalled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                return;
+                return false;
             }
 
             LateBindingObject doc = _application.Invoke("ActiveDocument");
@@ -300,6 +298,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                 )
             {
                 System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                return false;
             }
             else
             {
@@ -407,7 +406,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                             lMsg = _addinLib.GetString("OdfExportErrorTryDocxFirst");
                             System.Windows.Forms.MessageBox.Show(lMsg, DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
                             System.Diagnostics.Trace.WriteLine(ex.ToString());
-                            return;
+                            return false;
                         }
                     }
 
@@ -429,8 +428,8 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                         this._addinLib.DeleteTempPath((string)tempDocxName);
                     }
                     _application.Invoke("System").SetInt32("Cursor", (int)currentCursor);
-
                 }
+                return true;
             }
         }
 

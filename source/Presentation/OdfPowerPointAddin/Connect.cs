@@ -137,53 +137,51 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        public override void importOdf()
+        public override bool importOdfFile(string odfFileName)
         {
-            foreach (string odfFile in getOpenFileNames())
+            try
             {
                 // create a temporary file
-                string fileName = this._addinLib.GetTempFileName(odfFile, ".pptx");
+                string fileName = this._addinLib.GetTempFileName(odfFileName, ".pptx");
 
                 ConversionOptions options = new ConversionOptions();
-                options.InputFullName = odfFile;
+                options.InputFullName = odfFileName;
                 options.OutputFullName = fileName;
                 options.ConversionDirection = ConversionDirection.OdpToPptx;
                 options.Generator = this.GetGenerator();
-                options.DocumentType = Path.GetExtension(odfFile).ToUpper().Equals(".OTP") ? DocumentType.Template : DocumentType.Document;
+                options.DocumentType = Path.GetExtension(odfFileName).ToUpper().Equals(".OTP") ? DocumentType.Template : DocumentType.Document;
                 options.ShowProgress = true;
                 options.ShowUserInterface = true;
-                
-                this._addinLib.OdfToOox(odfFile, fileName, options);
 
-                try
+                this._addinLib.OdfToOox(odfFileName, fileName, options);
+            
+                // open the document
+                bool confirmConversions = false;
+                bool readOnly = true;
+                bool addToRecentFiles = false;
+                bool isVisible = true;
+                bool openAndRepair = false;
+
+                // conversion may have been cancelled and file deleted.
+                if (File.Exists((string)fileName))
                 {
-                    // open the document
-                    bool confirmConversions = false;
-                    bool readOnly = true;
-                    bool addToRecentFiles = false;
-                    bool isVisible = true;
-                    bool openAndRepair = false;
+                    LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
 
-                    // conversion may have been cancelled and file deleted.
-                    if (File.Exists((string)fileName))
-                    {
-                        LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
-
-                    }
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Trace.WriteLine(ex.ToString());
-                    System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                    return;
-                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                System.Windows.Forms.MessageBox.Show(this._addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                return false;
             }
         }
 
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        public override void exportOdf()
+        public override bool ExportOdf()
         {
             LateBindingObject doc = _application.Invoke("ActivePresentation");
 
@@ -197,6 +195,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                 )
             {
                 System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                return false;
             }
             else
             {
@@ -310,7 +309,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                         this._addinLib.DeleteTempPath((string)tmpFileName);
                     }
                 }
-
+                return true;
             }
         }
 

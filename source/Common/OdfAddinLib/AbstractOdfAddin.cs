@@ -399,7 +399,27 @@ namespace OdfConverter.OdfConverterLib
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        public abstract void importOdf();
+        /// <returns>True on success, false if an excepction occurred</returns>
+        public virtual bool importOdf()
+        {
+            foreach (string odfFile in getOpenFileNames())
+            {
+                if (!importOdfFile(odfFile))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        /// <summary>
+        /// Read the specified ODF file.
+        /// </summary>
+        /// <param name="odfFileName"></param>
+        /// <returns>True on success, false if an excepction occurred</returns>
+        public abstract bool importOdfFile(string odfFileName);
+
 
         /// <summary>
         /// Event handler for Office 2007
@@ -409,7 +429,7 @@ namespace OdfConverter.OdfConverterLib
         {
             try
             {
-                exportOdf();
+                ExportOdf();
             }
             catch (Exception ex)
             {
@@ -422,14 +442,16 @@ namespace OdfConverter.OdfConverterLib
         /// </summary>
         protected virtual void exportButton_Click(object /*CommandBarButton*/ Ctrl, object CancelDefault)
         {
-            exportOdf();
+            ExportOdf();
         }
 
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        public abstract void exportOdf();
+        /// <returns>True on success, false if an excepction occurred</returns>
+        public abstract bool ExportOdf();
 
+        
         /// <summary>
         /// Event handler for Office 2007
         /// </summary>
