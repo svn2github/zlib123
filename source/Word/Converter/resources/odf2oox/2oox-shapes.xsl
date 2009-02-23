@@ -132,13 +132,15 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
           <!-- TODO - other shapes -->
           <xsl:otherwise>
             <!--Start of RefNo-1-->
-            <v:shapetype id="_x0000_t222">
+            <xsl:variable name="shapeTypeID" select="generate-id(.)"/>
+            
+            <v:shape id="{concat('_x0000_s',$shapeTypeID)}" >
               <xsl:attribute name="coordsize">
                 <xsl:variable name="svgViewBox">
                   <xsl:choose>
                     <xsl:when test="./draw:enhanced-geometry/@svg:viewBox">
                       <xsl:value-of select="substring-after(./draw:enhanced-geometry/@svg:viewBox,' ')"/>
-					</xsl:when>
+                    </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="'0 21600 21600'"/>
                     </xsl:otherwise>
@@ -151,15 +153,15 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
                   <xsl:value-of select="translate(./draw:enhanced-geometry/@draw:modifiers,' ',',')"/>
                 </xsl:attribute>
               </xsl:if>
-	    <xsl:variable name="viewBox">
+              <xsl:variable name="viewBox">
                 <xsl:choose>
                   <xsl:when test="./draw:enhanced-geometry/@svg:viewBox">
                     <xsl:value-of select="./draw:enhanced-geometry/@svg:viewBox"/>
-					</xsl:when>
+                  </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="'0 0 21600 21600'"/>
                   </xsl:otherwise>
-				</xsl:choose>
+                </xsl:choose>
               </xsl:variable>
               <xsl:variable name="modifiers" select="./draw:enhanced-geometry/@draw:modifiers"/>
               <xsl:variable name="drawEqn">
@@ -173,16 +175,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
                 <xsl:attribute name="path">
                   <xsl:value-of select="concat('CustShpWrdFreFrm',$modifiers,'###',substring($drawEqn,2),'###',$viewBox,'###',$enhPath)"/>
                 </xsl:attribute>
+                <!--<xsl:value-of select="concat('CustShpWrdFreFrm',$modifiers,'###',substring($drawEqn,2),'###',$viewBox,'###',$enhPath)"/>-->
               </xsl:if>
-				
-							<v:stroke joinstyle="miter"/>
-              <v:formulas/>
-              <v:path />
-							<v:handles>
-								<v:h position="#0,topLeft" xrange="0,21600"/>
-							</v:handles>
-						</v:shapetype>
-            <v:shape id="_x0000_s1111" type="#_x0000_t222" >
+            
 							<xsl:call-template name="ConvertShapeProperties">
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
                 <!-- Sona: Changed I/P parameter-->
