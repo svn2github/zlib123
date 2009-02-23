@@ -961,30 +961,20 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
     <xsl:param name="frame"/>
 
     <!-- wrapping of text (horizontal adjustment) -->
-    <!-- Sona: wrap text styles-->
-    <!--<xsl:if test="($frameStyle/style:graphic-properties/@fo:min-width and substring-before($frameStyle/style:graphic-properties/@fo:min-width,$unit) != '0') or 
-            ($frameStyle/style:graphic-properties/@fo:min-height and substring-before($frameStyle/style:graphic-properties/@fo:min-width,$unit1) != '0') or 
-            $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true' or 
-            not($frameStyle/style:graphic-properties/@fo:wrap-option)">
-      --><!--
-      makz: was uncommented in r2655 by rebet
-      I commented it in for bugfix 1827515
-      --><!--            
-      <xsl:text>mso-wrap-style:none;</xsl:text>
-    </xsl:if>-->
     <xsl:choose>
-      <xsl:when test ="($frameStyle/style:graphic-properties/@fo:min-width and $frameStyle/style:graphic-properties/@fo:min-height) 
+      <xsl:when test ="not($frame/@svg:width) and 
+                (($frameStyle/style:graphic-properties/@fo:min-width and $frameStyle/style:graphic-properties/@fo:min-height) 
                 or ($frameStyle/style:graphic-properties/@fo:min-width and $frame/child::node()/@fo:min-height)                
                 or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
-                or $frameStyle/style:graphic-properties/@fo:min-width">
+                or $frameStyle/style:graphic-properties/@fo:min-width)">
         <!-- Sona: The above condition valid only for frames-->
-        <xsl:if test="parent::draw:frame or draw:frame">
+        <xsl:if test="$frame/parent::draw:frame or $frame/self::draw:frame">
           <xsl:text>mso-wrap-style:none;</xsl:text>
         </xsl:if>
       </xsl:when>
-      <xsl:when test="(@fo:min-height and parent::draw:frame/@fo:min-width) or parent::draw:frame/@fo:min-width">
+      <xsl:when test="not($frame/@svg:width) and ($frame/@fo:min-height and $frame/parent::draw:frame/@fo:min-width) or $frame/parent::draw:frame/@fo:min-width">
         <!-- Sona: The above condition valid only for frames-->
-        <xsl:if test="parent::draw:frame or draw:frame">
+        <xsl:if test="$frame/parent::draw:frame or $frame/self::draw:frame">
           <xsl:text>mso-wrap-style:none;</xsl:text>
         </xsl:if>
       </xsl:when>

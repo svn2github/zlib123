@@ -70,8 +70,7 @@ namespace OdfConverterLauncher
             try
             {
                 // call the exposed add-in method for importing ODF
-                LateBindingObject application = new LateBindingObject(_application);
-                application.Invoke("COMAddins", _progIdAddin).Invoke("Object").Invoke("importOdfFile", odfFileName);
+                _application.Invoke("COMAddIns", _progIdAddin).Invoke("Object").Invoke("importOdfFile", odfFileName);
             }
             catch (Exception ex)
             {

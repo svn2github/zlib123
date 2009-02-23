@@ -406,7 +406,7 @@
           <xsl:call-template name="GetTotalCellWidth">
             <xsl:with-param name="colPos" select="1" />
             <xsl:with-param name="colEndPos" select="1 + @table:number-columns-spanned" />
-            <xsl:with-param name="columns" select="ancestor::table:table/table:table-column" />
+            <xsl:with-param name="columns" select="ancestor::table:table/table:table-column | ancestor::table:table/table:table-columns/table:table-column" />
           </xsl:call-template>
 
         </xsl:for-each>
@@ -517,7 +517,7 @@
           select="substring-before(key('automatic-styles',@table:style-name)/style:table-column-properties/@style:rel-column-width, '*')"/>
         <xsl:variable name="totRelWidth">
           <xsl:call-template name="ComputeTotalRelativeWidth">
-            <xsl:with-param name="columns" select="parent::node()/table:table-column"/>
+            <xsl:with-param name="columns" select="parent::node()/table:table-column | parent::node()/table:table-columns/table:table-column"/>
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
@@ -629,7 +629,7 @@
     <xsl:call-template name="InsertTableCellWidth">
       <xsl:with-param name="cellPos" select="position() - count(preceding-sibling::table:covered-table-cell)" />
       <xsl:with-param name="cells" select="ancestor::table:table-row/table:table-cell" />
-      <xsl:with-param name="columns" select="ancestor::table:table/table:table-column" />
+      <xsl:with-param name="columns" select="ancestor::table:table/table:table-column | ancestor::table:table/table:table-columns/table:table-column" />
     </xsl:call-template>
 
     <xsl:call-template name="InsertCellSpan" />
