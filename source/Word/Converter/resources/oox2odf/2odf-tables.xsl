@@ -600,7 +600,7 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:variable name="precSectPr" select="preceding::w:p[1]/w:pPr/w:sectPr"/>
-            <xsl:variable name="followingSectPr" select="following::w:sectPr"/>
+            <xsl:variable name="followingSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))"/>
             <xsl:if
               test="($precSectPr/w:pgSz/@w:w = $followingSectPr/w:pgSz/@w:w
               and $precSectPr/w:pgSz/@w:h = $followingSectPr/w:pgSz/@w:h

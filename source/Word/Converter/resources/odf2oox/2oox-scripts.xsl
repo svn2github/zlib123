@@ -51,24 +51,37 @@
       {
           Uri result = null;
           
-          // remove leading slash on absolute local paths (OOo uses /C:/somefolder for local paths)
-          if (Regex.Match(path, "^/[A-Za-z]:").Success)
+          try
           {
-              path = path.Substring(1);
-          }
-          
-          if (!Uri.TryCreate(path, UriKind.Absolute, out result))
-          {
-              // check whether relative URI points into package or outside
-              string uriBase = Path.Combine(Environment.CurrentDirectory, "dummy.odt");
-              string absolutePath = Path.GetFullPath(Path.Combine(uriBase, path));
-              
-              if (absolutePath.StartsWith(uriBase))
+              // remove leading slash on absolute local paths (OOo uses /C:/somefolder for local paths)
+              if (Regex.Match(path, "^/[A-Za-z]:").Success)
               {
-                  // relative path inside the package
-                  return false;
+                  path = path.Substring(1);
+              }
+              
+              // escape special characters
+              //path = Uri.EscapeUriString(path.Replace('\\', '/'));
+              
+              if (!Uri.TryCreate(path, UriKind.Absolute, out result))
+              {
+                  // check whether relative URI points into package or outside
+                  Uri uriBase = new Uri(Path.Combine(Environment.CurrentDirectory, @"dummy.odt\"));
+                  string absolutePath = uriBase.ToString() + path;
+                  
+                  if (Uri.TryCreate(absolutePath, UriKind.RelativeOrAbsolute, out result))
+                  {
+                      if (result.ToString().StartsWith(uriBase.ToString()))
+                      {
+                          // relative path inside the package
+                          return false;
+                      }
+                  }
               }
           }
+          catch
+          {
+          }
+            
           return true;
       }
 
@@ -80,34 +93,46 @@
       
       public string UriFromPath(string path)
       {
-          Uri result = null;
-          
-          // remove leading slash on absolute local paths (OOo uses /C:/somefolder for local paths)
-          if (Regex.Match(path, "^/[A-Za-z]:").Success)
+          try
           {
-              path = path.Substring(1);
-          }
-          
-          if (!Uri.TryCreate(path, UriKind.Absolute, out result))
-          {
-              // check whether relative URI points into package or outside
-              string uriBase = Path.Combine(Environment.CurrentDirectory, "dummy.odt");
-              string absolutePath = Path.GetFullPath(Path.Combine(uriBase, path));
+              Uri result = null;
               
-              if (absolutePath.StartsWith(uriBase))
+              // remove leading slash on absolute local paths (OOo uses /C:/somefolder for local paths)
+              if (Regex.Match(path, "^/[A-Za-z]:").Success)
               {
-                  // relative path inside the package
-                  absolutePath = absolutePath.Substring(uriBase.Length);
+                  path = path.Substring(1);
               }
-
-              if (!Uri.TryCreate(absolutePath, UriKind.RelativeOrAbsolute, out result))
+              
+              // escape special characters
+              //path = Uri.EscapeUriString(path.Replace('\\', '/'));
+                        
+              if (!Uri.TryCreate(path, UriKind.Absolute, out result))
               {
-                  // documents with invalid URIs might not open so we replace the invalid URI with one that works -->
-                  return "/";
-                  //return path;
+                  // check whether relative URI points into package or outside
+                  Uri uriBase = new Uri(Path.Combine(Environment.CurrentDirectory, @"dummy.odt\"));
+                  string absolutePath = uriBase.ToString() + path;
+                  
+                  if (Uri.TryCreate(absolutePath, UriKind.RelativeOrAbsolute, out result))
+                  {
+                      if (result.ToString().StartsWith(uriBase.ToString()))
+                      {
+                          // relative path inside the package
+                          return result.ToString().Substring(uriBase.ToString().Length);
+                      }
+                  }
+                  else
+                  {
+                      // documents with invalid URIs might not open so we replace the invalid URI with one that works -->
+                      return "/";
+                      //return path;
+                  }
               }
+              return result.ToString();
           }
-          return result.ToString();
+          catch
+          {
+              return path;
+          }
       }
       
       ///<summary>

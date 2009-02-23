@@ -757,7 +757,6 @@
     <xsl:choose>
 
       <!--fields-->
-      <!--xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate']"-->
       <xsl:when test="@oox:fid and $ignoreFieldFlag!='true'">
         <xsl:call-template name="InsertComplexField" />
       </xsl:when>

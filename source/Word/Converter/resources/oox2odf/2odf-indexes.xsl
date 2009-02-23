@@ -91,7 +91,8 @@
         <!-- TODO : localization -->
         <xsl:message terminate="no">feedback:many alphabetical index properties</xsl:message>
         <!-- TODO: use the exising pre-processing ( @oox:s with the corresponding key to replace the following:: -->
-        <text:alphabetical-index text:style-name="{generate-id(following::w:sectPr[1])}" 
+        <!--<text:alphabetical-index text:style-name="{generate-id(following::w:sectPr[1])}"-->
+        <text:alphabetical-index text:style-name="{generate-id(key('sectPr', number(ancestor-or-self::node()/@oox:s)))}"
                                  text:protected="false"
                                  text:name="Alphabetical Index1">
           <xsl:call-template name="InsertIndexProperties">

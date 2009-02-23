@@ -1016,6 +1016,8 @@
       <xsl:call-template name="InsertDefaultTextStyle"/>
       <!-- table default -->
       <xsl:call-template name="InsertDefaultTableStyle"/>
+      <!-- graphic defaul -->
+      <xsl:call-template name="InsertDefaultGraphicStyle" />      
       <!-- TODO : other ODF style families : section, table-column, table-row, table-cell, table-page, chart, default, drawing-page, graphic, presentation, control and ruby -->
     </xsl:for-each>
   </xsl:template>
@@ -1194,6 +1196,18 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template name="InsertDefaultGraphicStyle">
+    <style:default-style style:family="graphic">
+      <style:graphic-properties draw:fill="solid" 
+                                draw:fill-color="#4f81bd" 
+                                draw:opacity="100%" 
+                                draw:stroke="solid" 
+                                svg:stroke-width="0.02778in" 
+                                svg:stroke-color="#385d8a" 
+                                svg:stroke-opacity="100%" />
+    </style:default-style>
+  </xsl:template>
+  
   <xsl:template name="HeaderFooterAutomaticStyle">
     <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
       <xsl:call-template name="HeaderFooterStyles"/>

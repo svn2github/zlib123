@@ -1391,27 +1391,31 @@
       </xsl:attribute>
     </xsl:if>
     <!-- Insert background-color -->
-    <xsl:if test="(not($isFilled) or $isFilled != 'f') and $fillcolor != ''">
-      <xsl:attribute name="fo:background-color">
+    <xsl:attribute name="fo:background-color">
+      <xsl:choose>
+        <xsl:when test="(not($isFilled) or $isFilled != 'f') and $fillcolor != ''">
+          <xsl:call-template name="InsertColor">
+            <xsl:with-param name="color" select="$fillcolor" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="(not($isFilled) or $isFilled != 'f') and ($fillcolor = '' or not($fillcolor))">
+          <xsl:call-template name="InsertColor">
+            <xsl:with-param name="color">#ffffff</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <!--<xsl:text>transparent</xsl:text>-->
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    <!-- insert fill-color -->
+    <xsl:if test="$isFilled != 'f'">
+      <xsl:attribute name="draw:fill-color">
         <xsl:call-template name="InsertColor">
           <xsl:with-param name="color" select="$fillcolor" />
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test="(not($isFilled) or $isFilled != 'f') and ($fillcolor = '' or not($fillcolor))">
-      <xsl:attribute name="fo:background-color">
-        <xsl:call-template name="InsertColor">
-          <xsl:with-param name="color">#ffffff</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- insert fill-color -->
-    <xsl:attribute name="draw:fill-color">
-      <xsl:call-template name="InsertColor">
-        <xsl:with-param name="color" select="$fillcolor" />
-      </xsl:call-template>
-    </xsl:attribute>
     <!--added by chhavi to fix bug 2003056-->
     <xsl:if test="$isFilled = 'f'">
       <xsl:attribute name="draw:fill">
@@ -3451,7 +3455,7 @@
           <xsl:attribute name="svg:width">
             <xsl:choose>
               <xsl:when test="$width = 0 and $shape//@o:hr='t'">
-                <xsl:value-of select="ooc:CmFromTwips(following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1])" />
+                <xsl:value-of select="ooc:CmFromTwips(key('sectPr', number(ancestor-or-self::node()/@oox:s))/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1])" />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:call-template name="ConvertMeasure">

@@ -2596,9 +2596,10 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
 
     <xsl:param name="length"/>
     <!-- (string) The length to convert (including the unit) -->
-    <xsl:param name="round">false</xsl:param>
+
+    <xsl:variable name="round">false</xsl:variable>
     <!-- (string) If set to true, the result will be rounded to the nearest integer, otherwise the result will be a 3 decimal digit -->
-    <xsl:param name="addUnit">true</xsl:param>
+    <xsl:variable name="addUnit">true</xsl:variable>
     <!-- (string) If set to true, wil append 'cm' to the result -->
 
     <xsl:variable name="tmplength">
