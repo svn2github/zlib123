@@ -195,7 +195,9 @@
   <!-- stop doing things for w:instrText, otherwise the text content 
        (i.e. the field code) will be insterted as text -->
   <xsl:template match="w:instrText" />
-
+  <xsl:template match="w:instrText" mode="fieldDisplayValue" />
+  <xsl:template match="w:instrText" mode="fieldDisplayValueEscapeSpace" />
+  
   <!-- translate simple fields -->
   <xsl:template match="w:fldSimple">
     <!-- nested fields are handled by the surrounding field and converted to static text -->
