@@ -172,6 +172,7 @@ namespace OdfConverter.OdfConverterLib
         public virtual string GetGenerator()
         {
             string generator = Microsoft.Win32.Registry.GetValue(this.RegistryKeyUser, "Generator", null) as string;
+            string officeVersion = "";
 
             if (generator == null)
             {
@@ -183,7 +184,20 @@ namespace OdfConverter.OdfConverterLib
                 generator = "ODF Add-in for Microsoft Office";
             }
 
-            return generator + " (Office " + _application.GetString("Build") + ")";
+            if (_application != null)
+            {
+                officeVersion = _application.GetString("Build");
+                if (!officeVersion.Contains("."))
+                {
+                    // Excel and PowerPoint only return the build number, not the full version 
+                    // (as Word does). Therefore we build our own full version information in this case.
+                    //
+                    officeVersion = _application.GetString("Version") + "." + officeVersion;
+                }
+                generator = generator + " (" + officeVersion + ")";
+            }
+
+            return generator;
         }
 
         /// <summary>
