@@ -201,7 +201,7 @@
   <!-- translate simple fields -->
   <xsl:template match="w:fldSimple">
     <!-- nested fields are handled by the surrounding field and converted to static text -->
-    <xsl:if test="w:r/oox:f &lt;= 1">
+    <xsl:if test="w:r/@oox:f &lt;= 1">
       <!-- a simple field may contain several runs, however we only keep the formatting of the first one -->
       <text:span text:style-name="{generate-id(w:r)}">
         <xsl:call-template name="InsertFieldFromFieldCode">
