@@ -226,8 +226,10 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         {
             try
             {
+                bool isTemplate = Path.GetExtension(odfFileName).ToUpper().Equals(".OTT");
                 // create a temporary file
-                string outputFileName = this._addinLib.GetTempFileName(odfFileName, ".docx");
+                string outputExtension = isTemplate ? ".dotx" : ".docx";
+                string outputFileName = this._addinLib.GetTempFileName(odfFileName, outputExtension);
 
                 this._application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorWait);
 
@@ -236,7 +238,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                 options.OutputFullName = outputFileName;
                 options.ConversionDirection = ConversionDirection.OdtToDocx;
                 options.Generator = this.GetGenerator();
-                options.DocumentType = Path.GetExtension(odfFileName).ToUpper().Equals(".OTT") ? DocumentType.Template : DocumentType.Document;
+                options.DocumentType = isTemplate ? DocumentType.Template : DocumentType.Document;
                 options.ShowProgress = true;
                 options.ShowUserInterface = true;
 
@@ -341,7 +343,10 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     this._application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorWait);
 
 
-                    if (doc.GetInt32("SaveFormat") != _word12SaveFormat)
+                    if (doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLDocument 
+                        || doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLDocumentMacroEnabled
+                        || doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLTemplate
+                        || doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLTemplateMacroEnabled)
                     {
                         try
                         {
@@ -374,6 +379,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                             newDoc.Invoke("Windows").Invoke("Item", 1).SetBool("Visible", false);
 
                             // generate docx file from the duplicated file (under a temporary file)
+                            string outputExtension = 
                             tempDocxName = this._addinLib.GetTempPath((string)sourceFileName, ".docx");
 
                             SaveDocumentAs(newDoc, tempDocxName);
@@ -416,8 +422,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     options.InputFullNameOriginal = doc.GetString("FullName");
                     options.ConversionDirection = ConversionDirection.DocxToOdt;
                     options.Generator = this.GetGenerator();
-                    options.DocumentType = Path.GetExtension(sourceFileName).ToUpper().Equals(".DOTX")
-                        || Path.GetExtension(sourceFileName).ToUpper().Equals(".DOTM") ? DocumentType.Template : DocumentType.Document;
+                    options.DocumentType = Path.GetExtension(odfFileName).ToUpper().Equals(".OTT") ? DocumentType.Template : DocumentType.Document;
                     options.ShowProgress = true;
                     options.ShowUserInterface = true;
 

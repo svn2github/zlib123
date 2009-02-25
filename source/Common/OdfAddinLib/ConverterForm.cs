@@ -66,7 +66,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.lblMessage.Text = manager.GetString("ProgressBarLoadLabel");
             this.lblMessage.Visible = true;
 
-            FileInfo file = new FileInfo(options.InputFullName);
+            FileInfo file = new FileInfo(options.InputFullNameOriginal);
             this.Text = _manager.GetString("ConversionFormTitle").Replace("%1", file.Name);
 
             if (this.Parent == null)

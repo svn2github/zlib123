@@ -30,16 +30,16 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="0410CFF1-A31B-405B-B058-A0A1BE8F532E"
+  <Product Id="FE4230B6-8CA8-462E-B1D0-583A44BF90C5"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-       Version="3.0.5145.0"
+       Version="3.0.5149.0"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
-    <Package Id="2A574654-1E12-40C5-9740-0859939C5B03" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"
+    <Package Id="4C53D188-454D-47EB-ADD7-855404CB4708" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"
              Languages="!(loc.lcid)" SummaryCodepage="!(loc.CodePage)" />
-    <WixVariable Id='VersionNumber' Value='3.0.5145.0'/>
+    <WixVariable Id='VersionNumber' Value='3.0.5149.0'/>
 
     <!--  IMPORTANT NOTE:
 			  When creating a new release, 

@@ -155,7 +155,7 @@
       <xsl:value-of select="@adj"/>
     </xsl:variable>
     <xsl:choose>
- <!--sonata: Free form shapes -->
+      <!--sonata: Free form shapes -->
       <xsl:when test="$pathId !='' and $shapeTypeId !=''">
         <xsl:variable name="EnhanceGeometry">
           <xsl:choose>
@@ -167,17 +167,17 @@
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:for-each>
-      </xsl:when >
+            </xsl:when >
             <xsl:otherwise>
-          <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
-            <xsl:if test ="position()=1">
+              <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+                <xsl:if test ="position()=1">
                   <xsl:call-template name="CreateEnhancePath">
                     <xsl:with-param name="pathModifier">
                       <xsl:value-of select="$pathModifier"/>
                     </xsl:with-param>
                   </xsl:call-template>
-        </xsl:if>
-          </xsl:for-each>
+                </xsl:if>
+              </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
 
@@ -201,9 +201,7 @@
           <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
             <xsl:if test ="position()=1">
               <xsl:call-template name="CreateEnhancePath">
-                <xsl:with-param name="pathModifier">
-                  <xsl:value-of select="$pathModifier"/>
-                </xsl:with-param>
+                <xsl:with-param name="pathModifier" select="$pathModifier" />
               </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
@@ -225,51 +223,52 @@
                   <xsl:value-of select="$pathModifier"/>
                 </xsl:with-param>
               </xsl:call-template>
-      </xsl:when>
-                <xsl:otherwise>
-                  <xsl:copy-of select="$enhanceGeometry"/>
-                </xsl:otherwise>
-              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:copy-of select="$enhanceGeometry"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </draw:custom-shape>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
   <xsl:template name="CreateEnhancePath">
     <xsl:param name="pathModifier"/>
-            <draw:enhanced-geometry draw:type="non-primitive" >
-              <xsl:attribute name="svg:viewBox">
-                <xsl:value-of select="concat('0 0 ',translate(@coordsize,',',' '))"/>
-              </xsl:attribute>
-              <xsl:choose>
+    <draw:enhanced-geometry draw:type="non-primitive" >
+      <xsl:attribute name="svg:viewBox">
+        <xsl:value-of select="concat('0 0 ',translate(@coordsize,',',' '))"/>
+      </xsl:attribute>
+      <xsl:choose>
         <xsl:when test="@adj">
-                <xsl:attribute name="draw:modifiers">
+          <xsl:attribute name="draw:modifiers">
             <xsl:value-of select="concat('Wordshapes-draw-modifier:',@adj)"/>
-                  </xsl:attribute>
-      </xsl:when>
+          </xsl:attribute>
+        </xsl:when>
         <xsl:when test="$pathModifier !=''">
-                  <xsl:attribute name="draw:modifiers">
+          <xsl:attribute name="draw:modifiers">
             <xsl:value-of select="concat('Wordshapes-draw-modifier:',$pathModifier)"/>
-                  </xsl:attribute>
-      </xsl:when>
-    </xsl:choose>
-              <xsl:attribute name="draw:enhanced-path">
-                <xsl:value-of select="concat('WordshapesEnhance-Path:',@path)"/>
-                </xsl:attribute>
-              <xsl:if test="v:formulas/v:f">
-                <xsl:for-each select="v:formulas/v:f">
-                  <draw:equation>
-                    <xsl:attribute name="draw:name">
-                      <xsl:value-of select="concat('f',position()-1)"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="draw:formula">
-                      <xsl:value-of select="concat('WordshapesFormula:',@eqn,':',parent::node()/parent::node()/@coordsize)"/>
-                    </xsl:attribute>
-                  </draw:equation>
-                </xsl:for-each>
-              </xsl:if>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:attribute name="draw:enhanced-path">
+        <xsl:value-of select="concat('WordshapesEnhance-Path:',@path)"/>
+      </xsl:attribute>
+      <xsl:if test="v:formulas/v:f">
+        <xsl:for-each select="v:formulas/v:f">
+          <draw:equation>
+            <xsl:attribute name="draw:name">
+              <xsl:value-of select="concat('f',position()-1)"/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:formula">
+              <xsl:value-of select="concat('WordshapesFormula:',@eqn,':',parent::node()/parent::node()/@coordsize)"/>
+            </xsl:attribute>
+          </draw:equation>
+        </xsl:for-each>
+      </xsl:if>
 
-              <!--<draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600"/>-->
-          </draw:enhanced-geometry>
+      <!--<draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600"/>-->
+    </draw:enhanced-geometry>
   </xsl:template>
   <!--
   Summary: Template writes rectangles/lines.

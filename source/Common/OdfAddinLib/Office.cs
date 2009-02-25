@@ -217,6 +217,39 @@ namespace OdfConverter
             ppSaveAsXMLPresentation = 34,
         }
 
+        public enum WdSaveFormat
+        {
+            wdFormatDocument = 0,
+            wdFormatDocument97 = 0,
+            wdFormatDocumentDefault = 0x10,
+            wdFormatDOSText = 4,
+            wdFormatDOSTextLineBreaks = 5,
+            wdFormatEncodedText = 7,
+            wdFormatFilteredHTML = 10,
+            wdFormatFlatXML = 0x13,
+            wdFormatFlatXMLMacroEnabled = 20,
+            wdFormatFlatXMLTemplate = 0x15,
+            wdFormatFlatXMLTemplateMacroEnabled = 0x16,
+            wdFormatHTML = 8,
+            wdFormatPDF = 0x11,
+            wdFormatRTF = 6,
+            wdFormatTemplate = 1,
+            wdFormatTemplate97 = 1,
+            wdFormatText = 2,
+            wdFormatTextLineBreaks = 3,
+            wdFormatUnicodeText = 7,
+            wdFormatWebArchive = 9,
+            wdFormatXML = 11,
+            wdFormatXMLDocument = 12,
+            wdFormatXMLDocumentMacroEnabled = 13,
+            wdFormatXMLTemplate = 14,
+            wdFormatXMLTemplateMacroEnabled = 15,
+            wdFormatXPS = 0x12
+        }
+
+ 
+
+
         public enum MsoTriState
         {
             msoTriStateToggle = -3,

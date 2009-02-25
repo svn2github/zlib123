@@ -145,15 +145,17 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         {
             try
             {
+                bool isTemplate = Path.GetExtension(odfFile).ToUpper().Equals(".OTS");
                 // create a temporary file
-                string fileName = this._addinLib.GetTempFileName(odfFile, ".xlsx");
+                string outputExtension = isTemplate ? ".xltx" : ".xlsx";
+                string fileName = this._addinLib.GetTempFileName(odfFile, outputExtension);
 
                 ConversionOptions options = new ConversionOptions();
                 options.InputFullName = odfFile;
                 options.OutputFullName = fileName;
                 options.ConversionDirection = ConversionDirection.OdsToXlsx;
                 options.Generator = this.GetGenerator();
-                options.DocumentType = Path.GetExtension(odfFile).ToUpper().Equals(".OTS") ? DocumentType.Template : DocumentType.Document;
+                options.DocumentType = isTemplate ? DocumentType.Template : DocumentType.Document;
                 options.ShowProgress = true;
                 options.ShowUserInterface = true;
 
@@ -244,7 +246,10 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                         // name of the temporary Word12 file created if current file is not already a Word12 document
                         string tempXlsxName = null;
 
-                        if (!Path.GetExtension(doc.GetString("FullName")).Equals(".xlsx"))
+                        if (doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLWorkbook
+                            || doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLWorkbookMacroEnabled
+                            || doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLTemplate
+                            || doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLTemplateMacroEnabled)
                         {
                             // if file is not currently in Excel12 format
                             // 1. Create a copy
@@ -305,8 +310,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                         options.OutputFullName = odfFileName;
                         options.ConversionDirection = ConversionDirection.XlsxToOds;
                         options.Generator = this.GetGenerator();
-                        options.DocumentType = Path.GetExtension(sourceFileName).ToUpper().Equals(".XLTX")
-                            || Path.GetExtension(sourceFileName).ToUpper().Equals(".XLTM") ? DocumentType.Template : DocumentType.Document;
+                        options.DocumentType = Path.GetExtension(odfFileName).ToUpper().Equals(".OTS") ? DocumentType.Template : DocumentType.Document;
                         options.ShowProgress = true;
                         options.ShowUserInterface = true;
 

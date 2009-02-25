@@ -141,15 +141,17 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
         {
             try
             {
+                bool isTemplate = Path.GetExtension(odfFileName).ToUpper().Equals(".OTP");
                 // create a temporary file
-                string fileName = this._addinLib.GetTempFileName(odfFileName, ".pptx");
+                string outputExtension = isTemplate ? ".potx" : ".pptx";
+                string fileName = this._addinLib.GetTempFileName(odfFileName, outputExtension);
 
                 ConversionOptions options = new ConversionOptions();
                 options.InputFullName = odfFileName;
                 options.OutputFullName = fileName;
                 options.ConversionDirection = ConversionDirection.OdpToPptx;
                 options.Generator = this.GetGenerator();
-                options.DocumentType = Path.GetExtension(odfFileName).ToUpper().Equals(".OTP") ? DocumentType.Template : DocumentType.Document;
+                options.DocumentType = isTemplate ? DocumentType.Template : DocumentType.Document;
                 options.ShowProgress = true;
                 options.ShowUserInterface = true;
 
@@ -225,7 +227,10 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
 
                     object tmpFileName = null;
 
-                    if (!Path.GetExtension(doc.GetString("FullName")).Equals(".pptx"))
+                    if (!(Path.GetExtension(doc.GetString("FullName")).Equals(".pptx")
+                        || Path.GetExtension(doc.GetString("FullName")).Equals(".pptm")
+                        || Path.GetExtension(doc.GetString("FullName")).Equals(".potx")
+                        || Path.GetExtension(doc.GetString("FullName")).Equals(".potm")))
                     {
                         // open the duplicated file
                         object confirmConversions = false;
@@ -258,11 +263,8 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                                 // setting defaultformat value in registry
                                 int oldFormat = SetPPTXasDefault();
 
-				                //Code added by Achougle@Xandros on 2 Jan 09
-                                tmpFileName = this._addinLib.GetTempPath((string)sourceFileName, ".ppt");
-                                //tmpFileName = this._addinLib.GetTempFileName((string)sourceFileName, ".ppt");
-                                //Code added by Achougle@Xandros on 2 Jan 09
-
+				                tmpFileName = this._addinLib.GetTempPath((string)sourceFileName, ".ppt");
+                                
                                 SaveCopyAs(doc, (string)tmpFileName);
 
                                 newDoc = OpenPresentation((string)tmpFileName, confirmConversions, readOnly, addToRecentFiles);
@@ -289,7 +291,6 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                                 sourceFileName = (string)tmpFileName;
                                 break;
                         }
-
                     }
 
                     ConversionOptions options = new ConversionOptions();
@@ -298,8 +299,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                     options.OutputFullName = odfFileName;
                     options.ConversionDirection = ConversionDirection.PptxToOdp;
                     options.Generator = this.GetGenerator();
-                    options.DocumentType = Path.GetExtension(sourceFileName).ToLower().Equals(".potx")
-                        || Path.GetExtension(sourceFileName).ToLower().Equals(".potm") ? DocumentType.Template : DocumentType.Document;
+                    options.DocumentType = Path.GetExtension(odfFileName).ToUpper().Equals(".OTP") ? DocumentType.Template : DocumentType.Document;
                     options.ShowProgress = true;
                     options.ShowUserInterface = true;
                     this._addinLib.OoxToOdf(sourceFileName, odfFileName, options);
