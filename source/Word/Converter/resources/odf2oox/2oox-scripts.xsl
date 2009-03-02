@@ -127,7 +127,7 @@
                       //return path;
                   }
               }
-              return result.ToString();
+              return Uri.EscapeUriString(result.ToString());
           }
           catch
           {
