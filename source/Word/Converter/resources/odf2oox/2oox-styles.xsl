@@ -2967,51 +2967,15 @@
     </xsl:choose>
   </xsl:template>
 
-<msxsl:script language="C#" implements-prefix="ooc">
+<!--<msxsl:script language="C#" implements-prefix="ooc">
   <msxsl:assembly name="WordprocessingConverter" />
   <msxsl:using namespace="OdfConverter.Wordprocessing" />
   
   <![CDATA[
-  
-      public bool CustomStyle(string styleId)
-      {
-          OoxDefaultStyleVisibility properties = OoxDefaultStyleVisibility.GetDefaultProperties(styleId);
-          return properties.CustomStyle;
-      }
-      
-      public bool Hidden(string styleId)
-      {
-          OoxDefaultStyleVisibility properties = OoxDefaultStyleVisibility.GetDefaultProperties(styleId);
-          return properties.Hidden;
-      }
-      
-      public int UiPriority(string styleId)
-      {
-          OoxDefaultStyleVisibility properties = OoxDefaultStyleVisibility.GetDefaultProperties(styleId);
-          return properties.UiPriority;
-      }
-      
-      public bool SemiHidden(string styleId)
-      {
-          OoxDefaultStyleVisibility properties = OoxDefaultStyleVisibility.GetDefaultProperties(styleId);
-          return properties.SemiHidden;
-      }
-      
-      public bool UnhideWhenUsed(string styleId)
-      {
-          OoxDefaultStyleVisibility properties = OoxDefaultStyleVisibility.GetDefaultProperties(styleId);
-          return properties.UnhideWhenUsed;
-      }
-      
-      public bool QFormat(string styleId)
-      {
-          OoxDefaultStyleVisibility properties = OoxDefaultStyleVisibility.GetDefaultProperties(styleId);
-          return properties.QFormat;
-      }
-      
+            
     ]]>
 
-</msxsl:script>
+</msxsl:script>-->
 
 
 </xsl:stylesheet>

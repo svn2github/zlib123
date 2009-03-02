@@ -332,8 +332,8 @@ namespace OdfConverter.CommandLineTool
             bool converted = false;
             bool validated = false;
 
-            string relativeInputFileName = options.InputFullName.Substring(options.InputBaseFolder.Length).TrimStart('\\');
-            string relativeOutputFileName = options.OutputFullName.Substring(options.OutputBaseFolder.Length).TrimStart('\\');
+            string relativeInputFileName = options.InputFullName.Substring(options.InputBaseFolder.Length).TrimStart(Path.DirectorySeparatorChar);
+            string relativeOutputFileName = options.OutputFullName.Substring(options.OutputBaseFolder.Length).TrimStart(Path.DirectorySeparatorChar);
             _report.LogInfo(options.InputFullName, "Converting {0} into {1}", relativeInputFileName, relativeOutputFileName);
 
             converted = convertFile(options.InputFullName, options.OutputFullName, options);
