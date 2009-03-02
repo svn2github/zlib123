@@ -5,9 +5,9 @@
     exclude-result-prefixes="msxsl ooc">
 
   <msxsl:script language="C#" implements-prefix="ooc">
-    <msxsl:assembly name="WordprocessingConverter" />
+    <!--<msxsl:assembly name="WordprocessingConverter" />
     <msxsl:using namespace="System.Collections.Generic" />
-    <msxsl:using namespace="OdfConverter.Wordprocessing" />
+    <msxsl:using namespace="OdfConverter.Wordprocessing" />-->
     
     <![CDATA[
       public string ToUpper(string input)
@@ -163,13 +163,26 @@
       
       public string UriFromPath(string path)
       {
-          System.Uri result = null;
+          string result = string.Empty;
+          System.Uri uri = null;
 
-          if (!System.Uri.TryCreate(path, System.UriKind.RelativeOrAbsolute, out result))
+          try
           {
-              return path;
+              if (!System.Uri.TryCreate(path, System.UriKind.RelativeOrAbsolute, out uri))
+              {
+                  result = path;
+              }
+              else
+              {
+                  result = uri.ToString();
+              }
           }
-          return result.ToString();
+          catch (Exception ex)
+          {
+              System.Diagnostics.Trace.WriteLine(ex.ToString());
+              result = path;
+          }
+          return result;
       }
       
       /// <summary>
