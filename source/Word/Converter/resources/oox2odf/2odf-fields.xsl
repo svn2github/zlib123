@@ -182,10 +182,10 @@
           <xsl:call-template name="BuildFieldCode" />
         </xsl:variable>
 
-        <xsl:variable name="runParent" select="parent::node()" />
+        <xsl:variable name="fieldId" select="@oox:fid" />
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="$fieldCode" />
-          <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByParaId', @oox:fpid)" />
+          <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByParaId', @oox:fpid)[@oox:fid = $fieldId]" />
         </xsl:call-template>
 
       </text:span>
@@ -237,6 +237,7 @@
   <xsl:template match="w:t" mode="fieldDisplayValueEscapeSpace">
     <!-- ODF 1.1 only allows text inside ODF fields, no text:s nodes, therefore spaces are replaced by en-space -->
     <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
+    <!--<xsl:value-of select="ooc:Replace(., ' ', '&#x00A0;')" />-->
   </xsl:template>
 
   <xsl:template match="text()" mode="fieldDisplayValue" />
