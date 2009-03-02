@@ -1857,8 +1857,12 @@
         </text:paragraph-count>
       </xsl:when>
       <xsl:otherwise>
-        <!-- translate field to static text -->
-        <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
+        <xsl:variable name="pattern" select="'\s*(?:&quot;(.*?)&quot;|([^ ]*))[ \\]*.*'" />
+        <!-- custom document properties -->
+        <text:user-defined text:name="{ooc:RegexReplace($fieldInstruction, $pattern, '$1$2', true())}" text:fixed="true" >
+          <!-- NOTE: We set the field to be fixed, because OOo 3.0 cannot handle document properties of certain types correctly (e.g. dates) -->
+          <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
+        </text:user-defined>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

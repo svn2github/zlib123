@@ -446,6 +446,13 @@
     </w:fldSimple>
   </xsl:template>
 
+  <!-- custom document property fields-->
+  <xsl:template match="text:user-defined" mode="paragraph">
+    <w:fldSimple w:instr="{concat('DOCPROPERTY &quot;', @text:name, '&quot; \* MERGEFORMAT')}">
+      <xsl:apply-templates mode="paragraph"/>
+    </w:fldSimple>
+  </xsl:template>
+
   <!-- simple variables and user variables-->
   <xsl:template match="text:variable-set" mode="paragraph">
     <xsl:call-template name="InsertVariableField"/>
