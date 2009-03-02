@@ -328,7 +328,7 @@
                             Id="{generate-id(ancestor::draw:a)}"
                             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
                             TargetMode="External"
-                            Target="{ancestor::draw:a/@xlink:href}" />
+                            Target="{ooc:UriFromPath(ancestor::draw:a/@xlink:href)}" />
             </xsl:if>
           </xsl:when>
           <!-- Internal image -->

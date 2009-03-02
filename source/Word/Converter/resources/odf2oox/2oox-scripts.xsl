@@ -93,46 +93,54 @@
       
       public string UriFromPath(string path)
       {
+          string result = string.Empty;
+              
           try
           {
-              Uri result = null;
+              Uri uri = null;
               
               // remove leading slash on absolute local paths (OOo uses /C:/somefolder for local paths)
               if (Regex.Match(path, "^/[A-Za-z]:").Success)
               {
                   path = path.Substring(1);
               }
+              else if (string.IsNullOrEmpty(path))
+              {
+                  // workaround for empty href (Word does not like an empty Target attribute)
+                  path = "#";
+              }
               
               // escape special characters
               //path = Uri.EscapeUriString(path.Replace('\\', '/'));
                         
-              if (!Uri.TryCreate(path, UriKind.Absolute, out result))
+              if (!Uri.TryCreate(path, UriKind.Absolute, out uri))
               {
                   // check whether relative URI points into package or outside
                   Uri uriBase = new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, @"dummy.odt\"));
                   string absolutePath = uriBase.ToString() + path;
                   
-                  if (Uri.TryCreate(absolutePath, UriKind.RelativeOrAbsolute, out result))
+                  if (Uri.TryCreate(absolutePath, UriKind.RelativeOrAbsolute, out uri))
                   {
-                      if (result.ToString().StartsWith(uriBase.ToString()))
+                      if (uri.ToString().StartsWith(uriBase.ToString()))
                       {
                           // relative path inside the package
-                          return result.ToString().Substring(uriBase.ToString().Length);
+                          result = uri.ToString().Substring(uriBase.ToString().Length);
                       }
                   }
                   else
                   {
                       // documents with invalid URIs might not open so we replace the invalid URI with one that works -->
-                      return "/";
+                      result = "/";
                       //return path;
                   }
               }
-              return Uri.EscapeUriString(result.ToString());
+              result = uri.ToString();
           }
           catch
           {
-              return path;
+              result = path;
           }
+          return Uri.EscapeUriString(result);
       }
       
       ///<summary>
