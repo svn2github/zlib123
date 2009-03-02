@@ -246,10 +246,10 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                         // name of the temporary Word12 file created if current file is not already a Word12 document
                         string tempXlsxName = null;
 
-                        if (doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLWorkbook
-                            || doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLWorkbookMacroEnabled
-                            || doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLTemplate
-                            || doc.GetInt32("FileFormat") != (int)XlFileFormat.xlOpenXMLTemplateMacroEnabled)
+                        if (!(doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLWorkbook
+                            || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLWorkbookMacroEnabled
+                            || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLTemplate
+                            || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLTemplateMacroEnabled))
                         {
                             // if file is not currently in Excel12 format
                             // 1. Create a copy

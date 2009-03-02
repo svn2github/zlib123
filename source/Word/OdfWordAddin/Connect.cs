@@ -343,10 +343,10 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     this._application.Invoke("System").SetInt32("Cursor", (int)WdCursorType.wdCursorWait);
 
 
-                    if (doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLDocument 
-                        || doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLDocumentMacroEnabled
-                        || doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLTemplate
-                        || doc.GetInt32("SaveFormat") != (int)WdSaveFormat.wdFormatXMLTemplateMacroEnabled)
+                    if (!(doc.GetInt32("SaveFormat") == (int)WdSaveFormat.wdFormatXMLDocument 
+                        || doc.GetInt32("SaveFormat") == (int)WdSaveFormat.wdFormatXMLDocumentMacroEnabled
+                        || doc.GetInt32("SaveFormat") == (int)WdSaveFormat.wdFormatXMLTemplate
+                        || doc.GetInt32("SaveFormat") == (int)WdSaveFormat.wdFormatXMLTemplateMacroEnabled))
                     {
                         try
                         {
