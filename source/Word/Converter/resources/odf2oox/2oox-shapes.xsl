@@ -700,7 +700,15 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="shape" select="$shape"/>
       </xsl:call-template>
-
+      <!-- Vipul:2645455  flip without rotation-->
+      <xsl:choose>
+        <xsl:when test="$shape/draw:enhanced-geometry/@draw:mirror-horizontal='true'">
+          <xsl:value-of select="'flip:x;'"/>
+        </xsl:when>
+        <xsl:when test="$shape/draw:enhanced-geometry/@draw:mirror-vertical='true'">
+          <xsl:value-of select="'flip:y;'"/>
+        </xsl:when>
+      </xsl:choose>
 			<!-- reuse the frame template, attributes are the same -->
 			<xsl:call-template name="FrameToRelativeShapePosition">
 				<xsl:with-param name="frameStyle" select="$shapeStyle"/>
