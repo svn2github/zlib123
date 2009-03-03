@@ -8,7 +8,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:w10="urn:schemas-microsoft-com:office:word"
-  xmlns:o="urn:schemas-microsoft-com:office:office" 
+  xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
@@ -17,7 +17,7 @@
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:oox="urn:oox"
-  xmlns:ooc="urn:odf-converter"                
+  xmlns:ooc="urn:odf-converter"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   exclude-result-prefixes="a pic w r wp v w10 o rels oox ooc">
 
@@ -101,7 +101,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <!--
   Summary:  Sometimes Word puts "invisible" frames immediatly after table that is inserted in another table.
             I can only suppose that this is a workaround for preventing some display issues.
@@ -113,7 +113,7 @@
     <!-- do nothing -->
   </xsl:template>
 
-  
+
   <!--
   Summary: Convert the frame properties into automatic styles
   Author: Clever Age
@@ -171,12 +171,9 @@
   <xsl:template name="InsertFrame">
     <xsl:param name="framePr" />
 
-    <draw:frame>
-      <xsl:attribute name="draw:style-name">
-        <xsl:value-of select="generate-id($framePr)"/>
-      </xsl:attribute>
+    <draw:frame draw:style-name="{generate-id($framePr)}" >
 
-      <xsl:call-template name="InsertFrameSize">
+      <xsl:call-template name="InsertFrameSizeAttributes">
         <xsl:with-param name="framePr" select="$framePr"/>
       </xsl:call-template>
 
@@ -199,35 +196,20 @@
   Author:   makz (DIaLOGIKa)
   Params:   framePr: The properties of the paragraph frame
   -->
-  <xsl:template name="InsertFrameSize">
+  <xsl:template name="InsertFrameSizeAttributes">
     <xsl:param name="framePr" />
 
-    <xsl:choose>
-      <xsl:when test="$framePr/@w:w">
-        <!-- If a size is specifed, use the width attribute -->
-        <xsl:attribute name="svg:width">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length" select="$framePr/@w:w" />
-            <xsl:with-param name="destUnit" select="'cm'"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <!-- If no width is specified, the frame is autosized, so use the min-width attribute -->
-        <!--<xsl:attribute name="fo:min-width">
-          <xsl:text>0cm</xsl:text>
-        </xsl:attribute>-->
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:if test="$framePr/@w:w">
+      <xsl:attribute name="svg:width">
+        <xsl:value-of select="ooc:CmFromTwips($framePr/@w:w)" />
+      </xsl:attribute>
+    </xsl:if>
 
-    <xsl:attribute name="svg:height">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:value-of select="$framePr/@w:h"/>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:attribute>
+    <xsl:if test="$framePr/@w:h">
+      <xsl:attribute name="svg:height">
+        <xsl:value-of select="ooc:CmFromTwips($framePr/@w:h)" />
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
 
@@ -323,7 +305,7 @@
         <xsl:with-param name="vPos" select="$yAlign" />
       </xsl:call-template>
     </xsl:if>
-    
+
     <xsl:if test ="count($xAlign)>0 or count($hAnchor)>0">
       <xsl:call-template name="InsertHorizontalPos">
         <xsl:with-param name="xAlign" select="$xAlign" />
@@ -333,7 +315,7 @@
         <xsl:with-param name="hPos" select="$xAlign" />
       </xsl:call-template>
     </xsl:if>
-    
+
   </xsl:template>
 
 
@@ -403,7 +385,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:value-of select="concat('#', $fill)"/>
         </xsl:attribute>
 
@@ -444,11 +426,11 @@
 
     <!-- horizontal margin -->
     <xsl:variable name="horzMargin" select="ooc:CmFromTwips($framePr/@w:hSpace)" />
-    
+
     <xsl:attribute name="fo:margin-bottom">
       <xsl:value-of select="$vertMargin"/>
     </xsl:attribute>
-    
+
     <xsl:attribute name="fo:margin-top">
       <xsl:value-of select="$vertMargin"/>
     </xsl:attribute>
@@ -456,7 +438,7 @@
     <xsl:attribute name="fo:margin-left">
       <xsl:value-of select="$horzMargin"/>
     </xsl:attribute>
-    
+
     <xsl:attribute name="fo:margin-right">
       <xsl:value-of select="$horzMargin"/>
     </xsl:attribute>

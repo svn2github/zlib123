@@ -229,7 +229,7 @@
           </xsl:otherwise>
         </xsl:choose>-->
         <xsl:choose>
-          <xsl:when test="$z-index = ''">
+          <xsl:when test="$z-index = '' or $z-index = 'NaN'">
             <xsl:value-of select="0"/>
           </xsl:when>
           <xsl:otherwise>
@@ -239,7 +239,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="$z-index = ''">
+          <xsl:when test="$z-index = '' or $z-index = 'NaN'">
             <xsl:value-of select="0"/>
           </xsl:when>
           <!--<xsl:when test="$z-index &lt; 0">
@@ -316,26 +316,9 @@
   <xsl:template name="SetSize">
     <xsl:choose>
       <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln and not(a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:noFill)">
-        <xsl:variable name="border">
-          <xsl:call-template name="ConvertEmu3">
-            <xsl:with-param name="length">
-              <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="height">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="wp:extent/@cy"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="width">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="wp:extent/@cx"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
+        <xsl:variable name="border" select="ooc:CmFromEmu(a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w)" />
+        <xsl:variable name="height" select="ooc:CmFromEmu(wp:extent/@cy)" />
+        <xsl:variable name="width" select="ooc:CmFromEmu(wp:extent/@cx)" />
         <xsl:attribute name="svg:height">
           <xsl:value-of select="concat(substring-before($height,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')" />
         </xsl:attribute>
@@ -345,22 +328,10 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="svg:height">
-          <xsl:variable name="tmp">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="wp:extent/@cy"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$tmp" />
+          <xsl:value-of select="ooc:CmFromEmu(wp:extent/@cy)" />
         </xsl:attribute>
         <xsl:attribute name="svg:width">
-          <xsl:variable name="tmp">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="wp:extent/@cx"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$tmp" />
+          <xsl:value-of select="ooc:CmFromEmu(wp:extent/@cx)" />
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
@@ -368,45 +339,22 @@
 
   <xsl:template name="SetPosition">
     <xsl:attribute name="svg:x">
-      <xsl:call-template name="ConvertEmu">
-        <xsl:with-param name="length" select="wp:positionH/wp:posOffset"/>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
+      <xsl:value-of select="ooc:CmFromEmu(wp:positionH/wp:posOffset)" />
     </xsl:attribute>
     <xsl:attribute name="svg:y">
       <xsl:choose>
         <xsl:when test="wp:positionV/@relativeFrom = 'line'">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length">
-              <!--
-              makz, 19.5.2008:
-              The previous code here was:
-              <xsl:value-of select="-wp:positionV/wp:posOffset"/>
-              I don't know why the value should get inverted. I removed for a bugfix.
-              -->
-              <xsl:value-of select="wp:positionV/wp:posOffset"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromEmu(wp:positionV/wp:posOffset)" />
         </xsl:when>
         <xsl:when test="wp:positionV/@relativeFrom = 'bottomMargin'">
           <xsl:variable name="pgH" select="ooc:CmFromTwips(/w:document/w:body/w:sectPr/w:pgSz/@w:h)" />
           <xsl:variable name="botMar" select="ooc:CmFromTwips(/w:document/w:body/w:sectPr/w:pgMar/@w:bottom)" />
-          <xsl:variable name="Pos">
-            <xsl:call-template name="ConvertEmu">
-              <xsl:with-param name="length">
-                <xsl:value-of select="wp:positionV/wp:posOffset"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
+          <xsl:variable name="Pos" select="ooc:CmFromEmu(wp:positionV/wp:posOffset)" />
+
           <xsl:value-of select="substring-before($pgH,'cm') -substring-before($botMar,'cm') + substring-before($Pos,'cm')"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="wp:positionV/wp:posOffset"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="ooc:CmFromEmu(wp:positionV/wp:posOffset)" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
@@ -496,12 +444,8 @@
 
   <xsl:template name="InsertImageBorder">
     <xsl:if test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln[not(a:noFill)]">
-      <xsl:variable name="width">
-        <xsl:call-template name="ConvertEmu3">
-          <xsl:with-param name="length" select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w" />
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
+      <xsl:variable name="width" select="ooc:CmFromEmu(*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w)" />
+
       <xsl:variable name="type">
         <xsl:choose>
           <xsl:when test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:prstDash/@val = 'solid'">
@@ -610,31 +554,19 @@
     <xsl:if test="wp:anchor">
 
       <xsl:attribute name="fo:margin-top">
-        <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="wp:anchor/@distT"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromEmu(wp:anchor/@distT)" />
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-bottom">
-        <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="wp:anchor/@distB"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromEmu(wp:anchor/@distB)" />
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-left">
-        <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="wp:anchor/@distL"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromEmu(wp:anchor/@distL)" />
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-right">
-        <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="wp:anchor/@distR"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromEmu(wp:anchor/@distR)" />
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
@@ -955,25 +887,8 @@
     <!-- crop -->
     <xsl:if test="descendant::pic:blipFill/a:srcRect/attribute::node()">
       <xsl:for-each select="descendant::pic:pic">
-        <xsl:variable name="width">
-          <xsl:variable name="widthText">
-            <xsl:call-template name="ConvertEmu">
-              <xsl:with-param name="length" select="ancestor::w:drawing/descendant::wp:extent/@cx"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="substring-before($widthText,'cm')"/>
-        </xsl:variable>
-
-        <xsl:variable name="height">
-          <xsl:variable name="heightText">
-            <xsl:call-template name="ConvertEmu">
-              <xsl:with-param name="length" select="ancestor::w:drawing/descendant::wp:extent/@cy"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="substring-before($heightText,'cm')"/>
-        </xsl:variable>
+        <xsl:variable name="width" select="substring-before(ooc:CmFromEmu(ancestor::w:drawing/descendant::wp:extent/@cx), 'cm')" />
+        <xsl:variable name="height" select="substring-before(ooc:CmFromEmu(ancestor::w:drawing/descendant::wp:extent/@cy), 'cm')"/>
 
         <xsl:variable name="leftCrop">
           <xsl:call-template name="GetCropSize">

@@ -236,7 +236,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="CreateEnhancePath">
     <xsl:param name="pathModifier"/>
     <xsl:param name="shapeStyle"/>
@@ -314,12 +314,9 @@
   <xsl:template match="v:rect|v:line|v:shape|v:oval|v:roundrect">
     <!-- version 1.1-->
     <xsl:choose>
-      <!--<xsl:when test=".//w:drawing">
-        -->
-      <!--If picture inside any shape is present ignore the shape for converion
-        since it is causing the crash in ODT and also this feature is not compatible in ODT.-->
-      <!--
-      </xsl:when>-->
+      <!--<xsl:when test=".//w:drawing"> -->
+      <!--If picture inside any shape is present ignore the shape for conversion since it is causing a crash in OOo.-->
+      <!-- </xsl:when>-->
       <xsl:when test="v:imagedata/@r:id">
         <xsl:variable name="document">
           <xsl:call-template name="GetDocumentName" />
@@ -336,41 +333,20 @@
           <xsl:call-template name="InsertAnchorTypeAttribute" />
           <xsl:call-template name="InsertShapeWidth" />
           <xsl:call-template name="InsertShapeHeight" />
+
           <xsl:variable name="rotation" select="ooc:ParseValueFromList(@style, 'rotation')" />
           <xsl:variable name="left2" select="ooc:ParseValueFromList(@style, 'left')" />
           <xsl:variable name="width" select="ooc:ParseValueFromList(@style, 'width')" />
-          <xsl:variable name="left">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="length" select="$left2+$width" />
-              <xsl:with-param name="destUnit" select="'cm'" />
-            </xsl:call-template>
-          </xsl:variable>
+          <xsl:variable name="left" select="ooc:CmFromMeasuredUnit($left2+$width)" />
+
           <xsl:variable name="height" select="ooc:ParseValueFromList(@style, 'height')" />
           <xsl:variable name="top2" select="ooc:ParseValueFromList(@style, 'top')" />
-          <xsl:variable name="top">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$top2+$height" />
-              </xsl:with-param>
-              <xsl:with-param name="destUnit" select="'cm'" />
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="leftcm">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$left2" />
-              </xsl:with-param>
-              <xsl:with-param name="destUnit" select="'cm'" />
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="topcm">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$top2" />
-              </xsl:with-param>
-              <xsl:with-param name="destUnit" select="'cm'" />
-            </xsl:call-template>
-          </xsl:variable>
+
+          <xsl:variable name="top" select="ooc:CmFromMeasuredUnit($top2+$height)" />
+
+          <xsl:variable name="leftcm" select="ooc:CmFromMeasuredUnit($left2)" />
+          <xsl:variable name="topcm" select="ooc:CmFromMeasuredUnit($top2)" />
+
           <xsl:choose>
             <xsl:when test="$rotation != ''">
               <xsl:attribute name="draw:transform">
@@ -742,12 +718,13 @@
       <xsl:message terminate="no">translation.odf2oox.valignInsideTextbox</xsl:message>
     </xsl:if>
     <xsl:if test="$shapetype!='' ">
-      <xsl:call-template name="InsertTextBoxAutomaticHeight" />
+      <!-- shapes do not have fo:min-height and fo:min-width attributes -->
+      <!--<xsl:call-template name="InsertMinHeightAttribute" />-->
       <xsl:apply-templates select="w:txbxContent/child::node()" />
     </xsl:if>
     <xsl:if test="$shapetype=''">
       <draw:text-box>
-        <xsl:call-template name="InsertTextBoxAutomaticHeight" />
+        <xsl:call-template name="InsertMinHeightAttribute" />
         <xsl:apply-templates select="w:txbxContent/child::node()" />
       </draw:text-box>
     </xsl:if>
@@ -981,7 +958,7 @@
 
     <xsl:for-each select="$shape/v:textbox">
       <xsl:call-template name="InsertTexboxTextDirectionAttribute" />
-      <xsl:call-template name="InsertTextBoxPadding" />
+      <xsl:call-template name="InsertTextBoxPaddingAttributes" />
     </xsl:for-each>
     <!-- Sona: Gradient for Frame-->
     <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
@@ -1123,7 +1100,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template name="InsertTextBoxAutomaticHeight">
+  <xsl:template name="InsertMinHeightAttribute">
     <xsl:param name="textbox" select="." />
 
     <xsl:variable name="fitToText" select="ooc:ParseValueFromList($textbox/@style, 'mso-fit-shape-to-text')" />
@@ -1360,10 +1337,7 @@
     <!-- if a value requires percent calculation -->
     <xsl:variable name="shapeLength">
       <xsl:if test="contains($distance, '%') or contains($origin, '%')">
-        <xsl:call-template name="ConvertMeasure">
-          <xsl:with-param name="length" select="ooc:ParseValueFromList(parent::node()/@style, $side)" />
-          <xsl:with-param name="destUnit">cm</xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of select="ooc:CmFromMeasuredUnit(ooc:ParseValueFromList(parent::node()/@style, $side))" />
       </xsl:if>
     </xsl:variable>
     <!-- compute value of shadow offset -->
@@ -1829,10 +1803,9 @@
     </xsl:variable>
 
     <xsl:if test="$margin-top !=''">
-      <xsl:call-template name="InsertShapeMargin">
-        <xsl:with-param name="attributeName" select=" 'fo:margin-top' " />
-        <xsl:with-param name="margin" select="$margin-top" />
-      </xsl:call-template>
+      <xsl:attribute name="fo:margin-top">
+        <xsl:value-of select="ooc:CmFromMeasuredUnit($margin-top)" />
+      </xsl:attribute>
     </xsl:if>
 
     <xsl:variable name="margin-bottom">
@@ -1847,10 +1820,9 @@
     </xsl:variable>
 
     <xsl:if test="$margin-bottom !=''">
-      <xsl:call-template name="InsertShapeMargin">
-        <xsl:with-param name="attributeName" select=" 'fo:margin-bottom' " />
-        <xsl:with-param name="margin" select="$margin-bottom" />
-      </xsl:call-template>
+      <xsl:attribute name="fo:margin-bottom">
+        <xsl:value-of select="ooc:CmFromMeasuredUnit($margin-bottom)" />
+      </xsl:attribute>
     </xsl:if>
 
     <xsl:variable name="margin-left">
@@ -1870,11 +1842,11 @@
     </xsl:variable>
 
     <xsl:if test="$margin-left !=''">
-      <xsl:call-template name="InsertShapeMargin">
-        <xsl:with-param name="attributeName" select=" 'fo:margin-left' " />
-        <xsl:with-param name="margin" select="$margin-left" />
-      </xsl:call-template>
+      <xsl:attribute name="fo:margin-left">
+        <xsl:value-of select="ooc:CmFromMeasuredUnit($margin-left)" />
+      </xsl:attribute>
     </xsl:if>
+
     <xsl:if test="$margin-left=''">
       <xsl:attribute name="fo:margin-left">
         <xsl:text>0</xsl:text>
@@ -1897,28 +1869,15 @@
     </xsl:variable>
 
     <xsl:if test="$margin-right !=''">
-      <xsl:call-template name="InsertShapeMargin">
-        <xsl:with-param name="attributeName" select=" 'fo:margin-right' " />
-        <xsl:with-param name="margin" select="$margin-right" />
-      </xsl:call-template>
+      <xsl:attribute name="fo:margin-right">
+        <xsl:value-of select="ooc:CmFromMeasuredUnit($margin-right)" />
+      </xsl:attribute>
     </xsl:if>
     <xsl:if test="$margin-right=''">
       <xsl:attribute name="fo:margin-right">
         <xsl:text>0</xsl:text>
       </xsl:attribute>
     </xsl:if>
-  </xsl:template>
-
-  <xsl:template name="InsertShapeMargin">
-    <xsl:param name="margin" />
-    <xsl:param name="attributeName" />
-
-    <xsl:attribute name="{$attributeName}">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length" select="$margin" />
-        <xsl:with-param name="destUnit" select="'cm'" />
-      </xsl:call-template>
-    </xsl:attribute>
   </xsl:template>
 
   <!--
@@ -2025,22 +1984,11 @@
         <xsl:variable name="borderWeight">
           <xsl:choose>
             <xsl:when test="($paintBorder='shape' or $paintBorder='default') and $shape/@strokeweight">
-              <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length" select="$shape/@strokeweight" />
-                <xsl:with-param name="destUnit" select="'cm'" />
-              </xsl:call-template>
+              <xsl:value-of select="ooc:CmFromMeasuredUnit($shape/@strokeweight)" />
             </xsl:when>
             <xsl:when test="($paintBorder='shapetype' or $paintBorder='default') and $shapetype/@strokeweight">
-              <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length" select="$shapetype/@strokeweight" />
-                <xsl:with-param name="destUnit" select="'cm'" />
-              </xsl:call-template>
+              <xsl:value-of select="ooc:CmFromMeasuredUnit($shapetype/@strokeweight)" />
             </xsl:when>
-            <!--
-            <xsl:when test="$paintBorder='default'">
-              <xsl:text>0.0176cm</xsl:text>
-            </xsl:when>
-            -->
             <xsl:otherwise>
               <xsl:text>0.0176cm</xsl:text>
             </xsl:otherwise>
@@ -2781,10 +2729,7 @@
                     <xsl:variable name="marginLeft">
                       <xsl:choose>
                         <xsl:when test="$margLeft != 0">
-                          <xsl:call-template name="ConvertMeasure">
-                            <xsl:with-param name="length" select="$margLeft"></xsl:with-param>
-                            <xsl:with-param name="destUnit" select="'cm'"></xsl:with-param>
-                          </xsl:call-template>
+                          <xsl:value-of select="ooc:CmFromMeasuredUnit($margLeft)" />
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:value-of select="'0'" />
@@ -2814,10 +2759,7 @@
                 <xsl:variable name="marginLeft">
                   <xsl:choose>
                     <xsl:when test="$margLeft != 0">
-                      <xsl:call-template name="ConvertMeasure">
-                        <xsl:with-param name="length" select="$margLeft"></xsl:with-param>
-                        <xsl:with-param name="destUnit" select="'cm'"></xsl:with-param>
-                      </xsl:call-template>
+                      <xsl:value-of select="ooc:CmFromMeasuredUnit($margLeft)" />
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="'0'" />
@@ -2832,7 +2774,7 @@
                     <xsl:value-of select="$marginLeft" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="$marginLeft"></xsl:value-of>
+                    <xsl:value-of select="$marginLeft" />
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:otherwise>
@@ -2864,19 +2806,7 @@
                 <xsl:choose>
                   <xsl:when test="contains($shape/@style,'margin-top')">
                     <xsl:variable name="margTop" select="ooc:ParseValueFromList($shape/@style, 'margin-top')" />
-                    <xsl:variable name="marginTop">
-                      <xsl:choose>
-                        <xsl:when test="$margTop != 0">
-                          <xsl:call-template name="ConvertMeasure">
-                            <xsl:with-param name="length" select="$margTop"></xsl:with-param>
-                            <xsl:with-param name="destUnit" select="'cm'"></xsl:with-param>
-                          </xsl:call-template>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="'0cm'" />
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:variable>
+                    <xsl:variable name="marginTop" select="ooc:CmFromMeasuredUnit($margTop)" />
                     <xsl:choose>
 
                       <!--added by chhavi for vertical alignment bottom-margin-area-->
@@ -2931,19 +2861,7 @@
               <!-- shape is in document -->
               <xsl:otherwise>
                 <xsl:variable name="margTop" select="ooc:ParseValueFromList($shape/@style, 'margin-top')" />
-                <xsl:variable name="marginTop">
-                  <xsl:choose>
-                    <xsl:when test="$margTop != 0">
-                      <xsl:call-template name="ConvertMeasure">
-                        <xsl:with-param name="length" select="$margTop"></xsl:with-param>
-                        <xsl:with-param name="destUnit" select="'cm'"></xsl:with-param>
-                      </xsl:call-template>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="'0cm'" />
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:variable>
+                <xsl:variable name="marginTop" select="ooc:CmFromMeasuredUnit($margTop)" />
                 <xsl:choose>
 
                   <!--added by chhavi for vertical alignment bottom-margin-area-->
@@ -3372,10 +3290,7 @@
                 (contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
                 not(contains($shape/@style,'mso-wrap-style:none')))">
           <xsl:attribute name="svg:height">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="length" select="$height" />
-              <xsl:with-param name="destUnit" select="'cm'" />
-            </xsl:call-template>
+            <xsl:value-of select="ooc:CmFromMeasuredUnit($height)" />
           </xsl:attribute>
         </xsl:if>
       </xsl:otherwise>
@@ -3528,10 +3443,7 @@
                 <xsl:value-of select="ooc:CmFromTwips(key('sectPr', number(ancestor-or-self::node()/@oox:s))/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1])" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:call-template name="ConvertMeasure">
-                  <xsl:with-param name="length" select="$width"/>
-                  <xsl:with-param name="destUnit" select="'cm'"/>
-                </xsl:call-template>
+                <xsl:value-of select="ooc:CmFromMeasuredUnit($width)" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
@@ -3541,95 +3453,34 @@
   </xsl:template>
 
 
-  <xsl:template name="InsertTextBoxPadding">
+  <xsl:template name="InsertTextBoxPaddingAttributes">
     <xsl:param name="shape" select="." />
 
     <xsl:variable name="textBoxInset" select="$shape/@inset" />
 
+    <!-- default values: "0.1in, 0.05in, 0.1in, 0.05in" (see p4716 of ODF specification) -->
+    <xsl:variable name="insetLeft" select="ooc:RegexReplaceWithDefault($shape/@inset, '([^,]*),([^,]*),([^,]*),([^,]*)', '$1', true(), '0.1in')" />
+    <xsl:variable name="insetTop" select="ooc:RegexReplaceWithDefault($shape/@inset, '([^,]*),([^,]*),([^,]*),([^,]*)', '$2', true(), '0.05in')" />
+    <xsl:variable name="insetRight" select="ooc:RegexReplaceWithDefault($shape/@inset, '([^,]*),([^,]*),([^,]*),([^,]*)', '$3', true(), '0.1in')" />
+    <xsl:variable name="insetBottom" select="ooc:RegexReplaceWithDefault($shape/@inset, '([^,]*),([^,]*),([^,]*),([^,]*)', '$4', true(), '0.05in')" />
+
     <xsl:attribute name="fo:padding-left">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="1" />
-            <xsl:with-param name="text" select="$textBoxInset" />
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'" />
-      </xsl:call-template>
+      <xsl:value-of select="ooc:CmFromMeasuredUnit($insetLeft)" />
     </xsl:attribute>
 
     <xsl:attribute name="fo:padding-top">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="2" />
-            <xsl:with-param name="text" select="$textBoxInset" />
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'" />
-      </xsl:call-template>
+      <xsl:value-of select="ooc:CmFromMeasuredUnit($insetTop)" />
     </xsl:attribute>
 
     <xsl:attribute name="fo:padding-right">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="3" />
-            <xsl:with-param name="text" select="$textBoxInset" />
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'" />
-      </xsl:call-template>
+      <xsl:value-of select="ooc:CmFromMeasuredUnit($insetRight)" />
     </xsl:attribute>
 
     <xsl:attribute name="fo:padding-bottom">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="4" />
-            <xsl:with-param name="text" select="$textBoxInset" />
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'" />
-      </xsl:call-template>
+      <xsl:value-of select="ooc:CmFromMeasuredUnit($insetBottom)" />
     </xsl:attribute>
   </xsl:template>
 
-
-  <xsl:template name="ExplodeValues">
-    <xsl:param name="elementNum" />
-    <xsl:param name="text" />
-    <xsl:param name="counter" select="1" />
-    <xsl:choose>
-      <xsl:when test="$elementNum = $counter">
-        <xsl:variable name="length">
-          <xsl:choose>
-            <xsl:when test="contains($text,',')">
-              <xsl:value-of select="substring-before($text,',')" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$text" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:choose>
-          <!-- default values -->
-          <xsl:when test="$length = '' and ($counter = 1 or $counter = 3)">0.1in</xsl:when>
-          <xsl:when test="$length = '' and ($counter = 2 or $counter = 4)">0.05in</xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$length" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="ExplodeValues">
-          <xsl:with-param name="elementNum" select="$elementNum" />
-          <xsl:with-param name="text" select="substring-after($text,',')" />
-          <xsl:with-param name="counter" select="$counter+1" />
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
 
   <xsl:template name="InsertShapeRelativeWidth">
     <xsl:param name="shape" select="." />

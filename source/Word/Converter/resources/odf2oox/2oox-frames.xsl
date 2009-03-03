@@ -51,9 +51,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   xmlns:w10="urn:schemas-microsoft-com:office:word"
   exclude-result-prefixes="xlink draw svg fo office style text">
 
-  <xsl:key name="images" match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''"/>
-  <xsl:key name="frames" match="draw:frame" use="''"/>
-  <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
+  <xsl:key name="images" match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''" />
+  <xsl:key name="frames" match="draw:frame" use="''" />
+  <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name" />
 
   <!--
   *************************************************************************
@@ -80,9 +80,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   -->
   <xsl:template match="draw:frame" mode="paragraph">
     <!-- insert link to TOC field when required (user indexes) -->
-    <xsl:call-template name="InsertTCField"/>
+    <xsl:call-template name="InsertTCField" />
     
-    <xsl:apply-templates select="draw:text-box" mode="paragraph"/>
+    <xsl:apply-templates select="draw:text-box" mode="paragraph" />
   </xsl:template>
 
   <!-- 
@@ -100,13 +100,13 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <w:p>
           <xsl:choose>
             <xsl:when test="self::draw:frame">
-              <xsl:apply-templates select="." mode="paragraph"/>
+              <xsl:apply-templates select="." mode="paragraph" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:apply-templates select="." mode="shapes"/>
+              <xsl:apply-templates select="." mode="shapes" />
             </xsl:otherwise>
           </xsl:choose>
-          <xsl:apply-templates select="following-sibling::node()[1][contains(name(), 'draw:')]"/>
+          <xsl:apply-templates select="following-sibling::node()[1][contains(name(), 'draw:')]" />
         </w:p>
       </xsl:otherwise>
     </xsl:choose>
@@ -123,44 +123,44 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <w:rPr>
         <xsl:variable name="prefixedStyleName">
           <xsl:call-template name="GetPrefixedStyleName">
-            <xsl:with-param name="styleName" select="parent::draw:frame/@draw:style-name"/>
+            <xsl:with-param name="styleName" select="parent::draw:frame/@draw:style-name" />
           </xsl:call-template>
         </xsl:variable>
         <xsl:if test="$prefixedStyleName!=''">
-          <w:rStyle w:val="{$prefixedStyleName}"/>
+          <w:rStyle w:val="{$prefixedStyleName}" />
         </xsl:if>
       </w:rPr>
       <w:pict>
 
         <!-- this properties are needed to make z-index work properly -->
         <v:shapetype coordsize="21600,21600" path="m,l,21600r21600,l21600,xe">
-          <v:stroke joinstyle="miter"/>
-          <v:path gradientshapeok="t" o:connecttype="rect"/>
+          <v:stroke joinstyle="miter" />
+          <v:path gradientshapeok="t" o:connecttype="rect" />
         </v:shapetype>
 
         <v:shape type="#_x0000_t202">
-          <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name"/>
-          <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
-          <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-          <xsl:variable name="frameStyle" select="$automaticStyle | $officeStyle"/>
+          <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name" />
+          <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)" />
+          <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]" />
+          <xsl:variable name="frameStyle" select="$automaticStyle | $officeStyle" />
           <!-- Sona Added Fill Color Property to text -->
-          <xsl:variable name ="color" select ="($automaticStyle)/style:graphic-properties/@draw:fill-color"></xsl:variable>
+          <xsl:variable name="color" select="($automaticStyle)/style:graphic-properties/@draw:fill-color"></xsl:variable>
           <xsl:call-template name="FrameToShapeProperties">
-            <xsl:with-param name="frameStyle" select="$frameStyle"/>
-            <xsl:with-param name="frame" select="parent::draw:frame"/>
+            <xsl:with-param name="frameStyle" select="$frameStyle" />
+            <xsl:with-param name="frame" select="parent::draw:frame" />
           </xsl:call-template>
-          <xsl:if test ="$color!=''">
+          <xsl:if test="$color!=''">
             <xsl:attribute name="fillcolor">
-              <xsl:value-of select ="$color"/>
+              <xsl:value-of select="$color" />
             </xsl:attribute>
           </xsl:if>
           <xsl:call-template name="FrameToShapeWrap">
-            <xsl:with-param name="frameStyle" select="$frameStyle"/>
+            <xsl:with-param name="frameStyle" select="$frameStyle" />
           </xsl:call-template>
 
           <xsl:call-template name="InsertTextBox">
-            <xsl:with-param name="frameStyle" select="$frameStyle"/>
-            <xsl:with-param name="frame" select="parent::draw:frame"/>
+            <xsl:with-param name="frameStyle" select="$frameStyle" />
+            <xsl:with-param name="frame" select="parent::draw:frame" />
           </xsl:call-template>
         </v:shape>
       </w:pict>
@@ -206,8 +206,8 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             frame: The draw:frame itself
   -->
   <xsl:template name="FrameToShapeProperties">
-    <xsl:param name="frameStyle"/>
-    <xsl:param name="frame"/>
+    <xsl:param name="frameStyle" />
+    <xsl:param name="frame" />
 
     <!-- report lost properties -->
     <xsl:if test="$frameStyle/style:graphic-properties/@draw:textarea-vertical-align != 'top' ">
@@ -216,7 +216,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
 
     <xsl:if test="$frame/@draw:name">
       <xsl:attribute name="id">
-        <xsl:value-of select="$frame/@draw:name"/>
+        <xsl:value-of select="$frame/@draw:name" />
       </xsl:attribute>
     </xsl:if>
 
@@ -225,10 +225,10 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <!-- avoid empty target -->
         <xsl:choose>
           <xsl:when test="contains(ancestor::draw:a/@xlink:href, './')">
-            <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href, '../')"/>
+            <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href, '../')" />
           </xsl:when>
           <xsl:when test="string-length(ancestor::draw:a/@xlink:href) &gt; 0">
-            <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+            <xsl:value-of select="ancestor::draw:a/@xlink:href" />
           </xsl:when>
           <xsl:otherwise>/</xsl:otherwise>
         </xsl:choose>
@@ -236,58 +236,58 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
     </xsl:if>
     <xsl:if test="ancestor::draw:a/@office:target-frame-name">
       <xsl:attribute name="target">
-        <xsl:value-of select="ancestor::draw:a/@office:target-frame-name"/>
+        <xsl:value-of select="ancestor::draw:a/@office:target-frame-name" />
       </xsl:attribute>
     </xsl:if>
 
     <xsl:attribute name="style">
       <xsl:call-template name="FrameToShapeSize">
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frame" select="$frame" />
       </xsl:call-template>
 
       <xsl:call-template name="FrameToRelativeShapeSize">
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frame" select="$frame" />
       </xsl:call-template>
 
       <xsl:call-template name="FrameToShapeZindex">
-        <xsl:with-param name="frameStyle" select="$frameStyle"/>
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frameStyle" select="$frameStyle" />
+        <xsl:with-param name="frame" select="$frame" />
       </xsl:call-template>
 
       <xsl:call-template name="FrameToRelativeShapePosition">
-        <xsl:with-param name="frameStyle" select="$frameStyle"/>
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frameStyle" select="$frameStyle" />
+        <xsl:with-param name="frame" select="$frame" />
       </xsl:call-template>
 
       <xsl:call-template name="FrameToShapePosition">
-        <xsl:with-param name="frameStyle" select="$frameStyle"/>
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frameStyle" select="$frameStyle" />
+        <xsl:with-param name="frame" select="$frame" />
       </xsl:call-template>
 
       <xsl:call-template name="FrameToShapeMargin">
-        <xsl:with-param name="frameStyle" select="$frameStyle"/>
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frameStyle" select="$frameStyle" />
+        <xsl:with-param name="frame" select="$frame" />
       </xsl:call-template>
 
       <xsl:call-template name="FrameToShapeRotation">
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frame" select="$frame" />
       </xsl:call-template>
 
       <xsl:call-template name="FrameToTextAnchor">
-        <xsl:with-param name="frameStyle" select="$frameStyle"/>
+        <xsl:with-param name="frameStyle" select="$frameStyle" />
       </xsl:call-template>
     </xsl:attribute>
 
     <xsl:call-template name="FrameToShapeFill">
-      <xsl:with-param name="frameStyle" select="$frameStyle"/>
+      <xsl:with-param name="frameStyle" select="$frameStyle" />
     </xsl:call-template>
     
     <xsl:call-template name="FrameToShapeBorders">
-      <xsl:with-param name="frameStyle" select="$frameStyle"/>
+      <xsl:with-param name="frameStyle" select="$frameStyle" />
     </xsl:call-template>
 
     <xsl:call-template name="FrameToShapeShadow">
-      <xsl:with-param name="frameStyle" select="$frameStyle"/>
+      <xsl:with-param name="frameStyle" select="$frameStyle" />
     </xsl:call-template>
   </xsl:template>
 
@@ -299,30 +299,30 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frame: The draw:frame
   -->
   <xsl:template name="FrameToShapeSize">
-    <xsl:param name="frame"/>
+    <xsl:param name="frame" />
 
     <!-- width -->
     <xsl:variable name="frameW">
       <xsl:call-template name="GetLengthOfFrameSide">
         <xsl:with-param name="side">width</xsl:with-param>
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frame" select="$frame" />
         <xsl:with-param name="unit">point</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:if test="$frameW != '' and $frameW != 0">
-      <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
+      <xsl:value-of select="concat('width:',$frameW,'pt;')" />
     </xsl:if>
 
     <!-- height-->
     <xsl:variable name="frameH">
       <xsl:call-template name="GetLengthOfFrameSide">
         <xsl:with-param name="side">height</xsl:with-param>
-        <xsl:with-param name="frame" select="$frame"/>
+        <xsl:with-param name="frame" select="$frame" />
         <xsl:with-param name="unit">point</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:if test="$frameH != '' and $frameH != 0">
-      <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+      <xsl:value-of select="concat('height:',$frameH,'pt;')" />
     </xsl:if>
   </xsl:template>
   
@@ -334,7 +334,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frame: The draw:frame
   -->
   <xsl:template name="FrameToRelativeShapeSize">
-    <xsl:param name="frame"/>
+    <xsl:param name="frame" />
 
     <xsl:if test="$frame/@style:rel-width or $frame/@style:rel-height">
 
@@ -363,18 +363,18 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
           <xsl:variable name="relWidth">
             <xsl:choose>
               <xsl:when test="contains($frame/@style:rel-width,'%')">
-                <xsl:value-of select="substring-before($frame/@style:rel-width,'%')"/>
+                <xsl:value-of select="substring-before($frame/@style:rel-width,'%')" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="$frame/@style:rel-width"/>
+                <xsl:value-of select="$frame/@style:rel-width" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
           <xsl:if test="$relWidth != '' ">
             <xsl:text>mso-width-percent:</xsl:text>
-            <xsl:value-of select="number($relWidth) * 10"/>
+            <xsl:value-of select="number($relWidth) * 10" />
             <xsl:text>;mso-width-relative:</xsl:text>
-            <xsl:value-of select="$relativeTo"/>
+            <xsl:value-of select="$relativeTo" />
             <xsl:text>;</xsl:text>
           </xsl:if>
         </xsl:otherwise>
@@ -390,18 +390,18 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
           <xsl:variable name="relHeight">
             <xsl:choose>
               <xsl:when test="contains($frame/@style:rel-height,'%')">
-                <xsl:value-of select="substring-before($frame/@style:rel-height,'%')"/>
+                <xsl:value-of select="substring-before($frame/@style:rel-height,'%')" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="$frame/@style:rel-height"/>
+                <xsl:value-of select="$frame/@style:rel-height" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
           <xsl:if test="$relHeight != '' ">
             <xsl:text>mso-height-percent:</xsl:text>
-            <xsl:value-of select="number($relHeight) * 10"/>
+            <xsl:value-of select="number($relHeight) * 10" />
             <xsl:text>;mso-height-relative:</xsl:text>
-            <xsl:value-of select="$relativeTo"/>
+            <xsl:value-of select="$relativeTo" />
             <xsl:text>;</xsl:text>
           </xsl:if>
         </xsl:otherwise>
@@ -419,19 +419,19 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             frame: The draw:frame
   -->
   <xsl:template name="FrameToShapeZindex">
-    <xsl:param name="frameStyle"/>
-    <xsl:param name="frame"/>
+    <xsl:param name="frameStyle" />
+    <xsl:param name="frame" />
 
     <xsl:variable name="frameWrap">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">style:wrap</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="runThrought">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">style:run-through</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -449,7 +449,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="$frame/@draw:z-index">
-              <xsl:value-of select="2 + $frame/@draw:z-index"/>
+              <xsl:value-of select="2 + $frame/@draw:z-index" />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -457,7 +457,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
+    <xsl:value-of select="concat('z-index:', $zIndex, ';')" />
   </xsl:template>
 
 
@@ -469,33 +469,33 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             frame: The draw:frame
   -->
   <xsl:template name="FrameToRelativeShapePosition">
-    <xsl:param name="frameStyle"/>
-    <xsl:param name="frame"/>
+    <xsl:param name="frameStyle" />
+    <xsl:param name="frame" />
 
-    <xsl:variable name="anchor" select="$frame/@text:anchor-type"/>
+    <xsl:variable name="anchor" select="$frame/@text:anchor-type" />
     
     <xsl:variable name="horizontalRel">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="verticalRel">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="wrappedPara">
       <xsl:variable name="wrapping">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:wrap</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:if test="$wrapping = 'parallel' ">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:number-wrapped-paragraphs</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
@@ -503,7 +503,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
     <!-- Sona: #2149141 changes because mirror margins was lost-->
     <xsl:variable name="horizontalPos">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -523,10 +523,10 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <xsl:otherwise>
         <xsl:choose>
           <!-- Sona: #2149141 changes because mirror margins was lost-->
-          <xsl:when test ="contains($horizontalRel, 'page-end-margin') and ($horizontalPos='inside' or $horizontalPos='outside' or $horizontalPos='from-inside')">
+          <xsl:when test="contains($horizontalRel, 'page-end-margin') and ($horizontalPos='inside' or $horizontalPos='outside' or $horizontalPos='from-inside')">
             mso-position-horizontal-relative:inner-margin-area;
           </xsl:when>
-          <xsl:when test ="contains($horizontalRel, 'page-start-margin') and ($horizontalPos='inside' or $horizontalPos='outside' or $horizontalPos='from-inside')">
+          <xsl:when test="contains($horizontalRel, 'page-start-margin') and ($horizontalPos='inside' or $horizontalPos='outside' or $horizontalPos='from-inside')">
             mso-position-horizontal-relative:outer-margin-area;
           </xsl:when>                    
           <!-- page-content -->
@@ -652,22 +652,22 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             frame: The draw:frame
   -->
   <xsl:template name="FrameToShapePosition">
-    <xsl:param name="frameStyle"/>
-    <xsl:param name="frame"/>
+    <xsl:param name="frameStyle" />
+    <xsl:param name="frame" />
 
-    <xsl:variable name="graphicProps" select="$frameStyle/style:graphic-properties"/>
-    <xsl:variable name="anchor" select="$frame/@text:anchor-type"/>
+    <xsl:variable name="graphicProps" select="$frameStyle/style:graphic-properties" />
+    <xsl:variable name="anchor" select="$frame/@text:anchor-type" />
     
     <xsl:variable name="wrappedPara">
       <xsl:variable name="wrapping">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:wrap</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:if test="$wrapping = 'parallel' ">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:number-wrapped-paragraphs</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
@@ -679,13 +679,13 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <!-- two cases : absolute (=>define margin-left and margin-top), or mso-position-horizontal / -vertical -->
       <xsl:variable name="horizontalPos">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="horizontalRel">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
@@ -693,7 +693,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="GetValue">
           <xsl:with-param name="length">
             <xsl:call-template name="GetGraphicProperties">
-              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="shapeStyle" select="$frameStyle" />
               <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -703,7 +703,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="GetValue">
           <xsl:with-param name="length">
             <xsl:call-template name="GetGraphicProperties">
-              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="shapeStyle" select="$frameStyle" />
               <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -713,7 +713,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="GetValue">
           <xsl:with-param name="length">
             <xsl:call-template name="GetGraphicProperties">
-              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="shapeStyle" select="$frameStyle" />
               <xsl:with-param name="attribName">svg:x</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -721,13 +721,13 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       </xsl:variable>
       <xsl:variable name="verticalPos">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:vertical-pos</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="verticalRel">
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+          <xsl:with-param name="shapeStyle" select="$frameStyle" />
           <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
@@ -735,7 +735,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="GetValue">
           <xsl:with-param name="length">
             <xsl:call-template name="GetGraphicProperties">
-              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="shapeStyle" select="$frameStyle" />
               <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -745,7 +745,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="GetValue">
           <xsl:with-param name="length">
             <xsl:call-template name="GetGraphicProperties">
-              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="shapeStyle" select="$frameStyle" />
               <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -755,32 +755,32 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="GetValue">
           <xsl:with-param name="length">
             <xsl:call-template name="GetGraphicProperties">
-              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="shapeStyle" select="$frameStyle" />
               <xsl:with-param name="attribName">svg:y</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="width">
-        <xsl:call-template name ="ConvertToCentimeters">
+        <xsl:call-template name="ConvertToCentimeters">
           <xsl:with-param name="length" select="$frame/@svg:width"></xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="height">
-        <xsl:call-template name ="ConvertToCentimeters">
+        <xsl:call-template name="ConvertToCentimeters">
           <xsl:with-param name="length" select="$frame/@svg:height"></xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="x2">
-        <xsl:call-template name ="ConvertToCentimeters">
+        <xsl:call-template name="ConvertToCentimeters">
           <xsl:with-param name="length" select="substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' ')" />
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="y2">
-        <xsl:call-template name ="ConvertToCentimeters">
-          <xsl:with-param name="length" select ="substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' ')" />
+        <xsl:call-template name="ConvertToCentimeters">
+          <xsl:with-param name="length" select="substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' ')" />
         </xsl:call-template>
       </xsl:variable>
 
@@ -811,17 +811,17 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             <!-- if rotation, revert X and Y -->
             <xsl:when test="$rotation != '' ">
               <!--<xsl:call-template name="ComputeMarginXWithRotation">
-                <xsl:with-param name="angle" select="$rotation"/>
+                <xsl:with-param name="angle" select="$rotation" />
               </xsl:call-template>-->
-              <xsl:value-of select ="concat('draw-transform:X:',substring-before($width,'cm'), ':',
+              <xsl:value-of select="concat('draw-transform:X:',substring-before($width,'cm'), ':',
 																   substring-before($height,'cm'), ':', 
 																   substring-before($x2,'cm'), ':', 
                                    substring-before($y2,'cm'), ':', 
-																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))"/>
+																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="ComputeMarginX">
-                <xsl:with-param name="frame" select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                <xsl:with-param name="frame" select="ancestor-or-self::node()[contains(name(), 'draw:')]" />
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -829,11 +829,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="number($valX) and $valX != 0">
-          <xsl:value-of select="$valX"/>
+          <xsl:value-of select="$valX" />
           <xsl:text>pt</xsl:text>
         </xsl:when>
         <xsl:when test="contains($valX,'draw-transform')">
-          <xsl:value-of select="$valX"/>
+          <xsl:value-of select="$valX" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
@@ -847,17 +847,17 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             <!-- if rotation, revert X and Y -->
             <xsl:when test="$rotation != '' ">
               <!--<xsl:call-template name="ComputeMarginYWithRotation">
-                <xsl:with-param name="angle" select="$rotation"/>
+                <xsl:with-param name="angle" select="$rotation" />
               </xsl:call-template>-->
-              <xsl:value-of select ="concat('draw-transform:Y:',substring-before($width,'cm'), ':',
+              <xsl:value-of select="concat('draw-transform:Y:',substring-before($width,'cm'), ':',
 																   substring-before($height,'cm'), ':', 
 																   substring-before($x2,'cm'), ':', 
                                    substring-before($y2,'cm'), ':', 
-																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))"/>
+																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="ComputeMarginY">
-                <xsl:with-param name="parent" select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                <xsl:with-param name="parent" select="ancestor-or-self::node()[contains(name(), 'draw:')]" />
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -865,37 +865,37 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="number($valY) and $valY != 0">
-          <xsl:value-of select="$valY"/>
+          <xsl:value-of select="$valY" />
           <xsl:text>pt</xsl:text>
         </xsl:when>
         <xsl:when test="contains($valY,'draw-transform')">
-          <xsl:value-of select="$valY"/>
+          <xsl:value-of select="$valY" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
       <xsl:text>;</xsl:text>
       <xsl:if test="$rotation != '' ">
         <xsl:text>rotation:</xsl:text>
-        <xsl:value-of select ="concat('draw-transform:ROT:',substring-before($width,'cm'), ':',
+        <xsl:value-of select="concat('draw-transform:ROT:',substring-before($width,'cm'), ':',
 																   substring-before($height,'cm'), ':', 
 																   substring-before($x2,'cm'), ':', 
                                    substring-before($y2,'cm'), ':', 
-																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))"/>
+																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))" />
 
         <xsl:text>;</xsl:text>
       </xsl:if>
       <!-- horizontal position (overrides margin-left) -->
       <xsl:choose>
         <!-- Sona: #2149141 changes because mirror margins was lost-->
-        <xsl:when test ="contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin')">
-          <xsl:if test ="$horizontalPos='inside' or $horizontalPos='left'">
-            <xsl:value-of select="concat('mso-position-horizontal:', 'left', ';')"/>
+        <xsl:when test="contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin')">
+          <xsl:if test="$horizontalPos='inside' or $horizontalPos='left'">
+            <xsl:value-of select="concat('mso-position-horizontal:', 'left', ';')" />
           </xsl:if>
-          <xsl:if test ="$horizontalPos='outside' or $horizontalPos='right'">
-            <xsl:value-of select="concat('mso-position-horizontal:', 'right', ';')"/>
+          <xsl:if test="$horizontalPos='outside' or $horizontalPos='right'">
+            <xsl:value-of select="concat('mso-position-horizontal:', 'right', ';')" />
           </xsl:if>
-          <xsl:if test ="$horizontalPos='middle' or $horizontalPos='center'">
-            <xsl:value-of select="concat('mso-position-horizontal:', 'center', ';')"/>
+          <xsl:if test="$horizontalPos='middle' or $horizontalPos='center'">
+            <xsl:value-of select="concat('mso-position-horizontal:', 'center', ';')" />
           </xsl:if>
         </xsl:when>
         
@@ -914,7 +914,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                   or $horizontalRel='paragraph'  
                   or $horizontalRel='paragraph-content' 
                   or $horizontalRel='char'">
-          <xsl:value-of select="concat('mso-position-horizontal:', $horizontalPos, ';')"/>
+          <xsl:value-of select="concat('mso-position-horizontal:', $horizontalPos, ';')" />
         </xsl:when>
       </xsl:choose>
 
@@ -937,7 +937,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                 <xsl:when test="$verticalPos='middle'">center</xsl:when>
                 <xsl:when test="$verticalPos='below'">bottom</xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="$verticalPos"/>
+                  <xsl:value-of select="$verticalPos" />
                 </xsl:otherwise>
               </xsl:choose>
               <xsl:text>;</xsl:text>
@@ -957,12 +957,12 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             frame: The draw:frame
   -->
   <xsl:template name="FrameToShapeMargin">
-    <xsl:param name="frameStyle"/>
-    <xsl:param name="frame"/>
+    <xsl:param name="frameStyle" />
+    <xsl:param name="frame" />
 
     <!-- wrapping of text (horizontal adjustment) -->
     <xsl:choose>
-      <xsl:when test ="not($frame/@svg:width) and 
+      <xsl:when test="not($frame/@svg:width) and 
                 (($frameStyle/style:graphic-properties/@fo:min-width and $frameStyle/style:graphic-properties/@fo:min-height) 
                 or ($frameStyle/style:graphic-properties/@fo:min-width and $frame/child::node()/@fo:min-height)                
                 or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
@@ -992,28 +992,28 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
     <!--text-box spacing/margins -->
     <xsl:variable name="marginL">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginT">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginR">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginB">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1021,32 +1021,32 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
     <xsl:if test="$marginL != '' ">
       <xsl:text>mso-wrap-distance-left:</xsl:text>
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$marginL"/>
-        <xsl:with-param name="round" select="'false'"/>
+        <xsl:with-param name="length" select="$marginL" />
+        <xsl:with-param name="round" select="'false'" />
       </xsl:call-template>
       <xsl:text>pt;</xsl:text>
     </xsl:if>
     <xsl:if test="$marginT != '' ">
       <xsl:text>mso-wrap-distance-top:</xsl:text>
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$marginT"/>
-        <xsl:with-param name="round" select="'false'"/>
+        <xsl:with-param name="length" select="$marginT" />
+        <xsl:with-param name="round" select="'false'" />
       </xsl:call-template>
       <xsl:text>pt;</xsl:text>
     </xsl:if>
     <xsl:if test="$marginR != '' ">
       <xsl:text>mso-wrap-distance-right:</xsl:text>
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$marginR"/>
-        <xsl:with-param name="round" select="'false'"/>
+        <xsl:with-param name="length" select="$marginR" />
+        <xsl:with-param name="round" select="'false'" />
       </xsl:call-template>
       <xsl:text>pt;</xsl:text>
     </xsl:if>
     <xsl:if test="$marginB != '' ">
       <xsl:text>mso-wrap-distance-bottom:</xsl:text>
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$marginB"/>
-        <xsl:with-param name="round" select="'false'"/>
+        <xsl:with-param name="length" select="$marginB" />
+        <xsl:with-param name="round" select="'false'" />
       </xsl:call-template>
       <xsl:text>pt;</xsl:text>
     </xsl:if>
@@ -1061,7 +1061,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frame: The draw:frame
   -->
   <xsl:template name="FrameToShapeRotation">
-    <xsl:param name="frame"/>
+    <xsl:param name="frame" />
 
     <xsl:if test="contains($frame/@draw:transform,'rotate')">
       <xsl:text>rotation:</xsl:text>
@@ -1075,7 +1075,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
           <xsl:with-param name="revert">true</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-      <xsl:value-of select="$angle"/>
+      <xsl:value-of select="$angle" />
       <xsl:text>;</xsl:text>
     </xsl:if>
   </xsl:template>
@@ -1088,11 +1088,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frameStyle: The automatic style of the draw:frame
   -->
   <xsl:template name="FrameToTextAnchor">
-    <xsl:param name="frameStyle"/>
+    <xsl:param name="frameStyle" />
 
     <xsl:variable name="verticalAlign">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">draw:textarea-vertical-align</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1123,11 +1123,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frameStyle: The automatic style of the draw:frame
   -->
   <xsl:template name="FrameToShapeFill">
-    <xsl:param name="frameStyle"/>
+    <xsl:param name="frameStyle" />
 
     <xsl:variable name="shapefillColor">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1139,19 +1139,19 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
           <!-- when no fill is set for frame it should take background color of page (as it is in ODF) -->
           <xsl:for-each select="document('styles.xml')">
             <xsl:variable name="defaultBgColor"
-              select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:background-color"/>
-            <xsl:value-of select="$defaultBgColor"/>
+              select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:background-color" />
+            <xsl:value-of select="$defaultBgColor" />
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$shapefillColor"/>
+          <xsl:value-of select="$shapefillColor" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
     <xsl:if test="$fillColor != '' ">
       <xsl:attribute name="fillcolor">
-        <xsl:value-of select="$fillColor"/>
+        <xsl:value-of select="$fillColor" />
       </xsl:attribute>
     </xsl:if>
 
@@ -1165,11 +1165,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frameStyle: The automatic style of the draw:frame
   -->
   <xsl:template name="FrameToShapeBorders">
-    <xsl:param name="frameStyle"/>
+    <xsl:param name="frameStyle" />
 
     <xsl:variable name="border">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">fo:border</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1181,10 +1181,10 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:attribute name="stroked">f</xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="strokeColor" select="substring-after($border,'#')"/>
+        <xsl:variable name="strokeColor" select="substring-after($border,'#')" />
         <xsl:variable name="strokeWeight">
           <xsl:call-template name="point-measure">
-            <xsl:with-param name="length" select="substring-before($border,' ')"/>
+            <xsl:with-param name="length" select="substring-before($border,' ')" />
             <xsl:with-param name="round">
               <xsl:text>false</xsl:text>
             </xsl:with-param>
@@ -1192,20 +1192,20 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         </xsl:variable>
         <xsl:variable name="styleBorderLine">
           <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+            <xsl:with-param name="shapeStyle" select="$frameStyle" />
             <xsl:with-param name="attribName">style:border-line-width</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
 
         <xsl:if test="$strokeColor != '' ">
           <xsl:attribute name="strokecolor">
-            <xsl:value-of select="concat('#', $strokeColor)"/>
+            <xsl:value-of select="concat('#', $strokeColor)" />
           </xsl:attribute>
         </xsl:if>
 
         <xsl:if test="$strokeWeight != '' ">
           <xsl:attribute name="strokeweight">
-            <xsl:value-of select="concat($strokeWeight,'pt')"/>
+            <xsl:value-of select="concat($strokeWeight,'pt')" />
           </xsl:attribute>
         </xsl:if>
 
@@ -1226,7 +1226,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                   <xsl:variable name="outerLineWidth">
                     <xsl:call-template name="point-measure">
                       <xsl:with-param name="length"
-                        select="substring-after(substring-after($styleBorderLine,' ' ),' ' )"/>
+                        select="substring-after(substring-after($styleBorderLine,' ' ),' ' )" />
                     </xsl:call-template>
                   </xsl:variable>
 
@@ -1257,11 +1257,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frameStyle: The automatic style of the draw:frame
   -->
   <xsl:template name="FrameToShapeShadow">
-    <xsl:param name="frameStyle"/>
+    <xsl:param name="frameStyle" />
     <!-- Sona: Shadow implementation-->
     <xsl:variable name="shadowForFrame">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">style:shadow</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1270,20 +1270,20 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <v:shadow on="t">
           <xsl:if test="substring-before($shadowForFrame, ' ') != 'none' ">
             <xsl:attribute name="color">
-              <xsl:value-of select="substring-before($shadowForFrame, ' ')"/>
+              <xsl:value-of select="substring-before($shadowForFrame, ' ')" />
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="firstShadow" select="substring-before(substring-after($shadowForFrame, ' '), ' ')"/>
-          <xsl:variable name="secondShadow" select="substring-after(substring-after($shadowForFrame, ' '), ' ')"/>
+          <xsl:variable name="firstShadow" select="substring-before(substring-after($shadowForFrame, ' '), ' ')" />
+          <xsl:variable name="secondShadow" select="substring-after(substring-after($shadowForFrame, ' '), ' ')" />
           
           <xsl:if test="$firstShadow != '' and $secondShadow != '' ">
             <xsl:attribute name="offset">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="$firstShadow"/>
+                <xsl:with-param name="length" select="$firstShadow" />
               </xsl:call-template>
               <xsl:text>pt,</xsl:text>
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="$secondShadow"/>
+                <xsl:with-param name="length" select="$secondShadow" />
               </xsl:call-template>
               <xsl:text>pt</xsl:text>
             </xsl:attribute>
@@ -1292,7 +1292,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
           <!--dialogika, clam: bugfix #1826917-->
           <xsl:variable name="transparency">
             <xsl:call-template name="GetGraphicProperties">
-              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="shapeStyle" select="$frameStyle" />
               <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
@@ -1304,25 +1304,25 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <xsl:otherwise>
     <xsl:variable name="shadow">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">draw:shadow</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="shadowColor">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">draw:shadow-color</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="shadowOffsetX">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">draw:shadow-offset-x</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="shadowOffsetY">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">draw:shadow-offset-y</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1331,20 +1331,20 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <v:shadow on="t">
         <xsl:if test="$shadowColor != 'none' ">
           <xsl:attribute name="color">
-            <xsl:value-of select="$shadowColor"/>
+            <xsl:value-of select="$shadowColor" />
           </xsl:attribute>
         </xsl:if>
-        <xsl:variable name="firstShadow" select="$shadowOffsetX"/>
-        <xsl:variable name="secondShadow" select="$shadowOffsetY"/>
+        <xsl:variable name="firstShadow" select="$shadowOffsetX" />
+        <xsl:variable name="secondShadow" select="$shadowOffsetY" />
         
         <xsl:if test="$firstShadow != '' and $secondShadow != '' ">
           <xsl:attribute name="offset">
             <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="$firstShadow"/>
+              <xsl:with-param name="length" select="$firstShadow" />
             </xsl:call-template>
             <xsl:text>pt,</xsl:text>
             <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="$secondShadow"/>
+              <xsl:with-param name="length" select="$secondShadow" />
             </xsl:call-template>
             <xsl:text>pt</xsl:text>
           </xsl:attribute>
@@ -1353,12 +1353,12 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <!--dialogika, clam: bugfix #1826917-->
         <xsl:variable name="transparency">
           <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+            <xsl:with-param name="shapeStyle" select="$frameStyle" />
             <xsl:with-param name="attribName">draw:shadow-opacity</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:attribute name="opacity">
-          <xsl:value-of select ="substring-before($transparency,'%') div 100 "/>
+          <xsl:value-of select="substring-before($transparency,'%') div 100 " />
         </xsl:attribute>
         <xsl:if test="$transparency = '100%'">
           <xsl:attribute name="obscured">true</xsl:attribute>
@@ -1377,29 +1377,29 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frameStyle: The automatic style of the draw:frame
   -->
   <xsl:template name="FrameToShapeWrap">
-    <xsl:param name="frameStyle"/>
+    <xsl:param name="frameStyle" />
 
     <xsl:variable name="frameWrap">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="shapeStyle" select="$frameStyle" />
         <xsl:with-param name="attribName">style:wrap</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:choose>
       <xsl:when test="parent::node()[contains(name(), 'draw:')]/@text:anchor-type = 'as-char' ">
-        <w10:wrap type="none"/>
-        <w10:anchorlock/>
+        <w10:wrap type="none" />
+        <w10:anchorlock />
       </xsl:when>
       <xsl:when test="$frameWrap='left'">
-        <w10:wrap type="square" side="left"/>
+        <w10:wrap type="square" side="left" />
       </xsl:when>
       <xsl:when test="$frameWrap='right'">
-        <w10:wrap type="square" side="right"/>
+        <w10:wrap type="square" side="right" />
       </xsl:when>
       <xsl:when test="$frameWrap='none'">
         <xsl:message terminate="no">translation.odf2oox.shapeTopBottomWrapping</xsl:message>
-        <w10:wrap type="topAndBottom"/>
+        <w10:wrap type="topAndBottom" />
       </xsl:when>
       <xsl:when test="$frameWrap='run-through'">
         <!-- No wrapping. Frame/Shape is in front of text. -->
@@ -1407,29 +1407,29 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <xsl:when test="$frameWrap='parallel'">
         <xsl:variable name="wrappedPara">
           <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+            <xsl:with-param name="shapeStyle" select="$frameStyle" />
             <xsl:with-param name="attribName">style:number-wrapped-paragraphs</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <!-- Sona: Wrap implementation and also Defect #2025699 -->
         <xsl:variable name="contour">
           <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+            <xsl:with-param name="shapeStyle" select="$frameStyle" />
             <xsl:with-param name="attribName">style:wrap-contour</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$wrappedPara=1">
-            <w10:wrap type="none"/>
-            <w10:anchorlock/>
+            <w10:wrap type="none" />
+            <w10:anchorlock />
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
-              <xsl:when test ="$contour='true'">
-                <w10:wrap type="tight"/>
+              <xsl:when test="$contour='true'">
+                <w10:wrap type="tight" />
               </xsl:when>
               <xsl:otherwise>
-                <w10:wrap type="square"/>
+                <w10:wrap type="square" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
@@ -1440,8 +1440,8 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         makz: generally it's not possible to find a perfect value for a dynamic wrap.
         But I think topAndBottom is in the most cases a better solution than square
         -->
-        <!--<w10:wrap type="topAndBottom"/>-->
-        <w10:wrap type="square" side="largest"/>
+        <!--<w10:wrap type="topAndBottom" />-->
+        <w10:wrap type="square" side="largest" />
       </xsl:when>
     </xsl:choose>
 
@@ -1456,14 +1456,14 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             frame: The draw:frame
   -->
   <xsl:template name="InsertTextBox">
-    <xsl:param name="frameStyle"/>
-    <xsl:param name="frame" select ="."/>
+    <xsl:param name="frameStyle" />
+    <xsl:param name="frame" select="." />
 
     <v:textbox>
       <xsl:attribute name="style">
         <xsl:if test="@draw:chain-next-name">
           <xsl:text>mso-next-textbox:#</xsl:text>
-          <xsl:value-of select="@draw:chain-next-name"/>
+          <xsl:value-of select="@draw:chain-next-name" />
           <xsl:text>;</xsl:text>
         </xsl:if>
         <!-- Sona: Textbox resize and wrapping-->
@@ -1524,7 +1524,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
-        <xsl:if test ="not(contains(parent::draw:frame/@draw:transform,'rotate')) and $frameStyle/style:graphic-properties/@style:writing-mode='tb-rl'">
+        <xsl:if test="not(contains(parent::draw:frame/@draw:transform,'rotate')) and $frameStyle/style:graphic-properties/@style:writing-mode='tb-rl'">
           <xsl:text>layout-flow:vertical;</xsl:text>
         </xsl:if>
       </xsl:attribute>
@@ -1534,7 +1534,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="milimeter-measure">
           <xsl:with-param name="length">
             <xsl:call-template name="GetFramePadding">
-              <xsl:with-param name="frameStyle" select="$frameStyle"/>
+              <xsl:with-param name="frameStyle" select="$frameStyle" />
               <xsl:with-param name="side">left</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -1545,7 +1545,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="milimeter-measure">
           <xsl:with-param name="length">
             <xsl:call-template name="GetFramePadding">
-              <xsl:with-param name="frameStyle" select="$frameStyle"/>
+              <xsl:with-param name="frameStyle" select="$frameStyle" />
               <xsl:with-param name="side">top</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -1556,7 +1556,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="milimeter-measure">
           <xsl:with-param name="length">
             <xsl:call-template name="GetFramePadding">
-              <xsl:with-param name="frameStyle" select="$frameStyle"/>
+              <xsl:with-param name="frameStyle" select="$frameStyle" />
               <xsl:with-param name="side">right</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -1567,7 +1567,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
         <xsl:call-template name="milimeter-measure">
           <xsl:with-param name="length">
             <xsl:call-template name="GetFramePadding">
-              <xsl:with-param name="frameStyle" select="$frameStyle"/>
+              <xsl:with-param name="frameStyle" select="$frameStyle" />
               <xsl:with-param name="side">bottom</xsl:with-param>
             </xsl:call-template>
           </xsl:with-param>
@@ -1589,7 +1589,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             <xsl:when test="contains(name(), 'draw:')">
               <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
               <w:p>
-                <xsl:apply-templates select="." mode="paragraph"/>
+                <xsl:apply-templates select="." mode="paragraph" />
               </w:p>
             </xsl:when>
 
@@ -1598,7 +1598,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               <xsl:variable name="wrapping">
                 <xsl:call-template name="GetGraphicProperties">
                   <xsl:with-param name="shapeStyle"
-                    select="key('styles', draw:frame/@draw:style-name)"/>
+                    select="key('styles', draw:frame/@draw:style-name)" />
                   <xsl:with-param name="attribName">style:wrap</xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
@@ -1607,18 +1607,18 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                 <w:p>
                   <w:pPr>
                     <xsl:call-template name="FrameToTextboxAlignment">
-                      <xsl:with-param name="frame" select="draw:frame"/>
+                      <xsl:with-param name="frame" select="draw:frame" />
                     </xsl:call-template>
                   </w:pPr>
-                  <xsl:apply-templates select="draw:frame" mode="paragraph"/>
+                  <xsl:apply-templates select="draw:frame" mode="paragraph" />
                 </w:p>
               </xsl:if>
-              <xsl:apply-templates select="."/>
+              <xsl:apply-templates select="." />
             </xsl:when>
 
             <!--default scenario-->
             <xsl:otherwise>
-              <xsl:apply-templates select="."/>
+              <xsl:apply-templates select="." />
             </xsl:otherwise>
           </xsl:choose>
 
@@ -1638,31 +1638,28 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             unit: The target unit
   -->
   <xsl:template name="GetLengthOfFrameSide">
-    <xsl:param name="frame"/>
-    <xsl:param name="side"/>
-    <xsl:param name="unit"/>
+    <xsl:param name="frame" />
+    <xsl:param name="side" />
+    <xsl:param name="unit" />
 
     <xsl:choose>
       <xsl:when test="$frame/@*[name()=concat('svg:',$side)]">
         <xsl:call-template name="ConvertMeasure">
-          <xsl:with-param name="unit" select="$unit"/>
-          <xsl:with-param name="length" select="$frame/@*[name()=concat('svg:',$side)]"/>
+          <xsl:with-param name="unit" select="$unit" />
+          <xsl:with-param name="length" select="$frame/@*[name()=concat('svg:',$side)]" />
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]">
         <xsl:call-template name="ConvertMeasure">
-          <xsl:with-param name="unit" select="$unit"/>
-          <xsl:with-param name="length">
-            <xsl:value-of
-              select="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]"/>
-          </xsl:with-param>
+          <xsl:with-param name="unit" select="$unit" />
+          <xsl:with-param name="length" select="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]" />
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$frame/@*[name()=concat('fo:min-',$side)]">
         <xsl:call-template name="ConvertMeasure">
-          <xsl:with-param name="unit" select="$unit"/>
+          <xsl:with-param name="unit" select="$unit" />
           <xsl:with-param name="length">
-            <xsl:value-of select="$frame/@*[name()=concat('fo:min-',$side)]"/>
+            <xsl:value-of select="$frame/@*[name()=concat('fo:min-',$side)]" />
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
@@ -1684,16 +1681,16 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
           <xsl:if
             test="preceding-sibling::node()[1][not(descendant::*[(self::text:p or self::text:h) and (@text:style-name='Sender' or @text:style-name='Addressee')])]">
             <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
-              mode="paragraph"/>
+              mode="paragraph" />
           </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
-            mode="shapes"/>
+            mode="shapes" />
         </xsl:otherwise>
       </xsl:choose>
       <xsl:for-each select="preceding-sibling::node()[1]">
-        <xsl:call-template name="InsertPrecedingDrawingObject"/>
+        <xsl:call-template name="InsertPrecedingDrawingObject" />
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
@@ -1704,26 +1701,26 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Author:   Clever Age
   -->
   <xsl:template name="ComputeMarginX">
-    <xsl:param name="frame"/>
-    <xsl:variable name="frameStyle" select="key('styles', $frame[1]/@draw:style-name)"/>
+    <xsl:param name="frame" />
+    <xsl:variable name="frameStyle" select="key('styles', $frame[1]/@draw:style-name)" />
     
     <xsl:choose>
       <xsl:when test="$frame">
 
         <xsl:variable name="recursive_result">
           <xsl:call-template name="ComputeMarginX">
-            <xsl:with-param name="frame" select="$frame[position()>1]"/>
+            <xsl:with-param name="frame" select="$frame[position()>1]" />
           </xsl:call-template>
         </xsl:variable>
 
         <xsl:choose>
           <xsl:when test="count($frameStyle) = 0">
-            <xsl:value-of select="$recursive_result"/>
+            <xsl:value-of select="$recursive_result" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:variable name="anchor" select="$frame[1]/@text:anchor-type"/>
-            <xsl:variable name="horizontalPos" select="$frameStyle/style:graphic-properties/@style:horizontal-pos"/>
-            <xsl:variable name="horizontalRel" select="$frameStyle/style:graphic-properties/@style:horizontal-rel"/>
+            <xsl:variable name="anchor" select="$frame[1]/@text:anchor-type" />
+            <xsl:variable name="horizontalPos" select="$frameStyle/style:graphic-properties/@style:horizontal-pos" />
+            <xsl:variable name="horizontalRel" select="$frameStyle/style:graphic-properties/@style:horizontal-rel" />
             
             <!-- page properties. not valid if more than one page-master-style -->
             <xsl:variable name="pageWidth">
@@ -1756,19 +1753,19 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             <!-- width to be added depending on were object is located : column or page -->
             <xsl:variable name="contextWidth">
               <xsl:call-template name="ComputeContextWidth">
-                <xsl:with-param name="frame" select="$frame[1]"/>
-                <xsl:with-param name="horizontalRel" select="$horizontalRel"/>
-                <xsl:with-param name="horizontalPos" select="$horizontalPos"/>
-                <xsl:with-param name="pageWidth" select="$pageWidth"/>
-                <xsl:with-param name="pageLeftMargin" select="$pageRightMargin"/>
-                <xsl:with-param name="pageRightMargin" select="$pageLeftMargin"/>
+                <xsl:with-param name="frame" select="$frame[1]" />
+                <xsl:with-param name="horizontalRel" select="$horizontalRel" />
+                <xsl:with-param name="horizontalPos" select="$horizontalPos" />
+                <xsl:with-param name="pageWidth" select="$pageWidth" />
+                <xsl:with-param name="pageLeftMargin" select="$pageRightMargin" />
+                <xsl:with-param name="pageRightMargin" select="$pageLeftMargin" />
               </xsl:call-template>
             </xsl:variable>
             <!-- value to be substracted from the context width -->
             <xsl:variable name="contextSubstractedValue">
               <xsl:variable name="wrap">
                 <xsl:call-template name="GetGraphicProperties">
-                  <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+                  <xsl:with-param name="shapeStyle" select="$frameStyle" />
                   <xsl:with-param name="attribName">style:wrap</xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
@@ -1777,16 +1774,16 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                   <xsl:variable name="precedingFrames">
                     <xsl:call-template name="ComputeContextSubstractedWidth">
                       <xsl:with-param name="frames"
-                        select="$frame[1]/preceding-sibling::*[contains(name(),'draw:')]"/>
+                        select="$frame[1]/preceding-sibling::*[contains(name(),'draw:')]" />
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:variable name="followingFrames">
                     <xsl:call-template name="ComputeContextSubstractedWidth">
                       <xsl:with-param name="frames"
-                        select="$frame[1]/following-sibling::*[contains(name(),'draw:')]"/>
+                        select="$frame[1]/following-sibling::*[contains(name(),'draw:')]" />
                     </xsl:call-template>
                   </xsl:variable>
-                  <xsl:value-of select="$precedingFrames + $followingFrames"/>
+                  <xsl:value-of select="$precedingFrames + $followingFrames" />
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
@@ -1796,7 +1793,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length">
                   <xsl:call-template name="GetGraphicProperties">
-                    <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+                    <xsl:with-param name="shapeStyle" select="$frameStyle" />
                     <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
                   </xsl:call-template>
                 </xsl:with-param>
@@ -1806,7 +1803,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length">
                   <xsl:call-template name="GetGraphicProperties">
-                    <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+                    <xsl:with-param name="shapeStyle" select="$frameStyle" />
                     <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
                   </xsl:call-template>
                 </xsl:with-param>
@@ -1814,12 +1811,12 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             </xsl:variable>
             <xsl:variable name="frameWidth">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="$frame[1]/@svg:width"/>
+                <xsl:with-param name="length" select="$frame[1]/@svg:width" />
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="frameHeight">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="$frame[1]/@svg:height"/>
+                <xsl:with-param name="length" select="$frame[1]/@svg:height" />
               </xsl:call-template>
             </xsl:variable>
             <!-- if a value is specified for a frame move -->
@@ -1827,7 +1824,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               <xsl:choose>
                 <xsl:when test="$horizontalPos = 'from-left' or $horizontalPos = 'from-inside' ">
                   <xsl:call-template name="point-measure">
-                    <xsl:with-param name="length" select="$frame[1]/@svg:x"/>
+                    <xsl:with-param name="length" select="$frame[1]/@svg:x" />
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
@@ -1849,15 +1846,15 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     <!-- page, page-content, page-start-margin -->
                     <xsl:when
                       test="$horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'page-start-margin' ">
-                      <xsl:value-of select="$fromLeft + $translation"/>
+                      <xsl:value-of select="$fromLeft + $translation" />
                     </xsl:when>
                     <!-- page-end-margin -->
                     <xsl:when test="$horizontalRel = 'page-end-margin' ">
-                      <xsl:value-of select="$contextWidth + $fromLeft + $translation"/>
+                      <xsl:value-of select="$contextWidth + $fromLeft + $translation" />
                     </xsl:when>
                     <!-- avoid conflics -->
                     <xsl:when test="$anchor = 'page' ">
-                      <xsl:value-of select="$fromLeft + $translation"/>
+                      <xsl:value-of select="$fromLeft + $translation" />
                     </xsl:when>
                     <!-- paragraph, paragraph-content, paragraph-start-margin -->
                     <xsl:when
@@ -1878,11 +1875,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
                     <xsl:when test="contains($horizontalRel, 'frame')">
-                      <xsl:value-of select="$fromLeft + $translation"/>
+                      <xsl:value-of select="$fromLeft + $translation" />
                     </xsl:when>
                     <!-- char -->
                     <xsl:when test="$horizontalRel = 'char' ">
-                      <xsl:value-of select="$fromLeft + $translation"/>
+                      <xsl:value-of select="$fromLeft + $translation" />
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
@@ -1893,7 +1890,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     <!-- page, page-content, page-start-margin -->
                     <xsl:when
                       test="$horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'page-start-margin' ">
-                      <xsl:value-of select="$frameMarginLeft + $translation"/>
+                      <xsl:value-of select="$frameMarginLeft + $translation" />
                     </xsl:when>
                     <!-- page-end-margin -->
                     <xsl:when test="$horizontalRel = 'page-end-margin' ">
@@ -1905,13 +1902,13 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:value-of
-                            select="$pageWidth -$frameWidth - $frameMarginLeft + $translation"/>
+                            select="$pageWidth -$frameWidth - $frameMarginLeft + $translation" />
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:when>
                     <!-- avoid conflics -->
                     <xsl:when test="$anchor = 'page' ">
-                      <xsl:value-of select="$frameMarginLeft + $translation"/>
+                      <xsl:value-of select="$frameMarginLeft + $translation" />
                     </xsl:when>
                     <!-- paragraph, paragraph-content, paragraph-start-margin -->
                     <xsl:when
@@ -1932,11 +1929,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
                     <xsl:when test="contains($horizontalRel, 'frame')">
-                      <xsl:value-of select="$frameMarginLeft + $translation"/>
+                      <xsl:value-of select="$frameMarginLeft + $translation" />
                     </xsl:when>
                     <!-- char -->
                     <xsl:when test="$horizontalRel = 'char' ">
-                      <xsl:value-of select="$frameMarginLeft + $translation"/>
+                      <xsl:value-of select="$frameMarginLeft + $translation" />
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
@@ -1947,7 +1944,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     <!-- page, page-end-margin -->
                     <xsl:when test="$horizontalRel = 'page' or $horizontalRel = 'page-end-margin' ">
                       <xsl:value-of
-                        select="$pageWidth - $frameWidth - $frameMarginRight + $translation"/>
+                        select="$pageWidth - $frameWidth - $frameMarginRight + $translation" />
                     </xsl:when>
                     <!-- page-start-margin -->
                     <xsl:when test="$horizontalRel = 'page-start-margin' ">
@@ -1963,7 +1960,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     <!-- avoid conflics -->
                     <xsl:when test="$anchor = 'page' ">
                       <xsl:value-of
-                        select="$pageWidth - $frameWidth - $frameMarginRight + $translation"/>
+                        select="$pageWidth - $frameWidth - $frameMarginRight + $translation" />
                     </xsl:when>
                     <!-- page-content -->
                     <xsl:when test="$horizontalRel = 'page-content' ">
@@ -1990,11 +1987,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
                     <xsl:when test="contains($horizontalRel, 'frame')">
-                      <xsl:value-of select="$pageWidth - $frameMarginRight + $translation"/>
+                      <xsl:value-of select="$pageWidth - $frameMarginRight + $translation" />
                     </xsl:when>
                     <!-- char -->
                     <xsl:when test="$horizontalRel = 'char' ">
-                      <xsl:value-of select="$pageWidth - $frameMarginRight + $translation"/>
+                      <xsl:value-of select="$pageWidth - $frameMarginRight + $translation" />
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
@@ -2021,7 +2018,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                           />
                         </xsl:when>
                         <xsl:otherwise>
-                          <xsl:value-of select="$pageWidth - $frameWidth + $translation"/>
+                          <xsl:value-of select="$pageWidth - $frameWidth + $translation" />
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:when>
@@ -2049,14 +2046,14 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                           />
                         </xsl:when>
                         <xsl:otherwise>
-                          <xsl:value-of select="$contextWidth - $frameWidth + $translation"/>
+                          <xsl:value-of select="$contextWidth - $frameWidth + $translation" />
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
                     <xsl:when test="contains($horizontalRel, 'frame')">
                       <xsl:value-of
-                        select="round(number($pageWidth - $frameWidth div 2 + $translation))"/>
+                        select="round(number($pageWidth - $frameWidth div 2 + $translation))" />
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
@@ -2065,7 +2062,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                   <xsl:choose>
                     <xsl:when test="$frame[1]/@svg:x">
                       <xsl:call-template name="point-measure">
-                        <xsl:with-param name="length" select="$frame[1]/@svg:x"/>
+                        <xsl:with-param name="length" select="$frame[1]/@svg:x" />
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
@@ -2073,7 +2070,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <xsl:value-of select="$svgx+$recursive_result"/>
+            <xsl:value-of select="$svgx+$recursive_result" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -2094,12 +2091,12 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             pageRightMargin:
   -->
   <xsl:template name="ComputeContextWidth">
-    <xsl:param name="frame"/>
-    <xsl:param name="horizontalRel"/>
-    <xsl:param name="horizontalPos"/>
-    <xsl:param name="pageWidth"/>
-    <xsl:param name="pageLeftMargin"/>
-    <xsl:param name="pageRightMargin"/>
+    <xsl:param name="frame" />
+    <xsl:param name="horizontalRel" />
+    <xsl:param name="horizontalPos" />
+    <xsl:param name="pageWidth" />
+    <xsl:param name="pageLeftMargin" />
+    <xsl:param name="pageRightMargin" />
     
     <xsl:for-each select="document('styles.xml')">
       <xsl:choose>
@@ -2108,13 +2105,13 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
           <xsl:choose>
             <xsl:when
               test="$horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'page-start-margin' ">
-              <xsl:value-of select="$pageWidth - $pageRightMargin"/>
+              <xsl:value-of select="$pageWidth - $pageRightMargin" />
             </xsl:when>
             <xsl:when test="$horizontalPos='left' or $horizontalPos='inside' ">
-              <xsl:value-of select="$pageWidth - $pageRightMargin"/>
+              <xsl:value-of select="$pageWidth - $pageRightMargin" />
             </xsl:when>
             <xsl:when test="$horizontalPos='right' or $horizontalPos='outside' ">
-              <xsl:value-of select="$pageWidth - $pageLeftMargin - $pageRightMargin"/>
+              <xsl:value-of select="$pageWidth - $pageLeftMargin - $pageRightMargin" />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -2161,13 +2158,13 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Author:   Clever Age
   -->
   <xsl:template name="ComputeContextSubstractedWidth">
-    <xsl:param name="frames"/>
-    <xsl:param name="side"/>
+    <xsl:param name="frames" />
+    <xsl:param name="side" />
     <xsl:choose>
       <xsl:when test="$frames">
         <xsl:variable name="otherValues">
           <xsl:call-template name="ComputeContextSubstractedWidth">
-            <xsl:with-param name="frames" select="$frames[position() &gt; 1]"/>
+            <xsl:with-param name="frames" select="$frames[position() &gt; 1]" />
           </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="currentVal">
@@ -2176,7 +2173,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               test="key('automatic-styles', $frames[1]/@draw:style-name)/style:graphic-properties/@style:wrap = 'right' ">
               <xsl:call-template name="GetLengthOfFrameSide">
                 <xsl:with-param name="side">width</xsl:with-param>
-                <xsl:with-param name="frame" select="$frames[1]"/>
+                <xsl:with-param name="frame" select="$frames[1]" />
                 <xsl:with-param name="unit">point</xsl:with-param>
               </xsl:call-template>
             </xsl:when>
@@ -2184,14 +2181,14 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               test="key('automatic-styles', $frames[1]/@draw:style-name)/style:graphic-properties/@style:wrap = 'left' ">
               <xsl:call-template name="GetLengthOfFrameSide">
                 <xsl:with-param name="side">width</xsl:with-param>
-                <xsl:with-param name="frame" select="$frames[1]"/>
+                <xsl:with-param name="frame" select="$frames[1]" />
                 <xsl:with-param name="unit">point</xsl:with-param>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:value-of select="$currentVal + $otherValues"/>
+        <xsl:value-of select="$currentVal + $otherValues" />
       </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
@@ -2203,7 +2200,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Author:   Clever Age
   -->
   <xsl:template name="ComputeMarginXWithRotation">
-    <xsl:param name="angle"/>
+    <xsl:param name="angle" />
 
     <!-- particular transformation -->
     <xsl:variable name="translationX">
@@ -2227,21 +2224,21 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       </xsl:call-template>
     </xsl:variable>
     <!-- value used by Word to calculate frame position -->
-    <xsl:variable name="frameOffset" select="round(($frameWidth - $frameHeight) div 2)"/>
+    <xsl:variable name="frameOffset" select="round(($frameWidth - $frameHeight) div 2)" />
     
     <!-- special distance with rotation -->
     <xsl:choose>
       <xsl:when test="$angle = 90">
-        <xsl:value-of select="$translationX - $frameHeight - $frameOffset"/>
+        <xsl:value-of select="$translationX - $frameHeight - $frameOffset" />
       </xsl:when>
       <xsl:when test="$angle = -90">
-        <xsl:value-of select="$translationX - $frameOffset"/>
+        <xsl:value-of select="$translationX - $frameOffset" />
       </xsl:when>
       <xsl:when test="$angle &gt; 0">
-        <xsl:value-of select="$translationX - $frameHeight - $frameOffset"/>
+        <xsl:value-of select="$translationX - $frameHeight - $frameOffset" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$translationX - $frameOffset"/>
+        <xsl:value-of select="$translationX - $frameOffset" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -2252,23 +2249,23 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Author:   Clever Age
   -->
   <xsl:template name="ComputeMarginY">
-    <xsl:param name="parent"/>
+    <xsl:param name="parent" />
     
     <xsl:choose>
       <xsl:when test="$parent">
         <xsl:variable name="recursive_result">
           <xsl:call-template name="ComputeMarginY">
-            <xsl:with-param name="parent" select="$parent[position()>1]"/>
+            <xsl:with-param name="parent" select="$parent[position()>1]" />
           </xsl:call-template>
         </xsl:variable>
-        <xsl:variable name="shapeStyle" select="key('styles', $parent[1]/@draw:style-name)"/>
+        <xsl:variable name="shapeStyle" select="key('styles', $parent[1]/@draw:style-name)" />
         <xsl:choose>
           <xsl:when test="count($shapeStyle) = 0">
-            <xsl:value-of select="$recursive_result"/>
+            <xsl:value-of select="$recursive_result" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:variable name="verticalPos" select="$shapeStyle/style:graphic-properties/@style:vertical-pos"/>
-            <xsl:variable name="verticalRel" select="$shapeStyle/style:graphic-properties/@style:vertical-rel"/>
+            <xsl:variable name="verticalPos" select="$shapeStyle/style:graphic-properties/@style:vertical-pos" />
+            <xsl:variable name="verticalRel" select="$shapeStyle/style:graphic-properties/@style:vertical-rel" />
             <xsl:variable name="pageHeight">
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:page-height" />
@@ -2288,7 +2285,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length">
                   <xsl:call-template name="GetGraphicProperties">
-                    <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                    <xsl:with-param name="shapeStyle" select="$shapeStyle" />
                     <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
                   </xsl:call-template>
                 </xsl:with-param>
@@ -2298,7 +2295,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length">
                   <xsl:call-template name="GetGraphicProperties">
-                    <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                    <xsl:with-param name="shapeStyle" select="$shapeStyle" />
                     <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
                   </xsl:call-template>
                 </xsl:with-param>
@@ -2306,19 +2303,19 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             </xsl:variable>
             <xsl:variable name="frameWidth">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="$parent[1]/@svg:width"/>
+                <xsl:with-param name="length" select="$parent[1]/@svg:width" />
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="frameHeight">
               <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="$parent[1]/@svg:height"/>
+                <xsl:with-param name="length" select="$parent[1]/@svg:height" />
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="fromTop">
               <xsl:choose>
                 <xsl:when test="$verticalPos = 'from-top' ">
                   <xsl:call-template name="point-measure">
-                    <xsl:with-param name="length" select="$parent[1]/@svg:y"/>
+                    <xsl:with-param name="length" select="$parent[1]/@svg:y" />
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
@@ -2341,17 +2338,17 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                   <xsl:choose>
                     <!-- page, page-content, paragraph-content, line -->
                     <xsl:when test="$verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph' or $verticalRel = 'line'">
-                      <xsl:value-of select="$fromTop + $translation"/>
+                      <xsl:value-of select="$fromTop + $translation" />
                     </xsl:when>
                     <!-- paragraph-content -->
                     <xsl:when test="$verticalRel = 'paragraph-content' ">
                       <!-- TODO : get spacing property of current paragraph -->
                       <xsl:variable name="paragraphTopSpacing">0</xsl:variable>
-                      <xsl:value-of select="$paragraphTopSpacing + $fromTop + $translation"/>
+                      <xsl:value-of select="$paragraphTopSpacing + $fromTop + $translation" />
                     </xsl:when>
                     <!-- frame, frame-content -->
                     <xsl:when test="contains($verticalRel, 'frame')">
-                      <xsl:value-of select="$fromTop + $translation"/>
+                      <xsl:value-of select="$fromTop + $translation" />
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
@@ -2361,21 +2358,21 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                   <xsl:choose>
                     <!-- page -->
                     <xsl:when test="$verticalRel = 'page' ">
-                      <xsl:value-of select="$frameMarginTop + $translation"/>
+                      <xsl:value-of select="$frameMarginTop + $translation" />
                     </xsl:when>
                     <!-- page-content, paragraph -->
                     <xsl:when test="$verticalRel = 'page-content' or $verticalRel = 'paragraph' ">
-                      <xsl:value-of select="$frameMarginTop + $translation"/>
+                      <xsl:value-of select="$frameMarginTop + $translation" />
                     </xsl:when>
                     <!-- paragraph-content -->
                     <xsl:when test="$verticalRel = 'paragraph-content' ">
                       <!-- TODO : get spacing property of current paragraph -->
                       <xsl:variable name="paragraphTopSpacing">0</xsl:variable>
-                      <xsl:value-of select="$paragraphTopSpacing + $frameMarginTop + $translation"/>
+                      <xsl:value-of select="$paragraphTopSpacing + $frameMarginTop + $translation" />
                     </xsl:when>
                     <!-- frame, frame-content -->
                     <xsl:when test="contains($verticalRel, 'frame')">
-                      <xsl:value-of select="$frameMarginTop + $translation"/>
+                      <xsl:value-of select="$frameMarginTop + $translation" />
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
@@ -2386,7 +2383,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     <!-- page -->
                     <xsl:when test="$verticalRel = 'page' ">
                       <xsl:value-of
-                        select="$pageHeight - $frameHeight - $frameMarginBottom + $translation"/>
+                        select="$pageHeight - $frameHeight - $frameMarginBottom + $translation" />
                     </xsl:when>
                     <!-- page-content -->
                     <xsl:when test="$verticalRel = 'page-content' ">
@@ -2406,7 +2403,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                     <!-- frame, frame-content -->
                     <xsl:when test="contains($verticalRel, 'frame')">
                       <xsl:value-of
-                        select="$pageHeight - $frameHeight - $frameMarginBottom + $translation"/>
+                        select="$pageHeight - $frameHeight - $frameMarginBottom + $translation" />
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
@@ -2416,7 +2413,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
                   <xsl:choose>
                     <xsl:when test="$parent[1]/@svg:y">
                       <xsl:call-template name="point-measure">
-                        <xsl:with-param name="length" select="$parent[1]/@svg:y"/>
+                        <xsl:with-param name="length" select="$parent[1]/@svg:y" />
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
@@ -2425,7 +2422,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
               </xsl:choose>
             </xsl:variable>
             
-            <xsl:value-of select="$svgy+$recursive_result"/>
+            <xsl:value-of select="$svgy+$recursive_result" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -2440,7 +2437,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Author:   Clever Age
   -->
   <xsl:template name="ComputeMarginYWithRotation">
-    <xsl:param name="angle"/>
+    <xsl:param name="angle" />
 
     <!-- particular transformation -->
     <xsl:variable name="translationY">
@@ -2464,21 +2461,21 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       </xsl:call-template>
     </xsl:variable>
     <!-- value used by Word to calculate frame position -->
-    <xsl:variable name="frameOffset" select="round(($frameWidth - $frameHeight) div 2)"/>
+    <xsl:variable name="frameOffset" select="round(($frameWidth - $frameHeight) div 2)" />
     
     <!-- special distance with rotation -->
     <xsl:choose>
       <xsl:when test="$angle = 90">
-        <xsl:value-of select="$translationY + $frameOffset"/>
+        <xsl:value-of select="$translationY + $frameOffset" />
       </xsl:when>
       <xsl:when test="$angle = -90">
-        <xsl:value-of select="$translationY - $frameWidth + $frameOffset"/>
+        <xsl:value-of select="$translationY - $frameWidth + $frameOffset" />
       </xsl:when>
       <xsl:when test="$angle &gt; 0">
-        <xsl:value-of select="$translationY + $frameOffset"/>
+        <xsl:value-of select="$translationY + $frameOffset" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$translationY - $frameWidth + $frameOffset"/>
+        <xsl:value-of select="$translationY - $frameWidth + $frameOffset" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -2489,22 +2486,22 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Author:   CleverAge
   -->
   <xsl:template name="GetGraphicProperties">
-    <xsl:param name="attribName"/>
-    <xsl:param name="shapeStyle"/>
+    <xsl:param name="attribName" />
+    <xsl:param name="shapeStyle" />
 
     <xsl:choose>
       <xsl:when test="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName] ">
-        <xsl:value-of select="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName]"/>
+        <xsl:value-of select="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName]" />
       </xsl:when>
 
       <xsl:when test="$shapeStyle/@style:parent-style-name">
-        <xsl:variable name="parentStyleName" select="$shapeStyle/@style:parent-style-name"/>
+        <xsl:variable name="parentStyleName" select="$shapeStyle/@style:parent-style-name" />
 
-        <xsl:variable name="parentStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyleName]"/>
+        <xsl:variable name="parentStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyleName]" />
 
         <xsl:call-template name="GetGraphicProperties">
-          <xsl:with-param name="shapeStyle" select="$parentStyle"/>
-          <xsl:with-param name="attribName" select="$attribName"/>
+          <xsl:with-param name="shapeStyle" select="$parentStyle" />
+          <xsl:with-param name="attribName" select="$attribName" />
         </xsl:call-template>
       </xsl:when>
       <!--    <xsl:otherwise></xsl:otherwise>-->
@@ -2519,24 +2516,24 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             side: The values 'top', 'right', 'bottom' or 'left'
   -->
   <xsl:template name="GetFramePadding">
-    <xsl:param name="frameStyle"/>
-    <xsl:param name="side"/>
+    <xsl:param name="frameStyle" />
+    <xsl:param name="side" />
 
     <xsl:choose>
       <!-- priority to border padding -->
       <xsl:when test="$frameStyle/style:graphic-properties/@*[name() = concat('fo:padding-', $side)]">
-        <xsl:value-of select="$frameStyle/style:graphic-properties/@*[name() = concat('fo:padding-', $side)]"/>
+        <xsl:value-of select="$frameStyle/style:graphic-properties/@*[name() = concat('fo:padding-', $side)]" />
       </xsl:when>
       <!-- otherwise if padding attribute -->
       <xsl:when test="$frameStyle/style:graphic-properties/@fo:padding">
-        <xsl:value-of select="$frameStyle/style:graphic-properties/@fo:padding"/>
+        <xsl:value-of select="$frameStyle/style:graphic-properties/@fo:padding" />
       </xsl:when>
       <!-- otherwise look parent style -->
       <xsl:when test="$frameStyle/@style:parent-style-name">
-        <xsl:variable name="parentStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $frameStyle/@style:parent-style-name]"/>
+        <xsl:variable name="parentStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $frameStyle/@style:parent-style-name]" />
         <xsl:call-template name="GetFramePadding">
-          <xsl:with-param name="frameStyle" select="$parentStyle"/>
-          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="frameStyle" select="$parentStyle" />
+          <xsl:with-param name="side" select="$side" />
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
@@ -2552,11 +2549,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   Params:   frame: The draw:frame
   -->
   <xsl:template name="FrameToTextboxAlignment">
-    <xsl:param name="frame"/>
+    <xsl:param name="frame" />
     
     <xsl:variable name="hPos">
       <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="key('styles', $frame/@draw:style-name)"/>
+        <xsl:with-param name="shapeStyle" select="key('styles', $frame/@draw:style-name)" />
         <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -2584,7 +2581,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
     <!-- @Context: None -->
     <!-- @Private -->
 
-    <xsl:param name="length"/>
+    <xsl:param name="length" />
     <!-- (string) The length to convert (including the unit) -->
 
     <xsl:variable name="round">false</xsl:variable>
@@ -2596,46 +2593,46 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <!-- The convertion's result -->
       <xsl:choose>
         <xsl:when test="contains($length, 'cm')">
-          <xsl:value-of select="substring-before($length,'cm')"/>
+          <xsl:value-of select="substring-before($length,'cm')" />
         </xsl:when>
         <xsl:when test="contains($length, 'mm')">
-          <xsl:value-of select="format-number(substring-before($length, 'mm') div 10,'#.###')"/>
+          <xsl:value-of select="format-number(substring-before($length, 'mm') div 10,'#.###')" />
         </xsl:when>
         <xsl:when test="contains($length, 'in')">
-          <xsl:value-of select="format-number(substring-before($length, 'in') * 2.54,'#.###')"/>
+          <xsl:value-of select="format-number(substring-before($length, 'in') * 2.54,'#.###')" />
         </xsl:when>
         <xsl:when test="contains($length, 'pt')">
           <xsl:value-of
-            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
+            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')" />
         </xsl:when>
         <xsl:when test="contains($length, 'twip')">
           <xsl:value-of
-            select="format-number(substring-before($length, 'twip') * 2.54 div 1440,'#.###')"/>
+            select="format-number(substring-before($length, 'twip') * 2.54 div 1440,'#.###')" />
         </xsl:when>
         <xsl:when test="contains($length, 'pica')">
           <xsl:value-of
-            select="format-number(substring-before($length, 'pica') * 2.54 div 6,'#.###')"/>
+            select="format-number(substring-before($length, 'pica') * 2.54 div 6,'#.###')" />
         </xsl:when>
         <xsl:when test="contains($length, 'dpt')">
           <xsl:value-of
-            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
+            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')" />
         </xsl:when>
         <xsl:when test="contains($length, 'px')">
-          <xsl:value-of select="format-number(substring-before($length, 'px') * 0.0264,'#.###')"/>
+          <xsl:value-of select="format-number(substring-before($length, 'px') * 0.0264,'#.###')" />
         </xsl:when>
         <xsl:when test="not($length) or $length='' ">0</xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="format-number($length * 2.54 div 1440,'#.###')"/>
+          <xsl:value-of select="format-number($length * 2.54 div 1440,'#.###')" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-	<xsl:variable name ="newlength">
+	<xsl:variable name="newlength">
 		  <xsl:choose >
-			  <xsl:when test ="contains($tmplength,'NaN') or $tmplength=''">
-				  <xsl:value-of select ="'0'"/>	  
+			  <xsl:when test="contains($tmplength,'NaN') or $tmplength=''">
+				  <xsl:value-of select="'0'" />	  
 			  </xsl:when>
 			  <xsl:otherwise >
-				  <xsl:value-of select ="$tmplength"/>
+				  <xsl:value-of select="$tmplength" />
 			  </xsl:otherwise>
 		  </xsl:choose>		  
 	</xsl:variable>
@@ -2643,20 +2640,20 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       <!-- The result of the rounding -->
       <xsl:choose>
         <xsl:when test="$round='true'">
-          <xsl:value-of select="round($newlength)"/>
+          <xsl:value-of select="round($newlength)" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="(round($newlength * 1000)) div 1000"/>
+          <xsl:value-of select="(round($newlength * 1000)) div 1000" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
     <xsl:choose>
       <xsl:when test="$addUnit = 'true' ">
-        <xsl:value-of select="concat($roundLength, 'cm')"/>
+        <xsl:value-of select="concat($roundLength, 'cm')" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$roundLength"/>
+        <xsl:value-of select="$roundLength" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

@@ -438,7 +438,7 @@
     <!-- @Private -->
     
     <xsl:param name="length"/>                <!-- (string) The length to convert (including the unit) -->
-    <xsl:param name="round">false</xsl:param> <!-- (string) If set to true, the result will be rounded to the nearest integer, otherwise the result will be a 3 decimal digit -->
+    <!--<xsl:param name="round">false</xsl:param>--> <!-- (string) If set to true, the result will be rounded to the nearest integer, otherwise the result will be a 3 decimal digit -->
     <xsl:param name="addUnit">true</xsl:param><!-- (string) If set to true, wil append 'cm' to the result -->
     
     <xsl:variable name="newlength"> <!-- The convertion's result -->
@@ -479,14 +479,14 @@
     </xsl:variable>
     
     <xsl:variable name="roundLength"> <!-- The result of the rounding -->
-      <xsl:choose>
+      <!--<xsl:choose>
         <xsl:when test="$round='true'">
           <xsl:value-of select="round($newlength)"/>
         </xsl:when>
-        <xsl:otherwise>
+        <xsl:otherwise>-->
           <xsl:value-of select="(round($newlength * 1000)) div 1000"/>
-        </xsl:otherwise>
-      </xsl:choose>
+        <!--</xsl:otherwise>
+      </xsl:choose>-->
     </xsl:variable>
     
     <xsl:choose>

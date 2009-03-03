@@ -45,6 +45,17 @@
           return System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options);
       }
       
+      public string RegexReplaceWithDefault(string input, string pattern, string replacement, bool ignoreCase, string defaultValue)
+      {
+          string result = RegexReplace(input, pattern, replacement, ignoreCase);
+          
+          if (string.IsNullOrEmpty(result))
+          {
+              result = defaultValue;
+          }
+          return result;
+      }
+      
       /// <summary>
       /// Returns the current date and time as an XSD dateTime string in the format CCYY-MM-DDThh:mm:ss
       /// </summary>
@@ -78,6 +89,70 @@
           }
 
           return "0cm";
+      }
+      
+      public string CmFromEmu(string emuValue)
+      {
+          int emu = 0;
+          if (int.TryParse(emuValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out emu))
+          {
+              return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.###}cm", (double)emu / 360000.0);
+          }
+
+          return "0cm";
+      }
+      
+      public string CmFromMeasuredUnit(string measuredUnit)
+      {
+          double value = 0;
+          double factor = 1.0;
+
+          Regex regex = new Regex(@"\s*([-.0-9]+)\s*([a-zA-Z]*)\s*");
+
+          GroupCollection groups = regex.Match(measuredUnit).Groups;
+          if (groups.Count == 3)
+          {
+              string strValue = groups[1].Value;
+              string strUnit = groups[2].Value;
+
+              switch (strUnit)
+              {
+                  case "cm":
+                      factor = 1.0;
+                      break;
+                  case "mm":
+                      factor = 0.1;
+                      break;
+                  case "in":
+                  case "inch":
+                      factor = 2.54;
+                      break;
+                  case "pt":
+                      factor = 2.54 / 72.0;
+                      break;
+                  case "twip":
+                      factor = 2.54 / 1440;
+                      break;
+                  case "pica":
+                      factor = 2.54 / 6.0;
+                      break;
+                  case "dpt":
+                      factor = 2.54 / 72.0;
+                      break;
+                  case "px":
+                      factor = 2.54 / 96.0;
+                      break;
+                  default:
+                      factor = 2.54 / 1440;
+                      break;
+              }
+
+              if (double.TryParse(strValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out value))
+              {
+                  value = value * factor;
+              }
+          }
+          return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.###}cm", value);
       }
       
       public class OdfStyleNameGenerator
