@@ -1017,7 +1017,8 @@
       <!-- table default -->
       <xsl:call-template name="InsertDefaultTableStyle"/>
       <!-- graphic defaul -->
-      <xsl:call-template name="InsertDefaultGraphicStyle" />      
+      <!-- Commented by Sonata:Defect fix 2630175 DOCX: All VML get blue background  -->
+      <!--<xsl:call-template name="InsertDefaultGraphicStyle" /> -->   
       <!-- TODO : other ODF style families : section, table-column, table-row, table-cell, table-page, chart, default, drawing-page, graphic, presentation, control and ruby -->
     </xsl:for-each>
   </xsl:template>
