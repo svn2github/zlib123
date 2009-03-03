@@ -2049,6 +2049,12 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:value-of select="concat('/',translate(substring-after($Target,'file:///'),'\','/'))"/>
                 </xsl:attribute>
               </xsl:when>
+              <!--added by vipul for conf 1.1-->
+              <xsl:when test="starts-with($Target,'Files/')">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of select="concat('/',translate($Target,'\','/'))"/>
+                </xsl:attribute>
+              </xsl:when>
             </xsl:choose>
           </xsl:when>
           <xsl:when test="./a:graphic/a:graphicData/p:oleObj/p:embed">

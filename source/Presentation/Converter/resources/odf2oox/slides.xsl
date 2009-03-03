@@ -435,6 +435,8 @@ Copyright (c) 2007, Sonata Software Limited
                                     + count(descendant::draw:ellipse) 
                                     + count(descendant::draw:line) 
                                     + count(descendant::draw:connector) 
+                                    + count(descendant::draw:frame/draw:object) 
+                                    + count(descendant::draw:frame/draw:object-ole) 
                                     + count(descendant::draw:circle) 
                                     + count(descendant::draw:custom-shape),':')"/>
           </xsl:for-each>
@@ -1973,6 +1975,7 @@ Copyright (c) 2007, Sonata Software Limited
 
     <xsl:for-each select="./text:a">
       <xsl:if test="position()=1">
+        <xsl:if test="@xlink:href !=''">
         <a:hlinkClick>
           <xsl:if test="@xlink:href[ contains(.,'#Slide')]">
             <xsl:attribute name="action">
@@ -2000,6 +2003,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </xsl:if>
         </a:hlinkClick>
+      </xsl:if>
       </xsl:if>
     </xsl:for-each>
 
@@ -2151,14 +2155,20 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:choose>
                 <xsl:when test="./draw:object or ./draw:object-ole">
                   <xsl:choose>
-                    <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
-                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
-                      <xsl:call-template name="tmpOLEObjectsRel">
-                        <xsl:with-param name="slideNo" select="$slideNo"/>
-                      </xsl:call-template>
+                    <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node() or
+                                      document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node() ">
+                      <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                                 xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+
+                        <xsl:attribute name="Id">
+                          <xsl:value-of select="concat('oleObjectImage_',generate-id())"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="Target">
+                          <xsl:value-of select="concat('../media/','oleObjectImage_',generate-id(),'.png')"/>
+                        </xsl:attribute>
+
+                      </Relationship>
                     </xsl:when>
-                    <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
-                    <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>
                     <xsl:otherwise>
                       <xsl:call-template name="tmpOLEObjectsRel">
                         <xsl:with-param name="slideNo" select="$slideNo"/>
@@ -2243,7 +2253,7 @@ Copyright (c) 2007, Sonata Software Limited
                                           </xsl:if>
                                         </xsl:when>
                                         <xsl:when test="@xlink:href[ contains(.,'http')] or @xlink:href[ contains(.,'mailto:')]">
-                                          <xsl:value-of select="@xlink:href"/>
+                                          <xsl:value-of select="translate(@xlink:href,' ','')"/>
                                         </xsl:when>
                                           <!--added by chhavi for regession bug-->
                                         <xsl:when test="not(@xlink:href[ contains(.,'./')]) and not(@xlink:href[ contains(.,'http')])

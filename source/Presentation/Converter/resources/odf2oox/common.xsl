@@ -3678,16 +3678,21 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:choose>
                <xsl:when test="./draw:object or ./draw:object-ole">
                     <xsl:choose>
-                      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
-                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
-                        <xsl:call-template name="tmpOLEObjectsRel">
-                          <xsl:with-param name="slideNo" select="$slideNo"/>
-                          <xsl:with-param name ="grpBln" select ="'true'"/>
-                        </xsl:call-template>
+                      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node() or
+                                      document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node() ">
+                        <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                                   xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat('oleObjectImage_',generate-id())"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="concat('../media/','oleObjectImage_',generate-id(),'.png')"/>
+                          </xsl:attribute>
+
+                        </Relationship>
                       </xsl:when>
-                  <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
-                   <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>
-                  <xsl:otherwise>
+                 <xsl:otherwise>
                     <xsl:call-template name="tmpOLEObjectsRel">
                       <xsl:with-param name="slideNo" select="$slideNo"/>
                       <xsl:with-param name ="grpBln" select ="'true'"/>
@@ -4532,7 +4537,15 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="XY"/>
     
     <xsl:variable name="tmp_XY">
+      <xsl:choose>
+        <xsl:when test="$drawTranformVal!=''">
       <xsl:value-of select="substring-after(@draw:transform,'translate')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'0'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+     
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$XY='X'">
@@ -4540,9 +4553,13 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:when test="contains($tmp_XY,'translate')">
             <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after($tmp_XY,'translate'),'('),')'),' '),$unit)" />
           </xsl:when>
-          <xsl:otherwise>
+          <xsl:when test="$drawTranformVal!=''">
             <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after($drawTranformVal,'translate'),'('),')'),' '),$unit)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'0'"/>
           </xsl:otherwise>
+          
         </xsl:choose>
       </xsl:when>
       <xsl:when test="$XY='Y'">
@@ -4550,14 +4567,25 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:when test="contains($tmp_XY,'translate')">
             <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after($tmp_XY,'translate'),'('),')'),' '),$unit)" />
           </xsl:when>
-          <xsl:otherwise>
+          <xsl:when test="$drawTranformVal!=''">
             <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after($drawTranformVal,'translate'),'('),')'),' '),$unit)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'0'"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:when test="$XY='ROT'">
+        <xsl:choose>
+          <xsl:when test="$drawTranformVal!=''">
         <xsl:value-of select="substring-before(substring-after(substring-after(@draw:transform,'rotate'),'('),')')" />
         <!--<xsl:value-of select="substring-after(substring-before(substring-before($drawTranformVal,'translate'),')'),'(')" />-->
+      </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'0'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        
       </xsl:when>
     </xsl:choose>
 
@@ -6162,18 +6190,62 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="grpFlag" />
     <xsl:param name ="UniqueId" />
     <xsl:choose>
-      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))
-                                      /office:document-content/office:body/office:drawing/draw:page/draw:frame/draw:image">
-        <xsl:call-template name="tmpOLE">
-          <xsl:with-param name ="pageNo" select="$pageNo" />
-          <xsl:with-param name ="shapeCount" select="$shapeCount" />
-          <xsl:with-param name ="grpFlag" select="$grpFlag" />
-          <xsl:with-param name ="UniqueId" select="$UniqueId" />
-          <xsl:with-param name ="OLEasXML" select="'true'" />
-        </xsl:call-template>
+      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node() or
+                      document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node() ">
+        <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#"
+              pzip:target="{concat('ppt/media/','oleObjectImage_',generate-id(),'.png')}"/>
+        <p:pic>
+          <p:nvPicPr>
+            <p:cNvPr id="{$shapeCount + 1 }">
+              <xsl:attribute name="name">
+                <xsl:value-of select="concat('Picture ',$shapeCount+1)"/>
+              </xsl:attribute>
+              <xsl:attribute name="descr">
+                <xsl:value-of select="concat('oleObjectImage_',generate-id(),'.png')"/>
+              </xsl:attribute>
+            </p:cNvPr >
+            <p:cNvPicPr>
+              <a:picLocks noChangeAspect="1">
+                <xsl:choose>
+                  <xsl:when test="$grpFlag!='true'">
+                    <xsl:attribute name="noGrp">
+                      <xsl:value-of select="'1'"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                </xsl:choose>
+              </a:picLocks>
+            </p:cNvPicPr>
+            <p:nvPr/>
+          </p:nvPicPr>
+          <p:blipFill>
+            <a:blip>
+              <xsl:attribute name ="r:embed">
+                <xsl:value-of select ="concat('oleObjectImage_',generate-id())"/>
+              </xsl:attribute>
+            </a:blip >
+            <a:stretch>
+              <a:fillRect />
+            </a:stretch>
+          </p:blipFill>
+          <p:spPr>
+            <xsl:for-each select=".">
+              <xsl:choose>
+                <xsl:when test="$grpFlag='true'">
+                  <a:xfrm>
+                    <xsl:call-template name ="tmpGroupdrawCordinates"/>
+                  </a:xfrm>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name ="tmpdrawCordinates"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+            <a:prstGeom prst="rect">
+              <a:avLst/>
+            </a:prstGeom>
+          </p:spPr>
+        </p:pic>
       </xsl:when>
-      <!--<xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
-      <xsl:when test="document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node()"/>-->
       <xsl:otherwise>
         <xsl:call-template name="tmpOLE">
           <xsl:with-param name ="pageNo" select="$pageNo" />

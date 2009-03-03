@@ -3309,13 +3309,13 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:when>
       						<xsl:otherwise>
 						<xsl:attribute name ="wrap">
-              <!--added by chhvi for regression m1-->
+              <!--added by chhvi for regression m1 and m2-->
               <xsl:choose>
-                <xsl:when test="@draw:auto-grow-height = 'true'">
-              <xsl:value-of select ="'square'"/>
+                <xsl:when test="@draw:auto-grow-height = 'false'">
+              <xsl:value-of select ="'none'"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select ="'none'"/>
+                  <xsl:value-of select ="'square'"/>
                 </xsl:otherwise>                          
               </xsl:choose>             
 						</xsl:attribute>

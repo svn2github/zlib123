@@ -393,9 +393,7 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr>
-        <a:xfrm>
-          <xsl:call-template name ="tmpdrawCordinates"/>
-        </a:xfrm>
+        <xsl:call-template name ="tmpdrawCordinates"/>
         <a:prstGeom prst="rect">
           <a:avLst/>
         </a:prstGeom>
@@ -686,9 +684,7 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr>
-        <a:xfrm>
-          <xsl:call-template name ="tmpdrawCordinates"/>
-        </a:xfrm>
+         <xsl:call-template name ="tmpdrawCordinates"/>
         <a:prstGeom prst="rect">
           <a:avLst/>
         </a:prstGeom>
@@ -986,10 +982,8 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr>
-        <a:xfrm>
-          <xsl:call-template name ="tmpdrawCordinates"/>
-        </a:xfrm>
-        <a:prstGeom prst="rect">
+         <xsl:call-template name ="tmpdrawCordinates"/>
+         <a:prstGeom prst="rect">
           <a:avLst/>
         </a:prstGeom>
         <a:noFill />
@@ -1023,9 +1017,7 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr>
-        <a:xfrm>
           <xsl:call-template name ="tmpdrawCordinates"/>
-        </a:xfrm>
         <a:prstGeom prst="rect">
           <a:avLst/>
         </a:prstGeom>
@@ -1058,9 +1050,7 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr>
-        <a:xfrm>
-          <xsl:call-template name ="tmpdrawCordinates"/>
-        </a:xfrm>
+         <xsl:call-template name ="tmpdrawCordinates"/>
         <a:prstGeom prst="rect">
           <a:avLst/>
         </a:prstGeom>
@@ -1349,9 +1339,7 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr>
-        <a:xfrm>
           <xsl:call-template name ="tmpdrawCordinates"/>
-        </a:xfrm>
         <a:prstGeom prst="rect">
           <a:avLst/>
         </a:prstGeom>
