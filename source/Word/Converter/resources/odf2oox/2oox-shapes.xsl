@@ -47,7 +47,8 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:w10="urn:schemas-microsoft-com:office:word"
-  exclude-result-prefixes="xlink draw svg fo office style text">
+  xmlns:ooc="urn:odf-converter"                
+  exclude-result-prefixes="xlink draw svg fo office style text ooc">
 
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <!--
@@ -293,14 +294,14 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </v:shapetype>
         <v:shape id="_x0000_s1026" type="#_x0000_t32">
           <!--added by chhavi for alttext-->
-          <xsl:if test ="child::node()= svg:desc">
+          <xsl:if test="svg:desc">
             <xsl:attribute name="alt">
               <xsl:value-of select="svg:desc/child::node()"/>
             </xsl:attribute>
           </xsl:if>
           <!--end here-->
           <xsl:attribute name="style">
-            <xsl:call-template name ="GetLineCoordinatesODF">
+            <xsl:call-template name="GetLineCoordinatesODF">
               <xsl:with-param name="shape" select="."/>
             </xsl:call-template>
             <!-- Sona : Defect #2026780-->
@@ -345,7 +346,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
     <w:r>
       <w:pict>
         <xsl:choose>
-          <xsl:when test ="@draw:type='curve'">
+          <xsl:when test="@draw:type='curve'">
             <v:shapetype id="_x0000_t38" coordsize="21600,21600" o:spt="38" o:oned="t" path="m,c@0,0@1,5400@1,10800@1,16200@2,21600,21600,21600e" filled="f">
               <v:formulas>
                 <v:f eqn="mid #0 0"/>
@@ -361,7 +362,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
             <!-- Sona: Defect 2019239-->
             <v:shape id="_x0000_s1036" type="#_x0000_t38" adj="10800,22173,-43579">
               <xsl:attribute name="style">
-                <xsl:call-template name ="GetLineCoordinatesODF">
+                <xsl:call-template name="GetLineCoordinatesODF">
                   <xsl:with-param name="shape" select="."/>
                 </xsl:call-template>
                 <!-- Sona : Defect #2026780-->
@@ -405,7 +406,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
             </v:shapetype>
             <v:shape id="_x0000_s1026" type="#_x0000_t32">
               <xsl:attribute name="style">
-                <xsl:call-template name ="GetLineCoordinatesODF">
+                <xsl:call-template name="GetLineCoordinatesODF">
                   <xsl:with-param name="shape" select="."/>
                 </xsl:call-template>
                 <!-- Sona : Defect #2026780-->
@@ -456,7 +457,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
             </v:shapetype>
             <v:shape id="_x0000_s1033" type="#_x0000_t34" adj=",-249300,-14316">
               <xsl:attribute name="style">
-                <xsl:call-template name ="GetLineCoordinatesODF">
+                <xsl:call-template name="GetLineCoordinatesODF">
                   <xsl:with-param name="shape" select="."/>
                 </xsl:call-template>
                 <!-- Sona : Defect #2026780-->
@@ -595,7 +596,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
     <xsl:param name="shapeStyle"/>
     <xsl:param name="shape"/>
     <!--added by chhavi for alttext-->
-    <xsl:if test ="child::node()= svg:desc">
+    <xsl:if test="svg:desc">
       <xsl:attribute name="alt">
         <xsl:value-of select="svg:desc/child::node()"/>
       </xsl:attribute>
@@ -653,15 +654,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         <xsl:choose>
           <xsl:when test="$shape/@svg:width">
             <!-- Sona: Defect #2166160-->
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="$shape/@svg:width"/>
-            </xsl:call-template>
+            <xsl:value-of select="concat('width:', ooc:PtFromMeasuredUnit($shape/@svg:width, 0), 'pt;')" />
           </xsl:when>
           <xsl:otherwise>
             <!-- Sona: Defect #2166160-->
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="$shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width"/>
-            </xsl:call-template>
+            <xsl:value-of select="concat('width:', ooc:PtFromMeasuredUnit($shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width, 0), 'pt;')" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -670,22 +667,16 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       <!-- height: -->
       <xsl:variable name="frameH">
         <xsl:choose>
-          <xsl:when test ="$shape/@svg:height">
+          <xsl:when test="$shape/@svg:height">
             <!-- Sona: Defect #2166160-->
-            <xsl:call-template name="point-measure">
-              <!-- Sona: Defect #2019374-->
-              <xsl:with-param name="length" select="$shape/@svg:height"/>
-            </xsl:call-template>
+            <!-- Sona: Defect #2019374-->
+            <xsl:value-of select="concat('height:', ooc:PtFromMeasuredUnit($shape/@svg:height, 0), 'pt;')" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:call-template name="point-measure">
-              <!-- Sona: Defect #2166160-->
-              <xsl:with-param name="length" select="$shape/child::node()/@fo:min-height|$shapeStyle/style:graphic-properties/@fo:min-height"/>
-            </xsl:call-template>
+            <xsl:value-of select="concat('height:', ooc:PtFromMeasuredUnit($shape/child::node()/@fo:min-height|$shapeStyle/style:graphic-properties/@fo:min-height, 0), 'pt;')" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 
       <!--code added by Chhavi for relative size in Frame - Defect #2166036-->
       <xsl:if test="(../draw:frame or draw:frame) and string(number(substring-before($shape/@style:rel-width,'%'))) != 'NaN'">
@@ -739,9 +730,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
   Summary:  Inserts the VML shape z-index
   Author:   Sona 
   -->
-  <xsl:template name ="InsertShapeZIndex">
-    <xsl:param name ="shapeStyle"></xsl:param>
-    <xsl:param name ="shape"></xsl:param>
+  <xsl:template name="InsertShapeZIndex">
+    <xsl:param name="shapeStyle"></xsl:param>
+    <xsl:param name="shape"></xsl:param>
     <!-- z-index: -->
     <!-- Sona: Defect #2026780-->
     <xsl:variable name="frameWrap">
@@ -917,8 +908,8 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
             </xsl:for-each>
           </xsl:when>
           <!-- Sona: Picture fill for frame-->
-          <xsl:when test ="$fillProperty = '' and (parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame'])">
-            <xsl:if test ="$shapeStyle/style:graphic-properties/style:background-image/@*">
+          <xsl:when test="$fillProperty = '' and (parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame'])">
+            <xsl:if test="$shapeStyle/style:graphic-properties/style:background-image/@*">
               <xsl:variable name="stretch" select="$shapeStyle/style:graphic-properties/style:background-image/@style:repeat"/>
 
               <xsl:choose>
@@ -1011,8 +1002,8 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
 
     <!--code changed by yeswanth.s : For Stroke Weight-->
     <xsl:choose>
-      <xsl:when test ="$shapeBorder='none' or ($shapeBorder = '' and (name(parent::node()) = 'draw:frame' or self::node()[name()='draw:frame']))">
-        <xsl:attribute name ="stroked">
+      <xsl:when test="$shapeBorder='none' or ($shapeBorder = '' and (name(parent::node()) = 'draw:frame' or self::node()[name()='draw:frame']))">
+        <xsl:attribute name="stroked">
           <xsl:value-of select="'f'"/>
         </xsl:attribute>
       </xsl:when>
@@ -1064,52 +1055,52 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
     <xsl:param name="shape" select="."/>
     <xsl:variable name="x1">
       <xsl:choose>
-        <xsl:when test ="@svg:x1=0">
+        <xsl:when test="@svg:x1=0">
           <xsl:value-of select="'0pt'"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="@svg:x1"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="@svg:x1"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="y1">
       <xsl:choose>
-        <xsl:when test ="@svg:y1=0">
+        <xsl:when test="@svg:y1=0">
           <xsl:value-of select="'0pt'"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="@svg:y1"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="@svg:y1"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="x2">
       <xsl:choose>
-        <xsl:when test ="@svg:x2=0">
+        <xsl:when test="@svg:x2=0">
           <xsl:value-of select="'0pt'"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="@svg:x2"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="@svg:x2"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="y2">
       <xsl:choose>
-        <xsl:when test ="@svg:y2=0">
+        <xsl:when test="@svg:y2=0">
           <xsl:value-of select="'0pt'"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="@svg:y2"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="@svg:y2"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
@@ -1127,9 +1118,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="margin-top">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="$y2"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$y2"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>margin-top:</xsl:text>
@@ -1151,9 +1142,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="height">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>height:</xsl:text>
@@ -1169,9 +1160,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       </xsl:when>
       <xsl:when test="$x1 &gt; $x2 and $y2 &gt;= $y1">
         <!--<xsl:variable name="margin-left">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="$x2"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$x2"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>margin-left:</xsl:text>
@@ -1184,9 +1175,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="margin-top">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="$y1"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$y1"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>margin-top:</xsl:text>
@@ -1199,9 +1190,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="width">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>width:</xsl:text>
@@ -1214,9 +1205,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="height">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>height:</xsl:text>
@@ -1233,9 +1224,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       </xsl:when>
       <xsl:when test="$x1 &gt; $x2 and $y1 &gt; $y2">
         <!--<xsl:variable name="margin-left">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="$x2"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$x2"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>margin-left:</xsl:text>
@@ -1248,9 +1239,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="margin-top">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="$y2"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$y2"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>margin-top:</xsl:text>
@@ -1263,9 +1254,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="width">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat(substring-before($x1,'in')-substring-before($x2,'in'),'in')"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>width:</xsl:text>
@@ -1278,9 +1269,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="height">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat(substring-before($y1,'in')-substring-before($y2,'in'),'in')"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>height:</xsl:text>
@@ -1297,9 +1288,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       </xsl:when>
       <xsl:otherwise>
         <!--<xsl:variable name="margin-left">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="$x1"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$x1"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>margin-left:</xsl:text>
@@ -1312,9 +1303,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="margin-top">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="$y1"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$y1"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>margin-top:</xsl:text>
@@ -1327,9 +1318,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="width">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="concat(substring-before($x2,'in')-substring-before($x1,'in'),'in')"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat(substring-before($x2,'in')-substring-before($x1,'in'),'in')"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>width:</xsl:text>
@@ -1342,9 +1333,9 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:choose>
         <xsl:text>;</xsl:text>
         <!--<xsl:variable name="height">
-          <xsl:call-template name ="ConvertMeasure">
-            <xsl:with-param name ="length" select="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
-            <xsl:with-param name ="unit" select="'point'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat(substring-before($y2,'in')-substring-before($y1,'in'),'in')"/>
+            <xsl:with-param name="unit" select="'point'"/>
           </xsl:call-template>
         </xsl:variable>-->
         <xsl:text>height:</xsl:text>
@@ -1362,7 +1353,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
   </xsl:template>
   <!-- Sona Arrow Stroke Function-->
   <xsl:template name="GetLineStroke">
-    <xsl:param name ="shapeStyle"></xsl:param>
+    <xsl:param name="shapeStyle"></xsl:param>
     <v:stroke>
       <!--code added by yeswanth.s : 'linestyle' in DOCX-->
       <xsl:variable name="styleBorderLine">
@@ -1403,7 +1394,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       <!--Dash Styles-->
       <xsl:if test="$shapeStyle/style:graphic-properties/@draw:stroke!='' and $shapeStyle/style:graphic-properties/@draw:stroke!='none'">
         <xsl:variable name="drawStrokeDash" select="$shapeStyle/style:graphic-properties/@draw:stroke-dash"></xsl:variable>
-        <xsl:variable name ="strokeStyle" select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$drawStrokeDash]"></xsl:variable>
+        <xsl:variable name="strokeStyle" select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$drawStrokeDash]"></xsl:variable>
         <xsl:variable name="drawStroke" select="$shapeStyle/style:graphic-properties/@draw:stroke"/>
         <!-- Sona: Arrow feature continuation -->
         <xsl:variable name="Unit1">
@@ -1416,29 +1407,29 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
             <xsl:with-param name="length" select="$strokeStyle/@draw:dots2-length"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:attribute name ="dashstyle">
+        <xsl:attribute name="dashstyle">
           <xsl:choose>
-            <xsl:when test ="$strokeStyle/@draw:dots1=2 and $strokeStyle/@draw:dots2=1">
+            <xsl:when test="$strokeStyle/@draw:dots1=2 and $strokeStyle/@draw:dots2=1">
               <xsl:value-of select="'longDashDotDot'"/>
             </xsl:when>
-            <xsl:when test =" not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,$Unit2) &gt;'0.05'">
+            <xsl:when test=" not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,$Unit2) &gt;'0.05'">
               <xsl:value-of select="'longDashDot'"/>
             </xsl:when>
-            <xsl:when test ="not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,$Unit2) &lt;= '0.05'">
+            <xsl:when test="not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,$Unit2) &lt;= '0.05'">
               <xsl:value-of select="'dashDot'"/>
             </xsl:when>
             <!-- Square Dot-->
-            <xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &lt;= '0.02'">
+            <xsl:when test="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &lt;= '0.02'">
               <xsl:value-of select="'1 1'"/>
             </xsl:when>
-            <xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &lt;= '0.05'">
+            <xsl:when test="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &lt;= '0.05'">
               <xsl:value-of select="'dash'"/>
             </xsl:when>
-            <xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &gt; '0.05'">
+            <xsl:when test="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &gt; '0.05'">
               <xsl:value-of select="'longDash'"/>
             </xsl:when>
             <!-- Sona : code update for square or round dots-->
-            <xsl:when test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
+            <xsl:when test="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
               <xsl:value-of select="'1 1'"/>
             </xsl:when>
             <!--Sona: Defect #2019464-->
@@ -1454,8 +1445,8 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        <xsl:if test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
-          <xsl:attribute name ="endcap">
+        <xsl:if test="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
+          <xsl:attribute name="endcap">
             <xsl:value-of select="'round'"/>
           </xsl:attribute>
         </xsl:if>
@@ -1465,23 +1456,23 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       <!-- Start Arrow-->
       <!-- Sonata: Defect #2151408-->
       <xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-start and $shapeStyle/style:graphic-properties/@draw:marker-start !=''">
-        <xsl:variable name ="drawArrowTypeStart" select="$shapeStyle/style:graphic-properties/@draw:marker-start"></xsl:variable>
-        <xsl:variable name ="startArrow" select="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeStart]"></xsl:variable>
-        <xsl:attribute name ="startarrow">
+        <xsl:variable name="drawArrowTypeStart" select="$shapeStyle/style:graphic-properties/@draw:marker-start"></xsl:variable>
+        <xsl:variable name="startArrow" select="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeStart]"></xsl:variable>
+        <xsl:attribute name="startarrow">
           <xsl:choose>
-            <xsl:when test ="$startArrow/@svg:d='m10 0-10 30h20z'">
+            <xsl:when test="$startArrow/@svg:d='m10 0-10 30h20z'">
               <xsl:value-of select="'block'"/>
             </xsl:when>
-            <xsl:when test ="$startArrow/@svg:d='m0 2108v17 17l12 42 30 34 38 21 43 4 29-8 30-21 25-26 13-34 343-1532 339 1520 13 42 29 34 39 21 42 4 42-12 34-30 21-42v-39-12l-4 4-440-1998-9-42-25-39-38-25-43-8-42 8-38 25-26 39-8 42z'">
+            <xsl:when test="$startArrow/@svg:d='m0 2108v17 17l12 42 30 34 38 21 43 4 29-8 30-21 25-26 13-34 343-1532 339 1520 13 42 29 34 39 21 42 4 42-12 34-30 21-42v-39-12l-4 4-440-1998-9-42-25-39-38-25-43-8-42 8-38 25-26 39-8 42z'">
               <xsl:value-of select="'open'"/>
             </xsl:when>
-            <xsl:when test ="$startArrow/@svg:d='m1013 1491 118 89-567-1580-564 1580 114-85 136-68 148-46 161-17 161 13 153 46z'">
+            <xsl:when test="$startArrow/@svg:d='m1013 1491 118 89-567-1580-564 1580 114-85 136-68 148-46 161-17 161 13 153 46z'">
               <xsl:value-of select="'classic'"/>
             </xsl:when>
-            <xsl:when test ="$startArrow/@svg:d='m462 1118-102-29-102-51-93-72-72-93-51-102-29-102-13-105 13-102 29-106 51-102 72-89 93-72 102-50 102-34 106-9 101 9 106 34 98 50 93 72 72 89 51 102 29 106 13 102-13 105-29 102-51 102-72 93-93 72-98 51-106 29-101 13z'">
+            <xsl:when test="$startArrow/@svg:d='m462 1118-102-29-102-51-93-72-72-93-51-102-29-102-13-105 13-102 29-106 51-102 72-89 93-72 102-50 102-34 106-9 101 9 106 34 98 50 93 72 72 89 51 102 29 106 13 102-13 105-29 102-51 102-72 93-93 72-98 51-106 29-101 13z'">
               <xsl:value-of select="'oval'"/>
             </xsl:when>
-            <xsl:when test ="$startArrow/@svg:d='m0 564 564 567 567-567-567-564z'">
+            <xsl:when test="$startArrow/@svg:d='m0 564 564 567 567-567-567-564z'">
               <xsl:value-of select="'diamond'"/>
             </xsl:when>
             <!-- Sona: Defect #2019464-->
@@ -1491,38 +1482,38 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
           </xsl:choose>
         </xsl:attribute>
         <!-- Sonata: Defect #2151408-->
-        <xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-start-width and $shapeStyle/style:graphic-properties/@draw:marker-start-width !=''">
+        <xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-start-width and $shapeStyle/style:graphic-properties/@draw:marker-start-width !=''">
           <xsl:variable name="Unit">
             <xsl:call-template name="GetUnit">
               <xsl:with-param name="length" select="$shapeStyle/style:graphic-properties/@draw:marker-start-width"/>
             </xsl:call-template>
           </xsl:variable>
-          <xsl:call-template name ="setArrowSize">
-            <xsl:with-param name ="size" select="substring-before($shapeStyle/style:graphic-properties/@draw:marker-start-width,$Unit)" />
-            <xsl:with-param name ="arrType" select="'start'"></xsl:with-param>
+          <xsl:call-template name="setArrowSize">
+            <xsl:with-param name="size" select="substring-before($shapeStyle/style:graphic-properties/@draw:marker-start-width,$Unit)" />
+            <xsl:with-param name="arrType" select="'start'"></xsl:with-param>
           </xsl:call-template >
         </xsl:if>
       </xsl:if>
       <!-- End Arrow-->
       <!-- Sonata: Defect #2151408-->
       <xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-end and $shapeStyle/style:graphic-properties/@draw:marker-end !=''">
-        <xsl:variable name ="drawArrowTypeEnd" select="$shapeStyle/style:graphic-properties/@draw:marker-end"></xsl:variable>
-        <xsl:variable name ="endArrow" select="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeEnd]"></xsl:variable>
-        <xsl:attribute name ="endarrow">
+        <xsl:variable name="drawArrowTypeEnd" select="$shapeStyle/style:graphic-properties/@draw:marker-end"></xsl:variable>
+        <xsl:variable name="endArrow" select="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeEnd]"></xsl:variable>
+        <xsl:attribute name="endarrow">
           <xsl:choose>
-            <xsl:when test ="$endArrow/@svg:d='m10 0-10 30h20z'">
+            <xsl:when test="$endArrow/@svg:d='m10 0-10 30h20z'">
               <xsl:value-of select="'block'"/>
             </xsl:when>
-            <xsl:when test ="$endArrow/@svg:d='m0 2108v17 17l12 42 30 34 38 21 43 4 29-8 30-21 25-26 13-34 343-1532 339 1520 13 42 29 34 39 21 42 4 42-12 34-30 21-42v-39-12l-4 4-440-1998-9-42-25-39-38-25-43-8-42 8-38 25-26 39-8 42z'">
+            <xsl:when test="$endArrow/@svg:d='m0 2108v17 17l12 42 30 34 38 21 43 4 29-8 30-21 25-26 13-34 343-1532 339 1520 13 42 29 34 39 21 42 4 42-12 34-30 21-42v-39-12l-4 4-440-1998-9-42-25-39-38-25-43-8-42 8-38 25-26 39-8 42z'">
               <xsl:value-of select="'open'"/>
             </xsl:when>
-            <xsl:when test ="$endArrow/@svg:d='m1013 1491 118 89-567-1580-564 1580 114-85 136-68 148-46 161-17 161 13 153 46z'">
+            <xsl:when test="$endArrow/@svg:d='m1013 1491 118 89-567-1580-564 1580 114-85 136-68 148-46 161-17 161 13 153 46z'">
               <xsl:value-of select="'classic'"/>
             </xsl:when>
-            <xsl:when test ="$endArrow/@svg:d='m462 1118-102-29-102-51-93-72-72-93-51-102-29-102-13-105 13-102 29-106 51-102 72-89 93-72 102-50 102-34 106-9 101 9 106 34 98 50 93 72 72 89 51 102 29 106 13 102-13 105-29 102-51 102-72 93-93 72-98 51-106 29-101 13z'">
+            <xsl:when test="$endArrow/@svg:d='m462 1118-102-29-102-51-93-72-72-93-51-102-29-102-13-105 13-102 29-106 51-102 72-89 93-72 102-50 102-34 106-9 101 9 106 34 98 50 93 72 72 89 51 102 29 106 13 102-13 105-29 102-51 102-72 93-93 72-98 51-106 29-101 13z'">
               <xsl:value-of select="'oval'"/>
             </xsl:when>
-            <xsl:when test ="$endArrow/@svg:d='m0 564 564 567 567-567-567-564z'">
+            <xsl:when test="$endArrow/@svg:d='m0 564 564 567 567-567-567-564z'">
               <xsl:value-of select="'diamond'"/>
             </xsl:when>
             <!-- Sona: Defect #2019464-->
@@ -1532,84 +1523,84 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
           </xsl:choose>
         </xsl:attribute>
         <!-- Sonata: Defect #2151408-->
-        <xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-end-width and $shapeStyle/style:graphic-properties/@draw:marker-end-width !=''">
+        <xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-end-width and $shapeStyle/style:graphic-properties/@draw:marker-end-width !=''">
           <xsl:variable name="Unit">
             <xsl:call-template name="GetUnit">
               <xsl:with-param name="length" select="$shapeStyle/style:graphic-properties/@draw:marker-end-width"/>
             </xsl:call-template>
           </xsl:variable>
-          <xsl:call-template name ="setArrowSize">
-            <xsl:with-param name ="size" select="substring-before($shapeStyle/style:graphic-properties/@draw:marker-end-width,$Unit)" />
-            <xsl:with-param name ="arrType" select="'end'"></xsl:with-param>
+          <xsl:call-template name="setArrowSize">
+            <xsl:with-param name="size" select="substring-before($shapeStyle/style:graphic-properties/@draw:marker-end-width,$Unit)" />
+            <xsl:with-param name="arrType" select="'end'"></xsl:with-param>
           </xsl:call-template >
         </xsl:if>
       </xsl:if>
     </v:stroke>
   </xsl:template>
-  <xsl:template name ="setArrowSize">
-    <xsl:param name ="size" />
-    <xsl:param name ="arrType"></xsl:param>
+  <xsl:template name="setArrowSize">
+    <xsl:param name="size" />
+    <xsl:param name="arrType"></xsl:param>
 
     <xsl:choose>
       <xsl:when test="$arrType='start'">
         <xsl:choose>
-          <xsl:when test ="($size &lt;= $sm-sm)">
-            <xsl:attribute name ="startarrowwidth">
+          <xsl:when test="($size &lt;= $sm-sm)">
+            <xsl:attribute name="startarrowwidth">
               <xsl:value-of select="'narrow'"/>
             </xsl:attribute>
-            <xsl:attribute name ="startarrowlength">
+            <xsl:attribute name="startarrowlength">
               <xsl:value-of select="'short'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $sm-sm) and ($size &lt;= $sm-med)">
-            <xsl:attribute name ="startarrowwidth">
+          <xsl:when test="($size &gt; $sm-sm) and ($size &lt;= $sm-med)">
+            <xsl:attribute name="startarrowwidth">
               <xsl:value-of select="'narrow'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $sm-med) and ($size &lt;= $sm-lg)">
-            <xsl:attribute name ="startarrowwidth">
+          <xsl:when test="($size &gt; $sm-med) and ($size &lt;= $sm-lg)">
+            <xsl:attribute name="startarrowwidth">
               <xsl:value-of select="'narrow'"/>
             </xsl:attribute>
-            <xsl:attribute name ="startarrowlength">
+            <xsl:attribute name="startarrowlength">
               <xsl:value-of select="'long'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $sm-lg) and ($size &lt;= $med-sm)">
-            <xsl:attribute name ="startarrowlength">
+          <xsl:when test="($size &gt; $sm-lg) and ($size &lt;= $med-sm)">
+            <xsl:attribute name="startarrowlength">
               <xsl:value-of select="'short'"/>
             </xsl:attribute>
           </xsl:when>
-          <!--<xsl:when test ="($size &gt; $med-med) and ($size &lt;= $med-lg)">
-        <xsl:attribute name ="startarrowwidth">
+          <!--<xsl:when test="($size &gt; $med-med) and ($size &lt;= $med-lg)">
+        <xsl:attribute name="startarrowwidth">
           <xsl:value-of select="'med'"/>
         </xsl:attribute>
-        <xsl:attribute name ="startarrowlength">
+        <xsl:attribute name="startarrowlength">
           <xsl:value-of select="'lg'"/>
         </xsl:attribute>
       </xsl:when>-->
-          <xsl:when test ="($size &gt; $med-lg) and ($size &lt;= $lg-sm)">
-            <xsl:attribute name ="startarrowlength">
+          <xsl:when test="($size &gt; $med-lg) and ($size &lt;= $lg-sm)">
+            <xsl:attribute name="startarrowlength">
               <xsl:value-of select="'long'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $lg-sm) and ($size &lt;= $lg-med)">
-            <xsl:attribute name ="startarrowwidth">
+          <xsl:when test="($size &gt; $lg-sm) and ($size &lt;= $lg-med)">
+            <xsl:attribute name="startarrowwidth">
               <xsl:value-of select="'wide'"/>
             </xsl:attribute>
-            <xsl:attribute name ="startarrowlength">
+            <xsl:attribute name="startarrowlength">
               <xsl:value-of select="'short'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $lg-med) and ($size &lt;= $lg-lg)">
-            <xsl:attribute name ="startarrowwidth">
+          <xsl:when test="($size &gt; $lg-med) and ($size &lt;= $lg-lg)">
+            <xsl:attribute name="startarrowwidth">
               <xsl:value-of select="'wide'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $lg-lg)">
-            <xsl:attribute name ="startarrowwidth">
+          <xsl:when test="($size &gt; $lg-lg)">
+            <xsl:attribute name="startarrowwidth">
               <xsl:value-of select="'wide'"/>
             </xsl:attribute>
-            <xsl:attribute name ="startarrowlength">
+            <xsl:attribute name="startarrowlength">
               <xsl:value-of select="'long'"/>
             </xsl:attribute>
           </xsl:when>
@@ -1617,63 +1608,63 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test ="($size &lt;= $sm-sm)">
-            <xsl:attribute name ="endarrowwidth">
+          <xsl:when test="($size &lt;= $sm-sm)">
+            <xsl:attribute name="endarrowwidth">
               <xsl:value-of select="'narrow'"/>
             </xsl:attribute>
-            <xsl:attribute name ="endarrowlength">
+            <xsl:attribute name="endarrowlength">
               <xsl:value-of select="'short'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $sm-sm) and ($size &lt;= $sm-med)">
-            <xsl:attribute name ="endarrowwidth">
+          <xsl:when test="($size &gt; $sm-sm) and ($size &lt;= $sm-med)">
+            <xsl:attribute name="endarrowwidth">
               <xsl:value-of select="'narrow'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $sm-med) and ($size &lt;= $sm-lg)">
-            <xsl:attribute name ="endarrowwidth">
+          <xsl:when test="($size &gt; $sm-med) and ($size &lt;= $sm-lg)">
+            <xsl:attribute name="endarrowwidth">
               <xsl:value-of select="'narrow'"/>
             </xsl:attribute>
-            <xsl:attribute name ="endarrowlength">
+            <xsl:attribute name="endarrowlength">
               <xsl:value-of select="'long'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $sm-lg) and ($size &lt;= $med-sm)">
-            <xsl:attribute name ="endarrowlength">
+          <xsl:when test="($size &gt; $sm-lg) and ($size &lt;= $med-sm)">
+            <xsl:attribute name="endarrowlength">
               <xsl:value-of select="'short'"/>
             </xsl:attribute>
           </xsl:when>
-          <!--<xsl:when test ="($size &gt; $med-med) and ($size &lt;= $med-lg)">
-        <xsl:attribute name ="startarrowwidth">
+          <!--<xsl:when test="($size &gt; $med-med) and ($size &lt;= $med-lg)">
+        <xsl:attribute name="startarrowwidth">
           <xsl:value-of select="'med'"/>
         </xsl:attribute>
-        <xsl:attribute name ="startarrowlength">
+        <xsl:attribute name="startarrowlength">
           <xsl:value-of select="'lg'"/>
         </xsl:attribute>
       </xsl:when>-->
-          <xsl:when test ="($size &gt; $med-lg) and ($size &lt;= $lg-sm)">
-            <xsl:attribute name ="endarrowlength">
+          <xsl:when test="($size &gt; $med-lg) and ($size &lt;= $lg-sm)">
+            <xsl:attribute name="endarrowlength">
               <xsl:value-of select="'long'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $lg-sm) and ($size &lt;= $lg-med)">
-            <xsl:attribute name ="endarrowwidth">
+          <xsl:when test="($size &gt; $lg-sm) and ($size &lt;= $lg-med)">
+            <xsl:attribute name="endarrowwidth">
               <xsl:value-of select="'wide'"/>
             </xsl:attribute>
-            <xsl:attribute name ="endarrowlength">
+            <xsl:attribute name="endarrowlength">
               <xsl:value-of select="'short'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $lg-med) and ($size &lt;= $lg-lg)">
-            <xsl:attribute name ="endarrowwidth">
+          <xsl:when test="($size &gt; $lg-med) and ($size &lt;= $lg-lg)">
+            <xsl:attribute name="endarrowwidth">
               <xsl:value-of select="'wide'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="($size &gt; $lg-lg)">
-            <xsl:attribute name ="endarrowwidth">
+          <xsl:when test="($size &gt; $lg-lg)">
+            <xsl:attribute name="endarrowwidth">
               <xsl:value-of select="'wide'"/>
             </xsl:attribute>
-            <xsl:attribute name ="endarrowlength">
+            <xsl:attribute name="endarrowlength">
               <xsl:value-of select="'long'"/>
             </xsl:attribute>
           </xsl:when>

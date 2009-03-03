@@ -211,6 +211,57 @@
       }
       
       
+      ///<summary>
+      /// Convert various length units to point. The return value does not have the unit appended.
+      ///</summary>
+      public double PtFromMeasuredUnit(string measuredUnit, int precision)
+      {
+          double value = 0;
+          double factor = 1.0;
+
+          Regex regex = new Regex(@"\s*([-.0-9]+)\s*([a-zA-Z]*)\s*");
+
+          GroupCollection groups = regex.Match(measuredUnit).Groups;
+          if (groups.Count == 3)
+          {
+              string strValue = groups[1].Value;
+              string strUnit = groups[2].Value;
+
+              switch (strUnit)
+              {
+                  case "cm":
+                      factor = 72.0 / 2.54;
+                      break;
+                  case "mm":
+                      factor = 72.0 / 25.4;
+                      break;
+                  case "in":
+                  case "inch":
+                      factor = 72.0;
+                      break;
+                  case "pt":
+                      factor = 1.0;
+                      break;
+                  case "pica":
+                      factor = 12;
+                      break;
+                  case "dpt":
+                      factor = 1.0;
+                      break;
+                  case "px":
+                      factor = 72.0 / 96.0;
+                      break;
+              }
+
+              if (double.TryParse(strValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out value))
+              {
+                  value = value * factor;
+              }
+          }
+          return Math.Round(value, precision, MidpointRounding.AwayFromZero); 
+      }
+      
+      
       
       
       

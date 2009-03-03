@@ -39,11 +39,9 @@
 	-->
   <xsl:template name="padding-val">
     <xsl:param name="length"/>
-    <xsl:variable name="result">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$length"/>
-      </xsl:call-template>
-    </xsl:variable>
+    
+    <xsl:variable name="result" select="ooc:PtFromMeasuredUnit($length, 0)" />
+
     <xsl:choose>
       <xsl:when test="$result > 31">
         <xsl:message terminate="no">translation.odf2oox.paddingShortened</xsl:message>
