@@ -1054,7 +1054,7 @@
       <xsl:variable name="styleName">
         <xsl:call-template name="GetStyleName"/>
       </xsl:variable>
-      <xsl:variable name="paraStyleName" select="ancestor::text:p/@text:style-name" />
+      <xsl:variable name="paraStyleName" select="ancestor-or-self::text:p[1]/@text:style-name" />
 
       <!--
         makz: If the parent paragraph has an automatic style we must convert it's text formatting.
