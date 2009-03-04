@@ -510,6 +510,9 @@
       <!--<xsl:when test="$fieldType = 'FORMCHECKBOX' or $fieldType = 'FORMDROPDOWN' or $fieldType = 'FORMTEXT'">
 
       </xsl:when>-->
+      <xsl:when test="$fieldType = 'SET'">
+        <!-- SET fields are converted in mode "UserFieldDecls" -->
+      </xsl:when>
       <xsl:otherwise>
         <!-- translate field to static text -->
         <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
