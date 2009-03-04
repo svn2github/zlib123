@@ -39,7 +39,8 @@ using System;
 using System.IO;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using OdfConverter.CSharpEval;
+using CSharpEval;
+
 
 
 namespace CleverAge.OdfConverter.OdfConverterLib
@@ -1847,18 +1848,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 string strViewBox = strArrShpPth[2].Trim();
                 string strEnhPath = strArrShpPth[3].Trim();
 
-                strDrawEqn = strDrawEqn.Replace("cos(", "Math.cos(");
-                strDrawEqn = strDrawEqn.Replace("abs(", "Math.abs(");
-                strDrawEqn = strDrawEqn.Replace("sqrt(", "Math.sqrt(");
-                strDrawEqn = strDrawEqn.Replace("sin(", "Math.sin(");
-                strDrawEqn = strDrawEqn.Replace("tan(", "Math.tan(");
-                strDrawEqn = strDrawEqn.Replace("atan(", "Math.atan(");
-                strDrawEqn = strDrawEqn.Replace("atan2(", "Math.atan2(");
-                strDrawEqn = strDrawEqn.Replace("min(", "Math.min(");
-                strDrawEqn = strDrawEqn.Replace("max(", "Math.max(");
-                strDrawEqn = strDrawEqn.Replace("pi", "Math.PI");
-
-                string[] strArrAdj = strModifiers.Split(' ');
+               string[] strArrAdj = strModifiers.Split(' ');
 
                 string[] strArrBox = strViewBox.Split(' ');
 
@@ -1932,6 +1922,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                                {
                                    strElement = GetEqnVal(strElement, strEqnSlvd);
                                }
+                                if (strElement.Trim().StartsWith("-"))
+                                {
+                                    strElement = "(" + strElement + ")";
+                                }
                             }
                             strElement = strElement.Replace("(", "").Replace(")", "").Trim();
                             strElement = Convert.ToInt64(Convert.ToDouble(strElement, System.Globalization.CultureInfo.InvariantCulture), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -2048,11 +2042,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     {
                         if (strCurEqn.StartsWith("*"))
                         {
-                            strArrEqnResult[intCnt] = Convert.ToInt64(Evaluator.EvalToDouble(strCurEqn.Substring(1)), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            strArrEqnResult[intCnt] = Evaluate(strCurEqn.Substring(1));
                         }
                         else
                         {
-                            strArrEqnResult[intCnt] = Convert.ToInt64(Evaluator.EvalToDouble(strCurEqn), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            strArrEqnResult[intCnt] = Evaluate(strCurEqn);
                         }
                     }
                     
@@ -2176,9 +2170,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 else
                 {
-                    strResult = Convert.ToInt64(Evaluator.EvalToDouble(strCurEqn), System.Globalization.CultureInfo.InvariantCulture).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    strResult = Evaluate(strCurEqn);
                 }
             }
+            return strResult;
+        }      
+
+        private string Evaluate(string strEquation)
+        {
+            string strResult = "";            
+            Eval evl = new Eval();            
+            evl.ParseEquation(strEquation);
+            evl.Convert2PostFix();
+            evl.EvaluatePostfix();
+            if (evl.Error)
+            {
+                strResult = "0";
+            }
+            strResult = evl.Result.ToString(System.Globalization.CultureInfo.InvariantCulture);                
             return strResult;
         }      
         //End of RefNo-1
