@@ -45,6 +45,7 @@ namespace OdfConverter.Wordprocessing
         
         protected int _insideField = 0;
         protected int _fieldId = 0;
+        protected int _fieldLocked = 0;
 
         public DocxDocument(string fileName) : base(fileName)
         {
@@ -135,9 +136,13 @@ namespace OdfConverter.Wordprocessing
                                         string value = xtr.Value;
                                         // normalize type ST_OnOff
                                         if (value == "on" || value == "true")
+                                        {
                                             value = "1";
+                                        }
                                         else if (value == "off" || value == "false")
+                                        {
                                             value = "0";
+                                        }
 
                                         xtw.WriteAttributeString(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI, value);
                                     }
@@ -157,6 +162,10 @@ namespace OdfConverter.Wordprocessing
                                                 _insideField--;
                                             }
                                             break;
+                                        case "fldLock":
+                                            _fieldLocked = (xtr.Value.Equals("on") || xtr.Value.Equals("true") || xtr.Value.Equals("1")) ? 1 : 0;
+                                            break;
+
                                     }
                                 }
                                 xtr.MoveToElement();
@@ -229,6 +238,10 @@ namespace OdfConverter.Wordprocessing
                                         // also add the id of the current paragraph so we can get the display value of the 
                                         // field for a specific paragraph easily. This is to support multi-paragraph fields.
                                         xtw.WriteAttributeString(NS_PREFIX, "fpid", PACKAGE_NS, _paraId.ToString());
+
+                                        // also add a marker indicating whether a field is locked or not
+                                        xtw.WriteAttributeString(NS_PREFIX, "flocked", PACKAGE_NS, _fieldLocked.ToString());
+
                                         if (fieldBegin)
                                         {
                                             // add markup to the first run of a field so that we can trigger field 
@@ -237,6 +250,7 @@ namespace OdfConverter.Wordprocessing
                                             //
                                             xtw.WriteAttributeString(NS_PREFIX, "fStart", PACKAGE_NS, "1");
                                             fieldBegin = false;
+                                            _fieldLocked = 0;
                                         }
                                     }
                                     break;

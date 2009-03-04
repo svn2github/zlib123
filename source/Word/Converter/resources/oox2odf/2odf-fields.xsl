@@ -181,11 +181,12 @@
         <xsl:variable name="fieldCode">
           <xsl:call-template name="BuildFieldCode" />
         </xsl:variable>
-
+        
         <xsl:variable name="fieldId" select="@oox:fid" />
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="$fieldCode" />
           <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByParaId', @oox:fpid)[@oox:fid = $fieldId]" />
+          <xsl:with-param name="isLocked" select="@oox:flocked = '1'" />
         </xsl:call-template>
 
       </text:span>
@@ -207,6 +208,7 @@
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="@w:instr" />
           <xsl:with-param name="fieldDisplayValue" select="w:r" />
+          <xsl:with-param name="isLocked" select="@w:fldLock = '1'" />
         </xsl:call-template>
       </text:span>
     </xsl:if>
@@ -397,7 +399,9 @@
     <xsl:param name="fieldCode" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
-
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
+    
     <!-- the type of the field such as CREATEDATE, REF, etc -->
     <xsl:variable name="fieldType">
       <xsl:call-template name="ParseFieldTypeFromFieldCode">
@@ -420,6 +424,7 @@
           <xsl:with-param name="fieldType" select="$fieldType" />
           <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <!-- document automation -->
@@ -430,6 +435,7 @@
           <xsl:with-param name="fieldType" select="$fieldType" />
           <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <!-- document information -->
@@ -444,6 +450,7 @@
           <xsl:with-param name="fieldType" select="$fieldType" />
           <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <!-- equations and formulas -->
@@ -459,6 +466,7 @@
           <xsl:with-param name="fieldType" select="$fieldType" />
           <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <!-- links and references -->
@@ -472,6 +480,7 @@
           <xsl:with-param name="fieldType" select="$fieldType" />
           <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <!-- mail merge -->
@@ -495,6 +504,7 @@
           <xsl:with-param name="fieldType" select="$fieldType" />
           <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <!-- user information -->
@@ -503,6 +513,7 @@
           <xsl:with-param name="fieldType" select="$fieldType" />
           <xsl:with-param name="fieldInstruction" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <!-- form field -->
@@ -527,6 +538,15 @@
     <xsl:param name="fieldInstruction" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
+
+    <xsl:variable name="dateValue">
+      <xsl:for-each select="$fieldDisplayValue//w:t">
+        <xsl:value-of select="." />
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="xsdDateTime" select="ooc:XsdDateTimeFromField($fieldInstruction, $dateValue)" />
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'CREATEDATE'">
@@ -534,32 +554,45 @@
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValue" />
         </text:creation-time>-->
         <!-- TODO: which one is correct? creation-time? or creation-date? -->
-        <text:creation-date style:data-style-name="{generate-id(.)}">
+        <text:creation-date style:data-style-name="{generate-id(.)}" text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:creation-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'DATE'">
-        <text:date style:data-style-name="{generate-id(.)}">
+        <text:date style:data-style-name="{generate-id(.)}" text:fixed="{$isLocked}">
+          
+          <xsl:if test="$xsdDateTime != ''">
+            <xsl:attribute name="text:date-value">
+              <xsl:value-of select="$xsdDateTime" />    
+            </xsl:attribute>
+          </xsl:if>
+          
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:date>
       </xsl:when>
       <xsl:when test="$fieldType = 'EDITTIME'">
-        <text:editing-duration style:data-style-name="{generate-id(.)}">
+        <text:editing-duration style:data-style-name="{generate-id(.)}" text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:editing-duration>
       </xsl:when>
       <xsl:when test="$fieldType = 'PRINTDATE'">
-        <text:print-date style:data-style-name="{generate-id(.)}">
+        <text:print-date style:data-style-name="{generate-id(.)}" text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:print-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'SAVEDATE'">
-        <text:modification-date style:data-style-name="{generate-id(.)}">
+        <text:modification-date style:data-style-name="{generate-id(.)}" text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:modification-date>
       </xsl:when>
       <xsl:when test="$fieldType = 'TIME'">
-        <text:time style:data-style-name="{generate-id(.) }">
+        <text:time style:data-style-name="{generate-id(.) }" text:fixed="{$isLocked}">
+          <xsl:if test="$xsdDateTime != ''">
+            <xsl:attribute name="text:time-value">
+              <xsl:value-of select="$xsdDateTime" />
+            </xsl:attribute>
+          </xsl:if>
+          
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:time>
       </xsl:when>
@@ -578,6 +611,8 @@
     <xsl:param name="fieldInstruction" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'MACROBUTTON'">
@@ -597,15 +632,17 @@
     <xsl:param name="fieldInstruction" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'AUTHOR'">
-        <text:initial-creator>
+        <text:initial-creator text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:initial-creator>
       </xsl:when>
       <xsl:when test="$fieldType = 'COMMENTS'">
-        <text:description>
+        <text:description text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:description>
       </xsl:when>
@@ -616,7 +653,7 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$fieldType = 'FILENAME'">
-        <text:file-name text:display="name">
+        <text:file-name text:display="name" text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:file-name>
       </xsl:when>
@@ -626,45 +663,46 @@
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="$fieldInstruction" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$fieldType = 'KEYWORDS'">
-        <text:keywords>
+        <text:keywords text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:keywords>
       </xsl:when>
       <xsl:when test="$fieldType = 'LASTSAVEDBY'">
-        <text:creator>
+        <text:creator text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:creator>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMCHARS'">
-        <text:character-count>
+        <text:character-count text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:character-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMPAGES'">
-        <text:page-count>
+        <text:page-count text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:page-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMWORDS'">
-        <text:word-count>
+        <text:word-count text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:word-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'SUBJECT'">
-        <text:subject>
+        <text:subject text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:subject>
       </xsl:when>
       <xsl:when test="$fieldType = 'TITLE'">
-        <text:title>
+        <text:title text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:title>
       </xsl:when>
       <xsl:when test="$fieldType = 'TEMPLATE'">
-        <text:template-name text:display="name">
+        <text:template-name text:display="name" text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:template-name>
       </xsl:when>
@@ -682,6 +720,8 @@
     <xsl:param name="fieldInstruction" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'XE'">
@@ -704,6 +744,8 @@
     <xsl:param name="fieldInstruction" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'AUTOTEXT'">
@@ -771,6 +813,8 @@
     <xsl:param name="fieldInstruction" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'PAGE'">
@@ -780,7 +824,7 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$fieldType = 'REVNUM'">
-        <text:editing-cycles>
+        <text:editing-cycles text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:editing-cycles>
       </xsl:when>
@@ -819,20 +863,22 @@
     <xsl:param name="fieldInstruction" />
     <!-- a node set containing the text being displayed -->
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
 
     <xsl:choose>
       <xsl:when test="$fieldType = 'USERADDRESS'">
-        <text:sender-street>
+        <text:sender-street text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:sender-street>
       </xsl:when>
       <xsl:when test="$fieldType = 'USERINITIALS'">
-        <text:author-initials>
+        <text:author-initials text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:author-initials>
       </xsl:when>
       <xsl:when test="$fieldType = 'USERNAME'">
-        <text:author-name text:fixed="false">
+        <text:author-name text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:author-name>
       </xsl:when>
@@ -1612,8 +1658,7 @@
   <xsl:template name="InsertTextBibliographyMark">
     <xsl:param name="TextIdentifier" />
 
-    <xsl:variable name="Path"
-      select="key('Part', 'customXml/item1.xml')/b:Sources/b:Source[b:Tag = $TextIdentifier]" />
+    <xsl:variable name="Path" select="key('Part', 'customXml/item1.xml')/b:Sources/b:Source[b:Tag = $TextIdentifier]" />
 
     <xsl:variable name="BibliographyType" select="$Path/b:SourceType" />
 
@@ -1780,6 +1825,8 @@
   <xsl:template name="InsertDOCPROPERTY">
     <xsl:param name="fieldInstruction" />
     <xsl:param name="fieldDisplayValue" />
+    <!-- a flag indicating whether the field content is set to be updated by the application -->
+    <xsl:param name="isLocked" select="false()" />
 
     <xsl:variable name="docpropCategory">
       <xsl:call-template name="ParseFieldTypeFromFieldCode">
@@ -1848,15 +1895,16 @@
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="concat(equivalentFieldType, substring-after($fieldInstruction, $docpropCategory))" />
           <xsl:with-param name="fieldDisplayValue" select="$fieldDisplayValue" />
+          <xsl:with-param name="isLocked" select="$isLocked" />
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$docpropCategory = 'COMPANY'">
-        <text:sender-company>
+        <text:sender-company text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:sender-company>
       </xsl:when>
       <xsl:when test="$docpropCategory = 'PARAGRAPHS'">
-        <text:paragraph-count>
+        <text:paragraph-count text:fixed="{$isLocked}">
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:paragraph-count>
       </xsl:when>

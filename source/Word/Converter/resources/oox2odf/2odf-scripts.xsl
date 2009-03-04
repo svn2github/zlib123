@@ -79,6 +79,35 @@
           return string.Format("{0:s}", result);
       }
       
+      /// <summary>
+      /// Formats a given date as an XSD dateTime string in the format CCYY-MM-DDThh:mm:ss
+      /// If the date string cannot be parsed an empty string is returned
+      /// </summary>
+      public string XsdDateTimeFromField(string fieldInstruction, string fieldValue)
+        {
+            string result = string.Empty;
+
+            // parse the date format from the field code
+            //    date-and-time-formatting-switch:
+            //       \@ [ " ] switch-argument [ " ]
+            string dateFormat = Regex.Replace(fieldInstruction, "\\\\@ *(?:\"(.*)\"|([^ ]*))", "$1$2", RegexOptions.IgnoreCase);
+            
+            // 'AM/PM' in Word needs to be replaced by 'tt' in .NET
+            dateFormat = Regex.Replace(dateFormat, "(.*)AM/PM(.*)", "$1tt$2", RegexOptions.IgnoreCase);
+            
+            // remove other noise from the pattern
+            dateFormat = dateFormat.Replace("'", "");
+
+            DateTime dateTime = DateTime.Now;
+
+            if (DateTime.TryParseExact(fieldValue, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dateTime))
+            {
+                result = string.Format("{0:s}", dateTime);
+            }
+
+            return result;
+        }
+      
       public string CmFromTwips(string twipsValue)
       {
           // concat(format-number($length * 2.54 div 1440,'#.###'),'cm')

@@ -100,7 +100,7 @@
   </xsl:template>
 
   <xsl:template match="text:word-count|text:character-count|text:paragraph-count " mode="paragraph">
-    <w:fldSimple>
+    <w:fldSimple w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:attribute name="w:instr">
         <xsl:choose>
           <xsl:when test="../text:word-count"> NUMWORDS </xsl:when>
@@ -114,46 +114,35 @@
   </xsl:template>
 
   <xsl:template match="text:date|text:creation-date|text:print-date|text:modification-date" mode="paragraph">
-    <xsl:choose>
-      <xsl:when test="@text:fixed='true'">
-        <w:r>
-          <xsl:call-template name="InsertRunProperties"/>
-          <w:t>
-            <xsl:value-of select="text()"/>
-          </w:t>
-        </w:r>
-      </xsl:when>
-      <xsl:otherwise>
-        <w:fldSimple>
-          <xsl:if test="@number:automatic-order='true' ">
-            <xsl:message terminate="no">translation.odf2oox.dateFormat</xsl:message>
-          </xsl:if>
-          <xsl:variable name="curStyle" select="@style:data-style-name"/>
-          <xsl:variable name="fieldType">
-            <xsl:choose>
-              <xsl:when test="self::text:creation-date">CREATEDATE</xsl:when>
-              <xsl:when test="self::text:print-date">PRINTDATE</xsl:when>
-              <xsl:when test="self::text:modification-date">SAVEDATE</xsl:when>
-              <xsl:otherwise>DATE</xsl:otherwise>
-            </xsl:choose>
-          </xsl:variable>
-          <xsl:variable name="dataStyle">
-            <xsl:apply-templates
-              select="/*/office:automatic-styles/*[(self::number:date-style or self::number:time-style) and @style:name=$curStyle]"
-              mode="dataStyle"/>
-          </xsl:variable>
-          <xsl:attribute name="w:instr">
-            <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
-          </xsl:attribute>
-          <w:r>
-            <xsl:call-template name="InsertRunProperties"/>
-            <w:t>
-              <xsl:value-of select="text()"/>
-            </w:t>
-          </w:r>
-        </w:fldSimple>
-      </xsl:otherwise>
-    </xsl:choose>
+    <w:fldSimple w:fldLock="{number(@text:fixed = 'true')}">
+      <xsl:if test="@number:automatic-order='true' ">
+        <xsl:message terminate="no">translation.odf2oox.dateFormat</xsl:message>
+      </xsl:if>
+      
+      <xsl:variable name="curStyle" select="@style:data-style-name"/>
+      <xsl:variable name="fieldType">
+        <xsl:choose>
+          <xsl:when test="self::text:creation-date">CREATEDATE</xsl:when>
+          <xsl:when test="self::text:print-date">PRINTDATE</xsl:when>
+          <xsl:when test="self::text:modification-date">SAVEDATE</xsl:when>
+          <xsl:otherwise>DATE</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="dataStyle">
+        <xsl:apply-templates
+          select="/*/office:automatic-styles/*[(self::number:date-style or self::number:time-style) and @style:name=$curStyle]"
+          mode="dataStyle"/>
+      </xsl:variable>
+      <xsl:attribute name="w:instr">
+        <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
+      </xsl:attribute>
+      <w:r>
+        <xsl:call-template name="InsertRunProperties"/>
+        <w:t>
+          <xsl:value-of select="text()"/>
+        </w:t>
+      </w:r>
+    </w:fldSimple>
   </xsl:template>
 
   <xsl:template match="number:text" mode="dataStyle">
@@ -190,44 +179,32 @@
   </xsl:template>
 
   <xsl:template match="text:time|text:creation-time|text:editing-duration|text:print-time|text:modification-time" mode="paragraph">
-    <xsl:choose>
-      <xsl:when test="@text:fixed='true'">
-        <w:r>
-          <xsl:call-template name="InsertRunProperties"/>
-          <w:t>
-            <xsl:value-of select="text()"/>
-          </w:t>
-        </w:r>
-      </xsl:when>
-      <xsl:otherwise>
-        <w:fldSimple>
-          <xsl:variable name="curStyle" select="@style:data-style-name"/>
-          <xsl:variable name="fieldType">
-            <xsl:choose>
-              <xsl:when test="self::text:creation-time">CREATEDATE</xsl:when>
-              <xsl:when test="self::text:editing-duration">EDITTIME</xsl:when>
-              <xsl:when test="self::text:print-time">PRINTDATE</xsl:when>
-              <xsl:when test="self::text:modification-time">SAVEDATE</xsl:when>
-              <xsl:otherwise>TIME</xsl:otherwise>
-            </xsl:choose>
-          </xsl:variable>
-          <xsl:variable name="dataStyle">
-            <xsl:apply-templates
-              select="/*/office:automatic-styles/*[(self::number:time-style or self::number:date-style) and @style:name=$curStyle]"
-              mode="dataStyle"/>
-          </xsl:variable>
-          <xsl:attribute name="w:instr">
-            <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
-          </xsl:attribute>
-          <w:r>
-            <xsl:call-template name="InsertRunProperties"/>
-            <w:t>
-              <xsl:value-of select="text()"/>
-            </w:t>
-          </w:r>
-        </w:fldSimple>
-      </xsl:otherwise>
-    </xsl:choose>
+    <w:fldSimple w:fldLock="{number(@text:fixed = 'true')}">
+      <xsl:variable name="curStyle" select="@style:data-style-name"/>
+      <xsl:variable name="fieldType">
+        <xsl:choose>
+          <xsl:when test="self::text:creation-time">CREATEDATE</xsl:when>
+          <xsl:when test="self::text:editing-duration">EDITTIME</xsl:when>
+          <xsl:when test="self::text:print-time">PRINTDATE</xsl:when>
+          <xsl:when test="self::text:modification-time">SAVEDATE</xsl:when>
+          <xsl:otherwise>TIME</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="dataStyle">
+        <xsl:apply-templates
+          select="/*/office:automatic-styles/*[(self::number:time-style or self::number:date-style) and @style:name=$curStyle]"
+          mode="dataStyle"/>
+      </xsl:variable>
+      <xsl:attribute name="w:instr">
+        <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
+      </xsl:attribute>
+      <w:r>
+        <xsl:call-template name="InsertRunProperties"/>
+        <w:t>
+          <xsl:value-of select="text()"/>
+        </w:t>
+      </w:r>
+    </w:fldSimple>
   </xsl:template>
 
   <xsl:template match="number:hours" mode="dataStyle">
@@ -265,40 +242,40 @@
 
   <!-- Author Fields -->
   <!-- TODO : comment csv file -->
-  <xsl:template match="text:author-name[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" USERNAME \* MERGEFORMAT ">
+  <xsl:template match="text:author-name" mode="paragraph">
+    <w:fldSimple w:instr=" USERNAME \* MERGEFORMAT " w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:author-initials[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" USERINITIALS \* Upper  \* MERGEFORMAT ">
+  <xsl:template match="text:author-initials" mode="paragraph">
+    <w:fldSimple w:instr=" USERINITIALS \* Upper  \* MERGEFORMAT " w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
   <!-- User Fields -->
   <!-- TODO : comment csv file -->
-  <xsl:template match="text:initial-creator[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" AUTHOR ">
+  <xsl:template match="text:initial-creator" mode="paragraph">
+    <w:fldSimple w:instr=" AUTHOR " w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:creator[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" LASTSAVEDBY ">
+  <xsl:template match="text:creator" mode="paragraph">
+    <w:fldSimple w:instr=" LASTSAVEDBY " w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:description[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" COMMENTS ">
+  <xsl:template match="text:description" mode="paragraph">
+    <w:fldSimple w:instr=" COMMENTS " w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:subject[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" SUBJECT ">
+  <xsl:template match="text:subject" mode="paragraph">
+    <w:fldSimple w:instr=" SUBJECT " w:fldLock="{number(@text:fixed = 'true')}">
       <!--
       makz: Commented out for bugfix 2088835
       -->
@@ -306,14 +283,14 @@
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:keywords[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" KEYWORDS ">
+  <xsl:template match="text:keywords" mode="paragraph">
+    <w:fldSimple w:instr=" KEYWORDS " w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:title[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" TITLE ">
+  <xsl:template match="text:title" mode="paragraph">
+    <w:fldSimple w:instr=" TITLE " w:fldLock="{number(@text:fixed = 'true')}">
       <!--
       makz: Commented out for bugfix 2088835
       <xsl:apply-templates mode="paragraph"/>
@@ -323,26 +300,26 @@
   </xsl:template>
 
   <!-- Sender Fields -->
-  <xsl:template match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]" mode="paragraph">
+  <xsl:template match="text:sender-firstname | text:sender-lastname" mode="paragraph">
     <xsl:variable name="username" select="."/>
 
-    <w:fldSimple w:instr="{concat('USERNAME ' ,$username,'\* MERGEFORMAT')}">
+    <w:fldSimple w:instr="{concat('USERNAME ' ,$username,'\* MERGEFORMAT')}" w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:sender-initials[not(@text:fixed='true')]" mode="paragraph">
+  <xsl:template match="text:sender-initials" mode="paragraph">
     <xsl:variable name="userinitial" select="."/>
 
-    <w:fldSimple w:instr="{concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')}">
+    <w:fldSimple w:instr="{concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')}" w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]" mode="paragraph">
+  <xsl:template match="text:sender-street | text:sender-country | text:sender-postal-code | text:sender-city" mode="paragraph">
     <xsl:variable name="adress" select="."/>
 
-    <w:fldSimple w:instr="{concat('USERADDRESS ' ,$adress,'\* MERGEFORMAT')}">
+    <w:fldSimple w:instr="{concat('USERADDRESS ' ,$adress,'\* MERGEFORMAT')}" w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
@@ -367,8 +344,8 @@
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template match="text:editing-cycles[not(@text:fixed='true')]" mode="paragraph">
-    <w:fldSimple w:instr=" REVNUM ">
+  <xsl:template match="text:editing-cycles" mode="paragraph">
+    <w:fldSimple w:instr=" REVNUM " w:fldLock="{number(@text:fixed = 'true')}">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
@@ -540,6 +517,10 @@
   *************************************************************************
   -->
 
+  <xsl:template name="InsertSimpleField">
+    
+  </xsl:template>
+  
   <xsl:template name="InsertLanguage">
     <xsl:choose>
       <xsl:when test="$default-language">
@@ -588,7 +569,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
