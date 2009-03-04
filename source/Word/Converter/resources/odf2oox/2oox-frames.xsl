@@ -50,7 +50,7 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:w10="urn:schemas-microsoft-com:office:word"
   xmlns:ooc="urn:odf-converter"
-  exclude-result-prefixes="xlink draw svg fo office style text">
+  exclude-result-prefixes="xlink draw svg fo office style text ooc">
 
   <xsl:key name="images" match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''" />
   <xsl:key name="frames" match="draw:frame" use="''" />

@@ -40,7 +40,7 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:ooc="urn:odf-converter"                
-  exclude-result-prefixes="office text table fo style draw xlink v svg number">
+  exclude-result-prefixes="office text table fo style draw xlink v svg number ooc">
 
 
   <!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->

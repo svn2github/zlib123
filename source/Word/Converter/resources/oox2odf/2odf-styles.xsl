@@ -613,7 +613,7 @@
     <xsl:message terminate="no">progress:w:style</xsl:message>
 
     <xsl:variable name="currentStyleId" select="@w:styleId"/>
-    
+
     <!--math: Added for bugfix #1934315 START-->
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
@@ -1018,7 +1018,7 @@
       <xsl:call-template name="InsertDefaultTableStyle"/>
       <!-- graphic defaul -->
       <!-- Commented by Sonata:Defect fix 2630175 DOCX: All VML get blue background  -->
-      <!--<xsl:call-template name="InsertDefaultGraphicStyle" /> -->   
+      <!--<xsl:call-template name="InsertDefaultGraphicStyle" /> -->
       <!-- TODO : other ODF style families : section, table-column, table-row, table-cell, table-page, chart, default, drawing-page, graphic, presentation, control and ruby -->
     </xsl:for-each>
   </xsl:template>
@@ -1072,8 +1072,8 @@
               <xsl:otherwise>
                 <!-- insert attributes using match -->
                 <!--<xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">-->
-                  <xsl:apply-templates select="." mode="rPrChildren"/>
-                  <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
+                <xsl:apply-templates select="." mode="rPrChildren"/>
+                <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
                 <!--</xsl:if>-->
               </xsl:otherwise>
             </xsl:choose>
@@ -1156,9 +1156,9 @@
                 <!-- insert attributes using match -->
                 <!--<xsl:if test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
                   <xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">-->
-                    <xsl:apply-templates select="." mode="rPrChildren"/>
-                    <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
-                  <!--</xsl:if>
+                <xsl:apply-templates select="." mode="rPrChildren"/>
+                <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
+                <!--</xsl:if>
                 </xsl:if>-->
               </xsl:otherwise>
             </xsl:choose>
@@ -1199,16 +1199,16 @@
 
   <xsl:template name="InsertDefaultGraphicStyle">
     <style:default-style style:family="graphic">
-      <style:graphic-properties draw:fill="solid" 
-                                draw:fill-color="#4f81bd" 
-                                draw:opacity="100%" 
-                                draw:stroke="solid" 
-                                svg:stroke-width="0.02778in" 
-                                svg:stroke-color="#385d8a" 
+      <style:graphic-properties draw:fill="solid"
+                                draw:fill-color="#4f81bd"
+                                draw:opacity="100%"
+                                draw:stroke="solid"
+                                svg:stroke-width="0.02778in"
+                                svg:stroke-color="#385d8a"
                                 svg:stroke-opacity="100%" />
     </style:default-style>
   </xsl:template>
-  
+
   <xsl:template name="HeaderFooterAutomaticStyle">
     <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
       <xsl:call-template name="HeaderFooterStyles"/>
@@ -1434,22 +1434,25 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:choose>
+      <xsl:when test="$headerId != ''">
+        <style:header>
+          <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="key('Part', $headerXmlDocument)">
+            <xsl:call-template name="TrackChanges" />
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:header>
+      </xsl:when>
       <xsl:when test="$headerId = 'newempty'">
         <style:header>
-          <text:p></text:p>
+          <text:p />
         </style:header>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="$headerId != ''">
-          <style:header>
-            <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-            <!-- change context to get header content -->
-            <xsl:for-each select="key('Part', $headerXmlDocument)">
-              <xsl:call-template name="TrackChanges" />
-              <xsl:apply-templates/>
-            </xsl:for-each>
-          </style:header>
-        </xsl:if>
+        <style:header>
+          <text:p />
+        </style:header>
       </xsl:otherwise>
     </xsl:choose>
     <!--END clam bugfix #1802289-->
@@ -1467,11 +1470,11 @@
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="$headerIdEven != ''">
-          <xsl:if test="$headerId = ''">
+          <!--<xsl:if test="$headerId = ''">
             <style:header>
               <text:p/>
             </style:header>
-          </xsl:if>
+          </xsl:if>-->
           <style:header-left>
             <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)" />
             <!-- change context to get header content -->
@@ -2834,7 +2837,7 @@
   <xsl:template name="FirstLine">
 
     <xsl:variable name="StyleId" select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
-    
+
     <xsl:variable name="NumId">
       <xsl:choose>
         <xsl:when test="w:numPr/w:numId/@w:val">
@@ -3609,7 +3612,7 @@
       w:afterLines and w:beforeLines attributes are lost 
     -->
     <xsl:variable name="StyleId" select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
-    
+
     <!-- are we in a list -->
     <xsl:variable name="CheckIfList">
       <xsl:call-template name="CheckIfList">
@@ -4098,7 +4101,7 @@
     <xsl:variable name="ParagraphStyleDefinition" select="key('StyleId',$StyleId)"/>
 
     <xsl:variable name="IndirectNumId" select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
-    
+
     <xsl:variable name="IndirectAbstractNumId" select="key('numId', $IndirectNumId)/w:abstractNumId/@w:val"/>
 
     <xsl:variable name="IndirectIlvl">
@@ -4194,7 +4197,7 @@
                 <xsl:with-param name="Parameter">NumId</xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-            
+
             <xsl:variable name="IndirectAbstractNumId">
               <xsl:call-template name="GetIndirectListLevelParameter">
                 <xsl:with-param name="StyleId">
@@ -4352,7 +4355,7 @@
             <xsl:variable name="SpaceToNextTab">
 
               <xsl:variable name="MinTabOffset" select ="350"/>
-              
+
               <xsl:choose>
                 <xsl:when test="$Suffix='nothing'">0</xsl:when>
                 <xsl:when test="$Suffix='space'">350</xsl:when>
@@ -4401,7 +4404,7 @@
 
                       <xsl:variable name="DefaultTab" select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
                       <xsl:variable name="NextDefaultTabPos" select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
-                      
+
                       <xsl:choose>
                         <xsl:when test="$MinRelevantCustomTab != 'NaN'">
                           <!--take min relevant custom tab-->
@@ -4618,7 +4621,7 @@
     <xsl:param name="MarginLeft"/>
     <xsl:param name="parentStyleId"/>
     <xsl:variable name="parentParentStyleId" select="key('StyleId', $parentStyleId)/w:basedOn/@w:val" />
-    
+
     <!-- divo: seems this won't work for parent's parent's parent styles etc -->
     <xsl:if test="w:tabs or key('StyleId', $parentStyleId)/w:pPr/w:tabs or key('StyleId', $parentParentStyleId)/w:pPr/w:tabs">
       <style:tab-stops>

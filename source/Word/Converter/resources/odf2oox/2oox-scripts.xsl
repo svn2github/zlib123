@@ -31,6 +31,16 @@
           return input.Replace(oldValue, newValue);
       }
       
+      public string RegexReplace(string input, string pattern, string replacement, bool ignoreCase)
+      {
+          System.Text.RegularExpressions.RegexOptions options = System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.CultureInvariant;
+          if (ignoreCase)
+          {
+              options |= System.Text.RegularExpressions.RegexOptions.IgnoreCase;
+          }
+          return System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options);
+      }
+      
       ///<summary>
       /// Checks whether an URI points inside a package or outside
       /// 

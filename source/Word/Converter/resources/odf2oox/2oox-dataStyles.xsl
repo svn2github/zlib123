@@ -596,7 +596,7 @@
       <w:instrText xml:space="preserve"> SET <xsl:value-of select="$varName"/> "<xsl:value-of select="$varValue"/>" \* MERGEFORMAT </w:instrText>
     </w:r>
     <w:r>
-      <w:fldChar w:fldCharType="seperate"/>
+      <w:fldChar w:fldCharType="separate"/>
     </w:r>
     <w:bookmarkStart w:id="{ooc:GetBookmarkId(@text:name)}" w:name="{$varName}" />
     <w:r>

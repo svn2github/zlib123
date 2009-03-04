@@ -848,7 +848,7 @@
     
 		    20080710/divo: w:bookmarkStart can also be directly below w:body. This condition was missing
 		-->
-    <xsl:if test="parent::w:body or (ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='seperate'))">
+    <xsl:if test="parent::w:body or (ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='separate'))">
 
       <xsl:variable name="NameBookmark" select="@w:name" />
       <xsl:variable name="OutlineLvl" select="parent::w:p/w:pPr/w:outlineLvl/@w:val" />

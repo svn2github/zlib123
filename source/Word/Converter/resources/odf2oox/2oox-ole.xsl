@@ -15,7 +15,8 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:w10="urn:schemas-microsoft-com:office:word"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
-  exclude-result-prefixes="xlink draw svg fo office style text manifest">
+  xmlns:ooc="urn:odf-converter"
+  exclude-result-prefixes="xlink draw svg fo office style text manifest ooc">
 
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
 
@@ -35,7 +36,8 @@
     <xsl:call-template name="InsertTCField"/>
 
     <xsl:variable name="shapeId" select="@draw:name"/>
-    <xsl:variable name="olePicture" select="substring-after(draw:image/@xlink:href, './')" />
+    <!-- NOTE: remove any leading './' from the image path -->
+    <xsl:variable name="olePicture" select="ooc:RegexReplace(draw:image/@xlink:href, '(^\./)?(.*)', '$2', true())" />
     <xsl:variable name="olePictureType">
       <xsl:call-template name="GetOLEPictureType">
         <xsl:with-param name="olePicture" select="$olePicture" />
@@ -43,20 +45,9 @@
     </xsl:variable>
 
     <w:r>
-      <w:object>
-        <xsl:attribute name="w:dxaOrig">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length" select="@svg:width" />
-            <xsl:with-param name="unit" select="'twips'" />
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="w:dyaOrig">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length" select="@svg:height" />
-            <xsl:with-param name="unit" select="'twips'" />
-          </xsl:call-template>
-        </xsl:attribute>
-
+      <w:object w:dxaOrig="{ooc:TwipsFromMeasuredUnit(@svg:width)}" 
+                w:dyaOrig="{ooc:TwipsFromMeasuredUnit(@svg:height)}">
+        
         <xsl:call-template name="InsertObjectShape">
           <xsl:with-param name="shapeId" select="$shapeId" />
           <xsl:with-param name="olePictureType" select="$olePictureType" />
@@ -84,7 +75,7 @@
               <xsl:with-param name="olePictureType" select="$olePictureType" />
             </xsl:call-template>
           </xsl:when>
-          
+
         </xsl:choose>
 
       </w:object>
@@ -118,12 +109,12 @@
       <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
       <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
       <xsl:variable name="frameStyle" select="$automaticStyle | $officeStyle"/>
-      
+
       <xsl:call-template name="FrameToShapeProperties">
         <xsl:with-param name="frameStyle" select="$frameStyle"/>
         <xsl:with-param name="frame" select="."/>
       </xsl:call-template>
-      
+
       <xsl:call-template name="FrameToShapeWrap">
         <xsl:with-param name="frameStyle" select="$frameStyle"/>
       </xsl:call-template>
@@ -131,11 +122,11 @@
       <xsl:if test="draw:image">
         <v:imagedata o:title="" r:id="{generate-id(draw:image)}" />
       </xsl:if>
-      
+
     </v:shape>
   </xsl:template>
 
-  
+
   <!--
   Summary: Inserts a external object (linked to file)
   Author: makz (DIaLOGIKa)
@@ -144,13 +135,13 @@
   <xsl:template name="InsertExternalObject">
     <xsl:param name="shapeId" />
     <xsl:param name="olePictureType" />
-    
+
     <o:OLEObject Type="Link" ProgID="Package" UpdateMode="Always">
-      
+
       <xsl:attribute name="ShapeID">
         <xsl:value-of select="$shapeId"/>
       </xsl:attribute>
-      
+
       <xsl:attribute name="DrawAspect">
         <xsl:choose>
           <xsl:when test="$olePictureType=''">
@@ -161,7 +152,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
+
       <xsl:attribute name="r:id">
         <xsl:value-of select="generate-id(draw:object)"/>
       </xsl:attribute>
@@ -177,7 +168,7 @@
       </o:FieldCodes>
     </o:OLEObject>
   </xsl:template>
-  
+
   <!--
   Summary: Inserts an internal object (embedded in the zip)
   Author: makz (DIaLOGIKa)
@@ -193,11 +184,11 @@
         <xsl:with-param name="occurrence" select="'./'" />
       </xsl:call-template>
     </xsl:variable>
-                  
+
     <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
     <xsl:variable name="suffix" select="translate(substring-after($oleFile, '.'), 
                     'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
-    
+
     <!-- 
     don't insert internal ODF OLEs 
     internal ODF ole's have application type eg.
@@ -233,5 +224,5 @@
     </xsl:choose>
 
   </xsl:template>
-  
+
 </xsl:stylesheet>
