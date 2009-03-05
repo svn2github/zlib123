@@ -181,7 +181,7 @@
         <xsl:variable name="fieldCode">
           <xsl:call-template name="BuildFieldCode" />
         </xsl:variable>
-        
+
         <xsl:variable name="fieldId" select="@oox:fid" />
         <xsl:call-template name="InsertFieldFromFieldCode">
           <xsl:with-param name="fieldCode" select="$fieldCode" />
@@ -198,7 +198,7 @@
   <xsl:template match="w:instrText" />
   <xsl:template match="w:instrText" mode="fieldDisplayValue" />
   <xsl:template match="w:instrText" mode="fieldDisplayValueEscapeSpace" />
-  
+
   <!-- translate simple fields -->
   <xsl:template match="w:fldSimple">
     <!-- nested fields are handled by the surrounding field and converted to static text -->
@@ -235,7 +235,7 @@
   <xsl:template match="w:r" mode="fieldDisplayValue">
     <xsl:apply-templates />
   </xsl:template>
-  
+
   <xsl:template match="w:t" mode="fieldDisplayValueEscapeSpace">
     <!-- ODF 1.1 only allows text inside ODF fields, no text:s nodes, therefore spaces are replaced by en-space -->
     <xsl:value-of select="ooc:Replace(., ' ', '&#x2002;')" />
@@ -401,7 +401,7 @@
     <xsl:param name="fieldDisplayValue" />
     <!-- a flag indicating whether the field content is set to be updated by the application -->
     <xsl:param name="isLocked" select="false()" />
-    
+
     <!-- the type of the field such as CREATEDATE, REF, etc -->
     <xsl:variable name="fieldType">
       <xsl:call-template name="ParseFieldTypeFromFieldCode">
@@ -560,13 +560,13 @@
       </xsl:when>
       <xsl:when test="$fieldType = 'DATE'">
         <text:date style:data-style-name="{generate-id(.)}" text:fixed="{$isLocked}">
-          
+
           <xsl:if test="$xsdDateTime != ''">
             <xsl:attribute name="text:date-value">
-              <xsl:value-of select="$xsdDateTime" />    
+              <xsl:value-of select="$xsdDateTime" />
             </xsl:attribute>
           </xsl:if>
-          
+
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:date>
       </xsl:when>
@@ -592,7 +592,7 @@
               <xsl:value-of select="$xsdDateTime" />
             </xsl:attribute>
           </xsl:if>
-          
+
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:time>
       </xsl:when>
@@ -1605,23 +1605,19 @@
       <xsl:variable name="nodesectPr" select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]" />
 
       <!--dialogika, clam: bugfix (special workaround) for #1826728-->
-      <xsl:choose>
-        <xsl:when test="$nodesectPr[1]/w:pgNumType/@w:start='0'">
-          <xsl:attribute name="text:select-page">
+      <xsl:attribute name="text:select-page">
+        <xsl:choose>
+          <xsl:when test="$nodesectPr[1]/w:pgNumType/@w:start='0'">
             <xsl:text>previous</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:when test="$nodesectPr[1]/preceding::w:sectPr[w:pgNumType/@w:start][1]/w:pgNumType/@w:start='0'">
-          <xsl:attribute name="text:select-page">
+          </xsl:when>
+          <xsl:when test="$nodesectPr[1]/preceding::w:sectPr[w:pgNumType/@w:start][1]/w:pgNumType/@w:start='0'">
             <xsl:text>previous</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="text:select-page">
+          </xsl:when>
+          <xsl:otherwise>
             <xsl:text>current</xsl:text>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
 
       <xsl:variable name="standardNumType">
         <xsl:choose>
