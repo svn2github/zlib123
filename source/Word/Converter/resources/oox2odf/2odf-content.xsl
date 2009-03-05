@@ -506,79 +506,83 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:choose>
-      <xsl:when test="ancestor::w:txbxContent">
-        <text:p>
-          <!--style name-->
-          <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
-            <xsl:attribute name="text:style-name">
-              <xsl:value-of select="generate-id(self::node())" />
-            </xsl:attribute>
-          </xsl:if>
-          <!--header outline level -->
-          <!-- Fix: outline level is invalid for text:p -->
-          <!--<xsl:call-template name="InsertHeadingOutlineLvl">
+    <!-- NOTE: If the paragraph mark of the previous paragraph shall be treated as deleted 
+               we will skip this paragraph. This paragraph has been already translated together 
+               with the previous paragraph -->
+    <xsl:if test="not(key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del)">
+      <xsl:choose>
+        <xsl:when test="ancestor::w:txbxContent">
+          <text:p>
+            <!--style name-->
+            <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="generate-id(self::node())" />
+              </xsl:attribute>
+            </xsl:if>
+            <!--header outline level -->
+            <!-- Fix: outline level is invalid for text:p -->
+            <!--<xsl:call-template name="InsertHeadingOutlineLvl">
             <xsl:with-param name="outlineLevel" select="$outlineLevel" />
           </xsl:call-template>-->
-          <!-- unnumbered heading is list header  -->
-          <!-- Fix: text:is-list-header is invalid for text:p -->
-          <!--<xsl:call-template name="InsertHeadingAsListHeader" />-->
-          <!--change track end-->
-          <xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
-            <text:change-end text:change-id="{generate-id(key('p', number(@oox:id)-1))}" />
-          </xsl:if>
-          <xsl:apply-templates />
-          <xsl:if test="w:pPr/w:rPr/w:del">
-            <!-- if this following paragraph is attached to this one in track changes mode-->
-            <xsl:call-template name="InsertDeletedParagraph" />
-          </xsl:if>
-          <xsl:if test="w:pPr/w:rPr/w:ins">
-            <text:change-start text:change-id="{generate-id(self::node())}" />
-          </xsl:if>
-        </text:p>
-      </xsl:when>
-      <xsl:otherwise>
-        <text:h>
-          <!--style name-->
-          <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
-            <xsl:attribute name="text:style-name">
-              <xsl:value-of select="generate-id(self::node())" />
-            </xsl:attribute>
-          </xsl:if>
+            <!-- unnumbered heading is list header  -->
+            <!-- Fix: text:is-list-header is invalid for text:p -->
+            <!--<xsl:call-template name="InsertHeadingAsListHeader" />-->
+            <!--change track end-->
+            <xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
+              <text:change-end text:change-id="{generate-id(key('p', number(@oox:id)-1))}" />
+            </xsl:if>
+            <xsl:apply-templates />
+            <xsl:if test="w:pPr/w:rPr/w:del">
+              <!-- if this following paragraph is attached to this one in track changes mode-->
+              <xsl:call-template name="InsertDeletedParagraph" />
+            </xsl:if>
+            <xsl:if test="w:pPr/w:rPr/w:ins">
+              <text:change-start text:change-id="{generate-id(self::node())}" />
+            </xsl:if>
+          </text:p>
+        </xsl:when>
+        <xsl:otherwise>
+          <text:h>
+            <!--style name-->
+            <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="generate-id(self::node())" />
+              </xsl:attribute>
+            </xsl:if>
 
-          <!--clam, dialogika: bugfix #2088822-->
-          <xsl:variable name="myNum" select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId = $numId]"></xsl:variable>
+            <!--clam, dialogika: bugfix #2088822-->
+            <xsl:variable name="myNum" select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId = $numId]"></xsl:variable>
 
-          <xsl:if test="$myNum/w:lvlOverride[@w:ilvl=$outlineLevel]/w:startOverride">
-            <xsl:attribute name="text:restart-numbering">true</xsl:attribute>
-            <xsl:attribute name="text:start-value">
-              <xsl:value-of select="$myNum/w:lvlOverride[@w:ilvl=$outlineLevel]/w:startOverride/@w:val" />
-            </xsl:attribute>
-          </xsl:if>
+            <xsl:if test="$myNum/w:lvlOverride[@w:ilvl=$outlineLevel]/w:startOverride">
+              <xsl:attribute name="text:restart-numbering">true</xsl:attribute>
+              <xsl:attribute name="text:start-value">
+                <xsl:value-of select="$myNum/w:lvlOverride[@w:ilvl=$outlineLevel]/w:startOverride/@w:val" />
+              </xsl:attribute>
+            </xsl:if>
 
-          <!-- header outline level -->
-          <xsl:call-template name="InsertHeadingOutlineLvl">
-            <xsl:with-param name="outlineLevel" select="$outlineLevel" />
-          </xsl:call-template>
-          <!-- unnumbered heading is list header  -->
-          <xsl:call-template name="InsertHeadingAsListHeader" />
-          <!-- change track end-->
-          <xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
-            <text:change-end text:change-id="{generate-id(key('p', number(@oox:id)-1))}" />
-          </xsl:if>
-          <xsl:apply-templates />
-          <xsl:if test="w:pPr/w:rPr/w:del">
-            <!-- if this following paragraph is attached to this one in track changes mode -->
-            <xsl:call-template name="InsertDeletedParagraph" />
-          </xsl:if>
-          <xsl:if test="w:pPr/w:rPr/w:ins">
-            <text:change-start text:change-id="{generate-id(self::node())}" />
-          </xsl:if>
+            <!-- header outline level -->
+            <xsl:call-template name="InsertHeadingOutlineLvl">
+              <xsl:with-param name="outlineLevel" select="$outlineLevel" />
+            </xsl:call-template>
+            <!-- unnumbered heading is list header  -->
+            <xsl:call-template name="InsertHeadingAsListHeader" />
+            <!-- change track end-->
+            <xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
+              <text:change-end text:change-id="{generate-id(key('p', number(@oox:id)-1))}" />
+            </xsl:if>
+            <xsl:apply-templates />
+            <xsl:if test="w:pPr/w:rPr/w:del">
+              <!-- if this following paragraph is attached to this one in track changes mode -->
+              <xsl:call-template name="InsertDeletedParagraph" />
+            </xsl:if>
+            <xsl:if test="w:pPr/w:rPr/w:ins">
+              <text:change-start text:change-id="{generate-id(self::node())}" />
+            </xsl:if>
 
-        </text:h>
-      </xsl:otherwise>
-    </xsl:choose>
-
+          </text:h>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
 
     <xsl:if test="w:pPr/w:rPr/w:ins and $numId=''">
       <text:change-end text:change-id="{generate-id(self::node())}" />
@@ -588,8 +592,10 @@
   <xsl:template name="InsertDeletedParagraph">
     <text:change text:change-id="{generate-id(w:pPr/w:rPr)}" />
 
+    <!-- merge the following paragraph with the current one -->
     <xsl:apply-templates select="key('p', @oox:id+1)/child::node()" />
 
+    <!-- check if the paragraph mark of following paragraph also should be treated as deleted -->
     <xsl:if test="key('p', @oox:id+1)/w:pPr/w:rPr/w:del">
       <xsl:for-each select="key('p', @oox:id+1)">
         <xsl:call-template name="InsertDeletedParagraph" />
@@ -670,7 +676,10 @@
         <xsl:apply-templates select="child::node()" />
       </xsl:when>
       <!--default scenario-->
-      <xsl:otherwise>
+      <!-- NOTE: If the paragraph mark of the previous paragraph shall be treated as deleted 
+               we will skip this paragraph. This paragraph has been already translated together 
+               with the previous paragraph -->
+      <xsl:when test="not(key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del)">
         <xsl:variable name="numId">
           <xsl:call-template name="GetListProperty">
             <xsl:with-param name="node" select="." />
@@ -698,7 +707,8 @@
 
           <xsl:apply-templates />
 
-          <!--if this following paragraph is attached to this one in track changes mode-->
+          <!-- Note: If the paragraph mark of the current paragraph should be treated as deleted
+                     merge the following paragraph into this one. -->
           <xsl:if test="w:pPr/w:rPr/w:del">
             <xsl:call-template name="InsertDeletedParagraph" />
           </xsl:if>
@@ -709,7 +719,7 @@
         <xsl:if test="w:pPr/w:rPr/w:ins and $numId=''">
           <text:change-end text:change-id="{generate-id(self::node())}" />
         </xsl:if>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 

@@ -1600,8 +1600,7 @@
           <xsl:value-of select="w:footerReference[./@w:type = 'first']/@r:id"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="preceding::w:sectPr/w:footerReference[./@w:type = 'first'][1]/@r:id"
-          />
+          <xsl:value-of select="preceding::w:sectPr/w:footerReference[./@w:type = 'first'][1]/@r:id" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
