@@ -77,6 +77,8 @@
   <xsl:variable name="lg-lg" select="'0.4'" />
   <xsl:variable name="lineWeightDefault" select="'0.75'" />
 
+  <xsl:key name="shapeTypeById" match="v:shapetype" use="@id" />
+
   <!-- 
   *************************************************************************
   MATCHING TEMPLATES
@@ -159,32 +161,12 @@
       <!--sonata: Free form shapes -->
       <xsl:when test="$pathId !='' and $shapeTypeId !=''">
         <xsl:variable name="EnhanceGeometry">
-          <xsl:choose>
-            <xsl:when test="parent::node()/v:shapetype[@id=$shapeTypeId][1]">
-              <xsl:for-each select ="parent::node()/v:shapetype[@id=$shapeTypeId][1]">
-                <xsl:call-template name="CreateEnhancePath">
-                  <xsl:with-param name="pathModifier">
-                    <xsl:value-of select="$pathModifier"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-                  
-                </xsl:call-template>
-              </xsl:for-each>
-            </xsl:when >
-            <xsl:otherwise>
-              <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
-                <xsl:if test ="position()=1">
-                  <xsl:call-template name="CreateEnhancePath">
-                    <xsl:with-param name="pathModifier">
-                      <xsl:value-of select="$pathModifier"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-                  </xsl:call-template>
-                </xsl:if>
-              </xsl:for-each>
-            </xsl:otherwise>
-          </xsl:choose>
-
+          <xsl:for-each select="key('shapeTypeById', $shapeTypeId)[1]">
+            <xsl:call-template name="CreateEnhancePath">
+              <xsl:with-param name="pathModifier" select="$pathModifier"/>
+              <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            </xsl:call-template>
+          </xsl:for-each>
         </xsl:variable>
         <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
           <xsl:call-template name="InsertAnchorTypeAttribute" />
@@ -202,12 +184,10 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="enhanceGeometry">
-          <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
-            <xsl:if test ="position()=1">
-              <xsl:call-template name="CreateEnhancePath">
-                <xsl:with-param name="pathModifier" select="$pathModifier" />
-              </xsl:call-template>
-            </xsl:if>
+          <xsl:for-each select="key('shapeTypeById', $shapeTypeId)[1]">
+            <xsl:call-template name="CreateEnhancePath">
+              <xsl:with-param name="pathModifier" select="$pathModifier" />
+            </xsl:call-template>
           </xsl:for-each>
         </xsl:variable>
         <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
@@ -218,7 +198,7 @@
           <xsl:call-template name="InsertShapeZindexAttribute" />
           <xsl:call-template name="InsertAlternativeTextElement" />
           <xsl:apply-templates select="v:textbox" >
-            <xsl:with-param name ="shapetype" select ="'isosceles-triangle'"/>
+            <xsl:with-param name="shapetype" select="'isosceles-triangle'"/>
           </xsl:apply-templates >
           <xsl:choose>
             <xsl:when test="@path">
@@ -259,38 +239,38 @@
       <xsl:attribute name="draw:enhanced-path">
         <xsl:value-of select="concat('WordshapesEnhance-Path:',@path)"/>
       </xsl:attribute>
-              <xsl:if test="contains($shapeStyle,'flip') and not(contains($shapeStyle,'rotation'))">
-                <xsl:variable name="var_flipH">
-                  <xsl:choose>
-                    <xsl:when test="contains($shapeStyle,'flip:x y')">
-                      <xsl:value-of select="'1'" />
-                    </xsl:when>
-                    <xsl:when test="contains($shapeStyle,'flip:x')">
-                      <xsl:value-of select="'1'" />
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="'0'" />
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:variable>
-                <xsl:variable name="var_flipV">
-                  <xsl:choose>
-                    <xsl:when test="contains($shapeStyle,'flip:x y')">
-                      <xsl:value-of select="'1'" />
-                    </xsl:when>
-                    <xsl:when test="contains($shapeStyle,'flip:y')">
-                      <xsl:value-of select="'1'" />
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="'0'" />
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:variable>
-                <xsl:call-template name="tmpFlipwitoutRotation">
-                  <xsl:with-param name="flipH" select="$var_flipH"/>
-                  <xsl:with-param name="flipV" select="$var_flipV"/>
-                </xsl:call-template>
-              </xsl:if>
+      <xsl:if test="contains($shapeStyle,'flip') and not(contains($shapeStyle,'rotation'))">
+        <xsl:variable name="var_flipH">
+          <xsl:choose>
+            <xsl:when test="contains($shapeStyle,'flip:x y')">
+              <xsl:value-of select="'1'" />
+            </xsl:when>
+            <xsl:when test="contains($shapeStyle,'flip:x')">
+              <xsl:value-of select="'1'" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'0'" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="var_flipV">
+          <xsl:choose>
+            <xsl:when test="contains($shapeStyle,'flip:x y')">
+              <xsl:value-of select="'1'" />
+            </xsl:when>
+            <xsl:when test="contains($shapeStyle,'flip:y')">
+              <xsl:value-of select="'1'" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'0'" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:call-template name="tmpFlipwitoutRotation">
+          <xsl:with-param name="flipH" select="$var_flipH"/>
+          <xsl:with-param name="flipV" select="$var_flipV"/>
+        </xsl:call-template>
+      </xsl:if>
       <xsl:if test="v:formulas/v:f">
         <xsl:for-each select="v:formulas/v:f">
           <draw:equation>
@@ -405,7 +385,7 @@
             </draw:line>
           </xsl:when>
           <xsl:otherwise>
-  <xsl:choose>
+            <xsl:choose>
               <!--Rectangle -->
               <xsl:when  test="self::v:rect" >
                 <!--added by yeswanth.s : converting rectangle with text into frame-->
@@ -494,13 +474,8 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:variable name="shapeTypeId" select="substring-after(@type,'#')" />
-                <xsl:variable name="pathId">
-                  <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
-                    <xsl:if test="position()=1">
-                      <xsl:value-of select="@path" />
-                    </xsl:if>
-                  </xsl:for-each>
-                </xsl:variable>
+                <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+
                 <xsl:choose>
                   <xsl:when test="$pathId='m,l,21600r21600,l21600,xe' 
                                   or  $pathId='m,l,21600l21600,21600l21600,xe'
@@ -527,7 +502,7 @@
                     </xsl:call-template>
                   </xsl:otherwise>
                 </xsl:choose>
-             
+
               </xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
@@ -962,13 +937,8 @@
     </xsl:for-each>
     <!-- Sona: Gradient for Frame-->
     <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-    <xsl:variable name="pathId">
-      <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
-        <xsl:if test="position()=1">
-          <xsl:value-of select="@path" />
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
+    <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+
     <xsl:if test="($pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox)) and ($shape/v:fill/@type='tile' or $shape/v:fill/@type='pattern' or $shape/v:fill/@type='frame')">
       <xsl:call-template name="InsertGradientFillForFrame">
         <xsl:with-param name="shape" select="$shape"></xsl:with-param>
@@ -1133,13 +1103,8 @@
     <xsl:param name="shape" />
     <!-- Sona: Shadow implementation-->
     <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-    <xsl:variable name="pathId">
-      <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
-        <xsl:if test="position()=1">
-          <xsl:value-of select="@path" />
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
+    <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+
     <xsl:for-each select="$shape/v:shadow">
       <xsl:choose>
         <xsl:when test="$pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox)">
@@ -1455,13 +1420,7 @@
     <!--end here-->
     <!--Edited by Sona to implement Picture fill-->
     <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-    <xsl:variable name="pathId">
-      <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
-        <xsl:if test="position()=1">
-          <xsl:value-of select="@path" />
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
+    <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
     <!-- Sona: Gradient fill for frames-->
     <xsl:if test="($pathId!='m,l,21600r21600,l21600,xe' and not($shape[name()='v:rect'] and $shape/v:textbox))">
       <xsl:choose>
@@ -1889,8 +1848,8 @@
   <xsl:template name="InsertShapeBorders">
     <!-- current context is <v:shape> -->
     <xsl:param name="shape" select="." />
-    <xsl:variable name="typeId" select="substring-after($shape/@type, '#')" />
-    <xsl:variable name="shapetype" select="key('Part', 'word/document.xml')/w:document/w:body//v:shapetype[@id=$typeId]" />
+    <xsl:variable name="shapeTypeId" select="substring-after($shape/@type, '#')" />
+    <xsl:variable name="shapetype" select="key('shapeTypeById', $shapeTypeId)[1]" />
 
     <xsl:variable name="paintBorder">
       <!-- The stroked attribute of the shape is stronger than the attribute of the shapetype -->
@@ -3007,13 +2966,7 @@
       </xsl:if>
       <!--Sona : Rotation Implementation -->
       <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-      <xsl:variable name="pathId">
-        <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
-          <xsl:if test="position()=1">
-            <xsl:value-of select="@path" />
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:variable>
+      <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
 
       <xsl:if test="contains($shape/@style,'rotation')">
         <xsl:variable name="xCord">
@@ -3105,12 +3058,12 @@
     <xsl:param name="flipH"/>
     <xsl:param name="flipV"/>
     <xsl:if test="$flipH='1'">
-      <xsl:attribute name ="draw:mirror-horizontal">
+      <xsl:attribute name="draw:mirror-horizontal">
         <xsl:value-of select="'true'"/>
       </xsl:attribute>
     </xsl:if>
     <xsl:if test="$flipV='1'">
-      <xsl:attribute name ="draw:mirror-vertical">
+      <xsl:attribute name="draw:mirror-vertical">
         <xsl:value-of select="'true'"/>
       </xsl:attribute>
     </xsl:if>
@@ -3421,13 +3374,7 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-        <xsl:variable name="pathId">
-          <xsl:for-each select="//v:shapetype[@id=$shapeTypeId]">
-            <xsl:if test="position()=1">
-              <xsl:value-of select="@path" />
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:variable>
+        <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
 
         <!-- Don't insert the width if the textbox is set to auto-width -->
         <xsl:if test="(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
