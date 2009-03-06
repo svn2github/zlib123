@@ -148,7 +148,7 @@ exclude-result-prefixes="p a r xlink rels">
 			
 			<!--added by yeswanth-->
 			<xsl:call-template name="SlideTransition">
-				<xsl:with-param name="slidenum" select="document($pageSlide)"/>
+				<xsl:with-param name="slidenum" select="$pageSlide"/>
 			</xsl:call-template>
 			<!--end of code added by yeswanth-->
           <xsl:attribute name ="presentation:background-visible" >
@@ -5680,17 +5680,17 @@ exclude-result-prefixes="p a r xlink rels">
 	<xsl:template name="SlideTransition">
 		<xsl:param name="slidenum"/>
 		<xsl:choose>
-			<xsl:when test="(msxsl:node-set($slidenum)/p:sld/p:transition/@advClick) and not(msxsl:node-set($slidenum)/p:sld/p:transition/@advTm)">
+			<xsl:when test="document($slidenum)/p:sld/p:transition[@advClick and not(@advTm)]">
 				<xsl:attribute name ="presentation:transition-type">
 					<xsl:value-of select="'semi-automatic'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test="(msxsl:node-set($slidenum)/p:sld/p:transition/@advClick) and (msxsl:node-set($slidenum)/p:sld/p:transition/@advTm)">
+      <xsl:when test="document($slidenum)/p:sld/p:transition[@advClick and @advTm]">
 				<xsl:attribute name ="presentation:transition-type">
 					<xsl:value-of select="'automatic'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test="not(msxsl:node-set($slidenum)/p:sld/p:transition/@advClick) and (msxsl:node-set($slidenum)/p:sld/p:transition/@advTm)">
+      <xsl:when test="document($slidenum)/p:sld/p:transition[not(@advClick) and @advTm]">
 				<xsl:attribute name ="presentation:transition-type">
 					<xsl:value-of select="'automatic'"/>
 				</xsl:attribute>				
@@ -5700,18 +5700,18 @@ exclude-result-prefixes="p a r xlink rels">
 			</xsl:otherwise>
 		</xsl:choose>
 
-		<xsl:if test="msxsl:node-set($slidenum)/p:sld/p:transition/@advTm">
+		<xsl:if test="document($slidenum)/p:sld/p:transition/@advTm">
 			<xsl:call-template name="PresDuration">
-				<xsl:with-param name="TmVal" select="msxsl:node-set($slidenum)/p:sld/p:transition/@advTm div 1000"/>
+				<xsl:with-param name="TmVal" select="document($slidenum)/p:sld/p:transition/@advTm div 1000"/>
 			</xsl:call-template>
 		</xsl:if>
 
 		<xsl:attribute name ="presentation:transition-speed">
 			<xsl:choose>
-				<xsl:when test="msxsl:node-set($slidenum)/p:sld/p:transition/@spd='slow'">
+				<xsl:when test="document($slidenum)/p:sld/p:transition/@spd='slow'">
 					<xsl:value-of select="'slow'"/>
 				</xsl:when>
-				<xsl:when test="msxsl:node-set($slidenum)/p:sld/p:transition/@spd='med'">
+				<xsl:when test="document($slidenum)/p:sld/p:transition/@spd='med'">
 					<xsl:value-of select="'medium'"/>
 				</xsl:when>
 				<xsl:otherwise>
@@ -5721,11 +5721,8 @@ exclude-result-prefixes="p a r xlink rels">
 		</xsl:attribute>
 		
 		<xsl:call-template name="SlideTransSmilType">
-			<xsl:with-param name="slidenum" select="$slidenum/p:sld/p:transition/child::node()"/>
+			<xsl:with-param name="slidenum" select="document($slidenum)/p:sld/p:transition/child::node()"/>
 		</xsl:call-template>
-
-		
-		
 	</xsl:template>
 
 	<xsl:template name="SlideTransSmilType">
