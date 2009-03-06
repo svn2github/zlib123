@@ -112,7 +112,17 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
                 <xsl:value-of select="count(preceding-sibling::table:table)"/>
               </xsl:for-each>
             </xsl:when>
+            <xsl:otherwise>
+              <!--SP2MustFix condition added by sonata for bug no:2654544 -->
+              <xsl:choose>
+                <xsl:when test="key('style',office:spreadsheet/table:table[position()=1]/@table:style-name)/style:table-properties/@table:display = 'false'">
+                  <xsl:value-of select="1"/>
+                </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+              <!--end-->
+            
+            </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
 
@@ -224,8 +234,7 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 						Date       : 28th Jan '09
 						Desc       : SP2,If @table:target-range-address does not contain ':'
 						File       : Uni_Chart_Privatization.ods
-					 -->
-					
+					 -->					
 					<!--<xsl:variable name="rangeAddress">
 						<xsl:value-of select="@table:target-range-address"/>
 					</xsl:variable>
@@ -254,13 +263,16 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 					</xsl:variable>
 					
 					<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>-->
+					<xsl:variable name ="apos">
+						<xsl:text>&apos;</xsl:text>
+					</xsl:variable>
 					<xsl:choose>
 						<xsl:when test ="contains(@table:target-range-address,':')">
 							<xsl:variable name="partOne">
-								<xsl:value-of select="substring-before(substring-before(@table:target-range-address,':'),'.')"/>
+								<xsl:value-of select="translate(substring-before(substring-before(@table:target-range-address,':'),'.'),$apos,'')"/>
 							</xsl:variable>
 							<xsl:variable name="partTwo">
-								<xsl:value-of select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+								<xsl:value-of select="translate(substring-after(substring-before(@table:target-range-address,':'),'.'),$apos,'')"/>
 							</xsl:variable>
 							<xsl:variable name="partThree">
 								<xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
@@ -277,11 +289,11 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 							<xsl:variable name="secondRowValue">
 								<xsl:value-of select="translate($partThree,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
 							</xsl:variable>
-					<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>
+					<xsl:value-of select="concat($apos,$partOne,$apos,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:variable name="partOne">
-								<xsl:value-of select="substring-before(@table:target-range-address,'.')"/>
+								<xsl:value-of select="translate(substring-before(@table:target-range-address,'.'),$apos,'')"/>
 							</xsl:variable>
 							<xsl:variable name="partTwo">
 								<xsl:value-of select="substring-after(@table:target-range-address,'.')"/>
@@ -292,7 +304,7 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 							<xsl:variable name="firstRowValue">
 								<xsl:value-of select="translate($partTwo,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
 							</xsl:variable>
-							<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue)"/>
+							<xsl:value-of select="concat($apos,$partOne,$apos,'!','$',$firstColValue,'$',$firstRowValue)"/>
 						</xsl:otherwise>
 					</xsl:choose>					
 				</definedName>
@@ -302,7 +314,6 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 		  By     : Vijayeta
 		  Date   :11th Sept '08
 		  -->
-
 		<xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:named-expressions">
 			<xsl:for-each select ="child::node()">
 				<!--<xsl:if test ="not(contains(@table:name,'Excel_BuiltIn_Print_Area')) and not(contains(@table:name,'Excel_BuiltIn_Print_Titles_1 1'))  and @table:name!='C' and @table:name!='c' and @table:name!='R' and @table:name!='r' ">-->

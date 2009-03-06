@@ -63,9 +63,18 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
       </xsl:if>
-
+<!--
+	Changes By: Vijayeta
+	Desc      : Crash Because of Pivot Table,Some times when a 'Value' field appears as row,
+				instead of condition table:source-field-name = "", SP2 retains as table:source-field-name = "Values" or table:source-field-name = "Daten"
+				In this case,code picks up all the fields from source into a container and all the fields of pivot table
+				into another container, and then compares both the containers, which reults is false and node
+				rowFields is not added.  So add additional check, if @table:is-data-layout-field is 'true', other cases, attr is absent.
+	File      : TR_Bestellungen.DE.xlsx->SP2->TR_Bestellungen.DE.ods->Translator->TR_Bestellungen.DE.xlsx
+-->
       <xsl:if
-        test="table:data-pilot-field[@table:source-field-name = '' and @table:orientation = 'row' ]">
+        test="table:data-pilot-field[@table:source-field-name = '' and @table:orientation = 'row' ]
+		      or table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row' and @table:is-data-layout-field='true']">
         <xsl:attribute name="dataOnRows">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
@@ -452,12 +461,23 @@
         test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row' ] or $dataFields &gt;= 2">
         <rowFields count="{count(table:data-pilot-field[@table:orientation = 'row'])}">
           <xsl:for-each select="table:data-pilot-field[@table:orientation = 'row']">
-
             <xsl:choose>
               <!-- "Values" field -->
+				<!--
+				Changes By: Vijayeta
+				Desc      : Crash Because of Pivot Table,Some times when a 'Value' field appears as row,
+				instead of condition table:source-field-name = "", SP2 retains as table:source-field-name = "Values" or table:source-field-name = "Daten"
+				In this case,code picks up all the fields from source into a container and all the fields of pivot table
+				into another container, and then compares both the containers, which reults is false and node
+				rowFields is not added.  So add additional check, if @table:is-data-layout-field is 'true', other cases, attr is absent.
+				File      : TR_Bestellungen.DE.xlsx->SP2->TR_Bestellungen.DE.ods->Translator->TR_Bestellungen.DE.xlsx
+				-->
               <xsl:when test="@table:source-field-name = '' and $dataFields &gt;= 2">
                 <field x="-2"/>
               </xsl:when>
+			  <xsl:when test="@table:source-field-name != '' and @table:is-data-layout-field='true' and $dataFields &gt;= 2">
+				<field x="-2"/>
+			  </xsl:when>
               <xsl:when test="@table:source-field-name != '' ">
                 <field>
                   <pxsi:fieldPos pxsi:name="{@table:source-field-name}" pxsi:attribute="x"/>
@@ -482,14 +502,14 @@
 				<!-- 
 				  Added: By Vijayeta, 
                   Date:  1/9/2009
-                  Desc: Crash Because of Pivot Table,Some times when a 'Value' field appears as column,
+                  Desc: Crash Because of Pivot Table,Some times when a 'Value' field appears as column/row,
 					    instead of condition table:source-field-name = "", SP2 retains as table:source-field-name = "Values"
 						In this case,code picks up all the fields from source into a container and all the fields of pivot table
 						into another container, and then compares both the containers, which reults is false and node
-						colFields is not added.  So add additional check, if @table:show-empty is 'true', other cases, it's ste to 'false'
+						colFields/rowfields is not added.  So add additional check, if @table:is-data-layout-field is 'true', other cases, attr is absent
                   File:  Define_Name_Pivot_Table.ods(SP2 output of Define_Name_Pivot_Table.xlsx)
 				 -->
-              <xsl:when test="@table:source-field-name = '' or table:data-pilot-level[@table:show-empty='true']">
+              <xsl:when test="@table:source-field-name = '' or @table:is-data-layout-field='true' or table:data-pilot-level[@table:show-empty='true']">
                 <field x="-2"/>
               </xsl:when>
               <xsl:when test="@table:source-field-name != '' ">

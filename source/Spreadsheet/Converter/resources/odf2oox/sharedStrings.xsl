@@ -158,7 +158,13 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   </xsl:template>
 
   <!-- when there is formatted text in a string, all texts must be in runs -->
+	<!-- Changes By : Vijayeta
+     Code Change: SP2, Defect 2654510, Coments having repeated author name, cos SP2 inserts
+                  additional node 'dc:creator'
+     File       :Excel_SmokeTest_InputFile..xlsx->SP2->Excel_SmokeTest_InputFile..ods->Trans->Excel_SmokeTest_InputFile..xlsx
+  -->
   <xsl:template match="text()" mode="run">
+		<xsl:if test ="not(./parent::node()[name()='dc:creator'])">
     <r>
       <!--Start of RefNo-2-->
       <xsl:choose>
@@ -223,6 +229,7 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
         </xsl:otherwise>
       </xsl:choose>
     </r>
+		</xsl:if>
   </xsl:template>
 
   <xsl:template match="text()[parent::dc:date]" mode="text"/>

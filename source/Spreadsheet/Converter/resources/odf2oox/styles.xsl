@@ -893,8 +893,18 @@ RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date form
     </xsl:call-template>
 
     <!-- border -->
+<!-- Changes By: Vijayeta
+     Changes   : SP2, Additional Condition Added for Diagonal Borders 
+     File      :Excel_SmokeTest_InputFile..xlsx->SP2->Excel_SmokeTest_InputFile..ods->Trans->Excel_SmokeTest_InputFile..xlsx
+-->
     <xsl:if
-      test="(style:table-cell-properties/@fo:border) or (style:table-cell-properties/@fo:border-bottom) or (style:table-cell-properties/@fo:border-left) or(style:table-cell-properties/@fo:border-right)or(style:table-cell-properties/@fo:border-top)">
+      test="(style:table-cell-properties/@fo:border) or 
+	  (style:table-cell-properties/@fo:border-bottom) or
+	  (style:table-cell-properties/@fo:border-left) or
+	  (style:table-cell-properties/@fo:border-right)or
+	  (style:table-cell-properties/@fo:border-top) or 
+	  (style:table-cell-properties/@style:diagonal-bl-tr)or
+	  (style:table-cell-properties/@style:diagonal-tl-br) ">
       <xsl:attribute name="applyBorder">
         <xsl:text>1</xsl:text>
       </xsl:attribute>

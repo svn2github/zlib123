@@ -260,6 +260,13 @@
   
   <xsl:template match="text()" mode="border"/>
   
+	<!--Changes By : Vijayeta				
+				Desc       : Borders in SP2 Conversion
+							 The conventional manner of representing a border in the input as well as Translator converetd ODS 
+							 is '0.002cm solid #000000', but, ON SP2 Reverse Conversion, it's retained as 'thin solid #000000'.
+							 Hence, additional conditions added(thin solid,thick solid and 2pt solid)
+				File       : Möbelhersteller.DE.xlsx,Gasgesetz.DE.xlsx, FM_Shapes.FR.CONFIDENTIAL.xlsx,FM_Landscape.FR.CONFIDENTIAL.xlsx and _fedict - Xls 001.CONFIDENTIAL.xlsx
+	-->
  <xsl:template name="GetBorderStyle">
     <xsl:param name="style"/>
    <xsl:variable name="Width">
@@ -278,6 +285,17 @@
          <xsl:when test="$Width &gt; 0.088">
            <xsl:text>thick</xsl:text>
          </xsl:when>
+			<!--SP2-->
+			<xsl:when test="contains($style, 'thin solid')">
+				<xsl:text>thin</xsl:text>
+			</xsl:when>
+			<xsl:when test="contains($style, 'thick solid')">
+				<xsl:text>thick</xsl:text>
+			</xsl:when>			
+			<xsl:when test="contains($style, '2pt solid')">
+				<xsl:text>medium</xsl:text>
+			</xsl:when>
+			<!--End SP2-->
          <xsl:otherwise>
            <xsl:text>thin</xsl:text>
          </xsl:otherwise>

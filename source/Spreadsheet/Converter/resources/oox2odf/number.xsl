@@ -502,7 +502,7 @@ RefNo-1 9-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 			<!--<xsl:when
             test="contains(@formatCode,'$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">-->
           <xsl:when
-            test="contains(@formatCode,'$$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£') or (contains(@formatCode,'$') and not(contains(@formatCode,'%')))">
+            test="contains(@formatCode,'$$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£') or (contains(@formatCode,'$') and not(contains(@formatCode,'%')) and not(contains(@formatCode,'E+0')) and not(contains(@formatCode,'/')))">
             <number:currency-style style:name="{generate-id(.)}">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">

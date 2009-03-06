@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -41,8 +41,17 @@
   <!-- 
     Convert various length units to pixels
   -->
+<!--Change By : Vijayeta
+    Changes   : Additional condition 'check' added, cos in case of col width,
+                when the calculation is rounded, exact calclation is lost and 
+                col wid is found to be lesser than expected
+    File       : Excel_SmokeTest_InputFile..xlsx->sp2->Excel_SmokeTest_InputFile..ods->Translator->Excel_SmokeTest_InputFile..xlsx 
+-->
   <xsl:template name="pixel-measure">
     <xsl:param name="length"/>
+	<xsl:param name="check" select ="0"/>
+	  <xsl:choose >
+		  <xsl:when test ="$check=0">
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) div 0.0264)"/>
@@ -70,6 +79,36 @@
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
-  
+		  </xsl:when>
+		  <xsl:when test ="$check=1">
+			  <xsl:choose>
+				  <xsl:when test="contains($length, 'cm')">
+					  <xsl:value-of select="number(substring-before($length, 'cm')) div 0.0264"/>
+				  </xsl:when>
+				  <xsl:when test="contains($length, 'mm')">
+					  <xsl:value-of select="number(substring-before($length, 'mm')) div 0.264"/>
+				  </xsl:when>
+				  <xsl:when test="contains($length, 'in')">
+					  <xsl:value-of select="number(substring-before($length, 'in')) * 2.54 div 0.0264"/>
+				  </xsl:when>
+				  <xsl:when test="contains($length, 'pt')">
+					  <xsl:value-of select="number(substring-before($length, 'pt')) * 96 div 72"/>
+				  </xsl:when>
+				  <xsl:when test="contains($length, 'pica')">
+					  <xsl:value-of select="number(substring-before($length, 'pica')) * 2.54 div 0.1584"/>
+				  </xsl:when>
+				  <xsl:when test="contains($length, 'dpt')">
+					  <xsl:value-of select="number(substring-before($length, 'dpt')) * 2.54 div 1.9008"/>
+				  </xsl:when>
+				  <xsl:when test="contains($length, 'px')">
+					  <xsl:value-of select="$length"/>
+				  </xsl:when>
+				  <xsl:when test="not($length) or $length='' ">0</xsl:when>
+				  <xsl:otherwise>
+					  <xsl:value-of select="$length"/>
+				  </xsl:otherwise>
+			  </xsl:choose>
+		  </xsl:when>
+	  </xsl:choose>    
+  </xsl:template>  
 </xsl:stylesheet>

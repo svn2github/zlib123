@@ -66,6 +66,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
   <xsl:key name="series" match="chart:series" use="''"/>
   <xsl:key name="style" match="office:automatic-styles/child::node()" use="@style:name"/>
   <xsl:key name="chart" match="chart:chart" use="''"/>
+  <!--SP2 addded for bug no:2654297-->
+  <xsl:key name="SP2axis" match="chart:axis " use="''"/>
+  <!--end-->
 
   <xsl:template name="CreateChartFile">
     <!-- @Description: Searches for all charts within sheet and creates output chart files. -->
@@ -372,8 +375,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!-- secondary axis case (eliminate for now case when third chart is required - bar chart with lines and secondary axis) -->
           <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->
           <!--Start of RefNo-2:uncommented the code-->
+          <!--SP2-Must Fix. when condition changed by sonata for bug no:2654268 -->
           <xsl:when
-            test="key('series','')[@chart:attached-axis = 'secondary-y'] and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])">
+            test="(key('series','')[@chart:attached-axis = 'secondary-y'] 
+            and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])) 
+            or (key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class = 'chart:stock'])">
             <xsl:for-each select="parent::node()">
               <!--Start of RefNo-2:Check for min. no. of cols in case of stock 3 & 4-->
               <xsl:choose>
@@ -453,8 +459,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->
           <!--Start of RefNo-2:uncommented the code and Added condition to chk wheather any series is attached to seconday-y-axis.-->
           <xsl:if test="chart:axis[contains(@chart:name,'secondary')]">
+            <!--SP2-Must Fix if condition changed by sonata for bug no:2654268 -->
             <xsl:if
-              test="key('series','')[@chart:attached-axis = 'secondary-y'] and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])">
+              test="(key('series','')[@chart:attached-axis = 'secondary-y'] 
+              and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])) 
+              or (key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class = 'chart:stock'])">
               <!--secondary Y axis-->
               <xsl:choose>
                 <xsl:when test="$chartType = 'chart:stock' and count(key('series','')) &lt; 4">
@@ -1123,7 +1132,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     </xsl:if>
 
     <!-- only for stock chart 1&2 -->
-    <xsl:if test="$chartType = 'chart:stock' and not(key('series','')/@chart:class)">
+    <!--SP2-Must Fix.if condition changed by sonata for bug no:2654268-->
+    <xsl:if test="$chartType = 'chart:stock' and (not(key('series','')/@chart:class) or key('series','')/@chart:class = 'chart:stock')">
       <c:hiLowLines>
         <xsl:for-each select="chart:plot-area/chart:stock-range-line">
           <xsl:call-template name="InsertSpPr">
@@ -1196,6 +1206,13 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 				<xsl:if test="@chart:reverse-direction='false' and (($type = 'valAx') or ($type = 'catAx'))">
       <c:orientation val="minMax"/>
 				</xsl:if>	
+        <!--added by sonata for bug no:2605183-->
+        <xsl:if test="not(@chart:reverse-direction)">
+          <xsl:if test="key('chart','')/@chart:class = 'chart:bar'">
+            <c:orientation val="maxMin"/>
+          </xsl:if>
+        </xsl:if>
+        <!--end-->
 
       </xsl:for-each>
 <!--
@@ -1230,7 +1247,19 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 				  <xsl:text>true</xsl:text>
 			  </xsl:when>
 			  <xsl:otherwise>
+          <!--added by sonata for bug no:2605183-->
+          <xsl:choose>
+            <xsl:when test="not(key('style',$chartstyle)/style:chart-properties/@chart:reverse-direction)">
+              <xsl:if test="key('chart','')/@chart:class = 'chart:bar'">
+                <xsl:text>true</xsl:text>
+              </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
 				  <xsl:text>false</xsl:text>
+			  </xsl:otherwise>
+		  </xsl:choose>
+          <!--end-->
+          <!--<xsl:text>false</xsl:text>-->
 			  </xsl:otherwise>
 		  </xsl:choose>
 	  </xsl:variable>
@@ -2071,9 +2100,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                   <c:strRef>
                     <c:f>
                       <!--<xsl:value-of select="translate(key('series','')[position() = $number]/@chart:label-cell-address, '.','!')"/>-->
+                      <!--SP2 changed by sonata for bug no:2654233 -->
 						<xsl:variable name="strNumRefFrml">
-							<xsl:value-of select="translate(key('series','')[position() = $number]/@chart:values-cell-range-address, '.','!')"/>
+							<xsl:value-of select="translate(key('series','')[position() = $number]/@chart:label-cell-address, '.','!')"/>
 						</xsl:variable>
+                      <!--end-->
 						<xsl:variable name="sheet" select="substring-before($strNumRefFrml,'!')"/>
 						<xsl:variable name="apos">
 							<xsl:text>&apos;</xsl:text>
@@ -2162,7 +2193,16 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 							</xsl:if >
 						</xsl:variable>
 						<!--<xsl:value-of select="concat($apos,$checkedName,$apos,'!' ,substring-after($rngFrom,'!'),':',substring-after($rngTo,'!'))"/>-->
+                      <!--SP2 changed by sonata for bug no:2654233 -->
+                      <xsl:choose>
+                        <xsl:when test="contains($strNumRefFrml,':')">
 						<xsl:value-of select="concat($apos,$checkedName,$apos,'!$',$beginCol,'$',$beginRow ,':$',$endCol,'$',$endRow)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="concat($apos,$checkedName,$apos,'!',substring-after($strNumRefFrml,'!'))"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                      <!--end-->
                     </c:f>
                   </c:strRef>
                 </c:tx> 
@@ -2173,10 +2213,12 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </xsl:when>
 
         <xsl:otherwise>
-          <c:tx>
+         
+           
             <!--Start of RefNo-3:SP2:-->
             <xsl:choose>
               <xsl:when test="$seriesFrmCache='True'">
+                  <c:tx>
             <c:v>
               <xsl:choose>
                 <xsl:when test="$chartType = 'chart:scatter' ">
@@ -2195,13 +2237,21 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                 </xsl:otherwise>
               </xsl:choose>
             </c:v>
+                  </c:tx>
               </xsl:when>
               <xsl:when test="$seriesFrmCache='False'">              
+                  <!--SP2 added if condition for bug no:2654233-->
+                  <xsl:if test="key('series','')[position() = $number]/@chart:label-cell-address">
+                    <c:tx>
+                        
                 <c:strRef>
                   <c:f>
                     <!--<xsl:value-of select="translate(key('series','')[position() = $number]/@chart:label-cell-address, '.','!')"/>-->
 					  <xsl:variable name="strNumRefFrml">
-						  <xsl:value-of select="translate(key('series','')[position() = $number]/@chart:values-cell-range-address, '.','!')"/>
+
+                        <!--SP2 changed by sonata for bug no:2654233 -->
+                        <!--<xsl:value-of select="translate(key('series','')[position() = $number]/@chart:values-cell-range-address, '.','!')"/>-->
+                        <xsl:value-of select="translate(key('series','')[position() = $number]/@chart:label-cell-address, '.','!')"/>
 					  </xsl:variable>
 					  <xsl:variable name="sheet" select="substring-before($strNumRefFrml,'!')"/>
 					  <xsl:variable name="apos">
@@ -2291,13 +2341,26 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 						  </xsl:if >
 					  </xsl:variable>
 					  <!-- <xsl:value-of select="concat(substring-before($strNumRefFrml,':!'),':' ,substring-after($strNumRefFrml,':!'))"/>-->
+                      <!--SP2 changed by sonata for bug no:2654233 -->
+                      <xsl:choose>
+                        <xsl:when test="contains($strNumRefFrml,':')">
 					  <xsl:value-of select="concat($apos,$checkedName,$apos,'!$',$beginCol,'$',$beginRow ,':$',$endCol,'$',$endRow)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="concat($apos,$checkedName,$apos,'!',substring-after($strNumRefFrml,'!'))"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                      <!--end-->
                   </c:f>
                 </c:strRef>              
+                    </c:tx>
+                  </xsl:if>
+                      
             </xsl:when>
           </xsl:choose>
           <!--End of RefNo-3-->
-          </c:tx>
+        
+       
         </xsl:otherwise>
       </xsl:choose>
 
@@ -2495,7 +2558,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 
           <xsl:choose>
             <xsl:when test="$chartType = 'chart:ring' ">
-              <xsl:for-each select="key('series','')[last()]">
+              
+              <!--changed for-each condition by sonata for bug no: 2636243 and  2633431 -->
+              <!--<xsl:for-each select="key('series','')[last()]">-->
+               <xsl:for-each select="key('series','')[1]">
                 <xsl:call-template name="InsertRingPointsShapeProperties">
                   <xsl:with-param name="totalPoints" select="$numPoints"/>
                   <xsl:with-param name="series" select="$number"/>
@@ -2692,7 +2758,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       <xsl:if
         test="$chartType = 'chart:line' or $chartType = 'chart:radar' or ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]/@chart:class = 'chart:line' or 
         $chartType = 'chart:scatter' or $chartType = 'chart:stock' ">
-        <xsl:for-each select="ancestor::chart:chart/chart:plot-area">
+        <!--SP2-Must Fix changed condition by sonata for bug no:2654494-->
+        <!--<xsl:for-each select="/.//chart:chart/chart:plot-area">-->
+        <xsl:for-each select="key('chart','')/chart:plot-area">
           <xsl:choose>
             <!-- when plot-area has 'no symbol' property -->
             <xsl:when
@@ -2762,7 +2830,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                                 <xsl:attribute name="val">
                                   <xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>
                                 </xsl:attribute>
-
                                 <xsl:if test="@svg:stroke-opacity">
                                   <a:alpha>
                                     <xsl:attribute name="val">
@@ -2807,9 +2874,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                           <xsl:when test="@draw:stroke = 'solid' or @draw:stroke = 'dash' or @svg:stroke-color!='' ">
                             <a:solidFill>
                               <a:srgbClr>
-                                <xsl:attribute name="val">
-                                  <xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>
-                                </xsl:attribute>
+                                <!--changed by sonata for bug no:2605215-->
+                                <!--<xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>-->
+                                <xsl:value-of select="substring-after(@draw:fill-color, '#')"/>
+                                <!--end-->
 
                                 <xsl:if test="@svg:stroke-opacity">
                                   <a:alpha>
@@ -3389,6 +3457,114 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           </c:val>
             </xsl:when>
             <xsl:when test="$seriesFrmCache='False'">
+          <!--SP2 addded code for bug no:2654297-->
+              <xsl:if test="key('SP2axis','')[@chart:dimension='x']/chart:categories/@table:cell-range-address">
+              <c:cat>
+                <c:strRef>
+                  <c:f>
+                    <!--<xsl:variable name="strNumRefFrml">
+                      <xsl:value-of select="translate(key('series','')[position() = $number]/@chart:values-cell-range-address, '.','!')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="concat(substring-before($strNumRefFrml,':!'),':' ,substring-after($strNumRefFrml,':!'))"/>-->
+                    <xsl:variable name="strNumRefFrml">
+                      <xsl:value-of select="translate(key('SP2axis','')[@chart:dimension='x']/chart:categories/@table:cell-range-address, '.','!')"/>
+                    </xsl:variable>
+                    <xsl:variable name="sheet" select="substring-before($strNumRefFrml,'!')"/>
+                    <xsl:variable name="apos">
+                      <xsl:text>&apos;</xsl:text>
+                    </xsl:variable>
+                    <xsl:variable name="refSheetNumber">
+                      <xsl:for-each
+                      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name = translate($sheet,$apos,'')]">
+                        <xsl:number count="table:table" level="single"/>
+                      </xsl:for-each>
+                    </xsl:variable>
+                    <xsl:variable name="checkedName">
+                      <xsl:for-each
+                      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name = translate($sheet,$apos,'')]">
+                        <xsl:call-template name="CheckSheetName">
+                          <xsl:with-param name="sheetNumber">
+                            <xsl:value-of select="$refSheetNumber"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="name">
+                            <xsl:value-of
+                            select="substring(translate($sheet,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
+                    />
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:for-each>
+                    </xsl:variable>
+                    <xsl:variable name="rngFrom">
+                      <xsl:choose >
+                        <xsl:when test ="contains(substring-before($strNumRefFrml,':'),'!')">
+                          <xsl:value-of select ="substring-after(substring-before($strNumRefFrml,':'),'!')"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="substring-before($strNumRefFrml,':')"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:variable>
+                    <xsl:variable name="rngTo">
+                      <xsl:choose >
+                        <xsl:when test ="contains(substring-after($strNumRefFrml,':'),'!')">
+                          <xsl:value-of select ="substring-after(substring-after($strNumRefFrml,':'),'!')"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="translate(substring-after($strNumRefFrml,':'),'.','')"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:variable>
+                    <xsl:variable name ="beginCol">
+                      <xsl:if test ="$rngFrom != ''">
+                        <xsl:call-template name="NumbersToChars">
+                          <xsl:with-param name="num">
+                            <xsl:variable name ="ColNumber">
+                              <xsl:call-template name="GetColNum">
+                                <xsl:with-param name="cell" select="$rngFrom"/>
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:value-of select ="$ColNumber - 1"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:if>
+                    </xsl:variable>
+                    <xsl:variable name ="beginRow">
+                      <xsl:if test ="$rngFrom != ''">
+                        <xsl:call-template name="GetRowNum">
+                          <xsl:with-param name="cell" select="$rngFrom"/>
+                        </xsl:call-template>
+                      </xsl:if >
+                    </xsl:variable>
+                    <xsl:variable name ="endCol">
+                      <xsl:if test ="$rngFrom != ''">
+                        <xsl:call-template name="NumbersToChars">
+                          <xsl:with-param name="num">
+                            <xsl:variable name ="ColNumber">
+                              <xsl:call-template name="GetColNum">
+                                <xsl:with-param name="cell" select="$rngTo"/>
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:value-of select ="$ColNumber - 1"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:if>
+                    </xsl:variable>
+                    <xsl:variable name ="endRow">
+                      <xsl:if test ="$rngFrom != ''">
+                        <xsl:call-template name="GetRowNum">
+                          <xsl:with-param name="cell" select="$rngTo"/>
+                        </xsl:call-template>
+                      </xsl:if >
+                    </xsl:variable>
+                    <!-- <xsl:value-of select="concat(substring-before($strNumRefFrml,':!'),':' ,substring-after($strNumRefFrml,':!'))"/>-->
+                    <xsl:value-of select="concat($apos,$checkedName,$apos,'!$',$beginCol,'$',$beginRow ,':$',$endCol,'$',$endRow)"/>
+                  </c:f>
+                </c:strRef>
+              </c:cat>
+              </xsl:if>
+              <!--end-->
+              
+              
               <c:val>
                 <c:numRef>
                   <c:f>
@@ -4458,9 +4634,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 
   </xsl:template>
 
-  <xsl:template name="InsertRingPointsShapeProperties">
-    <!-- @Description: Inserts ring chart data point shape property-->
-    <!-- @Context: chart:series[last()] -->
+  <!--commented by sonata for bug no: 2636243 and  2633431 -->
+  <!--<xsl:template name="InsertRingPointsShapeProperties">
+   
     <xsl:param name="totalPoints"/>
     <xsl:param name="series"/>
     <xsl:param name="count" select="0"/>
@@ -4506,7 +4682,87 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       </xsl:call-template>
     </xsl:for-each>
 
+  </xsl:template>-->
+  <!--end-->
+
+  
+  <!--changed by sonata for bug no: 2636243 and  2633431 -->
+  <xsl:template name="InsertRingPointsShapeProperties">
+    <!-- @Description: Inserts ring chart data point shape property-->
+    <!-- @Context: chart:series[last()] -->
+    <xsl:param name="totalPoints"/>
+    <xsl:param name="series"/>
+    <xsl:param name="count" select="0"/>
+    <xsl:param name="ChartDirecotry"/>
+    <xsl:param name="pos" select="1"/>
+
+    <xsl:variable name="dataPointStyle">
+      <xsl:for-each
+        select="child::node()[$pos]">
+        <xsl:if test="@chart:repeated">
+        <xsl:call-template name="GetDataPointStyleName">
+          <xsl:with-param name="point" select="$series"/>
+        </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="not(@chart:repeated)">
+          <xsl:value-of select="@chart:style-name"/>
+        </xsl:if>
+        
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="styleName">
+      <xsl:choose>
+        <xsl:when test="$dataPointStyle != '' ">
+          <xsl:value-of select="$dataPointStyle"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@chart:style-name"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <c:dPt>
+      <c:idx val="{$count}"/>
+      <xsl:call-template name="InsertShapeProperties">
+        <xsl:with-param name="styleName" select="$styleName"/>
+        <xsl:with-param name="ChartDirectory">
+          <xsl:value-of select="$ChartDirecotry"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </c:dPt>
+
+    <!--<xsl:if test="not(./child::node()[$pos +1][name()='chart:data-point']) and following-sibling::node()[$pos +1][name() = 'chart:series' ]">-->
+   <xsl:if test="not(./child::node()[$pos +1][name()='chart:data-point']) and ./child::node()[$pos][name()='chart:data-point']/@chart:repeated">
+    <xsl:for-each select="following-sibling::node()[name() = 'chart:series' ][1]">
+      <xsl:call-template name="InsertRingPointsShapeProperties">
+        <xsl:with-param name="totalPoints" select="$totalPoints"/>
+        <xsl:with-param name="series" select="$series"/>
+        <xsl:with-param name="count" select="$count + 1"/>
+        <xsl:with-param name="ChartDirecotry">
+          <xsl:value-of select="$ChartDirecotry"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:for-each>
+    </xsl:if>
+
+
+    <xsl:if test="./child::node()[$pos +1][name()='chart:data-point']">
+      <xsl:call-template name="InsertRingPointsShapeProperties">
+        <xsl:with-param name="totalPoints" select="$totalPoints"/>
+        <xsl:with-param name="series" select="$series"/>
+        <xsl:with-param name="count" select="$count + 1"/>
+        <xsl:with-param name="pos" select="$pos + 1"/>
+       
+        <xsl:with-param name="ChartDirecotry">
+          <xsl:value-of select="$ChartDirecotry"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+
   </xsl:template>
+  <!--end-->
+  
 
   <xsl:template name="GetDataPointStyleName">
     <!-- @Description: Gets data point style name -->

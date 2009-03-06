@@ -201,6 +201,13 @@
   </xsl:template>
 
   <!-- template to convert column width -->
+<!-- Change By : Vijayeta
+     Changes   : Additional condition 'check' added, cos in case of col width,
+                when the calculation is rounded, exact calclation is lost and 
+                col wid is found to be lesser than expected
+     File       : Excel_SmokeTest_InputFile..xlsx->sp2->Excel_SmokeTest_InputFile..ods->Translator->Excel_SmokeTest_InputFile..xlsx 
+
+  --> 
   <xsl:template name="ConvertToCharacters">
     <xsl:param name="width"/>
     <xsl:param name="defaultFontSize"/>
@@ -209,6 +216,7 @@
         <xsl:with-param name="length">
           <xsl:value-of select="$width"/>
         </xsl:with-param>
+		<xsl:with-param name="check" select ="1"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="fontSize">
@@ -216,6 +224,7 @@
         <xsl:with-param name="length">
           <xsl:value-of select="concat($defaultFontSize,'pt')"/>
         </xsl:with-param>
+		<xsl:with-param name="check" select ="1"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="realFontSize">

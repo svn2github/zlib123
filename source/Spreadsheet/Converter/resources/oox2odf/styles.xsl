@@ -124,9 +124,19 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
   <xsl:template name="InsertFonts">
 	  <!-- Perofomance-->
+	  <!--
+	      Changes by: Vijayeta
+	      Desc      : Fix for the defect 2633527, unknown chr appears in roundtrip
+		              as the font style is enclosed in apos, which is removed in the fix		  
+      -->
+	  <xsl:variable name ="apos">
+		  <xsl:text >&apos;</xsl:text>
+	  </xsl:variable>
     <xsl:for-each select="key('Part', 'xl/styles.xml')">
 		<xsl:for-each select ="e:styleSheet/e:fonts/e:font[e:name]">
-      <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>
+			<!--<style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>-->
+			<style:font-face style:name="{translate(e:name/@val,$apos,'')}" svg:font-family="{translate(e:name/@val,$apos,'')}"/>
+			<!--End of the fix for 2633527-->
     </xsl:for-each>
     </xsl:for-each>
   </xsl:template>

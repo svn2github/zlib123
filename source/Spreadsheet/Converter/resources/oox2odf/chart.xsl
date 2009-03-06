@@ -1171,7 +1171,9 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             i.e. data2-3
           -->
           <xsl:attribute name="chart:style-name">
-            <xsl:value-of select="concat('data',$seriesNum,'-',$current)"/>
+            <!--<xsl:value-of select="concat('data',$seriesNum,'-',$current)"/>-->
+            <!--changed by sonata for bug no: 2636243 and  2633431 -->
+            <xsl:value-of select="concat('data',$current,'-',$seriesNum)"/>
           </xsl:attribute>
         </chart:data-point>
 
@@ -1370,6 +1372,8 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
       </xsl:variable>
 
+      <!--RefNo-1:ODF1.1:Added condtion to chk for data-->
+      <xsl:if test="0 &lt; $points">
       <table:table-rows>
         <xsl:call-template name="InsertDataRows">
           <xsl:with-param name="points" select="$points"/>
@@ -1380,6 +1384,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <xsl:with-param name="pointIndex" select="'-1'"/>
         </xsl:call-template>
       </table:table-rows>
+      </xsl:if>
 
     </table:table>
   </xsl:template>
@@ -1654,13 +1659,17 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             </text:p>
           </table:table-cell>
         </xsl:when>
-        <!--<xsl:otherwise>
-          Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN"
-          <table:table-cell office:value-type="float" office:value="1.#NAN">
+        <xsl:otherwise>
+          <!--Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN", fix for 2632796
+              the type for 1.NaN is not specified, which solves both the defect and Conformance-->
+			<!--<table:table-cell office:value-type="float" office:value="1.#NAN">
             <text:p>1.#NAN</text:p>
           </table:table-cell>-->          
-          <!--End of RefNo-1
-        </xsl:otherwise>-->
+          <table:table-cell>
+            <text:p>1.#NAN</text:p>
+          </table:table-cell>          
+          <!--End of RefNo-1-->
+        </xsl:otherwise>		  
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
@@ -1696,7 +1705,9 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 							</table:table-cell>
 						</xsl:when>
 						<xsl:otherwise>
-							<table:table-cell office:value-type="float" office:value="1.#NAN">
+<!--Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN", fix for 2632796
+              the type for 1.NaN is not specified, which solves both the defect and Conformance-->
+							<table:table-cell>
 								<text:p>1.#NAN</text:p>
 							</table:table-cell>
 						</xsl:otherwise>
@@ -1721,13 +1732,14 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             </text:p>
           </table:table-cell>
         </xsl:when>
-        <!--<xsl:otherwise>
-          Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN"
-          <table:table-cell office:value-type="float" office:value="1.#NAN">
+        <xsl:otherwise>
+          <!--Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN", fix for 2632796
+              the type for 1.NaN is not specified, which solves both the defect and Conformance-->
+          <table:table-cell>
             <text:p>1.#NAN</text:p>
-          </table:table-cell>-->
-          <!--End of RefNo-1
-        </xsl:otherwise>-->
+          </table:table-cell>
+          <!--End of RefNo-1-->
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
     <!--end-->
@@ -1903,9 +1915,12 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
       </xsl:variable>
 
       <chart:categories>
+        <!--RefNo-1:ODF1.1:Avoided attribute if wrong address-->
+        <xsl:if test="1 + $points = 'NaN'">
         <xsl:attribute name="table:cell-range-address">
           <xsl:value-of select="concat('local-table.A2:.A',1 + $points)"/>
         </xsl:attribute>
+        </xsl:if>
       </chart:categories>
       <!--End of RefNo-1-->
       <xsl:if test="c:majorGridlines">
@@ -2145,99 +2160,43 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 										<xsl:variable name="customColWidPt">
 											<xsl:value-of select="substring-before($colWidPlusdefaultColCount,'|')"/>
 										</xsl:variable>
-										<xsl:if test="$customColWidPt = 0">
-											<xsl:value-of select="concat($customColWidPt,'cm')"/>
-										</xsl:if>
-										<xsl:if test="$customColWidPt = ''">
-											<xsl:value-of select="concat(0,'cm')"/>
-										</xsl:if>
-										<xsl:if test="$customColWidPt != 0">
-											<xsl:call-template name="ConvertToCentimeters">
-												<xsl:with-param name="length">
-													<xsl:value-of
-													  select="concat(substring-before($colWidPlusdefaultColCount,'|'),'pt')"
-                      />
-												</xsl:with-param>
-
-											</xsl:call-template>
-										</xsl:if>
-									</xsl:variable>
-									<xsl:variable name="defaultColCount">
-										<!--<xsl:if test="substring-before($endcoloffset,'cm')!=0">
-                <xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|')"/>
-              </xsl:if>
-              <xsl:if test="substring-before($endcoloffset,'cm')=0">
-                <xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|') -1"/>
-              </xsl:if>-->
-										<xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|')"/>
-
-									</xsl:variable>
-
-									<!--<xsl:attribute name="svg:width">
             <xsl:choose>
-              <xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')=0 ">
-                <xsl:variable name="totalDefWid">
-                  <xsl:value-of select="number($defaultColCount) * number($defaultcolWidth) "/>
-                </xsl:variable>
-                <xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
-                -->
-									<!--<xsl:value-of select="concat(($defaultColCount * substring-before($defaultcolWidth,'cm')),'cm') "/>-->
-									<!--
-              </xsl:when>
-              <xsl:when test="$defaultcolWidth != 'null' and $customColWid != 0">
-                <xsl:value-of select="concat((($defaultColCount * substring-before($defaultcolWidth,'cm')) + substring-before($customColWid,'cm') - 
-                         substring-before($startcoloffset,'cm') +  substring-before($endcoloffset,'cm')),'cm')    "/>
+                      <xsl:when test="$customColWidPt = 0 or $customColWidPt = ''">
+                        <xsl:value-of select="'0'"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')!=''">
-                  <xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'),'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
-                </xsl:if>
-                <xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')=''">
-                  <xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|','0','|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
-                </xsl:if>
-                -->
-									<!--<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'))"/>-->
-									<!--
+                        <xsl:value-of select="$customColWidPt"/>
               </xsl:otherwise>
             </xsl:choose>
-
-
-
-            -->
-									<!-- Call Post Processor Here-->
-									<!--
-
-
-          </xsl:attribute>-->
-
+                  </xsl:variable>
+									<xsl:variable name="defaultColCount">
+								<xsl:value-of select="substring-after($colWidPlusdefaultColCount,'|')"/>
+									</xsl:variable>
 									<xsl:attribute name="svg:width">
 										<xsl:choose>
-											<xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')=0 ">
+                      <xsl:when test="$defaultcolWidth != 'null' and $customColWid =0 ">
 												<xsl:variable name="totalDefWid">
 													<xsl:value-of select="number($defaultColCount) * number($defaultcolWidth) "/>
 												</xsl:variable>
 												<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
-												<!--<xsl:value-of select="concat(($defaultColCount * substring-before($defaultcolWidth,'cm')),'cm') "/>-->
-											</xsl:when>
-											<xsl:when test="$defaultcolWidth != 'null' and translate($customColWid,'cm','')!=0">
+																				</xsl:when>
+                      <xsl:when test="$defaultcolWidth != 'null' and $customColWid !=0">
 												<xsl:variable name="totalDefWid">
-													<xsl:value-of select="number($defaultColCount) * number($defaultcolWidth)+ substring-before($colWidPlusdefaultColCount,'|')"/>
+                          <xsl:value-of select="number($defaultColCount) * number($defaultcolWidth)+ $customColWid"/>
 												</xsl:variable>
 												<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|','0','|',$totalDefWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
 											</xsl:when>
 											<xsl:otherwise>
-												<xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')!=''">
-													<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'),'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
+                        <xsl:if test ="$customColWid !=0">
+                          <xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',$customColWid,'|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
 												</xsl:if>
-												<xsl:if test ="substring-before($colWidPlusdefaultColCount,'|')=''">
+                        <xsl:if test ="$customColWid =0">
 													<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|','0','|',substring-before($startcoloffset,'cm'),'|',substring-before($endcoloffset,'cm'))"/>
 												</xsl:if>
-												<!--<xsl:value-of select="concat('sonataChartWidth:','False|',$defaultFontStyle,'|',$defaultFontSize,'|',$defaultColCount,'|',substring-before($colWidPlusdefaultColCount,'|'))"/>-->
-											</xsl:otherwise>
+																	</xsl:otherwise>
 										</xsl:choose>
 										<!-- Call Post Processor Here-->
 									</xsl:attribute>
-
 
 								</xsl:for-each>
 
@@ -5443,8 +5402,11 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
     <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
       <xsl:choose>
+        <!--added condition by sonata for bug no:2567199-->
         <xsl:when
-          test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' or c:doughnutChart">
+          test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) 
+          or (c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'stacked' )
+          or c:areaChart/c:grouping/@val = 'standard' or c:doughnutChart">
           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:otherwise>

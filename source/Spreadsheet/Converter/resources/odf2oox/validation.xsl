@@ -252,7 +252,13 @@
             </xsl:attribute>
 
             <!-- Error Allert Action-->
+			<!--
+				Changes By: Vijayeta
+				Desc      : attribute 'errorStyle' is set to blank in SP2 converted file, which actually works in SP2 but in SP1
+				File      : MS_Kalkulace_Campus_Agreement.xlsx->SP2->MS_Kalkulace_Campus_Agreement.ods->Translator->MS_Kalkulace_Campus_Agreement.xlsx
+			-->
             <xsl:for-each select="table:error-message">
+					<xsl:if test ="table:error-message/@table:message-type">
                 <xsl:attribute name="errorStyle">
                     <xsl:choose>
                         <xsl:when test="contains(@table:message-type, 'information')">
@@ -266,16 +272,14 @@
                         </xsl:when>
                     </xsl:choose>
                 </xsl:attribute>
-            </xsl:for-each>
-            
+					</xsl:if>                
+            </xsl:for-each>            
             <xsl:if test="table:error-macro">
                 <xsl:message terminate="no">translation.odf2oox.DataValidErrorMacro</xsl:message>
             </xsl:if>
             <xsl:if test="contains(@table:condition, 'is-in-list(') and not(contains(@table:condition, 'is-in-list(&quot;'))">
                 <xsl:message terminate="no">translation.odf2oox.DataValidCellRange</xsl:message>
-            </xsl:if>
-            
-
+            </xsl:if>         
             <!-- Criteria Data -->
             <xsl:attribute name="operator">
                 <xsl:choose>

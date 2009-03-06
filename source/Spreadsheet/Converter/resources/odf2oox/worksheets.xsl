@@ -799,6 +799,8 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
           <xsl:for-each select="descendant::table:table-row[@table:number-rows-repeated > 32768]">
 <!-- Sonata: bug no:2025608 -->
             <xsl:if test="position()=1">
+              <!--SP2 added condition by sonata for bug no:2654338-->
+              <xsl:if test="@table:style-name">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="length">
                 <xsl:value-of
@@ -807,6 +809,11 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
               </xsl:with-param>
               <xsl:with-param name="unit">point</xsl:with-param>
             </xsl:call-template>
+            </xsl:if>
+              <xsl:if test="not(@table:style-name)">
+                <xsl:value-of select="13"/>
+              </xsl:if>
+              <!--end SP2-->
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
@@ -896,6 +903,8 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 			</xsl:if>
     </sheetFormatPr>
     <xsl:if test="descendant::table:table-column[1]">
+      <!--SP2 added if condition by sonata for bug no:2654338 -->
+      <xsl:if test="@table:style-name">
       <cols>
         <!-- insert first column -->
         <xsl:apply-templates select="descendant::table:table-column[1]" mode="sheet">
@@ -903,6 +912,7 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
       </cols>
+    </xsl:if>
     </xsl:if>
     <sheetData>
 
@@ -1865,6 +1875,8 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
     <xsl:variable name="breakes">
 		<xsl:variable name ="tableNumberColumnsRepeated">
 			<xsl:choose >
+					<xsl:when test ="@table:number-columns-repeated">
+						<xsl:choose >
 				<xsl:when test ="@table:number-columns-repeated &gt; 256">
 					<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
 				</xsl:when>
@@ -1872,22 +1884,24 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 					<xsl:value-of select="@table:number-columns-repeated"/>
 				</xsl:when>
 			</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select ="''"/>
+					</xsl:otherwise>
+				</xsl:choose>
 		</xsl:variable>
       <xsl:choose>
         <xsl:when
           test="key('style',@table:style-name)/style:table-column-properties/@fo:break-before='page' ">
-
           <xsl:value-of select="$colBreakes"/>
           <xsl:if test="$colBreakes != '' ">
             <xsl:text>;</xsl:text>
           </xsl:if>
           <xsl:value-of select="$colNumber"/>
-
-          <!--<xsl:if test="@table:number-columns-repeated">-->
-			<xsl:if test="$tableNumberColumnsRepeated">
+					<!--Fix for 2633110 by vijayeta-->
+					<xsl:if test="$tableNumberColumnsRepeated !=''">
             <xsl:call-template name="InsertRepeatedManualColumnBreak">
-              <xsl:with-param name="repeat">
-                <!--<xsl:value-of select="@table:number-columns-repeated - 1"/>-->
+              <xsl:with-param name="repeat">              
 				  <xsl:value-of select="$tableNumberColumnsRepeated - 1"/>
               </xsl:with-param>
               <xsl:with-param name="colNumber">
@@ -1942,14 +1956,11 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 
   <xsl:template name="InsertColBreakes">
     <xsl:param name="colBreakes"/>
-
-
     <brk max="1048575" man="1">
       <xsl:attribute name="id">
         <xsl:value-of select="substring-before($colBreakes,';')"/>
       </xsl:attribute>
     </brk>
-
     <xsl:if test="substring-after($colBreakes,';') != '' ">
       <xsl:call-template name="InsertColBreakes">
         <xsl:with-param name="colBreakes">
@@ -1957,7 +1968,6 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-
   </xsl:template>
 
 </xsl:stylesheet>

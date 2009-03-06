@@ -206,9 +206,9 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                 </xsl:call-template>
               </xsl:variable>
               <!-- a postprocessor puts here strings from sharedstrings -->
-							<!--Vijayeta,SP2,Text in Hyperlink Missing-->
+							<!--Vijayeta,SP2,Text in Hyperlink Missing and regression defect 2632716-->
 							<xsl:choose>
-								<xsl:when test="translate(substring-after($XlinkHref,'#'),'.','')!=''">
+								<xsl:when test="translate(substring-after($XlinkHref,'#'),'.','')!='' or contains($XlinkHref,'http://') or contains($XlinkHref,'file:///') or contains($XlinkHref,'mailto:')">
               <xsl:choose>
                 <xsl:when test="contains($rSheredStrings, e:v) ">
                   <xsl:for-each select="key('SharedStrings', e:v)">
