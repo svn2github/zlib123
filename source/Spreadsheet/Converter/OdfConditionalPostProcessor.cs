@@ -895,8 +895,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
             // Excel does not use the specified font size, 
             // instead, font size is rounded to an integral pixel size
             // check if this works on non-Windows platforms, otherwise 96dpi could do fine here
-            Graphics g = System.Drawing.Graphics.FromHwnd(new IntPtr());
-            float fSizePxl = (float)Math.Round(g.DpiX * dblSizePt / 72);
+            //Graphics g = System.Drawing.Graphics.FromHwnd(new IntPtr());
+            //float fSizePxl = (float)Math.Round(g.DpiX * dblSizePt / 72);           
+            float fSizePxl = (float)Math.Round(96 * dblSizePt / 72);
             float fSizePt = (72 * fSizePxl / g.DpiX);
             FontStyle fontStyle;
             if (fontName == "Monotype Corsiva")
