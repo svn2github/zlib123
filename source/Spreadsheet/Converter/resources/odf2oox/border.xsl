@@ -265,7 +265,7 @@
 							 The conventional manner of representing a border in the input as well as Translator converetd ODS 
 							 is '0.002cm solid #000000', but, ON SP2 Reverse Conversion, it's retained as 'thin solid #000000'.
 							 Hence, additional conditions added(thin solid,thick solid and 2pt solid)
-				File       : Möbelhersteller.DE.xlsx,Gasgesetz.DE.xlsx, FM_Shapes.FR.CONFIDENTIAL.xlsx,FM_Landscape.FR.CONFIDENTIAL.xlsx and _fedict - Xls 001.CONFIDENTIAL.xlsx
+				File       : Mobelhersteller.DE.xlsx,Gasgesetz.DE.xlsx, FM_Shapes.FR.CONFIDENTIAL.xlsx,FM_Landscape.FR.CONFIDENTIAL.xlsx and _fedict - Xls 001.CONFIDENTIAL.xlsx
 	-->
  <xsl:template name="GetBorderStyle">
     <xsl:param name="style"/>
