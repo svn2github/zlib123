@@ -898,7 +898,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             //Graphics g = System.Drawing.Graphics.FromHwnd(new IntPtr());
             //float fSizePxl = (float)Math.Round(g.DpiX * dblSizePt / 72);           
             float fSizePxl = (float)Math.Round(96 * dblSizePt / 72);
-            float fSizePt = (72 * fSizePxl / g.DpiX);
+            float fSizePt = (72 * fSizePxl / 96);
             FontStyle fontStyle;
             if (fontName == "Monotype Corsiva")
                 fontStyle = FontStyle.Italic;
