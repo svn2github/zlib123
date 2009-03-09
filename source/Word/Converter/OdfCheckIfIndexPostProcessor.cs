@@ -32,29 +32,33 @@ using System;
 using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.Collections.Generic;
 
 namespace OdfConverter.Wordprocessing
 {
-	/// <summary>
-	/// Postprocessor to remove paragraphs which were processed in Index
-	/// </summary>
-	public class OdfCheckIfIndexPostProcessor : AbstractPostProcessor
-	{
-		private int numberOfParagraphs;
-		private bool isIndex;
-		private int context;
-		private Stack context2;
+    /// <summary>
+    /// Postprocessor to remove paragraphs which were processed in Index
+    /// </summary>
+    public class OdfCheckIfIndexPostProcessor : AbstractPostProcessor
+    {
+        private int numberOfParagraphs;
+        private bool isIndex;
+        private int context;
+        private Stack<Element> context2;
         private int sectionContext;
         private int sectionParagraphs;
-		public OdfCheckIfIndexPostProcessor(XmlWriter nextWriter):base(nextWriter)
-		{
-			this.numberOfParagraphs = 0;
-			this.isIndex = false;
-			this.context = 0;
-			this.context2 = new Stack();
+        
+        public OdfCheckIfIndexPostProcessor(XmlWriter nextWriter)
+            : base(nextWriter)
+        {
+            this.numberOfParagraphs = 0;
+            this.isIndex = false;
+            this.context = 0;
+            this.context2 = new Stack<Element>();
             this.sectionContext = 0;
-		}
-		public override void WriteStartElement(string prefix, string localName, string ns)
+        }
+        
+        public override void WriteStartElement(string prefix, string localName, string ns)
         {
             //field this.sectionContext is increased each time when we start an element in section and decreased when we end an element in section,
             //so when it's value is more than 0, the current element must be in section 
@@ -70,85 +74,84 @@ namespace OdfConverter.Wordprocessing
                     this.sectionParagraphs++;
                 }
             }
-			if(IsIndex(localName))
-			{
-				this.isIndex = true;
-				this.nextWriter.WriteStartElement(prefix,localName,ns);
+
+            if (IsIndex(localName))
+            {
+                this.isIndex = true;
+                this.nextWriter.WriteStartElement(prefix, localName, ns);
                 if (IsAlphabetical(localName))
                 {
                     this.numberOfParagraphs++;
-                    //we increse context only if there are no paragraphs between beginning of section and beginning of alphabetical index
+                    //we increase context only if there are no paragraphs between beginning of section and beginning of alphabetical index
                     if (!(this.sectionParagraphs > 0))
                     {
                         this.context++;
                     }
                 }
-			}
-			else
-			{
-				//If isIndex variable is true, than we are in index and we increase numberOfParagraphs variable
-				if(this.isIndex)
-				{
-					if(IsParagraph(localName))
-					{
-						this.numberOfParagraphs++;
-					}
-					this.context++;
-					this.nextWriter.WriteStartElement(prefix,localName,ns);
-				}
-				else
-				{
-					//don't process paragraphs which should be in index, but they are not after conversion
-					if(this.numberOfParagraphs > 0)
-					{
-						Element element = new Element(prefix,localName,ns);
-						this.context2.Push(element);
-					}
-					else
-					{
-			    		this.nextWriter.WriteStartElement(prefix,localName,ns);
-					}
-				
-				}
-			}
+            }
+            else
+            {
+                //If isIndex variable is true, then we are in index and we increase numberOfParagraphs variable
+                if (this.isIndex)
+                {
+                    if (IsParagraph(localName))
+                    {
+                        this.numberOfParagraphs++;
+                    }
+                    this.context++;
+                    this.nextWriter.WriteStartElement(prefix, localName, ns);
+                }
+                else
+                {
+                    //don't process paragraphs which should be in index, but they are not after conversion
+                    if (this.numberOfParagraphs > 0)
+                    {
+                        this.context2.Push(new Element(prefix, localName, ns));
+                    }
+                    else
+                    {
+                        this.nextWriter.WriteStartElement(prefix, localName, ns);
+                    }
+                }
+            }
         }
-		public override void WriteStartAttribute(string prefix, string localName, string ns)
+        public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
-			//don't process paragraphs which should be in index, but they are not after conversion
-			if(this.numberOfParagraphs > 0 && !(this.isIndex))
-			{
-				
-			}
-			else
-			{
-				this.nextWriter.WriteStartAttribute(prefix,localName,ns);
-			}
+            //don't process paragraphs which should be in index, but they are not after conversion
+            if (this.numberOfParagraphs > 0 && !(this.isIndex))
+            {
+
+            }
+            else
+            {
+                this.nextWriter.WriteStartAttribute(prefix, localName, ns);
+            }
         }
         public override void WriteString(string text)
         {
-        	//don't process paragraphs which should be in index, but they are not after conversion
-			if(this.numberOfParagraphs > 0 && !(this.isIndex))
-        	{
-				
-			}
-			else
-			{
-				this.nextWriter.WriteString(text);
-			}
+            //don't process paragraphs which should be in index, but they are not after conversion
+            if (this.numberOfParagraphs > 0 && !(this.isIndex))
+            {
+
+            }
+            else
+            {
+                this.nextWriter.WriteString(text);
+            }
         }
         public override void WriteEndAttribute()
         {
-			//don't process paragraphs which should be in index, but they are not after conversion
-			if(this.numberOfParagraphs > 0 && !(this.isIndex))
-        	{
-				
-			}
-			else
-			{
-				this.nextWriter.WriteEndAttribute();
-			}
+            //don't process paragraphs which should be in index, but they are not after conversion
+            if (this.numberOfParagraphs > 0 && !(this.isIndex))
+            {
+
+            }
+            else
+            {
+                this.nextWriter.WriteEndAttribute();
+            }
         }
-		public override void WriteEndElement()
+        public override void WriteEndElement()
         {
             //we decrease this.sectionContext field when we end an element in section
             if (this.sectionContext > 0)
@@ -159,72 +162,58 @@ namespace OdfConverter.Wordprocessing
             {
                 this.sectionParagraphs = 0;
             }
-        	if(this.context > 0)
-        	{
-				this.context--;
-        		this.nextWriter.WriteEndElement();
-        	}
-			else
-			{
-				if(this.isIndex)
-				{
-        			this.isIndex = false;
-        			this.nextWriter.WriteEndElement();
-        			this.numberOfParagraphs--;
-				}
-				else
-				{
-					//we decrease numberOfParagraphs variable when we are processing unnecessary paragraphs
-					if (this.numberOfParagraphs > 0 && this.context2.Count > 0)
-					{
-						Element element = (Element) this.context2.Peek();
-						if (IsParagraph(element.Name)) {
-							this.numberOfParagraphs--;
-						}
-						this.context2.Pop();
-					}
-					else
-					{
-        				this.nextWriter.WriteEndElement();
-        			}
-				}
-        	}
+            if (this.context > 0)
+            {
+                this.context--;
+                this.nextWriter.WriteEndElement();
+            }
+            else
+            {
+                if (this.isIndex)
+                {
+                    this.isIndex = false;
+                    this.nextWriter.WriteEndElement();
+                    this.numberOfParagraphs--;
+                }
+                else
+                {
+                    //we decrease numberOfParagraphs variable when we are processing unnecessary paragraphs
+                    if (this.numberOfParagraphs > 0 && this.context2.Count > 0)
+                    {
+                        Element element = this.context2.Pop();
+                        if (IsParagraph(element.Name))
+                        {
+                            this.numberOfParagraphs--;
+                        }
+                    }
+                    else
+                    {
+                        this.nextWriter.WriteEndElement();
+                    }
+                }
+            }
         }
-		//method to check if element starts some kind of index(TOC or bibliography)
-		public bool IsIndex(string elementName)
-		{
-			if(elementName.Equals("table-of-content") || elementName.Equals("bibliography") || elementName.Equals("table-index") || elementName.Equals("alphabetical-index"))
-			{
-				return true;
-			}
-			return false;
-		}
-		
-		public bool IsAlphabetical(string elementName)
-		{
-			if(elementName.Equals("alphabetical-index"))
-			   {
-			   	return true;
-			   }
-			   return false;
-		}
-		//method to check if element is paragraph
-		public bool IsParagraph(string elementName)
-		{
-        	if(elementName.Equals("p"))
-        	{
-        	   	return true;
-        	}
-        	return false;
+        
+        //method to check if element starts some kind of index(TOC or bibliography)
+        public bool IsIndex(string elementName)
+        {
+            return (elementName.Equals("table-of-content") || elementName.Equals("bibliography") || elementName.Equals("table-index") || elementName.Equals("alphabetical-index"));
         }
+
+        public bool IsAlphabetical(string elementName)
+        {
+            return (elementName.Equals("alphabetical-index"));
+        }
+
+        public bool IsParagraph(string elementName)
+        {
+            return (elementName.Equals("p"));
+        }
+
         public bool IsSection(string elementName)
         {
-            if (elementName.Equals("section"))
-            {
-                return true;
-            }
-            return false;
-        } 	
-	}
+            return (elementName.Equals("section"));
+        }
+    }
 }
 

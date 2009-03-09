@@ -67,7 +67,9 @@ namespace OdfConverter.Wordprocessing
             bool isInRel = false;
             bool extractRels = ns.Equals(RELATIONSHIP_NS);
             bool fieldBegin = false;
+            bool isInIndex = false;
             List<RelationShip> rels = new List<RelationShip>();
+            Stack<string> context = new Stack<string>();
 
             XmlDocument xmlDocument = new XmlDocument();
             XmlNode bookmarkNode = null;
@@ -114,6 +116,7 @@ namespace OdfConverter.Wordprocessing
                         }
                         else if (!xtr.LocalName.Equals("proofErr"))
                         {
+                            context.Push(xtr.Name);
                             xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
 
                             if (xtr.HasAttributes)
@@ -160,12 +163,15 @@ namespace OdfConverter.Wordprocessing
                                             {
                                                 fieldBegin = false;
                                                 _insideField--;
+                                                if (_insideField == 0)
+                                                {
+                                                    isInIndex = false;
+                                                }
                                             }
                                             break;
                                         case "fldLock":
                                             _fieldLocked = (xtr.Value.Equals("on") || xtr.Value.Equals("true") || xtr.Value.Equals("1")) ? 1 : 0;
                                             break;
-
                                     }
                                 }
                                 xtr.MoveToElement();
@@ -200,6 +206,11 @@ namespace OdfConverter.Wordprocessing
                                     if (_insideField > 0)
                                     {
                                         fieldBegin = true;
+                                    }
+
+                                    if (isInIndex)
+                                    {
+                                        xtw.WriteAttributeString(NS_PREFIX, "index", PACKAGE_NS, "1");
                                     }
 
                                     break;
@@ -269,6 +280,7 @@ namespace OdfConverter.Wordprocessing
                             if (xtr.IsEmptyElement)
                             {
                                 xtw.WriteEndElement();
+                                context.Pop();
                             }
                         }
                         break;
@@ -280,6 +292,11 @@ namespace OdfConverter.Wordprocessing
                         if (!xtr.LocalName.Equals("proofErr"))
                         {
                             xtw.WriteEndElement();
+                            context.Pop();
+                        }
+                        if (_insideField == 0)
+                        {
+                            isInIndex = false;
                         }
                         break;
                     case XmlNodeType.EntityReference:
@@ -292,6 +309,13 @@ namespace OdfConverter.Wordprocessing
                         xtw.WriteWhitespace(xtr.Value);
                         break;
                     case XmlNodeType.Text:
+                        if (context.Count > 0 && context.Peek().Equals("w:instrText"))
+                        {
+                            if (xtr.Value.ToUpper().Contains("TOC") || xtr.Value.ToUpper().Contains("BIBLIOGRAPHY") || xtr.Value.ToUpper().Contains("INDEX"))
+                            {
+                                isInIndex = true;
+                            }
+                        }
                         xtw.WriteString(xtr.Value);
                         break;
                     case XmlNodeType.Whitespace:

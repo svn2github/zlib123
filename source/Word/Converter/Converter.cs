@@ -107,7 +107,7 @@ namespace OdfConverter.Wordprocessing
                 string fullname = Assembly.GetExecutingAssembly().FullName;
                 return new string[]  {
                     "OdfConverter.Wordprocessing.OdfParagraphPostProcessor,"+fullname,
-                    "OdfConverter.Wordprocessing.OdfCheckIfIndexPostProcessor,"+fullname,
+                    //"OdfConverter.Wordprocessing.OdfCheckIfIndexPostProcessor,"+fullname,
                     "CleverAge.OdfConverter.OdfConverterLib.OdfCharactersPostProcessor",
                     "OdfConverter.Wordprocessing.OdfIndexSourceStylesPostProcessor,"+fullname
                 };

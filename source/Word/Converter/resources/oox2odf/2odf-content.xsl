@@ -443,6 +443,9 @@
       <xsl:when test="w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText, 'INDEX' )]">
         <xsl:apply-templates select="." mode="tocstart" />
       </xsl:when>
+      <xsl:when test="@oox:index">
+        <!-- Ignore all paragraphs inside an index. The translation of such paragraphs is triggered by the first paragraph in the index -->
+      </xsl:when>
 
       <!-- ignore paragraph if it's deleted in change tracking mode-->
       <!--<xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />-->
