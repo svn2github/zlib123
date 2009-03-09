@@ -869,17 +869,19 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         {
             foreach (string target in _binaries.Keys)
             {
-                string source = _binaries[target];
-
-                Stream sourceStream = getStream(source);
-
-                // we also add empty streams to the target package
-                _zipOutputStream.AddEntry(target);
-                    
-                if (sourceStream != null && _zipOutputStream != null)
+                if (_zipOutputStream != null)
                 {
-                    int bytesCopied = streamCopy(sourceStream, _zipOutputStream);
-                    Debug.WriteLine("CopyBinary : " + source + " --> " + target + ", bytes copied = " + bytesCopied);
+                    // we also add empty streams to the target package
+                    _zipOutputStream.AddEntry(target);
+                    
+                    string source = _binaries[target];
+                    Stream sourceStream = getStream(source);
+                    
+                    if (sourceStream != null)
+                    {
+                        int bytesCopied = streamCopy(sourceStream, _zipOutputStream);
+                        Debug.WriteLine("CopyBinary : " + source + " --> " + target + ", bytes copied = " + bytesCopied);
+                    }
                 }
             }
         }

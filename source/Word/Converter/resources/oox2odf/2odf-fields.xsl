@@ -1554,6 +1554,8 @@
 
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumber">
+    <xsl:param name="fieldCode" />
+    
     <xsl:variable name="docName">
       <xsl:call-template name="GetDocumentName" />
     </xsl:variable>
@@ -1597,8 +1599,6 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <xsl:variable name="WInstr" select="./@w:instr" />
-
     <text:page-number>
 
       <xsl:variable name="rId" select="concat('',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Target=$docName]/@Id)" />
@@ -1635,11 +1635,11 @@
       </xsl:variable>
       <xsl:attribute name="style:num-format">
         <xsl:choose>
-          <xsl:when test="contains($WInstr, 'Arabic')">1</xsl:when>
-          <xsl:when test="contains($WInstr, 'alphabetic')">a</xsl:when>
-          <xsl:when test="contains($WInstr, 'ALPHABETIC')">A</xsl:when>
-          <xsl:when test="contains($WInstr, 'roman')">i</xsl:when>
-          <xsl:when test="contains($WInstr, 'ROMAN')">I</xsl:when>
+          <xsl:when test="contains($fieldCode, 'Arabic')">1</xsl:when>
+          <xsl:when test="contains($fieldCode, 'alphabetic')">a</xsl:when>
+          <xsl:when test="contains($fieldCode, 'ALPHABETIC')">A</xsl:when>
+          <xsl:when test="contains($fieldCode, 'roman')">i</xsl:when>
+          <xsl:when test="contains($fieldCode, 'ROMAN')">I</xsl:when>
           <xsl:when test="$standardNumType">
             <xsl:value-of select="$standardNumType" />
           </xsl:when>
