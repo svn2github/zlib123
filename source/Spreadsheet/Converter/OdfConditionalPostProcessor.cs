@@ -360,9 +360,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     strOoxFormula = TranslateToOoxFormula(strOdfFormula.Substring(6));
                 }
-                //Added: By Vijayeta, 
-                //Date:  1/7/2009
-                //Desc: Crash Because of Formula, formula begins with 'msoxl:' on SP2
+                //Added: By Vijayeta,Pradeep
+                //Date:  1/7/2009, 3/5/2009
+                //Desc: Crash Because of Formula, formula begins with 'msoxl:' for the ODS files created by office SP2                
                 //File:  Quote.xlsx, Testfeatures M4 and M5 Datarange.ods,Testfeatures_Formula.ods,Text.ods
                 else if (strOdfFormula.StartsWith("msoxl:"))
                 {
@@ -370,9 +370,26 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     // Earlier code commented to accomodate SAP.DE.EN.xlsx
                     strOoxFormula = strOdfFormula.Substring(7);
                 }
+                // To translate ODF1.2 formula
+                else if (strOdfFormula.StartsWith("of:"))
+                {
+                    strOoxFormula = TranslateToOoxFormula(strOdfFormula.Substring(4));
+                }
+                // To translate formulas having any namespace 
+                // Above conditions are not deleted to avoid regression issues for complex formulas,
+                // can be deleted later if below condition works for all the namespaces
+                else if (strOdfFormula.IndexOf(":=") > 0)
+                {
+                    strOoxFormula = TranslateToOoxFormula(strOdfFormula.Substring(strOdfFormula.IndexOf(":=")+2));
+                }
+                // To translate formulas not having any name space
                 else
                 {
-                    strOoxFormula = strOdfFormula;
+                    if (strOdfFormula.StartsWith("="))
+                    {
+                        strOdfFormula = strOdfFormula.Substring(1);
+                    }
+                    strOoxFormula = TranslateToOoxFormula(strOdfFormula);
                 }
             }
             else

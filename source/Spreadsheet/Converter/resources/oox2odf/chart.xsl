@@ -1665,8 +1665,11 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 			<!--<table:table-cell office:value-type="float" office:value="1.#NAN">
             <text:p>1.#NAN</text:p>
           </table:table-cell>-->          
-          <table:table-cell>
+          <!--<table:table-cell>
             <text:p>1.#NAN</text:p>
+          </table:table-cell>-->
+			<table:table-cell>
+            <text:p></text:p>
           </table:table-cell>          
           <!--End of RefNo-1-->
         </xsl:otherwise>		  
@@ -1708,7 +1711,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 <!--Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN", fix for 2632796
               the type for 1.NaN is not specified, which solves both the defect and Conformance-->
 							<table:table-cell>
-								<text:p>1.#NAN</text:p>
+								<text:p></text:p>
 							</table:table-cell>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -1736,7 +1739,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <!--Start of RefNo-1:ODF1.1:Avoid office:value="1.#NAN", fix for 2632796
               the type for 1.NaN is not specified, which solves both the defect and Conformance-->
           <table:table-cell>
-            <text:p>1.#NAN</text:p>
+            <text:p></text:p>
           </table:table-cell>
           <!--End of RefNo-1-->
         </xsl:otherwise>
@@ -2204,6 +2207,8 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 						</xsl:for-each>
 					</xsl:when>
 					<xsl:when test="xdr:oneCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
+            <xsl:for-each select ="xdr:oneCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
+              <xsl:for-each select="parent::node()/parent::node()/parent::node()/parent::node()">
 						<xsl:choose>
 							<xsl:when test="number(xdr:ext/@cx)=0 and number(xdr:ext/@cy)=0">
 								<xsl:attribute name="svg:width">
@@ -2217,20 +2222,17 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 								<xsl:call-template name="InsertAbsoluteSize"/>
 							</xsl:when>
 						</xsl:choose>
+              </xsl:for-each>
+              </xsl:for-each>					
 					</xsl:when>
 					<xsl:when test="xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
 						<xsl:for-each select="xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart[@r:id=$chartRelId]">
 							<xsl:for-each select="parent::node()/parent::node()/parent::node()/parent::node()">
 								<xsl:call-template name="InsertAbsoluteSize"/>
 							</xsl:for-each>
-
 						</xsl:for-each>
-
-
-
 					</xsl:when>
 				</xsl:choose>
-
 			</xsl:for-each>
 
 			<!--end-->

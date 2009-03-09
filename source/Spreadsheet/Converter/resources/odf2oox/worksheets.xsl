@@ -910,6 +910,8 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
         <xsl:apply-templates select="descendant::table:table-column[1]" mode="sheet">
           <xsl:with-param name="colNumber">1</xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+					<xsl:with-param name="defaultFontSizeForDefColWid" select="$defaultFontSize1"/>
+					<xsl:with-param name="defaultFontStyleForDefColWid" select="$defaultFontStyle"/>
         </xsl:apply-templates>
       </cols>
     </xsl:if>

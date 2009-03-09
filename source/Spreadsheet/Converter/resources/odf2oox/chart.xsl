@@ -986,7 +986,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 <!-- excel will support maximum 4 series for stock charts -->
         <!-- Sonata:Defect #2016108-XLSX-charts- Data label only partially retained  -->
         <xsl:when test="$chartType = 'chart:stock' and key('series','')[@chart:class !=$chartType] ">
-          <xsl:value-of  select="'5'"/>
+          <!--changed by sonata for bug no:2218864-->
+          <!--<xsl:value-of  select="'5'"/>-->
+          <xsl:value-of  select="count(key('series','')[@chart:class != $chartType])"/>
         </xsl:when>
         <xsl:when test="$chartType = 'chart:stock' ">
           <xsl:value-of  select="'4'"/>
@@ -1209,7 +1211,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <!--added by sonata for bug no:2605183-->
         <xsl:if test="not(@chart:reverse-direction)">
           <xsl:if test="key('chart','')/@chart:class = 'chart:bar'">
+            <xsl:if test="key('style',(key('chart','')/chart:plot-area/@chart:style-name))/style:chart-properties/@chart:vertical = 'true'">
             <c:orientation val="maxMin"/>
+          </xsl:if>
+            
           </xsl:if>
         </xsl:if>
         <!--end-->
@@ -1251,7 +1256,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <xsl:choose>
             <xsl:when test="not(key('style',$chartstyle)/style:chart-properties/@chart:reverse-direction)">
               <xsl:if test="key('chart','')/@chart:class = 'chart:bar'">
+                <xsl:if test="key('style',(key('chart','')/chart:plot-area/@chart:style-name))/style:chart-properties/@chart:vertical = 'true'">
                 <xsl:text>true</xsl:text>
+              </xsl:if>
               </xsl:if>
             </xsl:when>
             <xsl:otherwise>
@@ -2874,10 +2881,12 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                           <xsl:when test="@draw:stroke = 'solid' or @draw:stroke = 'dash' or @svg:stroke-color!='' ">
                             <a:solidFill>
                               <a:srgbClr>
+                                <xsl:attribute name="val">
                                 <!--changed by sonata for bug no:2605215-->
                                 <!--<xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>-->
                                 <xsl:value-of select="substring-after(@draw:fill-color, '#')"/>
                                 <!--end-->
+                                </xsl:attribute>
 
                                 <xsl:if test="@svg:stroke-opacity">
                                   <a:alpha>

@@ -62,6 +62,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
   <xsl:template match="table:table-column" mode="sheet">
     <xsl:param name="colNumber"/>
     <xsl:param name="defaultFontSize"/>
+	  <xsl:param name="defaultFontSizeForDefColWid"/>
+	  <xsl:param name="defaultFontStyleForDefColWid"/>
 
     <!-- tableId required for CheckIfColumnStyle template -->
     <xsl:variable name="tableId">
@@ -103,23 +105,29 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
         <xsl:attribute name="max">
           <xsl:value-of select="$max"/>
         </xsl:attribute>
-
         <!-- insert column width -->
-        <xsl:if
-          test="key('style',@table:style-name)/style:table-column-properties/@style:column-width">
+		  <!--Changes By: Vijayeta
+		      Code Change :Checking for condition if attr 'style:column-width' is present or not, if not, set 'width' as default column width
+			  Desc        :On conversion of KSpread.ods, xlsx file loses some columns as the ODS file does not have attriute 'style:column-width', to set the custom width
+			               Hence, if custom width not present in 'table:column' set 'width' to default width-->		 
           <xsl:attribute name="width">
+			  <xsl:choose>
+				  <xsl:when
+					test="key('style',@table:style-name)/style:table-column-properties/@style:column-width">
             <xsl:call-template name="ConvertToCharacters">
               <xsl:with-param name="width">
                 <xsl:value-of
-                  select="key('style',@table:style-name)/style:table-column-properties/@style:column-width"
-                />
+								select="key('style',@table:style-name)/style:table-column-properties/@style:column-width"/>
               </xsl:with-param>
               <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
             </xsl:call-template>
+				  </xsl:when>
+				  <xsl:otherwise>
+					  <xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyleForDefColWid,'|',$defaultFontSizeForDefColWid)"/>					 
+				  </xsl:otherwise>
+				  </xsl:choose>
           </xsl:attribute>
           <xsl:attribute name="customWidth">1</xsl:attribute>
-        </xsl:if>
-
         <!-- get parent table:table-row id-->
         <xsl:variable name="columnId">
           <xsl:value-of select="generate-id(.)"/>
@@ -192,7 +200,6 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
     <xsl:choose>
       <!-- next column is sibling of this one -->
 			<!--Vijayeta,SP2,@table:number-columns-repeated-->
-
 			<!--<xsl:when test="following::table:table-column[generate-id(ancestor::table:table) = $tableId]">
         <xsl:apply-templates
           select="following::table:table-column[generate-id(ancestor::table:table) = $tableId][1]"
@@ -232,6 +239,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
             </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+			<xsl:with-param name="defaultFontSizeForDefColWid" select="$defaultFontSizeForDefColWid"/>
+			<xsl:with-param name="defaultFontStyleForDefColWid" select="$defaultFontStyleForDefColWid"/>
         </xsl:apply-templates>
       </xsl:when>
 
@@ -272,6 +281,8 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
 					<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
 
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+			<xsl:with-param name="defaultFontSizeForDefColWid" select="$defaultFontSizeForDefColWid"/>
+			<xsl:with-param name="defaultFontStyleForDefColWid" select="$defaultFontStyleForDefColWid"/>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
