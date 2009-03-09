@@ -1142,7 +1142,10 @@
 
           <!-- 20080715/divo: performance improvement by using xsl:key -->
           <!--xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr"-->
-          <xsl:if test="key('p', number(ancestor-or-self::node()/@oox:id) - 1)/w:pPr/w:sectPr">
+          <!-- 20090309/divo: Fix for #2656993. The preceding paragraph might not be a top-level element, it might also be contained in a shape/textbox/table, 
+               hence we also check the ancestors of that paragraph -->
+          <!--<xsl:if test="key('p', number(ancestor-or-self::node()/@oox:id) - 1)/w:pPr/w:sectPr">-->
+          <xsl:if test="key('p', number(ancestor-or-self::node()/@oox:id) - 1)/ancestor-or-self::node()/w:pPr/w:sectPr">
             <xsl:choose>
               <xsl:when test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
                 <xsl:attribute name="style:master-page-name">
