@@ -60,16 +60,20 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							</xsl:variable>
 							<!-- Added by lohith.ar - Code for text Hyperlinks -->
 							<xsl:if test="node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd) ">
-								<text:a>
+                <!--added by chhavi for conformance-->
+                <xsl:if test="node()/a:hlinkClick/@r:id != ''">
+							
 									<xsl:call-template name="AddTextHyperlinks">
 										<xsl:with-param name="nodeAColonR" select="node()" />
 										<xsl:with-param name="slideRelationId" select="$slideRelationId" />
 										<xsl:with-param name="slideId" select="$slideId" />
+                    <xsl:with-param name="nodeTextSpan" select="$nodeTextSpan" />
 									</xsl:call-template>
-									<xsl:copy-of select="$nodeTextSpan"/>
-								</text:a>
+								
 							</xsl:if>
-							<xsl:if test="not(node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd))">
+							</xsl:if>
+              <!--added by chhavi for conformance-->
+							<xsl:if test="not(node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd))or node()/a:hlinkClick/@r:id = ''">
 								<xsl:copy-of select="$nodeTextSpan"/>
 							</xsl:if>
 						</text:span>
@@ -2932,6 +2936,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 		</xsl:if >
 		<!-- start at value-->
 		<xsl:attribute name ="text:start-value">
+     
 			<xsl:value-of select ="$startAt"/>
 		</xsl:attribute>
 	</xsl:template>

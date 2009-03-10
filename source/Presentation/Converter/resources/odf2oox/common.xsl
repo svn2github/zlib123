@@ -1288,6 +1288,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="FileName" select="concat('bitmap',$var_pos)" />
             <xsl:with-param name="var_imageName" select="style:graphic-properties/@draw:fill-image-name" />
             <xsl:with-param  name="opacity" select="substring-before(style:graphic-properties/@draw:opacity,'%')"/>
+            <xsl:with-param  name="stretch" select="style:graphic-properties/@style:repeat"/>
         </xsl:call-template>
         </xsl:when>
           <xsl:when test ="not(style:graphic-properties/@draw:fill) and $parentStyle!=''">
@@ -1311,6 +1312,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="var_imageName"/>
     <xsl:param name="FileName"/>
     <xsl:param name="opacity"/>
+    <xsl:param name="stretch"/>
    
     <xsl:if test="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$var_imageName]">
       <a:blipFill dpi="0" rotWithShape="1">
@@ -1321,11 +1323,19 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="opacity" select="$opacity" />
         </xsl:call-template>
         
-        <xsl:if test="@style:repeat='stretch'">
+        <xsl:choose>
+          <xsl:when test="$stretch='stretch'">
           <a:stretch>
             <a:fillRect />
           </a:stretch>
-        </xsl:if>
+          </xsl:when>
+          <xsl:when test="@style:repeat='stretch'">
+          <a:stretch>
+            <a:fillRect />
+          </a:stretch>
+          </xsl:when>
+        </xsl:choose>
+       
         <xsl:if test="@draw:fill-image-ref-point-x or @draw:fill-image-ref-point-y">
           <a:tile tx="0" ty="0" flip="none">
             <xsl:if test="@draw:fill-image-ref-point-x">
@@ -3727,105 +3737,13 @@ Copyright (c) 2007, Sonata Software Limited
                       </Relationship>
                       <!--added by chhavi for picture hyperlink relationship-->
                       <xsl:if test="./following-sibling::node()[name() = 'office:event-listeners']">
-                        <xsl:for-each select ="./parent::node()/office:event-listeners/presentation:event-listener">
-                          <xsl:if test="@xlink:href !=''">
-                            <xsl:choose>
-                              <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
-                                <xsl:variable name="pageID">
-                                  <xsl:call-template name="getThePageId">
-                                    <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
-                                  </xsl:call-template>
-                                </xsl:variable>
-                                <xsl:if test="$pageID > 0">
-                                  <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships" >
-                                    <xsl:attribute name="Id">
-                                      <xsl:value-of select="concat('picture',generate-id())"/>
-                                    </xsl:attribute>
-                                    <xsl:attribute name="Type">
-                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
-                                    </xsl:attribute>
-                                    <xsl:attribute name="Target">
-                                      <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
-                                    </xsl:attribute>
-                                  </Relationship>
-                                </xsl:if>
-                              </xsl:when>
-                              <xsl:when test="@xlink:href !=''">
-                                <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships" >
-                                  <xsl:attribute name="Id">
-                                    <xsl:value-of select="concat('picture',generate-id())"/>
-                                  </xsl:attribute>
-                                  <xsl:attribute name="Type">
-                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
-                                  </xsl:attribute>
-                                  <xsl:attribute name="Target">
-                                    <xsl:choose>
-                                      <xsl:when test="@xlink:href[ contains(.,'./')]">
-                                        <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
-                                          <xsl:value-of select="/"/>
-                                        </xsl:if>
-                                        <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
-                                          <!--links Absolute Path-->
-                                          <xsl:variable name ="xlinkPath" >
-                                            <xsl:value-of select ="@xlink:href"/>
-                                          </xsl:variable>
-                                          <xsl:value-of select ="concat('hyperlink-path:',$xlinkPath)"/>
-                                        </xsl:if>
-                                      </xsl:when>
-                                      <xsl:when test="@xlink:href[ contains(.,'http')] or @xlink:href[ contains(.,'mailto:')]">
-                                        <xsl:value-of select="@xlink:href"/>
-                                      </xsl:when>
-                                      <xsl:when test="not(@xlink:href[ contains(.,'./')]) and not(@xlink:href[ contains(.,'http')])
-                                                       and  not(@xlink:href[ contains(.,'mailto:')]) ">
-                                        <xsl:value-of select="concat('file://',@xlink:href)"/>
-                                      </xsl:when>
-                                    </xsl:choose>
-                                  </xsl:attribute>
-                                  <xsl:attribute name="TargetMode">
-                                    <xsl:value-of select="'External'"/>
-                                  </xsl:attribute>
-                                </Relationship>
-                              </xsl:when>
-                            </xsl:choose>
-                          </xsl:if>
-                          <xsl:if test="presentation:sound">
-                            <xsl:variable name="varblnDuplicateRelation">
-                              <xsl:call-template name="GetUniqueRelationIdForWavFile">
-                                <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
-                                <xsl:with-param name="ShapePosition" select="generate-id()" />
-                                <xsl:with-param name="ShapeType" select="'FRAME'" />
-                                <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                        <xsl:for-each select ="./parent::node()">
+                          <xsl:call-template name="tmpOfficeListnerRelationship">
+                            <xsl:with-param name="ShapeType" select="'picture'"/>
+                            <xsl:with-param name="PostionCount" select="generate-id()"/>
+                            <xsl:with-param name="Type" select="'FRAME'"/>
                               </xsl:call-template>
-                            </xsl:variable>
-                            <xsl:if test="$varblnDuplicateRelation != 1">
-                              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships" >
-                                <xsl:variable name="varMediaFilePath">
-                                  <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
-                                    <xsl:value-of select="presentation:sound/@xlink:href" />
-                                  </xsl:if>
-                                  <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
-                                    <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
-                                  </xsl:if>
-                                </xsl:variable>
-                                <xsl:variable name="varFileRelId">
-                                  <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
-                                </xsl:variable>
-                                <xsl:attribute name="Id">
-                                  <xsl:value-of select="$varFileRelId"/>
-                                </xsl:attribute>
-                                <!--<xsl:attribute name="Id">
-                                       <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
-                                         </xsl:attribute>-->
-                                <xsl:attribute name="Type">
-                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
-                                </xsl:attribute>
-                                <xsl:attribute name="Target">
-                                  <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
-                                </xsl:attribute>
-                              </Relationship>
-                            </xsl:if>
-                          </xsl:if>
-                        </xsl:for-each>
+                                    </xsl:for-each>
                       </xsl:if>
                       <!--end here-->
                     </xsl:if>
@@ -4047,6 +3965,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="listId" />
     <xsl:param name ="grpFlag" />
     <xsl:param name ="UniqueId" />
+    <xsl:param name ="listItemCount" />
+    
     <xsl:variable name="forCount" select="position()" />
     <xsl:for-each select ="child::node()[position()]">
       <xsl:choose >
@@ -4068,37 +3988,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="lvl" select ="$blvl"/>
             </xsl:call-template>
           </xsl:variable>
-          <!--<xsl:variable name ="isNumberingEnabled">
-            <xsl:if test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
-              <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
-            </xsl:if>
-            <xsl:if test ="not(document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering)">
-              <xsl:variable name ="styleNameFromStyles" >
-                <xsl:choose >
-                  <xsl:when test ="$prClsName='subtitle' or $prClsName='title'">
-                    <xsl:value-of select ="concat($prClsName,'-',$masterPageName)"/>
-                  </xsl:when>
-                  <xsl:when test ="$prClsName='outline'">
-                    <xsl:value-of select ="concat($masterPageName,'-outline',$lvl+1)"/>
-                  </xsl:when>
-                  <xsl:otherwise >
-                    <xsl:value-of select ="concat($prClsName,'-',$masterPageName)"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:variable>
-              <xsl:if test ="document('styles.xml')//office:styles/style:style[@style:name=$styleNameFromStyles]/style:paragraph-properties/@text:enable-numbering">
-                <xsl:value-of select ="document('styles.xml')//office:styles/style:style[@style:name=$styleNameFromStyles]/style:paragraph-properties/@text:enable-numbering"/>
-              </xsl:if>
-              <xsl:if test ="not(document('styles.xml')//office:styles/style:style[@style:name=$styleNameFromStyles]/style:paragraph-properties/@text:enable-numbering)">
-                <xsl:value-of select ="'true'"/>
-              </xsl:if>
-            </xsl:if>
-          </xsl:variable>-->
-          <!--<xsl:variable name="paragraphId" >
-            <xsl:call-template name ="getParaStyleName">
-              <xsl:with-param name ="lvl" select ="$blvl"/>
-            </xsl:call-template>
-          </xsl:variable> -->
+       
           <xsl:variable name ="isNumberingEnabled">
             <xsl:choose >
               <xsl:when test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
@@ -4110,60 +4000,12 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:choose>
           </xsl:variable>
           <xsl:if test="string-length($xhrefValue) > 0">
-            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-              <xsl:attribute name="Id">
-                <xsl:value-of select="concat($shapeId,'BLVL',$blvl,'Link',$forCount)"/>
-              </xsl:attribute>
-              <xsl:choose>
-                <xsl:when test="contains($xhrefValue,'#Slide')">
-                  <xsl:attribute name="Type">
-                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name="Target">
-                    <xsl:value-of select="concat('slide',substring-after($xhrefValue,'Slide '),'.xml')"/>
-                  </xsl:attribute>
-                </xsl:when>
-                <xsl:when test="contains($xhrefValue,'http://') or contains($xhrefValue,'mailto:')">
-                  <xsl:attribute name="Type">
-                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name="Target">
-                    <xsl:value-of select="$xhrefValue"/>
-                  </xsl:attribute>
-                  <xsl:attribute name="TargetMode">
-                    <xsl:value-of select="'External'"/>
-                  </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:if test="contains($xhrefValue,':')">
-                    <xsl:attribute name="Type">
-                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="Target">
-                      <xsl:value-of select="concat('file:///',translate(substring-after($xhrefValue,'/'),'/','\'))"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="TargetMode">
-                      <xsl:value-of select="'External'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test="not(contains ($xhrefValue,':'))">
-                    <xsl:attribute name="Type">
-                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="Target">
-                      <!--links Absolute Path-->
-                      <xsl:variable name ="xlinkPath" >
-                        <xsl:value-of select ="$xhrefValue"/>
-                      </xsl:variable>
-                      <xsl:value-of select ="concat('hyperlink-path:',$xlinkPath)"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="TargetMode">
-                      <xsl:value-of select="'External'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:otherwise>
-              </xsl:choose>
-            </Relationship>
+            <xsl:call-template name="tmpShapeBulletOfficeListnerRel">
+              <xsl:with-param name="shapeId" select="$shapeId"/>
+              <xsl:with-param name="blvl" select="$blvl"/>
+              <xsl:with-param name="xhrefValue" select="$xhrefValue"/>
+              <xsl:with-param name="listItemCount" select="$listItemCount"/>
+            </xsl:call-template>
           </xsl:if>
           <xsl:for-each select ="document('content.xml')//text:list-style[@style:name=$listId]">
             <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1] and $isNumberingEnabled='true' and text:list-level-style-image[@text:level=$blvl+1]/@xlink:href">
@@ -5179,12 +5021,21 @@ Copyright (c) 2007, Sonata Software Limited
                        or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'No Smoking'))	">
         <xsl:value-of select ="'noSmoking '"/>
       </xsl:when>     
-		<xsl:when test ="(draw:enhanced-geometry/@draw:type='block-arc')">
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='block-arc')
+                     or (draw:enhanced-geometry/@draw:type='non-primitive' 
+                          and (draw:enhanced-geometry/@draw:enhanced-path = 'M ?f55 ?f56 A ?f170 ?f171 ?f172 ?f173 ?f55 ?f56 ?f167 ?f169 W ?f174 ?f175 ?f176 ?f177 ?f55 ?f56 ?f167 ?f169 L ?f80 ?f81 A ?f208 ?f209 ?f210 ?f211 ?f80 ?f81 ?f205 ?f207 W ?f212 ?f213 ?f214 ?f215 ?f80 ?f81 ?f205 ?f207 Z N' 
+                               or  draw:enhanced-geometry/@draw:enhanced-path =  'M ?f55 ?f56 A ?f170 ?f171 ?f172 ?f173 ?f55 ?f56 ?f167 ?f169  W ?f174 ?f175 ?f176 ?f177 ?f55 ?f56 ?f167 ?f169 L ?f80 ?f81 A ?f208 ?f209 ?f210 ?f211 ?f80 ?f81 ?f205 ?f207  W ?f212 ?f213 ?f214 ?f215 ?f80 ?f81 ?f205 ?f207 Z N'))	">
 			<xsl:value-of select ="'Block Arc '"/>
 		</xsl:when>		
 		<!-- Pentagon -->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='pentagon-right'
                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f34 ?f38 L ?f11 ?f4 ?f37 ?f38 ?f36 ?f39 ?f35 ?f39 Z N')	">
+                                                                                                                             
+        <xsl:value-of select ="'Pentagon '"/>
+		</xsl:when>
+      <!-- homePlate -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f2 L ?f11 ?f2 ?f1 ?f6 ?f11 ?f3 ?f0 ?f3 Z N'	">
+
 			<xsl:value-of select ="'Pentagon '"/>
 		</xsl:when>
 		<!-- Chevron -->
@@ -5328,7 +5179,8 @@ Copyright (c) 2007, Sonata Software Limited
 	  </xsl:when>
       <!-- Cloud Callout (Added by A.Mathi as on 23/07/2007) -->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='cloud-callout'
-                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 1930 7160 C 1530 4490 3400 1970 5270 1970 5860 1950 6470 2210 6970 2600 7450 1390 8340 650 9340 650 10004 690 10710 1050 11210 1700 11570 630 12330 0 13150 0 13840 0 14470 460 14870 1160 15330 440 16020 0 16740 0 17910 0 18900 1130 19110 2710 20240 3150 21060 4580 21060 6220 21060 6720 21000 7200 20830 7660 21310 8460 21600 9450 21600 10460 21600 12750 20310 14680 18650 15010 18650 17200 17370 18920 15770 18920 15220 18920 14700 18710 14240 18310 13820 20240 12490 21600 11000 21600 9890 21600 8840 20790 8210 19510 7620 20000 7930 20290 6240 20290 4850 20290 3570 19280 2900 17640 1300 17600 480 16300 480 14660 480 13900 690 13210 1070 12640 380 12160 0 11210 0 10120 0 8590 840 7330 1930 7160 Z N M 1930 7160 C 1950 7410 2040 7690 2090 7920 F N M 6970 2600 C 7200 2790 7480 3050 7670 3310 F N M 11210 1700 C 11130 1910 11080 2160 11030 2400 F N M 14870 1160 C 14720 1400 14640 1720 14540 2010 F N M 19110 2710 C 19130 2890 19230 3290 19190 3380 F N M 20830 7660 C 20660 8170 20430 8620 20110 8990 F N M 18660 15010 C 18740 14200 18280 12200 17000 11450 F N M 14240 18310 C 14320 17980 14350 17680 14370 17360 F N M 8220 19510 C 8060 19250 7960 18950 7860 18640 F N M 2900 17640 C 3090 17600 3280 17540 3460 17450 F N M 1070 12640 C 1400 12900 1780 13130 2330 13040 F N U ?f17 ?f18 1800 1800 0 23592960 Z N U ?f19 ?f20 1200 1200 0 23592960 Z N U ?f13 ?f14 700 700 0 23592960 Z N')">
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' 
+                            and draw:enhanced-geometry/@draw:enhanced-path = 'M 1930 7160 C 1530 4490 3400 1970 5270 1970 5860 1950 6470 2210 6970 2600 7450 1390 8340 650 9340 650 10004 690 10710 1050 11210 1700 11570 630 12330 0 13150 0 13840 0 14470 460 14870 1160 15330 440 16020 0 16740 0 17910 0 18900 1130 19110 2710 20240 3150 21060 4580 21060 6220 21060 6720 21000 7200 20830 7660 21310 8460 21600 9450 21600 10460 21600 12750 20310 14680 18650 15010 18650 17200 17370 18920 15770 18920 15220 18920 14700 18710 14240 18310 13820 20240 12490 21600 11000 21600 9890 21600 8840 20790 8210 19510 7620 20000 7930 20290 6240 20290 4850 20290 3570 19280 2900 17640 1300 17600 480 16300 480 14660 480 13900 690 13210 1070 12640 380 12160 0 11210 0 10120 0 8590 840 7330 1930 7160 Z N M 1930 7160 C 1950 7410 2040 7690 2090 7920 F N M 6970 2600 C 7200 2790 7480 3050 7670 3310 F N M 11210 1700 C 11130 1910 11080 2160 11030 2400 F N M 14870 1160 C 14720 1400 14640 1720 14540 2010 F N M 19110 2710 C 19130 2890 19230 3290 19190 3380 F N M 20830 7660 C 20660 8170 20430 8620 20110 8990 F N M 18660 15010 C 18740 14200 18280 12200 17000 11450 F N M 14240 18310 C 14320 17980 14350 17680 14370 17360 F N M 8220 19510 C 8060 19250 7960 18950 7860 18640 F N M 2900 17640 C 3090 17600 3280 17540 3460 17450 F N M 1070 12640 C 1400 12900 1780 13130 2330 13040 F N U ?f17 ?f18 1800 1800 0 23592960 Z N U ?f19 ?f20 1200 1200 0 23592960 Z N U ?f13 ?f14 700 700 0 23592960 Z N')">
         <xsl:value-of select ="'Cloud Callout '"/>
       </xsl:when>
 		<!-- Line Callout 1) -->
@@ -5696,6 +5548,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="FileName" select="concat('bitmap',$shapeCount)" />
           <xsl:with-param name="var_imageName" select="@draw:fill-image-name"/>
           <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+          <xsl:with-param  name="stretch" select="style:graphic-properties/@style:repeat"/>
               </xsl:call-template>
             </xsl:when>
       <xsl:when test="(@draw:fill='bitmap') and $grpFlag='true'">
@@ -5704,6 +5557,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="var_imageName" select="@draw:fill-image-name" />
           <xsl:with-param name ="UniqueId" select ="$UniqueId" />
           <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+          <xsl:with-param  name="stretch" select="style:graphic-properties/@style:repeat"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -5908,10 +5762,10 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:if test ="(draw:enhanced-geometry/@draw:type='rectangular-callout'
-		                or draw:enhanced-geometry/@draw:type='round-rectangular-callout'
-						or draw:enhanced-geometry/@draw:type='round-callout'
-						or draw:enhanced-geometry/@draw:type='cloud-callout')">
+    <xsl:if test ="($prst='rectangular-callout'
+		                or $prst='wedgeRectCallout'
+						or $prst='wedgeRoundRectCallout'
+						or $prst='cloudCallout')">
 			<a:prstGeom>
 				<xsl:attribute name="prst">
 					<xsl:value-of select="$prst"/>
@@ -6180,6 +6034,8 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name ="listId" select="$listId" />
           <xsl:with-param name ="grpFlag" select="$grpFlag" />
           <xsl:with-param name ="UniqueId" select="$UniqueId" />
+          <xsl:with-param name ="listItemCount" select="generate-id()" />
+          
         </xsl:call-template>
       </xsl:if>
     </xsl:for-each>

@@ -1957,7 +1957,11 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
       <xsl:if test="text:list-level-style-number">
         <!--<xsl:for-each select ="./child::node()[1]">-->
-        <xsl:if test ="text:list-level-style-number[@text:level =$level]">
+        <xsl:choose>
+          <xsl:when test="text:list-level-style-number[@text:level =$level][@style:num-format='']">
+            <a:buNone/>
+          </xsl:when>
+          <xsl:when test ="text:list-level-style-number[@text:level =$level]">
           <a:buAutoNum>
             <xsl:attribute name ="type">
               <xsl:call-template name="getNumFormat">
@@ -1980,7 +1984,8 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:attribute>
             </xsl:if>
           </a:buAutoNum>
-        </xsl:if>
+          </xsl:when>
+        </xsl:choose>
         <!--</xsl:for-each>-->
       </xsl:if>
       <!--<xsl:if test ="text:list-level-style-image[@text:level=$level] and text:list-level-style-image/@xlink:href">

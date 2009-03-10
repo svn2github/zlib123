@@ -984,14 +984,14 @@ exclude-result-prefixes="p a r xlink rels">
                                           </xsl:variable>
                                           <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                           <xsl:if test="node()/a:hlinkClick">
-                                            <text:a>
+                                            
                                               <xsl:call-template name="AddTextHyperlinks">
                                                 <xsl:with-param name="nodeAColonR" select="node()" />
                                                 <xsl:with-param name="slideRelationId" select="$slideRel" />
                                                 <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
+                                                <xsl:with-param name="nodeTextSpan" select="$nodeTextSpan" />
                                               </xsl:call-template>
-                                              <xsl:copy-of select="$nodeTextSpan"/>
-                                            </text:a>
+                                             
                                           </xsl:if>
                                           <xsl:if test="not(node()/a:hlinkClick)">
                                             <xsl:copy-of select="$nodeTextSpan"/>
@@ -1046,14 +1046,14 @@ exclude-result-prefixes="p a r xlink rels">
                                         </xsl:variable>
                                         <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                         <xsl:if test="node()/a:hlinkClick">
-                                          <text:a>
+                                         
                                             <xsl:call-template name="AddTextHyperlinks">
                                               <xsl:with-param name="nodeAColonR" select="node()" />
                                               <xsl:with-param name="slideRelationId" select="$slideRel" />
                                               <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
+                                              <xsl:with-param name="nodeTextSpan" select="$nodeTextSpan" />
                                             </xsl:call-template>
-                                            <xsl:copy-of select="$nodeTextSpan"/>
-                                          </text:a>
+                                          
                                         </xsl:if>
                                         <xsl:if test="not(node()/a:hlinkClick)">
                                           <xsl:copy-of select="$nodeTextSpan"/>
@@ -1148,14 +1148,15 @@ exclude-result-prefixes="p a r xlink rels">
                                     </xsl:variable>
                                     <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                     <xsl:if test="node()/a:hlinkClick">
-                                      <text:a>
+                                     
                                         <xsl:call-template name="AddTextHyperlinks">
                                           <xsl:with-param name="nodeAColonR" select="node()" />
                                           <xsl:with-param name="slideRelationId" select="$slideRel" />
                                           <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
+                                          <xsl:with-param name="nodeTextSpan" select="$nodeTextSpan" />
                                         </xsl:call-template>
-                                        <xsl:copy-of select="$nodeTextSpan"/>
-                                      </text:a>
+                                      
+                                     
                                     </xsl:if>
                                     <xsl:if test="not(node()/a:hlinkClick)">
                                       <xsl:copy-of select="$nodeTextSpan"/>
@@ -1177,8 +1178,7 @@ exclude-result-prefixes="p a r xlink rels">
                             </text:p>
                               </xsl:otherwise>
                             </xsl:choose>
-
-                          </xsl:if>
+                            </xsl:if>
                         </xsl:for-each>
                       </draw:text-box >
                     </xsl:variable>

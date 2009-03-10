@@ -1276,32 +1276,77 @@ exclude-result-prefixes="p a r xlink ">
     </xsl:choose>
 
     <xsl:choose>
-      <xsl:when test="./child::node()[name() = 'a:latin' or name() = 'a:ea' or name() = 'a:cs']">
-        <xsl:attribute name ="fo:font-family">
-          <xsl:choose>
-            <xsl:when test="./a:latin/@typeface">
-              <xsl:value-of select="./a:latin/@typeface"/>
-            </xsl:when>
-            <xsl:when test="./a:ea/@typeface">
-              <xsl:value-of select="./a:ea/@typeface"/>
-            </xsl:when>
-            <xsl:when test="./a:cs/@typeface">
-              <xsl:value-of select="./a:cs/@typeface"/>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:attribute>
-      </xsl:when>
       <xsl:when test="$varCurrentNode/child::node()[name() = 'a:latin' or name() = 'a:ea' or name() = 'a:cs']">
         <xsl:attribute name ="fo:font-family">
           <xsl:choose>
             <xsl:when test="$varCurrentNode/a:latin/@typeface">
-              <xsl:value-of select="$varCurrentNode/a:latin/@typeface"/>
+              <xsl:variable name="typeFaceVal" select="$varCurrentNode/a:latin/@typeface"/>
+              <!--added by yeswanth.s-->
+              <xsl:choose>
+                <xsl:when test="$typeFaceVal='+mn-lt'">
+                  <xsl:choose>
+                    <xsl:when test="$DefFontMinor!=''">
+                      <xsl:value-of  select ="$DefFontMinor"/>
             </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of  select ="$DefFont"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+            </xsl:when>
+                <xsl:when test="$typeFaceVal='+mj-lt'">
+                  <xsl:value-of  select ="$DefFont"/>
+            </xsl:when>
+                <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  <xsl:value-of select ="$typeFaceVal"/>
+            </xsl:when>
+          </xsl:choose>
+              <!--end-->              
+      </xsl:when>
             <xsl:when test="$varCurrentNode/a:ea/@typeface">
-              <xsl:value-of select="$varCurrentNode/a:ea/@typeface"/>
+              <xsl:variable name="typeFaceVal" select="$varCurrentNode/a:ea/@typeface"/>
+              <!--added by yeswanth.s-->
+          <xsl:choose>
+                <xsl:when test="$typeFaceVal='+mn-lt'">
+          <xsl:choose>
+                    <xsl:when test="$DefFontMinor!=''">
+                      <xsl:value-of  select ="$DefFontMinor"/>
+            </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of  select ="$DefFont"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:when test="$typeFaceVal='+mj-lt'">
+                  <xsl:value-of  select ="$DefFont"/>
+                </xsl:when>
+                <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  <xsl:value-of select ="$typeFaceVal"/>
+            </xsl:when>
+              </xsl:choose>
+              <!--end-->
             </xsl:when>
             <xsl:when test="$varCurrentNode/a:cs/@typeface">
-              <xsl:value-of select="$varCurrentNode/a:cs/@typeface"/>
+              <xsl:variable name="typeFaceVal" select="$varCurrentNode/a:cs/@typeface"/>
+              <!--added by yeswanth.s-->
+              <xsl:choose>
+                <xsl:when test="$typeFaceVal='+mn-lt'">
+                  <xsl:choose>
+                    <xsl:when test="$DefFontMinor!=''">
+                      <xsl:value-of  select ="$DefFontMinor"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of  select ="$DefFont"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:when test="$typeFaceVal='+mj-lt'">
+                  <xsl:value-of  select ="$DefFont"/>
+                </xsl:when>
+                <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  <xsl:value-of select ="$typeFaceVal"/>
+                </xsl:when>
+              </xsl:choose>
+              <!--end-->
             </xsl:when>
           </xsl:choose>
         </xsl:attribute>
@@ -2402,6 +2447,7 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:param name="nodeAColonR" />
     <xsl:param name="slideRelationId" />
     <xsl:param name="slideId" />
+    <xsl:param name="nodeTextSpan" />
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
     <!-- varible to get the slide number ( Eg: 1,2 etc )-->
     <xsl:variable name="slidePostion">
@@ -2414,16 +2460,22 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:if test="$nodeAColonR/a:hlinkClick/@action[contains(.,'slide')] and string-length($nodeAColonR/a:hlinkClick/@r:id) = 0 ">
       <xsl:choose>
         <xsl:when test="$nodeAColonR/a:hlinkClick/@action[ contains(.,'jump=previousslide')]">
+          <text:a>
           <xsl:if test="$slidePostion > 1">
             <xsl:attribute name="xlink:href">
               <xsl:value-of select="concat('#Slide ',($slidePostion - 1))"/>
             </xsl:attribute>
           </xsl:if>
           <xsl:if test="$slidePostion = 1">
+              <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('#Slide ',1)"/>
+              </xsl:attribute>
           </xsl:if>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
         <xsl:when test="$nodeAColonR/a:hlinkClick/@action[ contains(.,'jump=nextslide')]">
+          <text:a>
           <xsl:if test="$slidePostion = $slideCount">
             <xsl:attribute name="xlink:href">
               <xsl:value-of select="concat('#Slide ',$slidePostion)"/>
@@ -2434,17 +2486,28 @@ exclude-result-prefixes="p a r xlink ">
               <xsl:value-of select="concat('#Slide ',($slidePostion + 1))"/>
             </xsl:attribute>
           </xsl:if>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
         <xsl:when test="$nodeAColonR/a:hlinkClick/@action[ contains(.,'jump=firstslide')]">
+          <text:a>
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('#Slide ',1)"/>
           </xsl:attribute>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
         <xsl:when test="$nodeAColonR/a:hlinkClick/@action[ contains(.,'jump=lastslide')]">
+          <text:a>
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('#Slide ',$slideCount)"/>
           </xsl:attribute>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:copy-of select="$nodeTextSpan"/>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
     <xsl:if test="string-length($nodeAColonR/a:hlinkClick/@r:id) > 0">
@@ -2459,34 +2522,52 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="contains($Target,'mailto:') or contains($Target,'http:') or contains($Target,'https:')">
+          <text:a>
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="$Target"/>
           </xsl:attribute>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
         <xsl:when test="contains($Target,'slide')">
+          <text:a>
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('#Slide ',substring-before(substring-after($Target,'slide'),'.xml'))"/>
           </xsl:attribute>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
         <xsl:when test="contains($Target,'file:///')">
+          <text:a>
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('file:///',translate(substring-after($Target,'file:///'),'\','/'))"/>
           </xsl:attribute>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
         <xsl:when test="contains($type,'hyperlink') and (contains($Target,'http:') or contains($Target,'https:'))">
+          <text:a>
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="$Target"/>
           </xsl:attribute>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
         <xsl:when test="contains($type,'hyperlink') and not(contains($Target,'http:')) and not(contains($Target,'https:'))">
           <!-- warn if hyperlink Path  -->
           <xsl:message terminate="no">translation.oox2odf.hyperlinkTypeRelativePath</xsl:message>
+          <text:a>
           <xsl:attribute name="xlink:href">
             <!--Link Absolute Path-->
             <xsl:value-of select ="concat('hyperlink-path:',$Target)"/>
             <!--End-->
           </xsl:attribute>
+            <xsl:copy-of select="$nodeTextSpan"/>
+          </text:a>
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:copy-of select="$nodeTextSpan"/>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
   </xsl:template>

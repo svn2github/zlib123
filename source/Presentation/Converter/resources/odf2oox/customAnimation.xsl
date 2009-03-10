@@ -65,6 +65,9 @@ Copyright (c) 2007, Sonata Software Limited
 							<p:cond>
 								<xsl:attribute name="delay">
                               <xsl:choose>
+                        <xsl:when test="./@smil:begin='indefinite'">
+                          <xsl:value-of select="'indefinite'"/>
+                        </xsl:when>
 										<xsl:when test="./@smil:begin='next'">
 											<xsl:value-of select="'indefinite'"/>
                                 </xsl:when>
@@ -94,6 +97,9 @@ Copyright (c) 2007, Sonata Software Limited
 								<p:cond>
 									<xsl:attribute name ="delay">
 										<xsl:choose >
+                      <xsl:when test="./@smil:begin='indefinite'">
+                        <xsl:value-of select="'indefinite'"/>
+                      </xsl:when>
 											<xsl:when test="./@smil:begin='next'">
 												<xsl:value-of select="'indefinite'"/>
 											</xsl:when>
@@ -210,13 +216,45 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:attribute>
 							</xsl:if>
 							<xsl:if test ="@smil:accelerate">
+                <xsl:variable name="varAccel">
+                  <xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+                </xsl:variable>
 								<xsl:attribute name ="accel">
-									<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+                  <xsl:choose>
+                    <xsl:when test="$varAccel &lt; 0">
+                      <xsl:value-of select ="'0'"/>
+                    </xsl:when>
+                    <xsl:when test="$varAccel &gt; 100000">
+                      <xsl:value-of select ="'100000'"/>
+                    </xsl:when>
+                    <xsl:when test="$varAccel = 'NaN'">
+                      <xsl:value-of select ="'100000'"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select ="$varAccel"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
 								</xsl:attribute>
 							</xsl:if>
 							<xsl:if test ="@smil:decelerate">
+                <xsl:variable name="varDecel">
+                  <xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+                </xsl:variable>
 								<xsl:attribute name ="decel">
-									<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+                  <xsl:choose>
+                    <xsl:when test="$varDecel &lt; 0">
+                      <xsl:value-of select ="'0'"/>
+                    </xsl:when>
+                    <xsl:when test="$varDecel &gt; 100000">
+                      <xsl:value-of select ="'100000'"/>
+                    </xsl:when>
+                    <xsl:when test="$varDecel = 'NaN'">
+                      <xsl:value-of select ="'100000'"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select ="$varDecel"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
 								</xsl:attribute>
 							</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
@@ -322,13 +360,45 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:accelerate">
-										<xsl:attribute name ="accel">
+                    <xsl:variable name="varAccel">
 											<xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+                    </xsl:variable>
+										<xsl:attribute name ="accel">
+                      <xsl:choose>
+                        <xsl:when test="$varAccel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varAccel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>											
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:decelerate">
-										<xsl:attribute name ="decel">
+                    <xsl:variable name="varDecel">
 											<xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+                    </xsl:variable>
+										<xsl:attribute name ="decel">
+                      <xsl:choose>
+                        <xsl:when test="$varDecel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varDecel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 										</xsl:attribute>
 									</xsl:if>
 
@@ -410,13 +480,45 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:accelerate">
+                    <xsl:variable name="varAccel">
+                      <xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+                    </xsl:variable>
 										<xsl:attribute name ="accel">
-											<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+                      <xsl:choose>
+                        <xsl:when test="$varAccel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varAccel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:decelerate">
+                    <xsl:variable name="varDecel">
+                      <xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+                    </xsl:variable>
 										<xsl:attribute name ="decel">
-											<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+                      <xsl:choose>
+                        <xsl:when test="$varDecel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varDecel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
@@ -457,13 +559,45 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:accelerate">
+                    <xsl:variable name="varAccel">
+                      <xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+                    </xsl:variable>
 										<xsl:attribute name ="accel">
-											<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+                      <xsl:choose>
+                        <xsl:when test="$varAccel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varAccel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:decelerate">
+                    <xsl:variable name="varDecel">
+                      <xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+                    </xsl:variable>
 										<xsl:attribute name ="decel">
-											<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+                      <xsl:choose>
+                        <xsl:when test="$varDecel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varDecel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
@@ -536,13 +670,45 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:attribute>
 										</xsl:if>										
 										<xsl:if test ="@smil:accelerate">
+                      <xsl:variable name="varAccel">
+                        <xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+                      </xsl:variable>
 											<xsl:attribute name ="accel">
-												<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+                        <xsl:choose>
+                          <xsl:when test="$varAccel &lt; 0">
+                            <xsl:value-of select ="'0'"/>
+                          </xsl:when>
+                          <xsl:when test="$varAccel &gt; 100000">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:when test="$varAccel = 'NaN'">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select ="$varAccel"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
 											</xsl:attribute>
 										</xsl:if>
 										<xsl:if test ="@smil:decelerate">
+                      <xsl:variable name="varDecel">
+                        <xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+                      </xsl:variable>
 											<xsl:attribute name ="decel">
-												<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+                        <xsl:choose>
+                          <xsl:when test="$varDecel &lt; 0">
+                            <xsl:value-of select ="'0'"/>
+                          </xsl:when>
+                          <xsl:when test="$varDecel &gt; 100000">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:when test="$varDecel = 'NaN'">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select ="$varDecel"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
 											</xsl:attribute>
 										</xsl:if>
 										<xsl:call-template name ="smilBegin"/>
@@ -639,13 +805,45 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:attribute>
 										</xsl:if>
 										<xsl:if test ="@smil:accelerate">
-											<xsl:attribute name ="accel">
+                      <xsl:variable name="varAccel">
 												<xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+                      </xsl:variable>
+											<xsl:attribute name ="accel">
+                        <xsl:choose>
+                          <xsl:when test="$varAccel &lt; 0">
+                            <xsl:value-of select ="'0'"/>
+                          </xsl:when>
+                          <xsl:when test="$varAccel &gt; 100000">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:when test="$varAccel = 'NaN'">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select ="$varAccel"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
 											</xsl:attribute>
 										</xsl:if>
 										<xsl:if test ="@smil:decelerate">
-											<xsl:attribute name ="decel">
+                      <xsl:variable name="varDecel">
 												<xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+                      </xsl:variable>
+											<xsl:attribute name ="decel">
+                        <xsl:choose>
+                          <xsl:when test="$varDecel &lt; 0">
+                            <xsl:value-of select ="'0'"/>
+                          </xsl:when>
+                          <xsl:when test="$varDecel &gt; 100000">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:when test="$varDecel = 'NaN'">
+                            <xsl:value-of select ="'100000'"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select ="$varDecel"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
 											</xsl:attribute>
 										</xsl:if>
 										<xsl:call-template name ="smilBegin"/>
@@ -691,13 +889,45 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:accelerate">
-										<xsl:attribute name ="accel">
+                    <xsl:variable name="varAccel">
 											<xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+                    </xsl:variable>
+										<xsl:attribute name ="accel">
+                      <xsl:choose>
+                        <xsl:when test="$varAccel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varAccel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varAccel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 										</xsl:attribute>
 									</xsl:if>
 									<xsl:if test ="@smil:decelerate">
-									<xsl:attribute name ="decel">										
+                    <xsl:variable name="varDecel">
 												<xsl:value-of select ="round(@smil:decelerate * 100000)"/>											
+                    </xsl:variable>
+									<xsl:attribute name ="decel">										
+                      <xsl:choose>
+                        <xsl:when test="$varDecel &lt; 0">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel &gt; 100000">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:when test="$varDecel = 'NaN'">
+                          <xsl:value-of select ="'100000'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="$varDecel"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 									</xsl:attribute>
 									</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
@@ -766,6 +996,9 @@ Copyright (c) 2007, Sonata Software Limited
 				<p:cond >
 					<xsl:attribute name ="delay">
 						<xsl:choose >
+              <xsl:when test="./@smil:begin='indefinite'">
+                <xsl:value-of select="'indefinite'"/>
+              </xsl:when>
 							<xsl:when test ="substring-before(./@smil:begin,'s') &gt; 0">
 								<!--<xsl:when test ="substring-before(./parent::node()/@smil:begin,'s') &gt; 0">-->
 								<xsl:value-of select ="round(substring-before(./@smil:begin,'s')* 1000)"/>
@@ -792,11 +1025,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="./@smil:targetElement">
 							<xsl:value-of select ="./@smil:targetElement"/>
 						</xsl:when>
-						<!--commented by yeswanth ,20/5/2008-->
-						<!--<xsl:otherwise>
-							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>-->
-					</xsl:choose>
+						</xsl:choose>
 				</xsl:with-param >
 			</xsl:call-template>
 		</xsl:variable>
@@ -810,11 +1039,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="./@smil:targetElement">
 							<xsl:value-of select ="./@smil:targetElement"/>
 						</xsl:when>
-						<!--commented by yeswanth ,20/5/2008-->
-						<!--<xsl:otherwise>
-							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>-->
-					</xsl:choose>
+						</xsl:choose>
 				</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
@@ -823,7 +1048,7 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:if>
 	</xsl:template>
 	<xsl:template name ="spTarget">
-		<xsl:attribute name ="spid">
+    <xsl:variable name="varSpId">
 			<xsl:call-template name ="getnvPrId">
 				<xsl:with-param name ="spId">
 					<xsl:choose >
@@ -833,13 +1058,19 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="parent::node()/@smil:targetElement">
 							<xsl:value-of select ="parent::node()/@smil:targetElement"/>
 						</xsl:when>
-						<!--commented by yeswanth ,20/5/2008-->
-						<!--<xsl:otherwise>
-							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>-->
 					</xsl:choose>
 				</xsl:with-param >
 			</xsl:call-template>
+    </xsl:variable>
+		<xsl:attribute name ="spid">
+      <xsl:choose>
+        <xsl:when test="contains($varSpId,'$')">
+          <xsl:value-of select="substring-before($varSpId,'$')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$varSpId"/>
+        </xsl:otherwise>
+      </xsl:choose>      
 		</xsl:attribute>
 		<xsl:variable name ="spId">
 			<xsl:call-template name ="getParaId">
@@ -851,10 +1082,6 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="parent::node()/@smil:targetElement">
 							<xsl:value-of select ="parent::node()/@smil:targetElement"/>
 						</xsl:when>
-						<!--commented by yeswanth ,20/5/2008-->
-						<!--<xsl:otherwise>
-							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>-->
 					</xsl:choose>
 				</xsl:with-param>
 			</xsl:call-template>
@@ -883,15 +1110,11 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test ="./@smil:targetElement">
               <xsl:value-of select ="./@smil:targetElement"/>
             </xsl:when>
-			<!--commented by yeswanth ,20/5/2008-->
-			<!--<xsl:otherwise>
-	      <xsl:value-of select="'id1'"/>
-			</xsl:otherwise>-->
-          </xsl:choose>
+    </xsl:choose>
         </xsl:with-param >
       </xsl:call-template>
     </xsl:variable>
-    <xsl:value-of select ="$spId"/>
+    <xsl:value-of select ="substring-before($spId,'$')"/>
   </xsl:template>
 	<xsl:template name ="tavListValues">
 		<xsl:call-template name ="addTavListNode">
@@ -1268,426 +1491,417 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:choose >
 			<xsl:when test ="$animationType ='entr'">
 				<xsl:choose >
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-appear'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-appear' or ./@presentation:preset-id='1'">
 						<xsl:value-of select ="1"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fly-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fly-in' or ./@presentation:preset-id ='2'">
 						<xsl:value-of select ="'2'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-venetian-blinds'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-venetian-blinds' or ./@presentation:preset-id ='3'">
 						<xsl:value-of select ="'3'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-box'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-box' or ./@presentation:preset-id ='4'">
 						<xsl:value-of select ="'4'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-checkerboard'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-checkerboard' or ./@presentation:preset-id ='5'">
 						<xsl:value-of select ="'5'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-circle'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-circle' or ./@presentation:preset-id ='6'">
 						<xsl:value-of select ="'6'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fly-in-slow'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fly-in-slow' or ./@presentation:preset-id ='7'">
 						<xsl:value-of select ="'7'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-diamond'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-diamond' or ./@presentation:preset-id ='8'">
 						<xsl:value-of select ="'8'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-dissolve-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-dissolve-in' or ./@presentation:preset-id ='9'">
 						<xsl:value-of select ="'9'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fade-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fade-in' or ./@presentation:preset-id ='10'">
 						<xsl:value-of select ="'10'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-flash-once'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-flash-once' or ./@presentation:preset-id ='11'">
 						<xsl:value-of select ="'11'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-peek-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-peek-in' or ./@presentation:preset-id ='12'">
 						<xsl:value-of select ="'12'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-plus'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-plus' or ./@presentation:preset-id ='13'">
 						<xsl:value-of select ="'13'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-random-bars'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-random-bars' or ./@presentation:preset-id ='14'">
 						<xsl:value-of select ="'14'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-random'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-random' or ./@presentation:preset-id ='24'">
 						<xsl:value-of select ="'24'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-split'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-split' or ./@presentation:preset-id ='16'">
 						<xsl:value-of select ="'16'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-diagonal-squares'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-diagonal-squares' or ./@presentation:preset-id ='18'">
 						<xsl:value-of select ="'18'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-wedge'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-wedge' or ./@presentation:preset-id ='20'">
 						<xsl:value-of select ="'20'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-wheel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-wheel' or ./@presentation:preset-id ='21'">
 						<xsl:value-of select ="'21'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-wipe'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-wipe' or ./@presentation:preset-id ='22'">
 						<xsl:value-of select ="'22'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-expand'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-expand' or ./@presentation:preset-id ='55'">
 						<xsl:value-of select ="'55'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fade-in-and-swivel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fade-in-and-swivel' or ./@presentation:preset-id ='45'">
 						<xsl:value-of select ="'45'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fade-in-and-zoom'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fade-in-and-zoom' or ./@presentation:preset-id ='53'">
 						<xsl:value-of select ="'53'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-ascend'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-ascend' or ./@presentation:preset-id ='42'">
 						<xsl:value-of select ="'42'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-center-revolve'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-center-revolve' or ./@presentation:preset-id ='43'">
 						<xsl:value-of select ="'43'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-colored-lettering'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-colored-lettering' or ./@presentation:preset-id ='27'">
 						<xsl:value-of select ="'27'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-compress'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-compress' or ./@presentation:preset-id ='50'">
 						<xsl:value-of select ="'50'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-descend'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-descend' or ./@presentation:preset-id ='47'">
 						<xsl:value-of select ="'47'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-ease-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-ease-in' or ./@presentation:preset-id ='29'">
 						<xsl:value-of select ="'29'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-turn-and-grow'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-turn-and-grow' or ./@presentation:preset-id ='31'">
 						<xsl:value-of select ="'31'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-rise-up'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-rise-up' or ./@presentation:preset-id ='37'">
 						<xsl:value-of select ="'37'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-spin-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-spin-in' or ./@presentation:preset-id ='49'">
 						<xsl:value-of select ="'49'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-stretchy'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-stretchy' or ./@presentation:preset-id ='17'">
 						<xsl:value-of select ="'17'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-swivel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-swivel' or ./@presentation:preset-id ='19'">
 						<xsl:value-of select ="'19'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-unfold'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-unfold' or ./@presentation:preset-id ='40'">
 						<xsl:value-of select ="'40'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-zoom'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-zoom' or ./@presentation:preset-id ='23'">
 						<xsl:value-of select ="'23'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-boomerang'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-boomerang' or ./@presentation:preset-id ='25'">
 						<xsl:value-of select ="'25'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-bounce'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-bounce' or ./@presentation:preset-id ='26'">
 						<xsl:value-of select ="'26'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-movie-credits'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-movie-credits' or ./@presentation:preset-id ='28'">
 						<xsl:value-of select ="'28'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-curve-up'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-curve-up' or ./@presentation:preset-id ='52'">
 						<xsl:value-of select ="'52'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-flip'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-flip' or ./@presentation:preset-id ='56'">
 						<xsl:value-of select ="'56'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-float'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-float' or ./@presentation:preset-id ='30'">
 						<xsl:value-of select ="'30'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fold'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-fold' or ./@presentation:preset-id ='58'">
 						<xsl:value-of select ="'58'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-glide'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-glide' or ./@presentation:preset-id ='54'">
 						<xsl:value-of select ="'54'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-breaks'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-breaks' or ./@presentation:preset-id ='34'">
 						<xsl:value-of select ="'34'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-magnify'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-magnify' or ./@presentation:preset-id ='51'">
 						<xsl:value-of select ="'51'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-pinwheel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-pinwheel' or ./@presentation:preset-id ='35'">
 						<xsl:value-of select ="'35'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-sling'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-sling' or ./@presentation:preset-id ='48'">
 						<xsl:value-of select ="'48'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-spiral-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-spiral-in' or ./@presentation:preset-id ='15'">
 						<xsl:value-of select ="'15'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-falling-in'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-falling-in' or ./@presentation:preset-id ='38'">
 						<xsl:value-of select ="'38'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-thread'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-thread' or ./@presentation:preset-id ='39'">
 						<xsl:value-of select ="'39'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-whip'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-entrance-whip' or ./@presentation:preset-id ='41'">
 						<xsl:value-of select ="'41'"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
 			<xsl:when test ="$animationType ='exit'">
 				<xsl:choose >
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-venetian-blinds'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-venetian-blinds' or ./@presentation:preset-id ='3'">
 						<xsl:value-of select ="'3'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-box'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-box' or ./@presentation:preset-id ='4'">
 						<xsl:value-of select ="'4'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-checkerboard'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-checkerboard' or ./@presentation:preset-id ='5'">
 						<xsl:value-of select ="'5'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-circle'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-circle' or ./@presentation:preset-id ='6'">
 						<xsl:value-of select ="'6'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-crawl-out'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-crawl-out' or ./@presentation:preset-id ='7'">
 						<xsl:value-of select ="'7'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-diamond'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-diamond' or ./@presentation:preset-id ='8'">
 						<xsl:value-of select ="'8'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-disappear'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-disappear' or ./@presentation:preset-id ='1'">
 						<xsl:value-of select ="'1'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-dissolve'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-dissolve' or ./@presentation:preset-id ='9'">
 						<xsl:value-of select ="'9'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-flash-once'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-flash-once' or ./@presentation:preset-id ='11'">
 						<xsl:value-of select ="'11'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fly-out'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fly-out' or ./@presentation:preset-id ='2'">
 						<xsl:value-of select ="'2'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-peek-out'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-peek-out' or ./@presentation:preset-id ='12'">
 						<xsl:value-of select ="'12'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-plus'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-plus' or ./@presentation:preset-id ='13'">
 						<xsl:value-of select ="'13'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-random-bars'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-random-bars' or ./@presentation:preset-id ='14'">
 						<xsl:value-of select ="'14'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-random'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-random' or ./@presentation:preset-id ='24'">
 						<xsl:value-of select ="'24'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-split'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-split' or ./@presentation:preset-id ='16'">
 						<xsl:value-of select ="'16'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-diagonal-squares'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-diagonal-squares' or ./@presentation:preset-id ='18'">
 						<xsl:value-of select ="'18'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-wheel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-wheel' or ./@presentation:preset-id ='21'">
 						<xsl:value-of select ="'21'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-wipe'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-wipe' or ./@presentation:preset-id ='22'">
 						<xsl:value-of select ="'22'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-contract'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-contract' or ./@presentation:preset-id ='55'">
 						<xsl:value-of select ="'55'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fade-out'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fade-out' or ./@presentation:preset-id ='10'">
 						<xsl:value-of select ="'10'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fade-out-and-swivel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fade-out-and-swivel' or ./@presentation:preset-id ='45'">
 						<xsl:value-of select ="'45'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fade-out-and-zoom'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fade-out-and-zoom' or ./@presentation:preset-id ='53'">
 						<xsl:value-of select ="'53'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-ascend'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-ascend' or ./@presentation:preset-id ='47'">
 						<xsl:value-of select ="'47'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-center-revolve'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-center-revolve' or ./@presentation:preset-id ='43'">
 						<xsl:value-of select ="'43'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-collapse'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-collapse' or ./@presentation:preset-id ='17'">
 						<xsl:value-of select ="'17'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-colored-lettering'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-colored-lettering' or ./@presentation:preset-id ='27'">
 						<xsl:value-of select ="'27'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-descend'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-descend' or ./@presentation:preset-id ='42'">
 						<xsl:value-of select ="'42'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-ease-out'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-ease-out' or ./@presentation:preset-id ='29'">
 						<xsl:value-of select ="'29'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-turn-and-grow'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-turn-and-grow' or ./@presentation:preset-id ='31'">
 						<xsl:value-of select ="'31'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-sink-down'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-sink-down' or ./@presentation:preset-id ='37'">
 						<xsl:value-of select ="'37'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-spin-out'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-spin-out' or ./@presentation:preset-id ='49'">
 						<xsl:value-of select ="'49'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-stretchy'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-stretchy' or ./@presentation:preset-id ='50'">
 						<xsl:value-of select ="'50'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-unfold'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-unfold' or ./@presentation:preset-id ='40'">
 						<xsl:value-of select ="'40'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-zoom'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-zoom' or ./@presentation:preset-id ='23'">
 						<xsl:value-of select ="'23'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-boomerang'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-boomerang' or ./@presentation:preset-id ='25'">
 						<xsl:value-of select ="'25'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-bounce'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-bounce' or ./@presentation:preset-id ='26'">
 						<xsl:value-of select ="'26'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-movie-credits'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-movie-credits' or ./@presentation:preset-id ='28'">
 						<xsl:value-of select ="'28'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-curve-down'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-curve-down' or ./@presentation:preset-id ='52'">
 						<xsl:value-of select ="'52'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-flip'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-flip' or ./@presentation:preset-id ='56'">
 						<xsl:value-of select ="'56'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-float'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-float' or ./@presentation:preset-id ='30'">
 						<xsl:value-of select ="'30'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fold'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-fold' or ./@presentation:preset-id ='58'">
 						<xsl:value-of select ="'58'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-glide'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-glide' or ./@presentation:preset-id ='54'">
 						<xsl:value-of select ="'54'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-breaks'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-breaks' or ./@presentation:preset-id ='34'">
 						<xsl:value-of select ="'34'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-magnify'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-magnify' or ./@presentation:preset-id ='51'">
 						<xsl:value-of select ="'51'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-pinwheel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-pinwheel' or ./@presentation:preset-id ='35'">
 						<xsl:value-of select ="'35'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-sling'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-sling' or ./@presentation:preset-id ='48'">
 						<xsl:value-of select ="'48'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-spiral-out'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-spiral-out' or ./@presentation:preset-id ='15'">
 						<xsl:value-of select ="'15'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-swish'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-swish' or ./@presentation:preset-id ='38'">
 						<xsl:value-of select ="'38'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-swivel'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-swivel' or ./@presentation:preset-id ='19'">
 						<xsl:value-of select ="'19'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-thread'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-thread' or ./@presentation:preset-id ='39'">
 						<xsl:value-of select ="'39'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-whip'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-whip' or ./@presentation:preset-id ='41'">
 						<xsl:value-of select ="'41'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-exit-wedge'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-exit-wedge' or ./@presentation:preset-id ='20'">
 						<xsl:value-of select ="'20'"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
 			<xsl:when test ="$animationType ='emph'">
 				<xsl:choose >
-          <xsl:when test ="./@presentation:preset-id ='ooo-emphasis-fill-color'">
+          <xsl:when test ="./@presentation:preset-id ='ooo-emphasis-fill-color' or ./@presentation:preset-id ='1'">
             <xsl:value-of select ="'1'"/>
           </xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font' or ./@presentation:preset-id ='2'">
 						<xsl:value-of select ="'2'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font-color'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font-color' or ./@presentation:preset-id ='3'">
 						<xsl:value-of select ="'3'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font-size'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font-size' or ./@presentation:preset-id ='4'">
 						<xsl:value-of select ="'4'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font-style'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-font-style' or ./@presentation:preset-id ='5'">
 						<xsl:value-of select ="'5'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-grow-and-shrink'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-grow-and-shrink' or ./@presentation:preset-id ='6'">
 						<xsl:value-of select ="'6'"/>
 					</xsl:when>
-          <xsl:when test ="./@presentation:preset-id ='ooo-emphasis-line-color'">
+          <xsl:when test ="./@presentation:preset-id ='ooo-emphasis-line-color' or ./@presentation:preset-id ='7'">
             <xsl:value-of select ="'7'"/>
           </xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-spin'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-spin' or ./@presentation:preset-id ='8'">
 						<xsl:value-of select ="'8'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-transparency'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-transparency' or ./@presentation:preset-id ='9'">
 						<xsl:value-of select ="'9'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-bold-flash'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-bold-flash' or ./@presentation:preset-id ='10'">
 						<xsl:value-of select ="'10'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-color-over-by-word'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-color-over-by-word' or ./@presentation:preset-id ='16'">
 						<xsl:value-of select ="'16'"/>
 					</xsl:when>					
-					<!--  Added by vijayeta, bug number 1775269, date: 20th Aug '07-->
-					<!-- slide 1 of input file 'animation partial.odp' -->
-					<xsl:when test="./@presentation:preset-id ='ooo-emphasis-color-blend'">
+					<xsl:when test="./@presentation:preset-id ='ooo-emphasis-color-blend' or ./@presentation:preset-id ='19'">
 						<xsl:value-of select="'19'" />
 					</xsl:when>
-					<!-- slide 2 of input file 'animation partial.odp' -->
-					<xsl:when test="./@presentation:preset-id ='ooo-emphasis-color-over-by-letter'">
+					<xsl:when test="./@presentation:preset-id ='ooo-emphasis-color-over-by-letter' or ./@presentation:preset-id ='20'">
 						<xsl:value-of select="'20'" />
 					</xsl:when>
-					<!-- slide 10 of input file 'animation partial.odp'-->
-					<xsl:when test="./@presentation:preset-id ='ooo-emphasis-reveal-underline'">
+					<xsl:when test="./@presentation:preset-id ='ooo-emphasis-reveal-underline' or ./@presentation:preset-id ='18'">
 						<xsl:value-of select="'18'" />
 					</xsl:when>
-					<!--  Added by vijayeta, bug number 1775269, date: 20th Aug '07 -->
-
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-color-over-by-letter'">
-						<xsl:value-of select ="'20'"/>
-					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-complementary-color'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-complementary-color' or ./@presentation:preset-id ='21'">
 						<xsl:value-of select ="'21'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-complementary-color-2'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-complementary-color-2' or ./@presentation:preset-id ='22'">
 						<xsl:value-of select ="'22'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-contrasting-color'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-contrasting-color' or ./@presentation:preset-id ='23'">
 						<xsl:value-of select ="'23'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-darken'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-darken' or ./@presentation:preset-id ='24'">
 						<xsl:value-of select ="'24'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-desaturate'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-desaturate' or ./@presentation:preset-id ='25'">
 						<xsl:value-of select ="'25'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-flash-bulb'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-flash-bulb' or ./@presentation:preset-id ='26'">
 						<xsl:value-of select ="'26'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-lighten'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-lighten' or ./@presentation:preset-id ='30'">
 						<xsl:value-of select ="'30'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-vertical-highlight'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-vertical-highlight' or ./@presentation:preset-id ='33'">
 						<xsl:value-of select ="'33'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-flicker'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-flicker' or ./@presentation:preset-id ='27'">
 						<xsl:value-of select ="'27'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-grow-with-color'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-grow-with-color' or ./@presentation:preset-id ='28'">
 						<xsl:value-of select ="'28'"/>
 					</xsl:when>
-          <xsl:when test ="./@presentation:preset-id ='ooo-emphasis-shimmer'">
+          <xsl:when test ="./@presentation:preset-id ='ooo-emphasis-shimmer' or ./@presentation:preset-id ='36'">
 						<xsl:value-of select ="'36'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-teeter'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-teeter' or ./@presentation:preset-id ='32'">
 						<xsl:value-of select ="'32'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-blast'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-blast' or ./@presentation:preset-id ='14'">
 						<xsl:value-of select ="'14'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-blink'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-blink' or ./@presentation:preset-id ='35'">
 						<xsl:value-of select ="'35'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-bold-reveal'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-bold-reveal' or ./@presentation:preset-id ='15'">
 						<xsl:value-of select ="'15'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-style-emphasis'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-style-emphasis' or ./@presentation:preset-id ='31'">
 						<xsl:value-of select ="'31'"/>
 					</xsl:when>
-					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-wave'">
+					<xsl:when test ="./@presentation:preset-id ='ooo-emphasis-wave' or ./@presentation:preset-id ='34'">
 						<xsl:value-of select ="'34'"/>
 					</xsl:when>
 				</xsl:choose>
@@ -1725,14 +1939,14 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@presentation:preset-sub-type ='4'">
 				<xsl:value-of select ="'4'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='horizontal'">
+			<xsl:when test ="./@presentation:preset-sub-type ='horizontal' or ./@presentation:preset-sub-type ='10'">
 				<xsl:value-of select ="'10'"/>
 				<!--<xsl:value-of select ="'5'"/>-->
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='downward'">
+			<xsl:when test ="./@presentation:preset-sub-type ='downward' or ./@presentation:preset-sub-type ='5'">
 				<xsl:value-of select ="'5'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='from-bottom-right'">
+			<xsl:when test ="./@presentation:preset-sub-type ='from-bottom-right' or ./@presentation:preset-sub-type ='6'">
 				<xsl:value-of select ="'6'"/>
 			</xsl:when>
 			<xsl:when test ="./@presentation:preset-sub-type ='right-to-bottom'">
@@ -1750,7 +1964,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@presentation:preset-sub-type ='544'">
 				<xsl:value-of select ="'544'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='from-top-left'">
+			<xsl:when test ="./@presentation:preset-sub-type ='from-top-left' or ./@presentation:preset-sub-type ='9'">
 				<xsl:value-of select ="'9'"/>
 			</xsl:when>
 			<xsl:when test ="./@presentation:preset-sub-type ='left-to-top'">
@@ -1763,40 +1977,40 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@presentation:preset-sub-type ='across'">
 				<xsl:value-of select ="'10'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='from-bottom-left'">
+			<xsl:when test ="./@presentation:preset-sub-type ='from-bottom-left' or ./@presentation:preset-sub-type ='12'">
 				<xsl:value-of select ="'12'"/>
 			</xsl:when>
 			<xsl:when test ="./@presentation:preset-sub-type ='left-to-bottom'">
 				<xsl:value-of select ="'12'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='in'">
+			<xsl:when test ="./@presentation:preset-sub-type ='in' or ./@presentation:preset-sub-type ='16'">
 				<xsl:value-of select ="'16'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='vertical-in'">
+			<xsl:when test ="./@presentation:preset-sub-type ='vertical-in' or ./@presentation:preset-sub-type ='21'">
 				<xsl:value-of select ="'21'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='horizontal-in'">
+			<xsl:when test ="./@presentation:preset-sub-type ='horizontal-in' or ./@presentation:preset-sub-type ='26'">
 				<xsl:value-of select ="'26'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='out'">
+			<xsl:when test ="./@presentation:preset-sub-type ='out' or ./@presentation:preset-sub-type ='32'">
 				<xsl:value-of select ="'32'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='vertical-out'">
+			<xsl:when test ="./@presentation:preset-sub-type ='vertical-out' or ./@presentation:preset-sub-type ='37'">
 				<xsl:value-of select ="'37'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='horizontal-out'">
+			<xsl:when test ="./@presentation:preset-sub-type ='horizontal-out' or ./@presentation:preset-sub-type ='42'">
 				<xsl:value-of select ="'42'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='in-from-screen-center'">
+			<xsl:when test ="./@presentation:preset-sub-type ='in-from-screen-center' or ./@presentation:preset-sub-type ='528'">
 				<xsl:value-of select ="'528'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='in-slightly'">
+			<xsl:when test ="./@presentation:preset-sub-type ='in-slightly' or ./@presentation:preset-sub-type ='272'">
 				<xsl:value-of select ="'272'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='out-from-screen-center'">
+			<xsl:when test ="./@presentation:preset-sub-type ='out-from-screen-center' or ./@presentation:preset-sub-type ='36'">
 				<xsl:value-of select ="'36'"/>
 			</xsl:when>
-			<xsl:when test ="./@presentation:preset-sub-type ='out-slightly'">
+			<xsl:when test ="./@presentation:preset-sub-type ='out-slightly' or ./@presentation:preset-sub-type ='288'">
 				<xsl:value-of select ="'288'"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -1841,6 +2055,10 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="@smil:type = 'ellipseWipe' and @smil:subtype ='horizontal' ">
 				<xsl:value-of  select ="'circle(out)'"/>
 			</xsl:when>
+      <!--for sp2 compatibility-->
+      <xsl:when test ="@smil:type = 'ellipseWipe' and @smil:subtype ='circle' and @smil:direction='reverse' ">
+        <xsl:value-of  select ="'circle(in)'"/>
+      </xsl:when>
 			<xsl:when test ="@smil:type = 'irisWipe' and @smil:subtype ='diamond' and @smil:direction='reverse'">
 				<xsl:value-of  select ="'diamond(in)'"/>
 			</xsl:when>
@@ -2162,10 +2380,10 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:variable>
     <xsl:choose>
       <xsl:when test ="$paraId!=''">
-        <xsl:value-of select ="$nvPrId +1 "/>
+        <xsl:value-of select ="concat($nvPrId +1,'$')"/>
       </xsl:when>
       <xsl:when test ="$paraId='' and $drawId !=''">
-        <xsl:value-of select ="$nvPrId +1 "/>
+        <xsl:value-of select ="concat($nvPrId +1,'$')"/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -2237,6 +2455,9 @@ Copyright (c) 2007, Sonata Software Limited
 									<p:cond>
 										<xsl:attribute name ="delay">
 											<xsl:choose >
+                        <xsl:when test="./@smil:begin='indefinite'">
+                          <xsl:value-of select="'indefinite'"/>
+                        </xsl:when>
 												<xsl:when test="./@smil:begin='next'">
 													<xsl:value-of select="'indefinite'"/>
 												</xsl:when>
