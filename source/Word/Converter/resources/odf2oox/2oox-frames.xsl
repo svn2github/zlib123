@@ -1429,12 +1429,19 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
             <!-- @fo:min-height or (@fo:min-height and parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width)
                   or -->
             <xsl:when test="$frameStyle/@style:parent-style-name and (parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame'])">
-              <xsl:if test="((@fo:min-height  or $frameStyle/style:graphic-properties/@fo:min-height) and (parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width))                  
+              <xsl:choose>
+                <!--Sonata:Sp2 defect:Scenario:docx ->SP2->odt->2.5->docx-testbox size is wrong-->
+                <xsl:when test="$frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false' and
+                                $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false'">
+                  
+                </xsl:when>
+                <xsl:when test="((@fo:min-height  or $frameStyle/style:graphic-properties/@fo:min-height) and (parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width))                  
                   or (@fo:min-height or $frameStyle/style:graphic-properties/@fo:min-height)                    
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
-              </xsl:if>
+                </xsl:when>
+              </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <xsl:if test="not(parent::draw:frame) and not(draw:frame)

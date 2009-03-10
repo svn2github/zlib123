@@ -828,7 +828,12 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    <!--Sonata:SP2 defect:Scenario:docx ->SP2->odt->3.0->docx-"no fill" property of text box lost:Added attribute filled="f" incase of transparent fill-->
+    <xsl:if test="$fillColor = 'transparent' ">
+      <xsl:attribute name="filled">
+        <xsl:value-of select="'f'"/>
+      </xsl:attribute>
+    </xsl:if>
     <xsl:if test="$fillColor != '' and $fillColor != 'transparent'">
       <xsl:attribute name="fillcolor">
         <xsl:value-of select="$fillColor"/>
