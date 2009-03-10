@@ -2799,7 +2799,8 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:when>
 		<!-- Half Frame -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='halfFrame') or
-              $enhancePath='M f29 f29 L f34 f29 L f55 f45 L f46 f45 L f46 f56 L f29 f35 Z N '">
+              $enhancePath='M f29 f29 L f34 f29 L f55 f45 L f46 f45 L f46 f56 L f29 f35 Z N ' or 
+              $enhancePath='M f5 f5 L f6 f5 L f7 f8 L f8 f8 L f8 f7 L f5 f6 Z N '">     
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
