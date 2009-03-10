@@ -1422,16 +1422,27 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:when test ="not(p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$LayoutName)]
 								and p:spPr/a:xfrm/a:off)" >
                         <xsl:variable name ="frameName">
-                          <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type">
+                          <xsl:choose>
+                            <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type">
                             <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">
+                              
+                                <xsl:choose>
+                                  <xsl:when test=".='ctrTitle'">
+                                    <xsl:value-of select ="'Title'"/>
+                                  </xsl:when>
+                                  <xsl:otherwise>
                               <xsl:value-of select ="."/>
+                                  </xsl:otherwise>
+                                </xsl:choose>
                             </xsl:for-each>
-                          </xsl:if>
-                          <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph/@type)">
+                            </xsl:when>
+                            <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph/@type)">
                             <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@idx">
                               <xsl:value-of select ="."/>
                             </xsl:for-each>
-                          </xsl:if >
+                            </xsl:when >
+                          </xsl:choose>
+                        
                         </xsl:variable>
                         <xsl:variable name ="FrameIdx">
                           <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@idx">
@@ -1635,7 +1646,12 @@ exclude-result-prefixes="p a r xlink rels">
                         <!-- Slide Layout Files Loop Second Loop-->
                         <xsl:choose>
                           <xsl:when test="count(document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp) >0">
-                        <xsl:for-each select ="document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp">
+                            <xsl:choose>
+                              <xsl:when test="document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp/
+                                                p:nvSpPr/p:nvPr/p:ph[( contains(@type,$frameName) and $frameName!='') or ( @idx=$FrameIdx and $FrameIdx !='')] ">
+                                <xsl:for-each select ="document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp/
+                                                p:nvSpPr/p:nvPr/p:ph[ ( contains(@type,$frameName) and $frameName!='') or ( @idx=$FrameIdx and $FrameIdx !='')]">
+                                  <xsl:for-each select="../../..">
                           <xsl:variable name ="SlFrameName">
                             <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">
                               <xsl:value-of select ="."/>
@@ -1652,27 +1668,10 @@ exclude-result-prefixes="p a r xlink rels">
                             </xsl:for-each>
                           </xsl:variable>
                           <xsl:choose >
-                            <!-- Modified by lohith to fix the bug 1719280-->
-                            <xsl:when test ="not($SlFrameName = $frameName 
-														or $SlFrameNameInd = $FrameIdx) ">
-                              <!-- Do nothing-or $SlFrameNameInd=$FrameIdx -->
-                            </xsl:when>
-                            <!-- Commented by lohith to fix the bug 1719280-->
-                            <!--<xsl:when test ="not($SlFrameName = $frameName) 
-														and string-length($SlFrameName) &gt; 0 
-														and string-length($frameName) &gt; 0 ">
-                  -->
-                            <!-- Do nothing-or $SlFrameNameInd=$FrameIdx -->
-                            <!--
-                </xsl:when>-->
-                            <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') 
-										or contains(.,'ftr') or contains(.,'sldNum')]">
-                              <!-- Do nothing-->
-                              <!-- These will be covered in footer and date time -->
-                            </xsl:when>
-
-                            <xsl:when test ="(p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)] or 
-												p:nvSpPr/p:nvPr/p:ph/@idx[contains(.,$FrameIdx)])
+                                    <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='subTitle' and 
+                                                     ( $frameName='title' or $frameName='ctrTitle') "/>
+                            <xsl:when test ="(p:nvSpPr/p:nvPr/p:ph[( contains(@type,$frameName) and $frameName!='')] or 
+                                                          ( $SlFrameNameInd=$FrameIdx and $FrameIdx !=''))
 												and p:spPr/a:xfrm/a:off" >
                               <xsl:choose >
                                 <xsl:when test ="$SlFrameNameInd != $FrameIdx and
@@ -1701,166 +1700,61 @@ exclude-result-prefixes="p a r xlink rels">
                                     <xsl:call-template name="tmpWriteCordinates"/>
                                     <xsl:copy-of select ="$var_textNode"/>
                                     <!--End-->
-                                    
                                     <!-- Added by lohith.ar -->
 									  <xsl:if test="msxsl:node-set($EventListnerNode)//presentation:event-listener">
                                     <xsl:copy-of select ="$EventListnerNode"/>
 									  </xsl:if>
                                   </draw:frame >
-
                                 </xsl:otherwise>
                               </xsl:choose>
                             </xsl:when >
+
+                                    <!-- Modified by lohith to fix the bug 1719280-->
                             <!--  modified by vipul:for ODF1.1 conformance-->
-                            <xsl:when test ="(p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)] or 
-											p:nvSpPr/p:nvPr/p:ph/@idx[contains(.,$FrameIdx)])
+                                    <xsl:when test =" ( p:nvSpPr/p:nvPr/p:ph[( ( contains(@type,$frameName) and $frameName!='') and $frameName!='')]  or 
+                                                          ( $SlFrameNameInd=$FrameIdx and $FrameIdx !='' ))
 											and not(p:spPr/a:xfrm/a:off)">
-                              <xsl:variable name ="LayoutRels">
-                                <xsl:for-each select ="document(concat(concat('ppt/slideLayouts/_rels',substring($LayoutFileNo,17)),'.rels'))
-													//node()/@Target[contains(.,'slideMasters')]">
-                                  <xsl:value-of select ="."/>
-                                </xsl:for-each>
-                              </xsl:variable>
-                              <xsl:variable name ="MasterFileName">
-                                <xsl:value-of select ="concat('ppt/slideMasters',substring($LayoutRels,16))"/>
-                              </xsl:variable>
-                              <!-- Slide Master Files Loop  Third Loop-->
-                              <xsl:for-each select ="document($MasterFileName)/p:sldMaster/p:cSld/p:spTree/p:sp">
-                                <xsl:variable name ="MstrFrameName">
-                                  <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">
-                                    <xsl:value-of select ="."/>
-                                  </xsl:for-each>
-                                  <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph/@type)">
-                                    <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@idx">
-                                      <xsl:value-of select ="."/>
-                                    </xsl:for-each>
-                                  </xsl:if >
-                                </xsl:variable>
-                                <xsl:variable name ="MstrFrameInd">
-                                  <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@idx">
-                                    <xsl:value-of select ="."/>
-                                  </xsl:for-each>
-                                </xsl:variable>
-                                <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)]">
-                                  <xsl:value-of select ="p:nvSpPr/p:nvPr/p:ph"/>
-                                </xsl:if>
-                                <xsl:choose >
-                                  <xsl:when test ="not($MstrFrameName = $frameName
-												or $MstrFrameInd =$FrameIdx)">
-                                    <!-- Do nothing-->
-                                    <!-- These will be covered in footer and date time -->
-                                  </xsl:when>
-                                  <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') or 
-																 contains(.,'ftr') or contains(.,'sldNum')]">
-                                    <!-- Do nothing-->
-                                    <!-- These will be covered in footer and date time -->
-                                  </xsl:when>
-                                  <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)] 
-													or p:nvSpPr/p:nvPr/p:ph/@idx[contains(.,$FrameIdx)]">
-                                    <draw:frame draw:layer="layout"
-                                                presentation:user-transformed="true">
-                                      <xsl:attribute name ="presentation:style-name">
-                                        <xsl:value-of select ="$textLayoutId"/>
-                                      </xsl:attribute>
-                                      <xsl:attribute name ="presentation:class">
-                                        <xsl:call-template name ="LayoutType">
-                                          <xsl:with-param name ="LayoutStyle">
-                                            <xsl:value-of select ="$LayoutName"/>
-                                          </xsl:with-param>
+                                      <xsl:call-template name="tmpSMFrameProperties">
+                                        <xsl:with-param name="LayoutFileNo" select="$LayoutFileNo"/>
+                                        <xsl:with-param name="frameName" select="$frameName"/>
+                                        <xsl:with-param name="FrameIdx" select="$FrameIdx"/>
+                                        <xsl:with-param name="textLayoutId" select="$textLayoutId"/>
+                                        <xsl:with-param name="LayoutName" select="$LayoutName"/>
+                                        <xsl:with-param name="drawAnimId" select="$drawAnimId"/>
+                                        <xsl:with-param name="var_textNode" select="$var_textNode"/>
+                                        <xsl:with-param name="EventListnerNode" select="$EventListnerNode"/>
                                         </xsl:call-template >
-                                      </xsl:attribute>
-							                        <xsl:attribute name ="draw:id" >
-								<xsl:value-of  select ="$drawAnimId"/>
-							</xsl:attribute>
-                                      <!--Added by Vipul for rotation-->
-                                      <!--Start-->
-                                      <xsl:call-template name="tmpWriteCordinates"/>
-                                      <xsl:copy-of select ="$var_textNode"/>
-                                      <!--End-->                                     
-                                      <!-- Added by lohith.ar -->
-										<xsl:if test="msxsl:node-set($EventListnerNode)//presentation:event-listener">
-                                      <xsl:copy-of select ="$EventListnerNode"/>
-										</xsl:if>
-                                    </draw:frame >
-                                  </xsl:when>
+                                      </xsl:when>
                                 </xsl:choose>
                               </xsl:for-each >
-                              <!-- Exit Slide Master Files Loop  Third Loop-->
-                            </xsl:when>
-                          </xsl:choose>
-                        </xsl:for-each>
-                          </xsl:when>
-
-                        <xsl:when test="count(document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp) =0">
-                            <xsl:variable name ="LayoutRels">
-                              <xsl:for-each select ="document(concat(concat('ppt/slideLayouts/_rels',substring($LayoutFileNo,17)),'.rels'))
-													//node()/@Target[contains(.,'slideMasters')]">
-                                <xsl:value-of select ="."/>
-                              </xsl:for-each>
-                            </xsl:variable>
-                            <xsl:variable name ="MasterFileName">
-                              <xsl:value-of select ="concat('ppt/slideMasters',substring($LayoutRels,16))"/>
-                            </xsl:variable>
-                            <xsl:for-each select ="document($MasterFileName)/p:sldMaster/p:cSld/p:spTree/p:sp">
-                              <xsl:variable name ="MstrFrameName">
-                                <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">
-                                  <xsl:value-of select ="."/>
-                                </xsl:for-each>
-                                <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph/@type)">
-                                  <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@idx">
-                                    <xsl:value-of select ="."/>
-                                  </xsl:for-each>
-                                </xsl:if >
-                              </xsl:variable>
-                              <xsl:variable name ="MstrFrameInd">
-                                <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@idx">
-                                  <xsl:value-of select ="."/>
-                                </xsl:for-each>
-                              </xsl:variable>
-                              <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)]">
-                                <xsl:value-of select ="p:nvSpPr/p:nvPr/p:ph"/>
-                              </xsl:if>
-                              <xsl:choose >
-                                <xsl:when test ="not($MstrFrameName = $frameName
-												or $MstrFrameInd =$FrameIdx)">
-                                  <!-- Do nothing-->
-                                  <!-- These will be covered in footer and date time -->
-                                </xsl:when>
-                                <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') or 
-																 contains(.,'ftr') or contains(.,'sldNum')]">
-                                  <!-- Do nothing-->
-                                  <!-- These will be covered in footer and date time -->
-                                </xsl:when>
-                                <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$frameName)] 
-													or p:nvSpPr/p:nvPr/p:ph/@idx[contains(.,$FrameIdx)]">
-                                  <draw:frame draw:layer="layout"
-                                              presentation:user-transformed="true">
-                                    <xsl:attribute name ="presentation:style-name">
-                                      <xsl:value-of select ="$textLayoutId"/>
-                                    </xsl:attribute>
-                                    <xsl:attribute name ="presentation:class">
-                                      <xsl:call-template name ="LayoutType">
-                                        <xsl:with-param name ="LayoutStyle">
-                                          <xsl:value-of select ="$LayoutName"/>
-                                        </xsl:with-param>
+                               </xsl:for-each>
+                                    </xsl:when>
+                              <xsl:when test="not(document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp/
+                                                p:nvSpPr/p:nvPr/p:ph[( contains(@type,$frameName) and $frameName!='') or ( @idx=$FrameIdx and $FrameIdx !='')]) ">
+                                <xsl:call-template name="tmpSMFrameProperties">
+                                  <xsl:with-param name="LayoutFileNo" select="$LayoutFileNo"/>
+                                  <xsl:with-param name="frameName" select="$frameName"/>
+                                  <xsl:with-param name="FrameIdx" select="$FrameIdx"/>
+                                  <xsl:with-param name="textLayoutId" select="$textLayoutId"/>
+                                  <xsl:with-param name="LayoutName" select="$LayoutName"/>
+                                  <xsl:with-param name="drawAnimId" select="$drawAnimId"/>
+                                  <xsl:with-param name="var_textNode" select="$var_textNode"/>
+                                  <xsl:with-param name="EventListnerNode" select="$EventListnerNode"/>
                                       </xsl:call-template >
-                                    </xsl:attribute>
-                                    <xsl:attribute name ="draw:id" >
-                                      <xsl:value-of  select ="$drawAnimId"/>
-                                    </xsl:attribute>
-                                    <!--Added by Vipul for rotation-->
-                                    <!--Start-->
-                                    <xsl:call-template name="tmpWriteCordinates"/>
-                                    <xsl:copy-of select ="$var_textNode"/>
-                                    <!--End-->
-                                    <!-- Added by lohith.ar -->
-                                    <xsl:if test="msxsl:node-set($EventListnerNode)//presentation:event-listener">
-                                      <xsl:copy-of select ="$EventListnerNode"/>
-                                    </xsl:if>
-                                  </draw:frame >
-                                </xsl:when>
+                                   </xsl:when>
                               </xsl:choose>
-                            </xsl:for-each >
+                          </xsl:when>
+                          <xsl:when test="count(document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp) =0">
+                            <xsl:call-template name="tmpSMFrameProperties">
+                              <xsl:with-param name="LayoutFileNo" select="$LayoutFileNo"/>
+                              <xsl:with-param name="frameName" select="$frameName"/>
+                              <xsl:with-param name="FrameIdx" select="$FrameIdx"/>
+                              <xsl:with-param name="textLayoutId" select="$textLayoutId"/>
+                              <xsl:with-param name="LayoutName" select="$LayoutName"/>
+                              <xsl:with-param name="drawAnimId" select="$drawAnimId"/>
+                              <xsl:with-param name="var_textNode" select="$var_textNode"/>
+                              <xsl:with-param name="EventListnerNode" select="$EventListnerNode"/>
+                            </xsl:call-template>
                          </xsl:when>
                         </xsl:choose>
 
@@ -1934,6 +1828,92 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:call-template>
         <!--End-->
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="tmpSMFrameProperties">
+    <xsl:param name="LayoutFileNo"/>
+    <xsl:param name="frameName"/>
+    <xsl:param name="FrameIdx"/>
+    <xsl:param name="textLayoutId"/>
+    <xsl:param name="LayoutName"/>
+    <xsl:param name="drawAnimId"/>
+    <xsl:param name="var_textNode"/>
+    <xsl:param name="EventListnerNode"/>
+
+    <xsl:variable name ="LayoutRels">
+      <xsl:for-each select ="document(concat(concat('ppt/slideLayouts/_rels',substring($LayoutFileNo,17)),'.rels'))
+													//node()/@Target[contains(.,'slideMasters')]">
+        <xsl:value-of select ="."/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name ="MasterFileName">
+      <xsl:value-of select ="concat('ppt/slideMasters',substring($LayoutRels,16))"/>
+    </xsl:variable>
+    <xsl:if test="document($MasterFileName)/p:sldMaster/p:cSld/p:spTree/p:sp/
+                                                p:nvSpPr/p:nvPr/p:ph[( contains(@type,$frameName) and $frameName!='') or (@idx=$FrameIdx and $FrameIdx!='')] ">
+      <xsl:for-each select ="document($MasterFileName)/p:sldMaster/p:cSld/p:spTree/p:sp/
+                                                p:nvSpPr/p:nvPr/p:ph[( contains(@type,$frameName) and $frameName!='') or (@idx=$FrameIdx and $FrameIdx!='')] ">
+        <xsl:for-each select="../../..">
+          <xsl:variable name ="MstrFrameName">
+            <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">
+              <xsl:value-of select ="."/>
+            </xsl:for-each>
+            <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph/@type)">
+              <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@idx">
+                <xsl:value-of select ="."/>
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:variable name ="MstrFrameInd">
+            <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@idx">
+              <xsl:value-of select ="."/>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:choose>
+            <xsl:when test ="not($MstrFrameName = $frameName
+										                		or $MstrFrameInd =$FrameIdx)">
+              <!-- Do nothing-->
+              <!-- These will be covered in footer and date time -->
+            </xsl:when>
+            <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') or 
+																 contains(.,'ftr') or contains(.,'sldNum')]">
+              <!-- Do nothing-->
+              <!-- These will be covered in footer and date time -->
+            </xsl:when>
+            <xsl:when test =" ( p:nvSpPr/p:nvPr/p:ph[( ( contains(@type,$frameName) or contains($frameName,@type) ) and $frameName!='')]  or 
+                                                          ( $MstrFrameInd=$FrameIdx and $FrameIdx !=''))
+                                                            and p:spPr/a:xfrm/a:off" >
+              <draw:frame draw:layer="layout"
+                          presentation:user-transformed="true">
+                <xsl:attribute name ="presentation:style-name">
+                  <xsl:value-of select ="$textLayoutId"/>
+                </xsl:attribute>
+                <xsl:attribute name ="presentation:class">
+                  <xsl:call-template name ="LayoutType">
+                    <xsl:with-param name ="LayoutStyle">
+                      <xsl:value-of select ="$LayoutName"/>
+                    </xsl:with-param>
+                  </xsl:call-template >
+                </xsl:attribute>
+                <xsl:attribute name ="draw:id" >
+                  <xsl:value-of  select ="$drawAnimId"/>
+                </xsl:attribute>
+                <!--Added by Vipul for rotation-->
+                <!--Start-->
+                <xsl:call-template name="tmpWriteCordinates"/>
+                <xsl:copy-of select ="$var_textNode"/>
+                <!--End-->
+                <!-- Added by lohith.ar -->
+                <xsl:if test="msxsl:node-set($EventListnerNode)//presentation:event-listener">
+                  <xsl:copy-of select ="$EventListnerNode"/>
+                </xsl:if>
+              </draw:frame >
+            </xsl:when>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
   <xsl:template name ="tmpOLEObjects">
     <xsl:param name ="SlideRelationId"/>

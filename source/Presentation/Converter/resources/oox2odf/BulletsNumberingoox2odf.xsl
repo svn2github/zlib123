@@ -60,8 +60,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							</xsl:variable>
 							<!-- Added by lohith.ar - Code for text Hyperlinks -->
 							<xsl:if test="node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd) ">
-                <!--added by chhavi for conformance-->
-                <xsl:if test="node()/a:hlinkClick/@r:id != ''">
+               
 							
 									<xsl:call-template name="AddTextHyperlinks">
 										<xsl:with-param name="nodeAColonR" select="node()" />
@@ -70,7 +69,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <xsl:with-param name="nodeTextSpan" select="$nodeTextSpan" />
 									</xsl:call-template>
 								
-							</xsl:if>
+							<!--</xsl:if>-->
 							</xsl:if>
               <!--added by chhavi for conformance-->
 							<xsl:if test="not(node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd))or node()/a:hlinkClick/@r:id = ''">

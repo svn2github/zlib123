@@ -3379,6 +3379,7 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:if>
                   <!-- Added by lohith - bug fix 1731885 -->
                   <xsl:if test="not(node())">
+                    <xsl:if test="position()=last()">
                     <a:endParaRPr lang="en-US" smtClean="0">
                       <!--Font Size -->
                       <xsl:variable name ="textId">
@@ -3406,6 +3407,7 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:call-template>
                       </xsl:if>
                     </a:endParaRPr>
+                  </xsl:if>
                   </xsl:if>
                   </xsl:otherwise>
                   </xsl:choose>
