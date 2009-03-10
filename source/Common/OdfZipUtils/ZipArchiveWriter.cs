@@ -1031,9 +1031,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
             {
                 if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
-                    tempOutputFilePath = Environment.GetCommandLineArgs()[i + 1];
+                    tempOutputFilePath = Path.GetFullPath(Environment.GetCommandLineArgs()[i + 1]);
                 if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/O")
-                    returnOutputFilePath = Environment.GetCommandLineArgs()[i + 1];
+                    returnOutputFilePath = Path.GetFullPath(Environment.GetCommandLineArgs()[i + 1]);
                 if (Environment.GetCommandLineArgs()[i].ToString().ToUpper().Contains("BATCH"))
                     varBatch = true;
 
@@ -1062,8 +1062,15 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         }
             else
             {
+                if (Directory.Exists(returnOutputFilePath))
+                {
+                    return returnOutputFilePath;
+                }
+                else
+                {
                 return returnOutputFilePath.Substring(0, returnOutputFilePath.LastIndexOf("\\"));
             }
+        }
         }
 
         #endregion
