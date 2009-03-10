@@ -72,7 +72,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							<!--</xsl:if>-->
 							</xsl:if>
               <!--added by chhavi for conformance-->
-							<xsl:if test="not(node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd))or node()/a:hlinkClick/@r:id = ''">
+							<xsl:if test="not(node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd))">
 								<xsl:copy-of select="$nodeTextSpan"/>
 							</xsl:if>
 						</text:span>

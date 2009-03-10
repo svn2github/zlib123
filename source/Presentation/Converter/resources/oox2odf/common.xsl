@@ -2510,6 +2510,9 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
+    <xsl:if test="$nodeAColonR/a:hlinkClick/@action[ contains(.,'noaction')]">
+      <xsl:copy-of select="$nodeTextSpan"/>
+    </xsl:if>
     <xsl:if test="string-length($nodeAColonR/a:hlinkClick/@r:id) > 0">
       <xsl:variable name="RelationId">
         <xsl:value-of select="$nodeAColonR/a:hlinkClick/@r:id"/>
