@@ -677,17 +677,17 @@
         </text:creator>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMCHARS'">
-        <text:character-count text:fixed="{$isLocked}">
+        <text:character-count>
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:character-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMPAGES'">
-        <text:page-count text:fixed="{$isLocked}">
+        <text:page-count>
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:page-count>
       </xsl:when>
       <xsl:when test="$fieldType = 'NUMWORDS'">
-        <text:word-count text:fixed="{$isLocked}">
+        <text:word-count>
           <xsl:apply-templates select="$fieldDisplayValue" mode="fieldDisplayValueEscapeSpace" />
         </text:word-count>
       </xsl:when>

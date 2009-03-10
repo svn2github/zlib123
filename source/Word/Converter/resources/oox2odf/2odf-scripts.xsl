@@ -234,7 +234,7 @@
                   }
 
                   // escape invalid start character
-                  Match firstChar = _invalidLettersAtStart.Match(name);
+                  Match firstChar = _invalidLettersAtStart.Match(ncname);
                   if (firstChar.Success)
                   {
                       ncname = string.Format("_{0:x}_{1}", (int)firstChar.Groups[1].Value[0], firstChar.Groups[2].Value);
