@@ -478,8 +478,9 @@
 
                 <xsl:choose>
                   <xsl:when test="$pathId='m,l,21600r21600,l21600,xe' 
-                                  or  $pathId='m,l,21600l21600,21600l21600,xe'
-                                  or $pathId='m0,0l0,21600l21600,21600l21600,0xe'">
+                                  or $pathId='m,l,21600l21600,21600l21600,xe'
+                                  or $pathId='m0,0l0,21600l21600,21600l21600,0xe'
+                                  or $pathId=''">
                     <draw:frame draw:name="Frame1"
                               draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
                       <xsl:call-template name="InsertAnchorTypeAttribute" />
