@@ -53,16 +53,19 @@ namespace OdfConverter.Wordprocessing
         private string[] RUN_PROPERTIES = { "ins", "del", "moveFrom", "moveTo", "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange" };
         private string[] PARAGRAPH_PROPERTIES = { "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "textboxTightWrap", "suppressOverlap", "jc", "textDirection", "textAlignment", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"};
 
-        private Stack currentNode;
-        private Stack context;
-        private Stack currentParagraphStyleName;
-        private Dictionary<string, Element> cStyles;
-        private Dictionary<string, Element> pStyles;
-        private Dictionary<string, Element> cStylesAdded = new Dictionary<string, Element>();
-        private Dictionary<string, Element> pStylesAdded = new Dictionary<string, Element>();
+        private Stack _currentNode;
+        private Stack _context;
+        private Stack _currentParagraphStyleName;
+        
+        private Dictionary<string, Element> _cStyles;
+        private Dictionary<string, Element> _pStyles;
+        private Dictionary<string, Element> _cStylesAdded = new Dictionary<string, Element>();
+        private Dictionary<string, Element> _pStylesAdded = new Dictionary<string, Element>();
         // keep track of lower case styles to avoid conflicts
-        private ArrayList cStylesLowerCaseList;
-        private ArrayList pStylesLowerCaseList;
+        // NOTE: This should be HashSet which is only available in .NET 3.5
+        //       The value of the dictionary is not used.
+        private Dictionary<string, string> _cStylesLowerCaseList;
+        private Dictionary<string, string> _pStylesLowerCaseList;
 
         /// <summary>
         /// Constructor
@@ -70,14 +73,14 @@ namespace OdfConverter.Wordprocessing
         public OoxAutomaticStylesPostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
-            this.currentNode = new Stack();
-            this.context = new Stack();
-            this.context.Push("root");
-            this.currentParagraphStyleName = new Stack();
-            this.cStyles = new Dictionary<string, Element>();
-            this.pStyles = new Dictionary<string, Element>();
-            this.cStylesLowerCaseList = new ArrayList();
-            this.pStylesLowerCaseList = new ArrayList();
+            this._currentNode = new Stack();
+            this._context = new Stack();
+            this._context.Push("root");
+            this._currentParagraphStyleName = new Stack();
+            this._cStyles = new Dictionary<string, Element>();
+            this._pStyles = new Dictionary<string, Element>();
+            this._cStylesLowerCaseList = new Dictionary<string, string>();
+            this._pStylesLowerCaseList = new Dictionary<string, string>();
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
@@ -88,7 +91,7 @@ namespace OdfConverter.Wordprocessing
                 this.nextWriter.WriteStartElement(prefix, localName, ns);
             }
           
-            this.currentNode.Push(new Element(prefix, localName, ns));
+            this._currentNode.Push(new Element(prefix, localName, ns));
 
             if (IsStyle(localName, ns))
             {
@@ -167,12 +170,12 @@ namespace OdfConverter.Wordprocessing
                 this.nextWriter.WriteEndElement();
             }
 
-            this.currentNode.Pop();
+            this._currentNode.Pop();
         }
 
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
-            this.currentNode.Push(new Attribute(prefix, localName, ns));
+            this._currentNode.Push(new Attribute(prefix, localName, ns));
 
             if (IsInRunProperties() || IsInRPrChange() || IsInParagraphProperties() || IsInPPrChange() || IsInStyle())
             {
@@ -186,24 +189,19 @@ namespace OdfConverter.Wordprocessing
 
         public override void WriteEndAttribute()
         {
-            if (IsInStyle())
+            if (IsInStyle() || IsInRunProperties() || IsInRPrChange() || IsInParagraphProperties() || IsInPPrChange())
             {
-                EndAttributeInStyle();
-            }
-            else if (IsInRunProperties() || IsInRPrChange())
-            {
-                EndAttributeInRunProperties();
-            }
-            else if (IsInParagraphProperties() || IsInPPrChange())
-            {
-                EndAttributeInParagraphProperties();
+                Attribute attribute = (Attribute)this._currentNode.Pop();
+                Element element = (Element)this._currentNode.Peek();
+                element.AddAttribute(attribute);
+                this._currentNode.Push(attribute);
             }
             else
             {
                 this.nextWriter.WriteEndAttribute();
             }
 
-            this.currentNode.Pop();
+            this._currentNode.Pop();
         }
 
         public override void WriteString(string text)
@@ -238,90 +236,82 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsInStyle()
         {
-            return "style".Equals(this.context.Peek());
+            return "style".Equals(this._context.Peek());
         }
 
         private void StartStyle()
         {
-            this.context.Push("style");
+            this._context.Push("style");
         }
 
         private void EndElementInStyle()
         {
-            Element element = (Element)this.currentNode.Pop();
+            Element element = (Element)this._currentNode.Pop();
             if (IsStyle(element.Name, element.Ns))
             {
                 // style element : write it if not hidden or not paragraph or character style.
                 if (IsCharacterStyle(element))
                 {
                     string key = element.GetAttributeValue("styleId", NAMESPACE);
-                    if (!cStyles.ContainsKey(key))
+                    if (!_cStyles.ContainsKey(key))
                     {
                         // if a style exists having same lower-case name, replace with new name.
                         string name = element.GetChild("name", NAMESPACE).GetAttributeValue("val", NAMESPACE);
-                        if (this.cStylesLowerCaseList.Contains(name.ToLower()))
+                        if (this._cStylesLowerCaseList.ContainsKey(name.ToLower()))
                         {
-                            string newStyleName = this.GetUniqueLowerCaseStyleName(name, cStylesLowerCaseList);
+                            string newStyleName = this.GetUniqueLowerCaseStyleName(name, _cStylesLowerCaseList);
                             Element newName = new Element("w", "name", NAMESPACE);
                             newName.AddAttribute(new Attribute("w", "val", newStyleName, NAMESPACE));
                             element.Replace(element.GetChild("name", NAMESPACE), newName);
-                            this.cStylesLowerCaseList.Add(newStyleName);
+                            this._cStylesLowerCaseList.Add(newStyleName, string.Empty);
                         }
                         else
                         {
-                            this.cStylesLowerCaseList.Add(name.ToLower());
+                            this._cStylesLowerCaseList.Add(name.ToLower(), string.Empty);
                         }
-                        this.cStyles.Add(key, element);
+                        this._cStyles.Add(key, element);
                     }
                 }
                 else if (IsParagraphStyle(element))
                 {
                     string key = element.GetAttributeValue("styleId", NAMESPACE);
-                    if (!pStyles.ContainsKey(key))
+                    if (!_pStyles.ContainsKey(key))
                     {
                         // if a style exists having same lower-case name, replace with new name.
                         string name = element.GetChild("name", NAMESPACE).GetAttributeValue("val", NAMESPACE);
-                        if (this.pStylesLowerCaseList.Contains(name.ToLower()))
+                        if (this._pStylesLowerCaseList.ContainsKey(name.ToLower()))
                         {
-                            string newStyleName = this.GetUniqueLowerCaseStyleName(name, pStylesLowerCaseList);
+                            string newStyleName = this.GetUniqueLowerCaseStyleName(name, _pStylesLowerCaseList);
                             Element newName = new Element("w", "name", NAMESPACE);
                             newName.AddAttribute(new Attribute("w", "val", newStyleName, NAMESPACE));
                             element.Replace(element.GetChild("name", NAMESPACE), newName);
-                            this.pStylesLowerCaseList.Add(newStyleName);
+                            this._pStylesLowerCaseList.Add(newStyleName, string.Empty);
                         }
                         else
                         {
-                            this.pStylesLowerCaseList.Add(name.ToLower());
+                            this._pStylesLowerCaseList.Add(name.ToLower(), string.Empty);
                         }
-                        this.pStyles.Add(key, element);
+                        this._pStyles.Add(key, element);
                     }
                 }
                 if (!IsParagraphStyle(element) && !IsCharacterStyle(element) || !IsAutomaticStyle(element))
                 {
                     element.Write(this.nextWriter);
                 }
-                this.context.Pop();
+                this._context.Pop();
             }
             else
             {
                 // child element : add it to its parent
-                Element parent = (Element)this.currentNode.Peek();
+                Element parent = (Element)this._currentNode.Peek();
                 parent.AddChild(element);
             }
-            this.currentNode.Push(element);
-        }
-
-        private void EndAttributeInStyle()
-        {
-            Attribute attribute = (Attribute)this.currentNode.Pop();
-            Element element = (Element)this.currentNode.Peek();
-            element.AddAttribute(attribute);
-            this.currentNode.Push(attribute);
+            this._currentNode.Push(element);
         }
 
         private void StringInStyle(string text)
         {
-            Node node = (Node)this.currentNode.Peek();
+            Node node = (Node)this._currentNode.Peek();
             if (node is Attribute)
             {
                 Attribute attribute = (Attribute)node;
@@ -364,23 +354,23 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsInParagraph()
         {
-            return "p".Equals(this.context.Peek());
+            return "p".Equals(this._context.Peek());
         }
 
         private void StartParagraph()
         {
-            this.context.Push("p");
+            this._context.Push("p");
             // no style name yet
-            this.currentParagraphStyleName.Push("");
+            this._currentParagraphStyleName.Push("");
         }
 
         private void EndElementInParagraph()
         {
-            Element element = (Element)this.currentNode.Peek();
+            Element element = (Element)this._currentNode.Peek();
             if (IsParagraph(element.Name, element.Ns))
             {
-                this.currentParagraphStyleName.Pop();
-                this.context.Pop();
+                this._currentParagraphStyleName.Pop();
+                this._context.Pop();
             }
         }
 
@@ -395,26 +385,26 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsInParagraphProperties()
         {
-            return "pPr".Equals(this.context.Peek());
+            return "pPr".Equals(this._context.Peek());
         }
 
         private void StartParagraphProperties()
         {
-            this.context.Push("pPr");
+            this._context.Push("pPr");
         }
 
         private void EndElementInParagraphProperties()
         {
-            Element element = (Element)this.currentNode.Pop();
+            Element element = (Element)this._currentNode.Pop();
             if (IsParagraphProperties(element.Name, element.Ns))
             {
-                this.context.Pop();
+                this._context.Pop();
                 CompleteParagraphProperties(element);
                 Element pPr = GetOrderedParagraphProperties(element);
                 if (IsInPPrChange())
                 {
                     // attach properties to parent
-                    Element pPrChange = (Element)this.currentNode.Peek();
+                    Element pPrChange = (Element)this._currentNode.Peek();
                     pPrChange.AddChild(pPr);
                 }
                 else
@@ -426,23 +416,15 @@ namespace OdfConverter.Wordprocessing
             }
             else
             {
-                Element parent = (Element)this.currentNode.Peek();
+                Element parent = (Element)this._currentNode.Peek();
                 parent.AddChild(element);
             }
-            this.currentNode.Push(element);
-        }
-
-        private void EndAttributeInParagraphProperties()
-        {
-            Attribute attribute = (Attribute)this.currentNode.Pop();
-            Element element = (Element)this.currentNode.Peek();
-            element.AddAttribute(attribute);
-            this.currentNode.Push(attribute);
+            this._currentNode.Push(element);
         }
 
         private void StringInParagraphProperties(string text)
         {
-            Node node = (Node)this.currentNode.Peek();
+            Node node = (Node)this._currentNode.Peek();
             if (node is Attribute)
             {
                 Attribute attribute = (Attribute)node;
@@ -480,8 +462,8 @@ namespace OdfConverter.Wordprocessing
                     {
                         AddRunStyleProperties(rPr, pStyleName, false);
                         // update current paragraph style name
-                        this.currentParagraphStyleName.Pop();
-                        this.currentParagraphStyleName.Push(pStyleName);
+                        this._currentParagraphStyleName.Pop();
+                        this._currentParagraphStyleName.Push(pStyleName);
                     }
                     // add style declaration
                     AddStyleDeclaration(pPr, pStyleName, "pStyle");
@@ -496,13 +478,13 @@ namespace OdfConverter.Wordprocessing
 
         private void AddParagraphStyleProperties(Element pPr, string styleName)
         {
-            if (pStyles.ContainsKey(styleName) && IsAutomaticStyle(pStyles[styleName]))
+            if (_pStyles.ContainsKey(styleName) && IsAutomaticStyle(_pStyles[styleName]))
             {
                 // add run properties
-                AddParagraphProperties(pPr, pStyles[styleName]);
+                AddParagraphProperties(pPr, _pStyles[styleName]);
 
                 // add parent style properties
-                Element basedOn = pStyles[styleName].GetChild("basedOn", NAMESPACE);
+                Element basedOn = _pStyles[styleName].GetChild("basedOn", NAMESPACE);
                 if (basedOn != null)
                 {
                     string baseStyleName = basedOn.GetAttributeValue("val", NAMESPACE);
@@ -571,17 +553,17 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsInPPrChange()
         {
-            return "pPrChange".Equals(this.context.Peek());
+            return "pPrChange".Equals(this._context.Peek());
         }
 
         private void StartPPrChange()
         {
-            this.context.Push("pPrChange");
+            this._context.Push("pPrChange");
         }
 
         private void EndElementInPPrChange()
         {
-            this.context.Pop();
+            this._context.Pop();
             EndElementInParagraphProperties();
         }
 
@@ -596,36 +578,36 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsInRun()
         {
-            return "r".Equals(this.context.Peek()) || "r-with-properties".Equals(this.context.Peek());
+            return "r".Equals(this._context.Peek()) || "r-with-properties".Equals(this._context.Peek());
         }
 
         private void StartRun()
         {
-            this.context.Push("r");
+            this._context.Push("r");
         }
 
         private void StartElementInRun(string localName, string ns)
         {
-            if (!IsInRunProperties() && "r".Equals(this.context.Peek()))
+            if (!IsInRunProperties() && "r".Equals(this._context.Peek()))
             {
-                string styleName = (string)this.currentParagraphStyleName.Peek();
-                if (!string.IsNullOrEmpty(styleName) && pStyles.ContainsKey(styleName) && IsAutomaticStyle(pStyles[styleName]))
+                string styleName = (string)this._currentParagraphStyleName.Peek();
+                if (!string.IsNullOrEmpty(styleName) && _pStyles.ContainsKey(styleName) && IsAutomaticStyle(_pStyles[styleName]))
                 {
                     Element rPr = new Element("w", "rPr", NAMESPACE);
                     AddRunStyleProperties(rPr, styleName, false);
                     WriteRunProperties(rPr);
-                    this.context.Pop();
-                    this.context.Push("r-with-properties");
+                    this._context.Pop();
+                    this._context.Push("r-with-properties");
                 }
             }
         }
 
         private void EndElementInRun()
         {
-            Element element = (Element)this.currentNode.Peek();
+            Element element = (Element)this._currentNode.Peek();
             if (IsRun(element.Name, element.Ns))
             {
-                this.context.Pop();
+                this._context.Pop();
             }
         }
 
@@ -640,53 +622,45 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsInRunProperties()
         {
-            return "rPr".Equals(this.context.Peek());
+            return "rPr".Equals(this._context.Peek());
         }
 
         private void StartRunProperties()
         {
-            this.context.Push("rPr");
+            this._context.Push("rPr");
         }
 
         private void EndElementInRunProperties()
         {
-            Element element = (Element)this.currentNode.Pop();
+            Element element = (Element)this._currentNode.Pop();
             if (IsRunProperties(element.Name, element.Ns))
             {
                 CompleteRunProperties(element);
-                this.context.Pop();
+                this._context.Pop();
                 if (!IsInRPrChange())
                 {
                     WriteRunProperties(element);
-                    this.context.Pop();
-                    this.context.Push("r-with-properties");
+                    this._context.Pop();
+                    this._context.Push("r-with-properties");
                 }
                 else
                 {
                     // attach rPr to rPrChange
-                    Element parent = (Element)this.currentNode.Peek();
+                    Element parent = (Element)this._currentNode.Peek();
                     parent.AddChild(GetOrderedRunProperties(element));
                 }
             }
             else
             {
-                Element parent = (Element)this.currentNode.Peek();
+                Element parent = (Element)this._currentNode.Peek();
                 parent.AddChild(element);
             }
-            this.currentNode.Push(element);
-        }
-
-        private void EndAttributeInRunProperties()
-        {
-            Attribute attribute = (Attribute)this.currentNode.Pop();
-            Element element = (Element)this.currentNode.Peek();
-            element.AddAttribute(attribute);
-            this.currentNode.Push(attribute);
+            this._currentNode.Push(element);
         }
 
         private void StringInRunProperties(string text)
         {
-            Node node = (Node)this.currentNode.Peek();
+            Node node = (Node)this._currentNode.Peek();
             if (node is Attribute)
             {
                 Attribute attribute = (Attribute)node;
@@ -714,10 +688,10 @@ namespace OdfConverter.Wordprocessing
                 }
             }
             // add paragraph run properties (if automatic)
-            string styleName = (string)this.currentParagraphStyleName.Peek();
-            if (!"".Equals(styleName) && pStyles.ContainsKey(styleName) && IsAutomaticStyle(pStyles[styleName]))
+            string styleName = (string)this._currentParagraphStyleName.Peek();
+            if (!"".Equals(styleName) && _pStyles.ContainsKey(styleName) && IsAutomaticStyle(_pStyles[styleName]))
             {
-                AddRunProperties(rPr, pStyles[styleName]);
+                AddRunProperties(rPr, _pStyles[styleName]);
             }
             // add style name
             if (rStyle != null)
@@ -732,29 +706,29 @@ namespace OdfConverter.Wordprocessing
 
         private void AddRunStyleProperties(Element rPr, string styleName, bool isCharacterStyle)
         {
-            cStylesAdded.Clear();
-            pStylesAdded.Clear();
+            _cStylesAdded.Clear();
+            _pStylesAdded.Clear();
             AddRunStylePropertiesRecursive(rPr, styleName, isCharacterStyle);
         }
 
         private void AddRunStylePropertiesRecursive(Element rPr, string styleName, bool isCharacterStyle)
         {
-            if (isCharacterStyle && cStylesAdded.ContainsKey(styleName) || pStylesAdded.ContainsKey(styleName))
+            if (isCharacterStyle && _cStylesAdded.ContainsKey(styleName) || _pStylesAdded.ContainsKey(styleName))
             {
                 // check for cycles in style hierarchy
                 return;
             } 
                 
             Element style = null;
-            if (isCharacterStyle && cStyles.ContainsKey(styleName))
+            if (isCharacterStyle && _cStyles.ContainsKey(styleName))
             {
-                style = cStyles[styleName];
-                cStylesAdded.Add(styleName, style);
+                style = _cStyles[styleName];
+                _cStylesAdded.Add(styleName, style);
             }
-            else if (pStyles.ContainsKey(styleName))
+            else if (_pStyles.ContainsKey(styleName))
             {
-                style = pStyles[styleName];
-                pStylesAdded.Add(styleName, style);
+                style = _pStyles[styleName];
+                _pStylesAdded.Add(styleName, style);
             }
             else
             {
@@ -828,13 +802,13 @@ namespace OdfConverter.Wordprocessing
         private void AddStyleDeclaration(Element element, string styleName, string styleType)
         {
             Element style = null;
-            if ("rStyle".Equals(styleType) && cStyles.ContainsKey(styleName))
+            if ("rStyle".Equals(styleType) && _cStyles.ContainsKey(styleName))
             {
-                style =  cStyles[styleName];
+                style =  _cStyles[styleName];
             }
-            else if (pStyles.ContainsKey(styleName))
+            else if (_pStyles.ContainsKey(styleName))
             {
-                style = pStyles[styleName];
+                style = _pStyles[styleName];
             }
             else
             {
@@ -876,17 +850,17 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsInRPrChange()
         {
-            return "rPrChange".Equals(this.context.Peek());
+            return "rPrChange".Equals(this._context.Peek());
         }
 
         private void StartRPrChange()
         {
-            this.context.Push("rPrChange");
+            this._context.Push("rPrChange");
         }
 
         private void EndElementInRPrChange()
         {
-            this.context.Pop();
+            this._context.Pop();
             EndElementInRunProperties();
         }
 
@@ -894,11 +868,11 @@ namespace OdfConverter.Wordprocessing
          *  Get a unique lower case name for a style in a list of lowered-case names.
          */
 
-        private string GetUniqueLowerCaseStyleName(string key, ArrayList styleList)
+        private string GetUniqueLowerCaseStyleName(string key, Dictionary<string, string> styleList)
         {
             string baseName = key.ToLower();
             int num = 0;
-            while (styleList.Contains(key.ToLower()))
+            while (styleList.ContainsKey(key.ToLower()))
             {
                 key = baseName + "_" + ++num ;
             }

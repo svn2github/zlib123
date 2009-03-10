@@ -41,6 +41,11 @@
           return System.Text.RegularExpressions.Regex.Replace(input, pattern, replacement, options);
       }
       
+      public string ListSeparator()
+      {
+          return System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator.ToString();
+      }
+      
       ///<summary>
       /// Checks whether an URI points inside a package or outside
       /// 

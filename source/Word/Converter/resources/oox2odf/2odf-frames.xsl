@@ -57,7 +57,7 @@
           makz: If the frame is anchored to the page insert only the frame
           else insert the paragraph and the frame.
           
-          A frame which iss not aligned to the page (in horiz. or vert. direction) 
+          A frame which is not aligned to the page (in horiz. or vert. direction) 
           needs a paragraph due to it's anchor.
 
           Frames in header/footer need a surrounding text:p, otherwise, OpenOffice will not show them
@@ -142,7 +142,7 @@
               <xsl:with-param name="pPr" select ="w:pPr" />
             </xsl:call-template>
 
-            <xsl:call-template name ="InsertFrameBackgroundForStyle">
+            <xsl:call-template name="InsertFrameBackgroundForStyle">
               <xsl:with-param name="pPr" select ="w:pPr" />
             </xsl:call-template>
 

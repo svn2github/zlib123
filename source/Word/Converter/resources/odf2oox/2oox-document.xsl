@@ -1324,8 +1324,7 @@
       <w:rPr>
         <w:rStyle w:val="{concat(@text:note-class, 'Reference')}"/>
         <!-- COMMENT : why this color as a direct formatting property here ? -->
-        <xsl:variable name="fo:color"
-          select="substring-after(key('automatic-styles', parent::text:span/@text:style-name)/style:text-properties/@fo:color,'#')"/>
+        <xsl:variable name="fo:color" select="substring-after(key('automatic-styles', parent::text:span/@text:style-name)/style:text-properties/@fo:color,'#')"/>
         <xsl:if test="$fo:color">
           <w:color w:val="{$fo:color}"/>
         </xsl:if>

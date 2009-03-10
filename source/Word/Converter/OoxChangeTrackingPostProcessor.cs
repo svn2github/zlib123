@@ -32,6 +32,7 @@ using System;
 using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.Collections.Generic;
 
 namespace OdfConverter.Wordprocessing
 {
@@ -49,16 +50,17 @@ namespace OdfConverter.Wordprocessing
         private string[] TR_CHILDREN = { "tblPrEx", "trPr", "tc", "customXml", "sdt", "proofErr", "permStart", "permEnd", "bookmarkStart", "bookmarkEnd", "moveFromRangeStart", "moveFromRangeEnd", "moveToRangeStart", "moveToRangeEnd", "commentRangeStart", "commentRangeEnd", "customXmlInsRangeStart", "customXmlInsRangeEnd", "customXmlDelRangeStart", "customXmlDelRangeEnd", "customXmlMoveFromRangeStart", "customXmlMoveFromRangeEnd", "customXmlMoveToRangeStart", "customXmlMoveToRangeEnd", "ins", "del", "moveFrom", "moveTo"};
         private string[] TRPR_CHILDREN = { "cnfStyle", "divid", "gridBefore", "gridAfter", "wBefore", "wAfter", "canSplit", "trHeight", "trHeader", "tblCellSpacing", "jc", "hidden", "ins", "del", "trPrChange" };
         
-        private Stack currentNode;
-        private Stack context;
-        private Stack currentInsertionRegion;
-        private Stack currentFormatChangeRegion;
-        private Stack currentDeletion;
-        private int currentId = 0;
-        private Stack previousParagraph;
-        private Element lastInsertionRegion;
-        private Element lastFormatChangeRegion;
-        private Stack dontWrites;
+        private Stack<Element> _currentNode = new Stack<Element>();
+        private Stack<string> _context = new Stack<string>();
+        private Stack<Element> _currentInsertionRegion = new Stack<Element>();
+        private Stack<Element> _currentFormatChangeRegion = new Stack<Element>();
+        private Stack<Element> _previousParagraph = new Stack<Element>();
+        private Element _lastInsertionRegion;
+        private Element _lastFormatChangeRegion;
+        private Stack<string> _dontWrites;
+        private int _currentId = 0;
+        
+        private Attribute _currentAttribute = null;
 
         /// <summary>
         /// Constructor
@@ -66,23 +68,16 @@ namespace OdfConverter.Wordprocessing
         public OoxChangeTrackingPostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
-            this.currentNode = new Stack();
-            this.context = new Stack();
-            this.context.Push("root");
-            this.currentInsertionRegion = new Stack();
-            this.currentFormatChangeRegion = new Stack();
-            this.currentDeletion = new Stack();
-            this.previousParagraph = new Stack();
-            this.lastInsertionRegion = null;
-            this.lastFormatChangeRegion = null;
-            this.dontWrites = new Stack();
+            this._context.Push("root");
+            this._lastInsertionRegion = null;
+            this._lastFormatChangeRegion = null;
+            this._dontWrites = new Stack<string>();
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
+            this._currentNode.Push(new Element(prefix, localName, ns));
 
-
-            this.currentNode.Push(new Element(prefix, localName, ns));
             if (IsRun())
             {
                 StartRun();
@@ -159,13 +154,13 @@ namespace OdfConverter.Wordprocessing
             {
                 this.nextWriter.WriteEndElement();
             }
-            this.currentNode.Pop();
+            this._currentNode.Pop();
         }
 
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
-            this.currentNode.Push(new Attribute(prefix, localName, ns));
-
+            _currentAttribute = new Attribute(prefix, localName, ns);
+            
             if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
                 // do nothing
@@ -178,29 +173,30 @@ namespace OdfConverter.Wordprocessing
 
         public override void WriteEndAttribute()
         {
-            if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
+            if (_currentAttribute != null && (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite()))
             {
-                AddAttributeToElement();
+                Element element = this._currentNode.Peek();
+                element.AddAttribute(_currentAttribute);
+                _currentAttribute = null;
             }
             else
             {
                 this.nextWriter.WriteEndAttribute();
             }
-
-            this.currentNode.Pop();
         }
 
         public override void WriteString(string text)
         {
-            //dialogika, clam: Word is not behaving like it should (according to the spec). It needs the currently set list separator
-            if (text == "[INSERTSEPARATOR]" && ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)currentNode.Peek()).Name == "instrText")
-            {
-                text = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator.ToString();
-            }  
-                
             if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
-                AddStringToNode(text);
+                if (_currentAttribute != null)
+                {
+                    _currentAttribute.Value += text;
+                }
+                else
+                {
+                    this._currentNode.Peek().AddChild(text);
+                }
             }
             else
             {
@@ -212,40 +208,17 @@ namespace OdfConverter.Wordprocessing
          * General methods
          */
 
-        private void AddAttributeToElement()
-        {
-            Attribute attribute = (Attribute)this.currentNode.Pop();
-            Element element = (Element)this.currentNode.Peek();
-            element.AddAttribute(attribute);
-            this.currentNode.Push(attribute);
-        }
-
-        private void AddStringToNode(string text)
-        {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                Element element = (Element)node;
-                element.AddChild(text);
-            }
-            else
-            {
-                Attribute attribute = (Attribute)node;
-                attribute.Value += text;
-            }
-        }
-
         private void AddChildToElement()
         {
-            Element child = (Element)this.currentNode.Pop();
-            Element parent = (Element)this.currentNode.Peek();
+            Element child = this._currentNode.Pop();
+            Element parent = this._currentNode.Peek();
             parent.AddChild(child);
-            this.currentNode.Push(child);
+            this._currentNode.Push(child);
         }
 
         private bool DontWrite()
         {
-            return this.dontWrites.Count > 0;
+            return this._dontWrites.Count > 0;
         }
 
         /*
@@ -254,36 +227,25 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsParagraph()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return W_NAMESPACE.Equals(node.Ns) && "p".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsParagraph();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(W_NAMESPACE) && this._currentNode.Peek().Name.Equals("p"));
         }
-
+        
         private bool IsInParagraph()
         {
-            return this.context.Contains("p") || this.context.Contains("p-with-ins");
+            return this._context.Contains("p") || this._context.Contains("p-with-ins");
         }
 
         private void StartParagraph()
         {
             if (IsInInsert())
             {
-                this.context.Push("p-with-ins");
+                this._context.Push("p-with-ins");
             }
             else
             {
-                this.context.Push("p");
+                this._context.Push("p");
             }
-            this.dontWrites.Push("p");
+            this._dontWrites.Push("p");
         }
 
         
@@ -291,15 +253,15 @@ namespace OdfConverter.Wordprocessing
         
         private void EndParagraph()
         {
-            string context = (string)this.context.Pop();
-            string dontWrite = (string)this.dontWrites.Pop();
+            string context = this._context.Pop();
+            string dontWrite = this._dontWrites.Pop();
             if (IsInInsert())
             {
                 EndParagraphInInsert();
             }
-            Element paragraph = (Element)this.currentNode.Peek();
+            Element paragraph = this._currentNode.Peek();
             Element deletion = (Element)paragraph.GetChild("deletion", PCT_NAMESPACE);
-            ArrayList followingParagraphs = new ArrayList();
+            List<Element> followingParagraphs = new List<Element>();
             ArrayList remainingChildren = null;
             // deletion is not null if there were more than one paragraph in it
             if (deletion != null)
@@ -327,7 +289,7 @@ namespace OdfConverter.Wordprocessing
 
                 // build w:del element for insertion into paragraphs properties
                 Element del = new Element("w", "del", W_NAMESPACE);
-                del.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+                del.AddAttribute(new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE));
                 del.AddAttribute(new Attribute("w", "author", deletion.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
                 del.AddAttribute(new Attribute("w", "date", deletion.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
                 // retrieve first paragraph properties
@@ -422,9 +384,9 @@ namespace OdfConverter.Wordprocessing
                 // we started the paragraph inside an insert region
                 // compare para properties with previous para properties and put the previous in pPrChange if they differ
                 Element previousParagraph = null;
-                if (this.previousParagraph.Count > 0)
+                if (this._previousParagraph.Count > 0)
                 {
-                    previousParagraph = (Element)this.previousParagraph.Peek();
+                    previousParagraph = this._previousParagraph.Peek();
                 }   
                 if (previousParagraph != null && !CompareParagraphProperties(paragraph.GetChild("pPr", W_NAMESPACE), previousParagraph.GetChild("pPr", W_NAMESPACE)))
                 {
@@ -434,10 +396,10 @@ namespace OdfConverter.Wordprocessing
                         pPr = new Element("w", "pPr", W_NAMESPACE);
                         paragraph.AddChild(pPr);
                     }
-                    Element region = this.lastInsertionRegion;
-                    if (this.currentInsertionRegion.Count > 0)
+                    Element region = this._lastInsertionRegion;
+                    if (this._currentInsertionRegion.Count > 0)
                     {
-                        region = (Element)this.currentInsertionRegion.Peek();
+                        region = this._currentInsertionRegion.Peek();
                     }
                     pPr.AddChild(BuildPPrChange(previousParagraph.GetChild("pPr", W_NAMESPACE), region));
                 }
@@ -453,22 +415,22 @@ namespace OdfConverter.Wordprocessing
             // add other paragraphs (deletion)
             foreach (Element p in followingParagraphs)
             {
-                this.currentNode.Pop();
-                this.currentNode.Push(p);
-                this.dontWrites.Push(dontWrite);
-                this.context.Push(context);
+                this._currentNode.Pop();
+                this._currentNode.Push(p);
+                this._dontWrites.Push(dontWrite);
+                this._context.Push(context);
                 EndParagraph();
             }
-            if (this.previousParagraph.Count > 0)
+            if (this._previousParagraph.Count > 0)
             {
-                this.previousParagraph.Pop();
+                this._previousParagraph.Pop();
             }
-            this.previousParagraph.Push(paragraph);
+            this._previousParagraph.Push(paragraph);
         }
 
         private void EndParagraphInInsert()
         {
-            Element paragraph = (Element)this.currentNode.Peek();
+            Element paragraph = this._currentNode.Peek();
             Element pPr = paragraph.GetChild("pPr", W_NAMESPACE);
             if (pPr == null)
             {
@@ -481,9 +443,9 @@ namespace OdfConverter.Wordprocessing
                 rPr = new Element("w", "rPr", W_NAMESPACE);
                 pPr.AddChild(rPr);
             }
-            Element region = (Element)this.currentInsertionRegion.Peek();
+            Element region = this._currentInsertionRegion.Peek();
             Element ins = new Element("w", "ins", W_NAMESPACE);
-            ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+            ins.AddAttribute(new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE));
             ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
             ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
             rPr.AddFirstChild(ins);
@@ -518,7 +480,7 @@ namespace OdfConverter.Wordprocessing
         private Element BuildPPrChange(Element pPr, Element region)
         {
             Element pPrChange = new Element("w", "pPrChange", W_NAMESPACE);
-            pPrChange.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+            pPrChange.AddAttribute(new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE));
             pPrChange.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
             pPrChange.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
             Element newPPr = new Element("w", "pPr", W_NAMESPACE);
@@ -543,23 +505,12 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsRun()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return W_NAMESPACE.Equals(node.Ns) && "r".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsRun();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(W_NAMESPACE) && this._currentNode.Peek().Name.Equals("r"));
         }
 
         private bool IsRunInsert()
         {
-            return "r-with-ins".Equals(this.context.Peek());
+            return "r-with-ins".Equals(this._context.Peek());
         }
 
         private void StartRun()
@@ -570,36 +521,36 @@ namespace OdfConverter.Wordprocessing
                 {
                     // run start: we add a w:ins before
                     Element ins = new Element("w", "ins", W_NAMESPACE);
-                    ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
-                    Element region = (Element)this.currentInsertionRegion.Peek();
+                    ins.AddAttribute(new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE));
+                    Element region = this._currentInsertionRegion.Peek();
                     ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
                     ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
-                    object current = this.currentNode.Pop();
-                    this.currentNode.Push(ins);
-                    this.currentNode.Push(current);
-                    this.context.Push("r-with-ins");
+                    Element current = this._currentNode.Pop();
+                    this._currentNode.Push(ins);
+                    this._currentNode.Push(current);
+                    this._context.Push("r-with-ins");
                 }
                 else
                 {
-                    this.context.Push("r");
+                    this._context.Push("r");
                 }
             }
             else
             {
-                // not sure that can hapens (in a run but not in a paragraph), but in case of...
+                // not sure that can happen (in a run but not in a paragraph), but in case of...
                 if (IsInInsert())
                 {
                     
                     this.nextWriter.WriteStartElement("w", "ins", W_NAMESPACE);
-                    new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE).Write(this.nextWriter);
-                    Element region = (Element)this.currentInsertionRegion.Peek();
+                    new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE).Write(this.nextWriter);
+                    Element region = this._currentInsertionRegion.Peek();
                     new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
                     new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
-                    this.context.Push("r-with-ins");
+                    this._context.Push("r-with-ins");
                 }
                 else
                 {
-                    this.context.Push("r");
+                    this._context.Push("r");
                 }
                 this.nextWriter.WriteStartElement("w", "r", W_NAMESPACE);
             }
@@ -610,7 +561,7 @@ namespace OdfConverter.Wordprocessing
             if (IsInFormatChange())
             {
                 // format change: add rPrChange
-                Element run = (Element)this.currentNode.Peek();
+                Element run = this._currentNode.Peek();
                 Element rPr = run.GetChild("rPr", W_NAMESPACE);
                 if (rPr == null)
                 {
@@ -619,8 +570,8 @@ namespace OdfConverter.Wordprocessing
                 }
                 Element newRPr = rPr.Clone();
                 Element rPrChange = new Element("w", "rPrChange", W_NAMESPACE);
-                rPrChange.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
-                Element region = (Element)this.currentFormatChangeRegion.Peek();
+                rPrChange.AddAttribute(new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE));
+                Element region = this._currentFormatChangeRegion.Peek();
                 rPrChange.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
                 rPrChange.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
                 rPrChange.AddChild(newRPr);
@@ -632,7 +583,7 @@ namespace OdfConverter.Wordprocessing
                 if (IsRunInsert())
                 {
                     // close the w:ins
-                    this.currentNode.Pop();
+                    this._currentNode.Pop();
                     AddChildToElement();
                 }
             }
@@ -646,7 +597,7 @@ namespace OdfConverter.Wordprocessing
                     this.nextWriter.WriteEndElement();
                 }
             }
-            this.context.Pop();
+            this._context.Pop();
         }
 
         /*
@@ -659,18 +610,7 @@ namespace OdfConverter.Wordprocessing
             {
                 return false;
             }
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return W_NAMESPACE.Equals(node.Ns) && "t".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsTInDeletion();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(W_NAMESPACE) && this._currentNode.Peek().Name.Equals("t"));
         }
 
         private bool IsInstrTextInDeletion()
@@ -679,29 +619,18 @@ namespace OdfConverter.Wordprocessing
             {
                 return false;
             }
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return W_NAMESPACE.Equals(node.Ns) && "instrText".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsTInDeletion();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(W_NAMESPACE) && this._currentNode.Peek().Name.Equals("instrText"));
         }
 
         private void StartTInDeletion()
         {
-            Element t = (Element)this.currentNode.Peek();
+            Element t = this._currentNode.Peek();
             t.Name = "delText";
         }
 
         private void StartInstrTextInDeletion()
         {
-            Element t = (Element)this.currentNode.Peek();
+            Element t = this._currentNode.Peek();
             t.Name = "delInstrText";
         }
 
@@ -712,68 +641,46 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsStartInsert()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return PCT_NAMESPACE.Equals(node.Ns) && "start-insert".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsStartInsert();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(PCT_NAMESPACE) && this._currentNode.Peek().Name.Equals("start-insert"));
         }
 
         private bool IsEndInsert()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return PCT_NAMESPACE.Equals(node.Ns) && "end-insert".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsEndInsert();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(PCT_NAMESPACE) && this._currentNode.Peek().Name.Equals("end-insert"));
         }
 
         private bool IsInInsert()
         {
-            return this.currentInsertionRegion.Count > 0;
+            return this._currentInsertionRegion.Count > 0;
         }
 
         private void EndStartInsert()
         {
             // add the region on the stack
-            this.currentInsertionRegion.Push(this.currentNode.Peek());
+            this._currentInsertionRegion.Push(this._currentNode.Peek());
         }
 
         private void EndEndInsert()
         {
             // remove the region from the regions stack
-            Stack tmp = new Stack();
-            Element element = (Element)this.currentNode.Peek();
+            Stack<Element> tmp = new Stack<Element>();
+            Element element = this._currentNode.Peek();
             string id = element.GetAttributeValue("id", PCT_NAMESPACE);
-            if (this.currentInsertionRegion.Count > 0)
+            if (this._currentInsertionRegion.Count > 0)
             {
-                Element region = (Element)this.currentInsertionRegion.Pop();
-                while (!id.Equals(region.GetAttributeValue("id", PCT_NAMESPACE)))
+                Element region = this._currentInsertionRegion.Pop();
+                while (!id.Equals(region.GetAttributeValue("id", PCT_NAMESPACE)) && this._currentInsertionRegion.Count > 0)
                 {
                     tmp.Push(region);
-                    region = (Element)this.currentInsertionRegion.Pop();
+                    region = this._currentInsertionRegion.Pop();
                 }
             
                 while (tmp.Count > 0)
                 {
-                    this.currentInsertionRegion.Push(tmp.Pop());
+                    this._currentInsertionRegion.Push(tmp.Pop());
                 }
                 // save the last region in case we need it before closing a paragraph
-                this.lastInsertionRegion = region;
+                this._lastInsertionRegion = region;
             }
         }
 
@@ -784,65 +691,43 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsStartFormatChange()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return PCT_NAMESPACE.Equals(node.Ns) && "start-format-change".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsStartFormatChange();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(PCT_NAMESPACE) && this._currentNode.Peek().Name.Equals("start-format-change"));
         }
 
         private bool IsEndFormatChange()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return PCT_NAMESPACE.Equals(node.Ns) && "end-format-change".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsEndFormatChange();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(PCT_NAMESPACE) && this._currentNode.Peek().Name.Equals("end-format-change"));
         }
 
         private bool IsInFormatChange()
         {
-            return this.currentFormatChangeRegion.Count > 0;
+            return this._currentFormatChangeRegion.Count > 0;
         }
 
         private void EndStartFormatChange()
         {
             // add the region on the stack
-            this.currentFormatChangeRegion.Push(this.currentNode.Peek());
+            this._currentFormatChangeRegion.Push(this._currentNode.Peek());
         }
 
         private void EndEndFormatChange()
         {
             // remove the region from the regions stack
-            Stack tmp = new Stack();
-            Element element = (Element)this.currentNode.Peek();
+            Stack<Element> tmp = new Stack<Element>();
+            Element element = this._currentNode.Peek();
             string id = element.GetAttributeValue("id", PCT_NAMESPACE);
-            Element region = (Element)this.currentFormatChangeRegion.Pop();
+            Element region = this._currentFormatChangeRegion.Pop();
             while (!id.Equals(region.GetAttributeValue("id", PCT_NAMESPACE)))
             {
                 tmp.Push(region);
-                region = (Element)this.currentFormatChangeRegion.Pop();
+                region = this._currentFormatChangeRegion.Pop();
             }
             while (tmp.Count > 0)
             {
-                this.currentFormatChangeRegion.Push(tmp.Pop());
+                this._currentFormatChangeRegion.Push(tmp.Pop());
             }
             // save the last region in case we need it before closing a paragraph
-            this.lastFormatChangeRegion = region;
+            this._lastFormatChangeRegion = region;
         }
 
         /*
@@ -851,43 +736,32 @@ namespace OdfConverter.Wordprocessing
 
         private bool IsDeletion()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return PCT_NAMESPACE.Equals(node.Ns) && "deletion".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsDeletion();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(PCT_NAMESPACE) && this._currentNode.Peek().Name.Equals("deletion"));
         }
 
         private bool IsInDeletion()
         {
-            return this.context.Contains("del");
+            return this._context.Contains("del");
         }
 
         private void StartDeletion()
         {
-            this.context.Push("del");
-            this.dontWrites.Push("del");
+            this._context.Push("del");
+            this._dontWrites.Push("del");
         }
 
         private void EndDeletion()
         {
-            this.context.Pop();
-            this.dontWrites.Pop();
-            Element deletion = (Element)this.currentNode.Pop();
+            this._context.Pop();
+            this._dontWrites.Pop();
+            Element deletion = this._currentNode.Pop();
             Element p = deletion.GetChild("p", W_NAMESPACE);
             // insert elements from first paragraph
             if (p != null)
             {
                 // remove the paragraph from the deletion element
                 deletion.RemoveChild(p);
-                Element parentP = (Element)this.currentNode.Peek();
+                Element parentP = this._currentNode.Peek();
                 foreach (object child in p.Children)
                 {
                     if (child is Element)
@@ -915,7 +789,7 @@ namespace OdfConverter.Wordprocessing
                     }
                 }
             }
-            this.currentNode.Push(deletion);
+            this._currentNode.Push(deletion);
             // attach deletion to previous element if not empty
             if (deletion.GetChild("p", W_NAMESPACE) != null)
             {
@@ -929,7 +803,7 @@ namespace OdfConverter.Wordprocessing
             {
                 // insert w:del element
                 Element del = new Element("w", "del", W_NAMESPACE);
-                del.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+                del.AddAttribute(new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE));
                 del.AddAttribute(new Attribute("w", "author", deletion.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
                 del.AddAttribute(new Attribute("w", "date", deletion.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
                 del.AddChild(element);
@@ -973,53 +847,42 @@ namespace OdfConverter.Wordprocessing
          */
         private bool IsTableRow()
         {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Element)
-            {
-                return W_NAMESPACE.Equals(node.Ns) && "tr".Equals(node.Name);
-            }
-            else
-            {
-                this.currentNode.Pop();
-                bool result = IsTableRow();
-                this.currentNode.Push(node);
-                return result;
-            }
+            return (this._currentNode.Count > 0 && this._currentNode.Peek().Ns.Equals(W_NAMESPACE) && this._currentNode.Peek().Name.Equals("tr"));
         }
         
         private bool IsInTableRow()
         {
-        	 return this.context.Contains("tr") || this.context.Contains("tr-with-ins");
+        	 return this._context.Contains("tr") || this._context.Contains("tr-with-ins");
         }
         
        	private bool IsTableRowInsert()
         {
-            return "tr-with-ins".Equals(this.context.Peek());
+            return "tr-with-ins".Equals(this._context.Peek());
         }
         
         private void StartTableRow() 
         {
         	if (IsInInsert())
         	{
-        		this.context.Push("tr-with-ins");
+        		this._context.Push("tr-with-ins");
         	}
         	else
         	{
-        		this.context.Push("tr");
+        		this._context.Push("tr");
         	}
-        	this.dontWrites.Push("tr");
+        	this._dontWrites.Push("tr");
         }
         
         private void EndTableRow()
         {
-        	Element tr = (Element) currentNode.Peek();
+        	Element tr = this._currentNode.Peek();
         		
         	if (IsTableRowInsert()) // only on insertion
         	{
         		Element trPr = tr.GetChild("trPr", W_NAMESPACE);
-        		Element region = (Element)this.currentInsertionRegion.Peek();
+        		Element region = this._currentInsertionRegion.Peek();
         		Element ins = new Element("w", "ins", W_NAMESPACE);
-        		ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+        		ins.AddAttribute(new Attribute("w", "id", "" + this._currentId++, W_NAMESPACE));
         		ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
         		ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
         		if (trPr == null)
@@ -1030,9 +893,9 @@ namespace OdfConverter.Wordprocessing
         		}
         		trPr.AddChild(ins);
         		trPr.Children = GetOrderedChildren(trPr, TRPR_CHILDREN);
-        		this.context.Pop();
+        		this._context.Pop();
         	}
-        	this.dontWrites.Pop();
+        	this._dontWrites.Pop();
         	if (DontWrite())
         	{
         		AddChildToElement();

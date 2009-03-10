@@ -367,22 +367,19 @@
       <w:instrText>
         <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level &gt; $MaxConsecutiveOutline and not(@style:default-outline-level &gt; $MaxConsideredOutline)]" >
           <xsl:choose>
+            <!-- NOTE: Word is not behaving like it should (according to the spec). It needs the currently set list separator -->
             <xsl:when test="@style:display-name">
               <xsl:value-of select="@style:display-name"/>
-              <!--<xsl:text>;</xsl:text>-->
-              <xsl:text>[INSERTSEPARATOR]</xsl:text>
+              <xsl:value-of select="ooc:ListSeparator()" />
               <xsl:value-of select="@style:default-outline-level"/>
-              <!--<xsl:text>;</xsl:text>-->
-              <xsl:text>[INSERTSEPARATOR]</xsl:text>
+              <xsl:value-of select="ooc:ListSeparator()" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:if test="@style:name">
                 <xsl:value-of select="@style:name"/>
-                <!--<xsl:text>;</xsl:text>-->
-                <xsl:text>[INSERTSEPARATOR]</xsl:text>
+                <xsl:value-of select="ooc:ListSeparator()" />
                 <xsl:value-of select="@style:default-outline-level"/>
-                <!--<xsl:text>;</xsl:text>-->
-                <xsl:text>[INSERTSEPARATOR]</xsl:text>
+                <xsl:value-of select="ooc:ListSeparator()" />
               </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
@@ -482,22 +479,19 @@
           <xsl:for-each select="document('styles.xml')">
             <xsl:for-each select="key('styles', $levelStyleName)">
               <xsl:choose>
+                <!-- NOTE: Word is not behaving like it should (according to the spec). It needs the currently set list separator -->
                 <xsl:when test="@style:display-name">
                   <xsl:value-of select="@style:display-name"/>
-                  <!--<xsl:text>;</xsl:text>-->
-                  <xsl:text>[INSERTSEPARATOR]</xsl:text>
+                  <xsl:value-of select="ooc:ListSeparator()" />
                   <xsl:value-of select="$level"/>
-                  <!--<xsl:text>;</xsl:text>-->
-                  <xsl:text>[INSERTSEPARATOR]</xsl:text>
+                  <xsl:value-of select="ooc:ListSeparator()" />
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:if test="@style:name">
                     <xsl:value-of select="@style:name"/>
-                    <!--<xsl:text>;</xsl:text>-->
-                    <xsl:text>[INSERTSEPARATOR]</xsl:text>
+                    <xsl:value-of select="ooc:ListSeparator()" />
                     <xsl:value-of select="$level"/>
-                    <!--<xsl:text>;</xsl:text>-->
-                    <xsl:text>[INSERTSEPARATOR]</xsl:text>
+                    <xsl:value-of select="ooc:ListSeparator()" />
                   </xsl:if>
                 </xsl:otherwise>
               </xsl:choose>
