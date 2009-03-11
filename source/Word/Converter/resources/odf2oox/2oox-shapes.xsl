@@ -654,11 +654,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         <xsl:choose>
           <xsl:when test="$shape/@svg:width">
             <!-- Sona: Defect #2166160-->
-            <xsl:value-of select="concat('width:', ooc:PtFromMeasuredUnit($shape/@svg:width, 0), 'pt;')" />
+            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/@svg:width, 0), 'pt;')" />
           </xsl:when>
           <xsl:otherwise>
             <!-- Sona: Defect #2166160-->
-            <xsl:value-of select="concat('width:', ooc:PtFromMeasuredUnit($shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width, 0), 'pt;')" />
+            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width, 0), 'pt;')" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -670,13 +670,14 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
           <xsl:when test="$shape/@svg:height">
             <!-- Sona: Defect #2166160-->
             <!-- Sona: Defect #2019374-->
-            <xsl:value-of select="concat('height:', ooc:PtFromMeasuredUnit($shape/@svg:height, 0), 'pt;')" />
+            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/@svg:height, 0), 'pt;')" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat('height:', ooc:PtFromMeasuredUnit($shape/child::node()/@fo:min-height|$shapeStyle/style:graphic-properties/@fo:min-height, 0), 'pt;')" />
+            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/child::node()/@fo:min-height|$shapeStyle/style:graphic-properties/@fo:min-height, 0), 'pt;')" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+      <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 
       <!--code added by Chhavi for relative size in Frame - Defect #2166036-->
       <xsl:if test="(../draw:frame or draw:frame) and string(number(substring-before($shape/@style:rel-width,'%'))) != 'NaN'">

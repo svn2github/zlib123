@@ -474,7 +474,16 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:variable name="shapeTypeId" select="substring-after(@type,'#')" />
-                <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+                <xsl:variable name="pathId">
+                  <xsl:choose>
+                    <xsl:when test="@path">
+                      <xsl:value-of select="@path" />
+                    </xsl:when>
+                    <xsl:when test="$shapeTypeId">
+                      <xsl:value-of select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:variable>
 
                 <xsl:choose>
                   <xsl:when test="$pathId='m,l,21600r21600,l21600,xe' 
@@ -938,7 +947,16 @@
     </xsl:for-each>
     <!-- Sona: Gradient for Frame-->
     <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-    <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+    <xsl:variable name="pathId">
+      <xsl:choose>
+        <xsl:when test="@path">
+          <xsl:value-of select="@path" />
+        </xsl:when>
+        <xsl:when test="$shapeTypeId">
+          <xsl:value-of select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
 
     <xsl:if test="($pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox)) and ($shape/v:fill/@type='tile' or $shape/v:fill/@type='pattern' or $shape/v:fill/@type='frame')">
       <xsl:call-template name="InsertGradientFillForFrame">
@@ -1104,7 +1122,16 @@
     <xsl:param name="shape" />
     <!-- Sona: Shadow implementation-->
     <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-    <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+    <xsl:variable name="pathId">
+      <xsl:choose>
+        <xsl:when test="@path">
+          <xsl:value-of select="@path" />
+        </xsl:when>
+        <xsl:when test="$shapeTypeId">
+          <xsl:value-of select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
 
     <xsl:for-each select="$shape/v:shadow">
       <xsl:choose>
@@ -1421,7 +1448,17 @@
     <!--end here-->
     <!--Edited by Sona to implement Picture fill-->
     <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-    <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+    <xsl:variable name="pathId">
+      <xsl:choose>
+        <xsl:when test="@path">
+          <xsl:value-of select="@path" />
+        </xsl:when>
+        <xsl:when test="$shapeTypeId">
+          <xsl:value-of select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    
     <!-- Sona: Gradient fill for frames-->
     <xsl:if test="($pathId!='m,l,21600r21600,l21600,xe' and not($shape[name()='v:rect'] and $shape/v:textbox))">
       <xsl:choose>
@@ -2967,7 +3004,16 @@
       </xsl:if>
       <!--Sona : Rotation Implementation -->
       <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-      <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+      <xsl:variable name="pathId">
+        <xsl:choose>
+          <xsl:when test="@path">
+            <xsl:value-of select="@path" />
+          </xsl:when>
+          <xsl:when test="$shapeTypeId">
+            <xsl:value-of select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
 
       <xsl:if test="contains($shape/@style,'rotation')">
         <xsl:variable name="xCord">
@@ -3375,8 +3421,17 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
-        <xsl:variable name="pathId" select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
-
+        <xsl:variable name="pathId">
+          <xsl:choose>
+            <xsl:when test="@path">
+              <xsl:value-of select="@path" />
+            </xsl:when>
+            <xsl:when test="$shapeTypeId">
+              <xsl:value-of select="key('shapeTypeById', $shapeTypeId)[1]/@path" />
+            </xsl:when>
+          </xsl:choose>
+        </xsl:variable> 
+        
         <!-- Don't insert the width if the textbox is set to auto-width -->
         <xsl:if test="(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
                 not(contains($shape/@style,'mso-wrap-style:none'))) or
