@@ -134,7 +134,15 @@
           mode="dataStyle"/>
       </xsl:variable>
       <xsl:attribute name="w:instr">
-        <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
+        <xsl:choose>
+          <!-- only insert formatting if there is one defined, otherwise use application default -->
+          <xsl:when test="$dataStyle != ''">
+            <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$fieldType"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
       <w:r>
         <xsl:call-template name="InsertRunProperties"/>
