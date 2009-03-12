@@ -172,16 +172,15 @@ RefNo-2 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
     </xsl:variable>
 
     <office:annotation>
-
       <xsl:variable name="widthInPt">
         <xsl:value-of
-          select="substring-before(substring-after(key('Part', concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('width', ':')), ';')"
+          select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('width', ':')), ';')"
         />
       </xsl:variable>
 
       <xsl:variable name="heightInPt">
         <xsl:value-of
-          select="substring-before(substring-after(key('Part', concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('height', ':')), ';')"
+          select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('height', ':')), ';')"
         />
       </xsl:variable>
 

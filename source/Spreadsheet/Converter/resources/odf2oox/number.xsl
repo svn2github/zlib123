@@ -42,6 +42,8 @@ RefNo-1 28-Oct-2008 Sandeep S     1796999   Changes done to fix Negative value i
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   exclude-result-prefixes="number style fo">
 	
+	<xsl:import href="chart.xsl"/>
+	
 	<xsl:key name="numtextStyle" match="style:style" use="@style:data-style-name"/>
 	<xsl:key name="table-cell" match="table:table-cell" use="@table:style-name"/>
 	<xsl:key name="number" match="number:number-style" use="@style:name"/>
@@ -641,9 +643,23 @@ RefNo-1 28-Oct-2008 Sandeep S     1796999   Changes done to fix Negative value i
             <xsl:with-param name="numerator">
               <xsl:value-of select="number:fraction/@number:min-numerator-digits"/>
             </xsl:with-param>
+            <!--<xsl:with-param name="denominator">
+              <xsl:value-of select="number:fraction/@number:min-denominator-digits"/>				
+            </xsl:with-param>-->
+			  <!--Vijayeta,SP2,Numberformat lost in case when denomnator is a value,Testfeatures M3-->
             <xsl:with-param name="denominator">
-              <xsl:value-of select="number:fraction/@number:min-denominator-digits"/>
+				  <xsl:choose>
+					  <xsl:when test ="number:fraction/@number:min-denominator-digits">
+						  <xsl:value-of select="concat('digits','|',number:fraction/@number:min-denominator-digits)"/>
+					  </xsl:when>
+					  <xsl:when test ="number:fraction/@number:denominator-value">
+						  <xsl:value-of select="concat('value','|',number:fraction/@number:denominator-value)"/>
+					  </xsl:when>
+				  </xsl:choose>
             </xsl:with-param>
+			  <!--<xsl:value-of select="number:fraction/@number:min-denominator-digits"/>-->
+			  <!--Vijayeta,SP2,Numberformat lost in case when denomnator is a value,Testfeatures M3,End-->
+
           </xsl:call-template>
         </xsl:when>
 
@@ -1028,11 +1044,28 @@ RefNo-1 28-Oct-2008 Sandeep S     1796999   Changes done to fix Negative value i
     <xsl:param name="denominator"/>
     <!-- (int) number of digits in denominator -->
     <xsl:variable name="fraction">
-      <xsl:call-template name="ConvertNumeratorDenominator">
+      <!--<xsl:call-template name="ConvertNumeratorDenominator">
         <xsl:with-param name="numerator" select="$numerator"/>
         <xsl:with-param name="denominator" select="$denominator"/>
         <xsl:with-param name="value">/</xsl:with-param>
+      </xsl:call-template>-->
+		<!--Vijayeta,SP2,Testfeatures M3-->
+		<xsl:choose>
+			<xsl:when test ="starts-with($denominator,'digits|')">
+      <xsl:call-template name="ConvertNumeratorDenominator">
+        <xsl:with-param name="numerator" select="$numerator"/>
+					<xsl:with-param name="denominator" select="substring-after($denominator,'digits|')"/>
+					<xsl:with-param name="value">/</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test ="starts-with($denominator,'value|')">
+				<xsl:call-template name="ConvertNumeratorDenominatorWithValue">
+					<xsl:with-param name="numerator" select="$numerator"/>
+					<xsl:with-param name="denominator" select="substring-after($denominator,'value|')"/>
+        <xsl:with-param name="value">/</xsl:with-param>
       </xsl:call-template>
+			</xsl:when>
+		</xsl:choose>
     </xsl:variable>
     <xsl:value-of select="concat(translate($value,'.',''),'&quot; &quot;',$fraction)"/>
   </xsl:template>
@@ -1500,9 +1533,22 @@ RefNo-1 28-Oct-2008 Sandeep S     1796999   Changes done to fix Negative value i
 						<xsl:with-param name="numerator">
 							<xsl:value-of select="number:fraction/@number:min-numerator-digits"/>
 						</xsl:with-param>
-						<xsl:with-param name="denominator">
+						<!--<xsl:with-param name="denominator">
 							<xsl:value-of select="number:fraction/@number:min-denominator-digits"/>
+						</xsl:with-param>-->
+						<!--Vijayeta,SP2,Numberformat lost in case when denomnator is a value,Testfeatures M3-->
+						<xsl:with-param name="denominator">
+							<xsl:choose>
+								<xsl:when test ="number:fraction/@number:min-denominator-digits">
+									<xsl:value-of select="concat('digits','|',number:fraction/@number:min-denominator-digits)"/>
+								</xsl:when>
+								<xsl:when test ="number:fraction/@number:denominator-value">
+									<xsl:value-of select="concat('value','|',number:fraction/@number:denominator-value)"/>
+								</xsl:when>
+							</xsl:choose>
 						</xsl:with-param>
+						<!--<xsl:value-of select="number:fraction/@number:min-denominator-digits"/>-->
+						<!--Vijayeta,SP2,Numberformat lost in case when denomnator is a value,Testfeatures M3,End-->
 					</xsl:call-template>
 				</xsl:when>
 
