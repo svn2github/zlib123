@@ -30,6 +30,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"   
   xmlns:odf="urn:odf"
+                xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"  
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -46,7 +47,10 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page r presentation fo script xlink svg">
   
-
+  <!--SP2: Wrap Issue-->
+  <xsl:variable name="docGeneratorName">
+    <xsl:value-of select="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+  </xsl:variable>
   <!-- Shape constants-->
   <xsl:variable name ="dot">
     <xsl:value-of select ="'0.07'"/>
@@ -3004,6 +3008,47 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:if>
         <!-- Text wrapping in shape-->
         <xsl:choose>
+          <xsl:when test="$docGeneratorName='MicrosoftOffice/12.0 MicrosoftPowerPoint'">
+            <xsl:choose>
+
+              <xsl:when test ="@fo:wrap-option='no-wrap'">
+                <xsl:attribute name ="wrap">
+                  <xsl:value-of select ="'none'"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test ="@fo:wrap-option='wrap'">
+                <xsl:attribute name ="wrap">
+                  <xsl:value-of select ="'square'"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test ="$default-wrap-option='no-wrap'">
+                <xsl:attribute name ="wrap">
+                  <xsl:value-of select ="'none'"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test ="$default-wrap-option='wrap'">
+                <xsl:attribute name ="wrap">
+                  <xsl:value-of select ="'square'"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name ="wrap">
+                  <!--added by chhvi for regression m1 and m2-->
+                  <xsl:choose>
+                    <xsl:when test="@draw:auto-grow-height = 'false'">
+                      <xsl:value-of select ="'none'"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select ="'square'"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+
 					<xsl:when test ="@fo:wrap-option='no-wrap'">
 						<xsl:attribute name ="wrap">
 							<xsl:value-of select ="'square'"/>
@@ -3038,6 +3083,9 @@ Copyright (c) 2007, Sonata Software Limited
 						</xsl:attribute>
 					</xsl:otherwise>  
 				</xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      
         <xsl:choose>
           <xsl:when test ="@draw:auto-grow-height = 'true' or @draw:auto-grow-width = 'true'">
 					<a:spAutoFit/>
@@ -3050,6 +3098,28 @@ Copyright (c) 2007, Sonata Software Limited
     </a:bodyPr>
     </xsl:template>
   <xsl:template name="tmpWrap">
+
+    <xsl:choose>
+      <xsl:when test="$docGeneratorName='MicrosoftOffice/12.0 MicrosoftPowerPoint'">
+        <xsl:choose>
+          <xsl:when test ="@fo:wrap-option='no-wrap'">
+            <xsl:attribute name ="wrap">
+              <xsl:value-of select ="'none'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test ="@fo:wrap-option='wrap'">
+            <xsl:attribute name ="wrap">
+              <xsl:value-of select ="'square'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name ="wrap">
+              <xsl:value-of select ="'square'"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
         <xsl:choose>
           <xsl:when test ="@fo:wrap-option='no-wrap'">
             <xsl:attribute name ="wrap">
@@ -3067,6 +3137,9 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+     
       <xsl:if test ="@draw:auto-grow-height = 'true' or @draw:auto-grow-width = 'true'">
           <a:spAutoFit/>
         </xsl:if>
