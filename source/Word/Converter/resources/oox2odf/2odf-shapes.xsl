@@ -305,7 +305,7 @@
           <xsl:with-param name="document" select="$document" />
           <xsl:with-param name="rId" select="v:imagedata/@r:id" />
         </xsl:call-template>
-        <draw:frame draw:style-name="{generate-id(.)}">
+        <draw:frame draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
           <!--TODO-->
           <xsl:attribute name="draw:name">
             <xsl:text>Frame1</xsl:text>
@@ -363,7 +363,7 @@
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="self::v:line">
-            <draw:line draw:style-name="{generate-id(.)}">
+            <draw:line draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
               <!--TODO-->
               <xsl:attribute name="draw:name">
                 <xsl:text>Frame1</xsl:text>
@@ -430,7 +430,7 @@
               </xsl:when>
               <!-- Oval -->
               <xsl:when  test="self::v:oval">
-                <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(parent::node()/v:oval/@id,generate-id(./parent::node())))}">
+                <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
                   <xsl:call-template name="InsertAnchorTypeAttribute" />
                   <xsl:call-template name="InsertShapeWidth" />
                   <xsl:call-template name="InsertShapeHeight" />
@@ -445,7 +445,7 @@
               </xsl:when>
               <!-- Rounded Rectangle -->
               <xsl:when  test="self::v:roundrect">
-                <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(parent::node()/v:roundrect/@id,generate-id(./parent::node())))}">
+                <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
                   <xsl:call-template name="InsertAnchorTypeAttribute" />
                   <xsl:call-template name="InsertShapeWidth" />
                   <xsl:call-template name="InsertShapeHeight" />
@@ -722,7 +722,7 @@
   <xsl:template match="w:pict">
     <xsl:choose>
       <xsl:when test="v:group">
-        <draw:g draw:style-name="{generate-id(.)}">
+        <draw:g draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
           <xsl:call-template name="InsertAnchorTypeAttribute">
             <xsl:with-param name="shape" select="v:group" />
           </xsl:call-template>
