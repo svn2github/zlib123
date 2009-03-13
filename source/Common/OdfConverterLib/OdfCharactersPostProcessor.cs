@@ -533,19 +533,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
             }
             strFormula = strFormula.Replace("#", "$");
+            //1 px   = 0.0264cm at 96dpi (Windows default) 
+            strFormula = strFormula.Replace("pixelwidth", "width * 0.0264");
+            strFormula = strFormula.Replace("pixellinewidth", "width * 0.0264");
+            strFormula = strFormula.Replace("pixelheight", "height * 0.0264");
+            strFormula = strFormula.Replace("pixellineheight", "height * 0.0264");
             
-            strFormula = strFormula.Replace("pixelwidth", "width");
-            strFormula = strFormula.Replace("pixellinewidth", "width");
-            strFormula = strFormula.Replace("pixelheight", "height");
-            strFormula = strFormula.Replace("pixellineheight", "height");
+            strFormula = strFormula.Replace("pixelWidth", "width * 0.0264");
+            strFormula = strFormula.Replace("pixellineWidth", "width * 0.0264");
+            strFormula = strFormula.Replace("pixelHeight", "height * 0.0264");
+            strFormula = strFormula.Replace("pixellineHeight", "height * 0.0264");
 
-            strFormula = strFormula.Replace("pixelWidth", "width");
-            strFormula = strFormula.Replace("pixellineWidth", "width");
-            strFormula = strFormula.Replace("pixelHeight", "height");
-            strFormula = strFormula.Replace("pixellineHeight", "height");
-
-            strFormula = strFormula.Replace("pixelLineWidth", "width");
-            strFormula = strFormula.Replace("pixelLineHeight", "height");
+            strFormula = strFormula.Replace("pixelLineWidth", "width * 0.0264");
+            strFormula = strFormula.Replace("pixelLineHeight", "height * 0.0264");
             strFormula = strFormula.Replace("linedrawn", "1");
             strFormula = strFormula.Replace("lineDrawn", "1");
 
