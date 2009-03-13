@@ -167,6 +167,17 @@
               <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             </xsl:call-template>
           </xsl:for-each>
+      </xsl:when >
+            <xsl:otherwise>
+          <xsl:for-each select="key('shapeTypeById', $shapeTypeId)[1]">
+            <xsl:call-template name="CreateEnhancePath">
+              <xsl:with-param name="pathModifier" select="$pathModifier"/>
+              <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            </xsl:call-template>
+          </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+
         </xsl:variable>
         <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
           <xsl:call-template name="InsertAnchorTypeAttribute" />
@@ -239,7 +250,7 @@
       <xsl:attribute name="draw:enhanced-path">
         <xsl:value-of select="concat('WordshapesEnhance-Path:',@path)"/>
       </xsl:attribute>
-      <xsl:if test="contains($shapeStyle,'flip') and not(contains($shapeStyle,'rotation'))">
+      <xsl:if test="contains($shapeStyle,'flip')">
         <xsl:variable name="var_flipH">
           <xsl:choose>
             <xsl:when test="contains($shapeStyle,'flip:x y')">
@@ -3106,15 +3117,26 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:variable name="angle">
+          <xsl:variable name="tmprotval" select="substring-after($shape/@style,'rotation:')"/>
+          <xsl:variable name="rotval">
+            <xsl:choose>
+            <xsl:when test="contains($tmprotval,'fd')">
+              <xsl:value-of select="number(substring-before($tmprotval,'fd;')) div 60000"/>
+            </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-before($tmprotval,';')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
           <xsl:choose>
-            <xsl:when test="$var_flipH='1' and $var_flipV='1'">
+            <xsl:when test="$var_flipH='0' and $var_flipV='1'">
               <xsl:call-template name="emu-measure">
-                <xsl:with-param name="length" select="concat(360-substring-before(substring-after($shape/@style,concat('rotation',':')),';'),'degrees')" />
+                <xsl:with-param name="length" select="concat(360 - $rotval,'degrees')" />
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="emu-measure">
-                <xsl:with-param name="length" select="concat(substring-before(substring-after($shape/@style,concat('rotation',':')),';'),'degrees')" />
+                <xsl:with-param name="length" select="concat($rotval,'degrees')" />
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>

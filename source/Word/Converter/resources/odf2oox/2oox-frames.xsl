@@ -775,14 +775,57 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape   Changes to retain shapes size in
       </xsl:variable>
 
       <xsl:variable name="x2">
+  <!--Sonata: SP2 shape rotation issue-->
+        <xsl:variable name="var_drawTransform">
+          <xsl:value-of select="substring-after($frame/@draw:transform,'translate')"/>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="contains($var_drawTransform,'translate')">
+            <xsl:variable name="tmpx1">
         <xsl:call-template name="ConvertToCentimeters">
-          <xsl:with-param name="length" select="substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' ')" />
+                  <xsl:with-param name="length" select="substring-before(substring-before(substring-after(substring-after($frame/@draw:transform,'translate'),'('),')'),' ')" />
         </xsl:call-template>
       </xsl:variable>
+            <xsl:variable name="tmpx2">
+              <xsl:call-template name="ConvertToCentimeters">
+                  <xsl:with-param name="length" select="substring-before(substring-before(substring-after(substring-after($var_drawTransform,'translate'),'('),')'),' ')" />
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat(number(substring-before($tmpx1,'cm')) + number(substring-before($tmpx2,'cm')),'cm')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="ConvertToCentimeters">
+              <xsl:with-param name="length" select="substring-before(substring-before(substring-after(substring-after($frame/@draw:transform,'translate'),'('),')'),' ')" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:variable name="y2">
+        
+  <!--Sonata: SP2 shape rotation issue-->
+        <xsl:variable name="var_drawTransform">
+          <xsl:value-of select="substring-after($frame/@draw:transform,'translate')"/>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="contains($var_drawTransform,'translate')">
+            <xsl:variable name="tmpy1">
         <xsl:call-template name="ConvertToCentimeters">
-          <xsl:with-param name="length" select="substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' ')" />
+                <xsl:with-param name="length" select="substring-after(substring-before(substring-after(substring-after($frame/@draw:transform,'translate'),'('),')'),' ')" />
         </xsl:call-template>
+      </xsl:variable>
+            <xsl:variable name="tmpy2">
+              <xsl:call-template name="ConvertToCentimeters">
+                <xsl:with-param name="length" select="substring-after(substring-before(substring-after(substring-after($var_drawTransform,'translate'),'('),')'),' ')" />
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat(number(substring-before($tmpy1,'cm')) + number(substring-before($tmpy2,'cm')),'cm')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="ConvertToCentimeters">
+              <xsl:with-param name="length" select="substring-after(substring-before(substring-after(substring-after($frame/@draw:transform,'translate'),'('),')'),' ')" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
 
       <xsl:variable name="rotation">
