@@ -504,6 +504,9 @@
                       </draw:text-box>
                     </draw:frame>
                   </xsl:when>
+                  <!--RefNo-1:To avoid canvas-->
+                  <xsl:when test="$pathId='m@4@5l@4@11@9@11@9@5xe'">
+                  </xsl:when>
                   <xsl:otherwise>
                     <xsl:call-template name="GetShape">
                       <xsl:with-param name="currentShape" select="." />
@@ -800,6 +803,27 @@
         </style:graphic-properties>
       </style:style>
     </xsl:if>
+    <!--Start of RefNo-1:Added style for the shapes in the group -->
+    <xsl:if test="$vmlElement[1]/v:shape">
+      <xsl:for-each select ="$vmlElement[1]/v:shape">
+        <style:style style:family="graphic">          
+          <xsl:attribute name="style:name">
+            <xsl:value-of  select="ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))" />
+          </xsl:attribute>          
+          <xsl:if test="v:textbox">
+            <xsl:attribute name="style:parent-style-name">
+              <xsl:text>Frame</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          <style:graphic-properties>
+            <xsl:call-template name="InsertShapeStyleProperties">
+              <xsl:with-param name="shape" select="." />
+            </xsl:call-template>
+          </style:graphic-properties>
+        </style:style>
+      </xsl:for-each>
+    </xsl:if>
+    <!--End of RefNo-1-->
     <!-- Sona: #2014221 and Arrow Feature Continuation-->
     <!--<xsl:call-template name="getDashType">
 			<xsl:with-param name="shape" select="$vmlElement" />
@@ -1432,13 +1456,13 @@
       </xsl:choose>
     </xsl:attribute>
     <!-- insert fill-color -->
-    <xsl:if test="$isFilled != 'f'">
+    <!--2630175<xsl:if test="$isFilled != 'f'">-->
       <xsl:attribute name="draw:fill-color">
         <xsl:call-template name="InsertColor">
           <xsl:with-param name="color" select="$fillcolor" />
         </xsl:call-template>
       </xsl:attribute>
-    </xsl:if>
+    <!--</xsl:if>-->
     <!--added by chhavi to fix bug 2003056-->
     <xsl:if test="$isFilled = 'f'">
       <xsl:attribute name="draw:fill">
@@ -1932,7 +1956,8 @@
               <xsl:text>default</xsl:text>
             </xsl:when>
             <!-- Sona: Added borders for shapes other than custom shapes like rounded rect,rect,oval,can-->
-            <xsl:when test="$shape=v:roundrect or $shape=v:rect or $shape=v:shape or $shape=v:oval">
+            <!--<xsl:when test="$shape=v:roundrect or $shape=v:rect or $shape=v:shape or $shape=v:oval">-->
+            <xsl:when test="name($shape)='v:roundrect' or name($shape)='v:rect' or name($shape)='v:shape' or name($shape)='v:oval'">
               <xsl:text>default</xsl:text>
             </xsl:when>
             <xsl:otherwise>
