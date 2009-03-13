@@ -249,7 +249,8 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                         if (!(doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLWorkbook
                             || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLWorkbookMacroEnabled
                             || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLTemplate
-                            || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLTemplateMacroEnabled))
+                            || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlOpenXMLTemplateMacroEnabled
+                            || doc.GetInt32("FileFormat") == (int)XlFileFormat.xlExcel12))
                         {
                             // if file is not currently in Excel12 format
                             // 1. Create a copy
