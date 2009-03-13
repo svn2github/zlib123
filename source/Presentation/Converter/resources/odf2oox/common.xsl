@@ -4393,7 +4393,14 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test="$XY='X'">
         <xsl:choose>
           <xsl:when test="contains($tmp_XY,'translate')">
+            <!--fix for SP2 shape rotation issue-->
+            <xsl:variable name="x1">
+              <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$unit)" />
+            </xsl:variable>
+            <xsl:variable name="x2">
             <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after($tmp_XY,'translate'),'('),')'),' '),$unit)" />
+            </xsl:variable>
+            <xsl:value-of select="number($x1) + number($x2) "/>
           </xsl:when>
           <xsl:when test="$drawTranformVal!=''">
             <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after($drawTranformVal,'translate'),'('),')'),' '),$unit)" />
@@ -4401,13 +4408,19 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:otherwise>
             <xsl:value-of select="'0'"/>
           </xsl:otherwise>
-          
         </xsl:choose>
       </xsl:when>
       <xsl:when test="$XY='Y'">
         <xsl:choose>
           <xsl:when test="contains($tmp_XY,'translate')">
+            <!--fix for SP2 shape rotation issue-->
+            <xsl:variable name="y1">
+             <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$unit)" />
+            </xsl:variable>
+            <xsl:variable name="y2">
             <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after($tmp_XY,'translate'),'('),')'),' '),$unit)" />
+            </xsl:variable>
+            <xsl:value-of select="number($y1) + number($y2) "/>
           </xsl:when>
           <xsl:when test="$drawTranformVal!=''">
             <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after($drawTranformVal,'translate'),'('),')'),' '),$unit)" />
@@ -4850,6 +4863,10 @@ Copyright (c) 2007, Sonata Software Limited
      </xsl:template>
   <xsl:template name="tmpgetCustShapeType">
     <xsl:choose>
+      <!-- Line -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path='M ?f0 ?f2 L ?f1 ?f3 N'">
+        <xsl:value-of select ="'line'"/>
+      </xsl:when>
       <!-- Text Box -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt202' and 
                       draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
@@ -5018,7 +5035,8 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <!-- "No Symbol" (Added by A.Mathi as on 19/07/2007)-->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='forbidden'
-                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'No Smoking'))	">
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'No Smoking'))
+                        or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path  = 'M ?f3 ?f9 A ?f124 ?f125 ?f126 ?f127 ?f3 ?f9 ?f121 ?f123  W ?f128 ?f129 ?f130 ?f131 ?f3 ?f9 ?f121 ?f123 A ?f167 ?f168 ?f169 ?f170 ?f121 ?f123 ?f164 ?f166  W ?f171 ?f172 ?f173 ?f174 ?f121 ?f123 ?f164 ?f166 A ?f210 ?f211 ?f212 ?f213 ?f164 ?f166 ?f207 ?f209  W ?f214 ?f215 ?f216 ?f217 ?f164 ?f166 ?f207 ?f209 A ?f253 ?f254 ?f255 ?f256 ?f207 ?f209 ?f250 ?f252  W ?f257 ?f258 ?f259 ?f260 ?f207 ?f209 ?f250 ?f252 Z M ?f61 ?f62 A ?f291 ?f292 ?f293 ?f294 ?f61 ?f62 ?f288 ?f290  W ?f295 ?f296 ?f297 ?f298 ?f61 ?f62 ?f288 ?f290 Z M ?f63 ?f64 A ?f334 ?f335 ?f336 ?f337 ?f63 ?f64 ?f331 ?f333  W ?f338 ?f339 ?f340 ?f341 ?f63 ?f64 ?f331 ?f333 Z N')">
         <xsl:value-of select ="'noSmoking '"/>
       </xsl:when>     
 		<xsl:when test ="(draw:enhanced-geometry/@draw:type='block-arc')
@@ -5320,12 +5338,14 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <!-- Flow Chart: Predefined-process -->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-predefined-process'
-                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 0 L 1143000 0 1143000 990600 0 990600 Z N F M 142875 0 L 142875 990600 M 1000125 0 L 1000125 990600 N F M 0 0 L 1143000 0 1143000 990600 0 990600 Z N')">
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 0 L 1143000 0 1143000 990600 0 990600 Z N F M 142875 0 L 142875 990600 M 1000125 0 L 1000125 990600 N F M 0 0 L 1143000 0 1143000 990600 0 990600 Z N')
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path ='S M 0 0 L 2357454 0 2357454 785818 0 785818 Z N F M 294682 0 L 294682 785818 M 2062772 0 L 2062772 785818 N F M 0 0 L 2357454 0 2357454 785818 0 785818 Z N')">
         <xsl:value-of select ="'Flowchart: Predefined Process '"/>
       </xsl:when>
       <!-- Flow Chart: Internal-storage -->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-internal-storage'
-                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 0 L 1219200 0 1219200 990600 0 990600 Z N F M 152400 0 L 152400 990600 M 0 123825 L 1219200 123825 N F M 0 0 L 1219200 0 1219200 990600 0 990600 Z N')">
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 0 L 1219200 0 1219200 990600 0 990600 Z N F M 152400 0 L 152400 990600 M 0 123825 L 1219200 123825 N F M 0 0 L 1219200 0 1219200 990600 0 990600 Z N')
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 0 L 1357322 0 1357322 1214446 0 1214446 Z N F M 169665 0 L 169665 1214446 M 0 151806 L 1357322 151806 N F M 0 0 L 1357322 0 1357322 1214446 0 1214446 Z N') ">
         <xsl:value-of select ="'Flowchart: Internal Storage '"/>
       </xsl:when>
       <!-- Flow Chart: Document -->
@@ -5410,7 +5430,8 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <!-- Flow Chart: Stored-data -->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-stored-data'
-                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 165100 0 L 990600 0 A ?f57 ?f58 ?f59 ?f60 990600 0 ?f54 ?f56  W ?f61 ?f62 ?f63 ?f64 990600 0 ?f54 ?f56 L 165100 914400 A ?f104 ?f105 ?f106 ?f107 165100 914400 ?f101 ?f103  W ?f108 ?f109 ?f110 ?f111 165100 914400 ?f101 ?f103 Z N')">
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 165100 0 L 990600 0 A ?f57 ?f58 ?f59 ?f60 990600 0 ?f54 ?f56  W ?f61 ?f62 ?f63 ?f64 990600 0 ?f54 ?f56 L 165100 914400 A ?f104 ?f105 ?f106 ?f107 165100 914400 ?f101 ?f103  W ?f108 ?f109 ?f110 ?f111 165100 914400 ?f101 ?f103 Z N')
+                       or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path ='M 292100 0 L 1752600 0 A ?f57 ?f58 ?f59 ?f60 1752600 0 ?f54 ?f56  W ?f61 ?f62 ?f63 ?f64 1752600 0 ?f54 ?f56 L 292100 1143000 A ?f104 ?f105 ?f106 ?f107 292100 1143000 ?f101 ?f103  W ?f108 ?f109 ?f110 ?f111 292100 1143000 ?f101 ?f103 Z N') ">
         <xsl:value-of select ="'Flowchart: Stored Data '"/>
       </xsl:when>
       <!-- Flow Chart: Delay-->
@@ -5425,12 +5446,17 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <!-- Flow Chart: Direct-access-storage -->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-direct-access-storage'
-                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 190500 0 L 952500 0 A ?f58 ?f59 ?f60 ?f61 952500 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 952500 0 ?f55 ?f57 L 190500 685800 A ?f101 ?f102 ?f103 ?f104 190500 685800 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 190500 685800 ?f98 ?f100 Z N F M 952500 685800 A ?f113 ?f102 ?f114 ?f104 952500 685800 ?f112 ?f100  W ?f115 ?f106 ?f116 ?f108 952500 685800 ?f112 ?f100 N F M 190500 0 L 952500 0 A ?f58 ?f59 ?f60 ?f61 952500 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 952500 0 ?f55 ?f57 L 190500 685800 A ?f101 ?f102 ?f103 ?f104 190500 685800 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 190500 685800 ?f98 ?f100 Z N')">
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 190500 0 L 952500 0 A ?f58 ?f59 ?f60 ?f61 952500 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 952500 0 ?f55 ?f57 L 190500 685800 A ?f101 ?f102 ?f103 ?f104 190500 685800 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 190500 685800 ?f98 ?f100 Z N F M 952500 685800 A ?f113 ?f102 ?f114 ?f104 952500 685800 ?f112 ?f100  W ?f115 ?f106 ?f116 ?f108 952500 685800 ?f112 ?f100 N F M 190500 0 L 952500 0 A ?f58 ?f59 ?f60 ?f61 952500 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 952500 0 ?f55 ?f57 L 190500 685800 A ?f101 ?f102 ?f103 ?f104 190500 685800 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 190500 685800 ?f98 ?f100 Z N')
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 381000 0 L 1905000 0 A ?f58 ?f59 ?f60 ?f61 1905000 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 1905000 0 ?f55 ?f57 L 381000 1295400 A ?f101 ?f102 ?f103 ?f104 381000 1295400 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 381000 1295400 ?f98 ?f100 Z N F M 1905000 1295400 A ?f113 ?f102 ?f114 ?f104 1905000 1295400 ?f112 ?f100  W ?f115 ?f106 ?f116 ?f108 1905000 1295400 ?f112 ?f100 N F M 381000 0 L 1905000 0 A ?f58 ?f59 ?f60 ?f61 1905000 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 1905000 0 ?f55 ?f57 L 381000 1295400 A ?f101 ?f102 ?f103 ?f104 381000 1295400 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 381000 1295400 ?f98 ?f100 Z N')
+                      or  (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path ='S M 250033 0 L 1250165 0 A ?f58 ?f59 ?f60 ?f61 1250165 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 1250165 0 ?f55 ?f57 L 250033 857256 A ?f101 ?f102 ?f103 ?f104 250033 857256 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 250033 857256 ?f98 ?f100 Z N F M 1250165 857256 A ?f113 ?f102 ?f114 ?f104 1250165 857256 ?f112 ?f100  W ?f115 ?f106 ?f116 ?f108 1250165 857256 ?f112 ?f100 N F M 250033 0 L 1250165 0 A ?f58 ?f59 ?f60 ?f61 1250165 0 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 1250165 0 ?f55 ?f57 L 250033 857256 A ?f101 ?f102 ?f103 ?f104 250033 857256 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 250033 857256 ?f98 ?f100 Z N')">
         <xsl:value-of select ="'Flowchart: Direct Access Storage'"/>
       </xsl:when>
       <!-- Flow Chart: Magnetic-disk --> 
       <xsl:when test ="draw:enhanced-geometry/@draw:type='flowchart-magnetic-disk'
-                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 139700 A ?f58 ?f59 ?f60 ?f61 0 139700 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 139700 ?f55 ?f57 L 762000 698500 A ?f101 ?f102 ?f103 ?f104 762000 698500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 762000 698500 ?f98 ?f100 Z N F M 762000 139700 A ?f101 ?f113 ?f103 ?f114 762000 139700 ?f98 ?f112  W ?f105 ?f115 ?f107 ?f116 762000 139700 ?f98 ?f112 N F M 0 139700 A ?f58 ?f59 ?f60 ?f61 0 139700 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 139700 ?f55 ?f57 L 762000 698500 A ?f101 ?f102 ?f103 ?f104 762000 698500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 762000 698500 ?f98 ?f100 Z N')">
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'S M 0 139700 A ?f58 ?f59 ?f60 ?f61 0 139700 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 139700 ?f55 ?f57 L 762000 698500 A ?f101 ?f102 ?f103 ?f104 762000 698500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 762000 698500 ?f98 ?f100 Z N F M 762000 139700 A ?f101 ?f113 ?f103 ?f114 762000 139700 ?f98 ?f112  W ?f105 ?f115 ?f107 ?f116 762000 139700 ?f98 ?f112 N F M 0 139700 A ?f58 ?f59 ?f60 ?f61 0 139700 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 139700 ?f55 ?f57 L 762000 698500 A ?f101 ?f102 ?f103 ?f104 762000 698500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 762000 698500 ?f98 ?f100 Z N')
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path ='S M 0 241300 A ?f58 ?f59 ?f60 ?f61 0 241300 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 241300 ?f55 ?f57 L 1143000 1206500 A ?f101 ?f102 ?f103 ?f104 1143000 1206500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 1143000 1206500 ?f98 ?f100 Z N F M 1143000 241300 A ?f101 ?f113 ?f103 ?f114 1143000 241300 ?f98 ?f112  W ?f105 ?f115 ?f107 ?f116 1143000 241300 ?f98 ?f112 N F M 0 241300 A ?f58 ?f59 ?f60 ?f61 0 241300 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 241300 ?f55 ?f57 L 1143000 1206500 A ?f101 ?f102 ?f103 ?f104 1143000 1206500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 1143000 1206500 ?f98 ?f100 Z N')
+                      or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path ='S M 0 215900 A ?f58 ?f59 ?f60 ?f61 0 215900 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 215900 ?f55 ?f57 L 990600 1079500 A ?f101 ?f102 ?f103 ?f104 990600 1079500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 990600 1079500 ?f98 ?f100 Z N F M 990600 215900 A ?f101 ?f113 ?f103 ?f114 990600 215900 ?f98 ?f112  W ?f105 ?f115 ?f107 ?f116 990600 215900 ?f98 ?f112 N F M 0 215900 A ?f58 ?f59 ?f60 ?f61 0 215900 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 215900 ?f55 ?f57 L 990600 1079500 A ?f101 ?f102 ?f103 ?f104 990600 1079500 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 990600 1079500 ?f98 ?f100 Z N')
+                      or  (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path ='S M 0 178595 A ?f58 ?f59 ?f60 ?f61 0 178595 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 178595 ?f55 ?f57 L 1214446 892975 A ?f101 ?f102 ?f103 ?f104 1214446 892975 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 1214446 892975 ?f98 ?f100 Z N F M 1214446 178595 A ?f101 ?f113 ?f103 ?f114 1214446 178595 ?f98 ?f112  W ?f105 ?f115 ?f107 ?f116 1214446 178595 ?f98 ?f112 N F M 0 178595 A ?f58 ?f59 ?f60 ?f61 0 178595 ?f55 ?f57  W ?f62 ?f63 ?f64 ?f65 0 178595 ?f55 ?f57 L 1214446 892975 A ?f101 ?f102 ?f103 ?f104 1214446 892975 ?f98 ?f100  W ?f105 ?f106 ?f107 ?f108 1214446 892975 ?f98 ?f100 Z N')">
         <xsl:value-of select ="'Flowchart: Magnetic Disk '"/>
       </xsl:when>
       <!-- Flow Chart: Display -->
@@ -5765,6 +5791,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:if test ="($prst='rectangular-callout'
 		                or $prst='wedgeRectCallout'
 						or $prst='wedgeRoundRectCallout'
+                                                or $prst='wedgeEllipseCallout'
 						or $prst='cloudCallout')">
 			<a:prstGeom>
 				<xsl:attribute name="prst">

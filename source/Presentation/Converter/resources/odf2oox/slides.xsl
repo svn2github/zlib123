@@ -1790,9 +1790,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
 			<Relationship>
 				<xsl:variable name="soundfileName">
-					<xsl:call-template name="retString">
-							<xsl:with-param name="string2rev" select="@xlink:href"/>
-					</xsl:call-template>
+          <xsl:value-of select="concat(generate-id(),'.wav')"/>
 				</xsl:variable>
 				<xsl:attribute name="Id">
 						<xsl:value-of select="concat('strId',generate-id())"/>
@@ -3453,7 +3451,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test="@smil:type='fade' or @presentation:transition-style='fade'">
 							<p:fade>
 								<xsl:choose>
-									<xsl:when test="@smil:subtype='fadeOverColor'">
+									<xsl:when test="@smil:subtype='fadeOverColor' or @smil:subtype='fadeFromColor'">
 										<xsl:attribute name="thruBlk">
 											<xsl:value-of select="'1'"/>
 										</xsl:attribute>
@@ -3570,11 +3568,42 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:choose>
 							</p:strips>
 						</xsl:when>
+            <!--Code for SP2 Compat-->
+            <xsl:when test="substring-after(@presentation:transition-style,'-') = 'checkerboard'">
+              <p:checker>
+                <xsl:choose>
+                  <xsl:when test="substring-before(@presentation:transition-style,'-') = 'vertical'">
+                    <xsl:attribute name="dir">
+                      <xsl:value-of select="'vert'"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <!--do nothing , as no attribute is to be included-->
+                  </xsl:otherwise>
+                </xsl:choose>
+              </p:checker>
+            </xsl:when>
 
-            <!--condition added by yeswanth.s, to get random transition as default-->
-            <xsl:when test="@smil:type != '' or @presentation:transition-style != ''">
+            <xsl:when test="@smil:type='starWipe' and @smil:subtype='fourPoint'">
+              <p:plus/>
+            </xsl:when>
+
+            <!--randomBarWipe-->
+            <xsl:when test="@smil:type='horizontal-lines' or @presentation:transition-style='horizontal-lines'">
+              <p:randomBar/>                
+            </xsl:when>
+
+            <xsl:when test="@smil:type='vertical-lines' or @presentation:transition-style='vertical-lines'">
+              <p:randomBar dir="vert"/>
+            </xsl:when>
+            
+            <!--random-->
+            <xsl:when test="@smil:type = 'random' or @presentation:transition-style = 'random'">
               <p:random/>
             </xsl:when>
+
+            <!--End-->
+
 
 					</xsl:choose>
 					
@@ -3622,9 +3651,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>
 							<p:snd>
 								<xsl:variable name="soundfileName">
-									<xsl:call-template name="retString">
-										<xsl:with-param name="string2rev" select="@xlink:href"/>
-									</xsl:call-template>
+                                               <xsl:value-of select="concat(generate-id(),'.wav')"/>
 								</xsl:variable>
 								<xsl:attribute name="r:embed">
 							<xsl:value-of select="concat('strId',generate-id())"/>

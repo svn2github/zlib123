@@ -295,12 +295,31 @@ Copyright (c) 2007, Sonata Software Limited
     <pzip:copy pzip:source="{'Thumbnails/thumbnail.png'}"
 				   pzip:target="{concat('ppt/media/thumbnail.png','')}"/>
     <xsl:if test="@xlink:href !=''">
+      <xsl:choose>
+        <xsl:when test="starts-with(@xlink:href,'/') or starts-with(@xlink:href,'../') or starts-with(@xlink:href,'//')
+                                            or starts-with(@xlink:href,'file:///')">
+         <!--do nothing-->
+        </xsl:when>
+        <xsl:otherwise>
       <pzip:copy pzip:source="{@xlink:href}"
        pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
+        </xsl:otherwise>
+      </xsl:choose>
+     
     </xsl:if>
     <xsl:if test="./draw:image/@xlink:href !=''">
+      <xsl:choose>
+        <xsl:when test="starts-with(./draw:image/@xlink:href,'/') or starts-with(./draw:image/@xlink:href,'../') 
+                             or starts-with(./draw:image/@xlink:href,'//')
+                                            or starts-with(./draw:image/@xlink:href,'file:///')">
+          <!--do nothing-->
+        </xsl:when>
+        <xsl:otherwise>
       <pzip:copy pzip:source="{./draw:image/@xlink:href}"
          pzip:target="{concat('ppt/media/',substring-after(./draw:image/@xlink:href,'/'))}"/>
+        </xsl:otherwise>
+      </xsl:choose>
+     
     </xsl:if>
     <xsl:variable name="varMediaFilePath">
       <xsl:if test="@xlink:href [ contains(.,'../')]">

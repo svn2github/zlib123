@@ -1072,6 +1072,12 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="prstGeom" />
     <xsl:choose>
 
+      <!-- line -->
+      <xsl:when test ="$prstGeom= 'line'">
+        <a:prstGeom prst="line">
+          <a:avLst/>
+        </a:prstGeom>
+      </xsl:when>
       <!-- Oval -->
       <xsl:when test ="contains($prstGeom, 'Oval')">
         <a:prstGeom prst="ellipse">
