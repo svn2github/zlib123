@@ -505,8 +505,8 @@
                     </draw:frame>
                   </xsl:when>
                   <!--RefNo-1:To avoid canvas-->
-                  <xsl:when test="$pathId='m@4@5l@4@11@9@11@9@5xe'">
-                  </xsl:when>
+                  <!--<xsl:when test="$pathId='m@4@5l@4@11@9@11@9@5xe'">
+                  </xsl:when>-->
                   <xsl:otherwise>
                     <xsl:call-template name="GetShape">
                       <xsl:with-param name="currentShape" select="." />
@@ -1456,22 +1456,32 @@
       </xsl:choose>
     </xsl:attribute>
     <!-- insert fill-color -->
-    <!--2630175<xsl:if test="$isFilled != 'f'">-->
+    <!--RefNo-1:2630175<xsl:if test="$isFilled != 'f'">-->
       <xsl:attribute name="draw:fill-color">
         <xsl:call-template name="InsertColor">
           <xsl:with-param name="color" select="$fillcolor" />
         </xsl:call-template>
       </xsl:attribute>
     <!--</xsl:if>-->
+    
+    <!--Start of RefNo-1:Added shapeTypeFill to chk for shape type fill property.-->
+    <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
+    <xsl:variable name="shapeTypeFill">
+      <xsl:choose>
+        <xsl:when test="$shapeTypeId">
+          <xsl:value-of select="key('shapeTypeById', $shapeTypeId)[1]/@filled" />
+        </xsl:when>      
+      </xsl:choose>
+    </xsl:variable>
+    <!--End of RefNo-1-->
     <!--added by chhavi to fix bug 2003056-->
-    <xsl:if test="$isFilled = 'f'">
+    <xsl:if test="$isFilled = 'f' or $shapeTypeFill = 'f'">
       <xsl:attribute name="draw:fill">
         <xsl:text>none</xsl:text>
       </xsl:attribute>
     </xsl:if>
     <!--end here-->
     <!--Edited by Sona to implement Picture fill-->
-    <xsl:variable name="shapeTypeId" select="substring-after($shape/@type,'#')" />
     <xsl:variable name="pathId">
       <xsl:choose>
         <xsl:when test="@path">
