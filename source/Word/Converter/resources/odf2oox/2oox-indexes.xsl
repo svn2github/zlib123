@@ -39,7 +39,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:ooc="urn:odf-converter"                
+  xmlns:ooc="urn:odf-converter"
   exclude-result-prefixes="office text table fo style draw xlink v svg number ooc">
 
 
@@ -72,22 +72,28 @@
     <!-- Why has there been a special handling for links? The prevented other toc content such as tabs from being translated 
          see #2592046 ODT - Index/Tables:Tab Stop Position, not retained.-->
     <!--<xsl:choose>
-      --><!-- when hyperlink option is on in TOC --><!--
+      -->
+    <!-- when hyperlink option is on in TOC -->
+    <!--
       <xsl:when test="text:a">
-        --><!-- apply templates to nodes except tabs who do not have preceding sibling other than tabs (converted into indent) --><!--
+        -->
+    <!-- apply templates to nodes except tabs who do not have preceding sibling other than tabs (converted into indent) -->
+    <!--
         <xsl:apply-templates select="child::node()[not(self::text:tab[not(preceding-sibling::node()[not(self::text:tab)])])]" mode="paragraph"/>
       </xsl:when>
-      --><!-- default scenario --><!--
+      -->
+    <!-- default scenario -->
+    <!--
       <xsl:otherwise>-->
-        <xsl:apply-templates mode="paragraph"/>
-      <!--</xsl:otherwise>
+    <xsl:apply-templates mode="paragraph"/>
+    <!--</xsl:otherwise>
     </xsl:choose>-->
 
     <!-- inserts field code end in last index element -->
     <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
       <xsl:call-template name="InsertIndexFieldCodeEnd"/>
     </xsl:if>
-    
+
     <!--
     
     makz:  
@@ -924,33 +930,36 @@
       <!-- if hyperlink -->
       <xsl:variable name="levelTextStyleName" select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/*[self::text:index-entry-link-start or self::text:index-entry-link-end]/@text:style-name" />
 
-      <w:style w:styleId="{concat('TOC', $level)}" w:type="paragraph">
-        <w:name w:val="{concat('toc ', $level)}"/>
-        <w:basedOn w:val="{$levelStyleName}"/>
-        <w:autoRedefine/>
-        <w:semiHidden/>
-        <w:pPr>
-          <xsl:for-each select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]">
-            <xsl:call-template name="OverrideIndexParagraphTabs">
-              <xsl:with-param name="levelStyleName" select="$levelStyleName"/>
-              <xsl:with-param name="level" select="$level"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </w:pPr>
-        <xsl:if test="$levelTextStyleName != '' ">
-          <!-- change context -->
-          <xsl:for-each select="document('styles.xml')">
-            <xsl:for-each select="key('styles', $levelStyleName)">
-              <w:rPr>
-                <w:rStyle w:val="{$levelTextStyleName}"/>
-                <xsl:for-each select="document('styles.xml')">
-                  <xsl:apply-templates select="key('styles', $levelTextStyleName)" mode="rPr"/>
-                </xsl:for-each>
-              </w:rPr>
+      <!-- fix for #2654138: This might create ciruclar references, e.g. TOC1 based on TOC1 etc. Also avoid redefining styles. -->
+      <xsl:if test="concat('TOC', $level) != $levelStyleName and not(document('styles.xml')/office:document-styles/office:styles/office:style[@style:name = concat('TOC', $level)])">
+        <w:style w:styleId="{concat('TOC', $level)}" w:type="paragraph">
+          <w:name w:val="{concat('toc ', $level)}"/>
+          <w:basedOn w:val="{$levelStyleName}"/>
+          <w:autoRedefine/>
+          <w:semiHidden/>
+          <w:pPr>
+            <xsl:for-each select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]">
+              <xsl:call-template name="OverrideIndexParagraphTabs">
+                <xsl:with-param name="levelStyleName" select="$levelStyleName"/>
+                <xsl:with-param name="level" select="$level"/>
+              </xsl:call-template>
             </xsl:for-each>
-          </xsl:for-each>
-        </xsl:if>
-      </w:style>
+          </w:pPr>
+          <xsl:if test="$levelTextStyleName != '' ">
+            <!-- change context -->
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:for-each select="key('styles', $levelStyleName)">
+                <w:rPr>
+                  <w:rStyle w:val="{$levelTextStyleName}"/>
+                  <xsl:for-each select="document('styles.xml')">
+                    <xsl:apply-templates select="key('styles', $levelTextStyleName)" mode="rPr"/>
+                  </xsl:for-each>
+                </w:rPr>
+              </xsl:for-each>
+            </xsl:for-each>
+          </xsl:if>
+        </w:style>
+      </xsl:if>
       <!-- insert next level -->
       <xsl:call-template name="InsertIndexLevelStyle">
         <xsl:with-param name="level" select="$level + 1"/>
@@ -1034,7 +1043,7 @@
     <xsl:param name="result" select="0"/>
     <!-- get value of first tab-stop -->
     <xsl:variable name="toCompare" select="ooc:TwipsFromMeasuredUnit($tabStops[1]/@style:position)" />
-    
+
     <!-- add to other tab-stops -->
     <xsl:choose>
       <xsl:when test="count($tabStops) &gt; 1">
