@@ -167,17 +167,6 @@
               <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             </xsl:call-template>
           </xsl:for-each>
-      </xsl:when >
-            <xsl:otherwise>
-          <xsl:for-each select="key('shapeTypeById', $shapeTypeId)[1]">
-            <xsl:call-template name="CreateEnhancePath">
-              <xsl:with-param name="pathModifier" select="$pathModifier"/>
-              <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-            </xsl:call-template>
-          </xsl:for-each>
-            </xsl:otherwise>
-          </xsl:choose>
-
         </xsl:variable>
         <draw:custom-shape draw:style-name="{ooc:NCNameFromString(concat(@id,generate-id(./parent::node())))}">
           <xsl:call-template name="InsertAnchorTypeAttribute" />
