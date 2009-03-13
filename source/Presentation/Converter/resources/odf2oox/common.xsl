@@ -3889,7 +3889,15 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:attribute name="Id">
           <xsl:choose>
             <xsl:when test="$grpBln='true'">
+              <xsl:choose>
+                <xsl:when test="contains($slideNo,'slideMaster')">
+                  <xsl:value-of select="concat('Slidegrp',substring-after($slideNo,'slideMaster'),'_Ole',generate-id())"/>
+                </xsl:when>
+                <xsl:otherwise>
               <xsl:value-of select="concat('Slidegrp',$slideNo,'_Ole',generate-id())"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="concat('Slide',$slideNo,'_Ole',generate-id())"/>
