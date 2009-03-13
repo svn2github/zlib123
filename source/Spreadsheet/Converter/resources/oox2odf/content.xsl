@@ -598,7 +598,7 @@ RefNo-6 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 													<xsl:variable name ="endRow">
                           <xsl:value-of select ="substring-after($beginEndRowCol,concat($beginCol,'|',$beginRow,'|',$endCol,'|'))"/>
 													</xsl:variable>
-                        <xsl:value-of select ="concat($sheetNameCorrect,'.$',$beginCol,'$',$beginRow,':.$',$endCol,'$',$endRow)"/>
+														<xsl:value-of select ="concat('$',$sheetNameCorrect,'.$',$beginCol,'$',$beginRow,':.$',$endCol,'$',$endRow)"/>
 													<!--<xsl:value-of select ="concat(substring-before($FinalRange,':'),':.',substring-after($FinalRange,':'))"/>-->
 													</xsl:if>
 													<xsl:if test ="not(contains($FinalRange,':'))">

@@ -3050,7 +3050,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     </xsl:variable>
                     <xsl:value-of select="concat(substring-before($strNumRefFrml,':!'),':' ,substring-after($strNumRefFrml,':!'))"/>-->
 					  <xsl:variable name="strNumRefFrml">
-						  <xsl:value-of select="translate(key('series','')[position() = $number]/@chart:values-cell-range-address, '.','!')"/>
+              <!--changed by sonata for bug no:2654446 -->
+						  <xsl:value-of select="translate(key('series','')[position() = $number]/chart:domain/@table:cell-range-address, '.','!')"/>
 					  </xsl:variable>
 					  <xsl:variable name="sheet" select="substring-before($strNumRefFrml,'!')"/>
 					  <xsl:variable name="apos">
