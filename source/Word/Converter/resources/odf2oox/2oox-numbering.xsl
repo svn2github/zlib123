@@ -1580,9 +1580,10 @@
               <xsl:when test="self::text:list-item or parent::text:list-item">
                 <w:ilvl w:val="{$level}"/>
               </xsl:when>
-              <xsl:otherwise>
+              <xsl:when test="@text:outline-level">
+                <!-- fix for #2686447: w:val must be a valid number, otherwise the document won't open -->
                 <w:ilvl w:val="{@text:outline-level - 1}"/>
-              </xsl:otherwise>
+              </xsl:when>
             </xsl:choose>
             <w:numId>
               <xsl:attribute name="w:val">
