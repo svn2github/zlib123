@@ -2103,8 +2103,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 while (strResult.Contains("?"));
             }
-
-            if (Convert.ToDouble(strResult.Trim(), System.Globalization.CultureInfo.InvariantCulture) > 0)
+            if (Convert.ToDouble(strResult.Trim().Replace("(", "").Replace(")", ""), System.Globalization.CultureInfo.InvariantCulture) > 0)
             {
                 strResult = strIf[1].Trim();
             }
