@@ -239,6 +239,8 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
       </w:pict>
     </w:r>
   </xsl:template>
+  
+  
   <!-- Sona: Defect #2019374-->
   <xsl:template match="draw:text-box" mode="paragraph">
     <w:r>
@@ -654,11 +656,11 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
         <xsl:choose>
           <xsl:when test="$shape/@svg:width">
             <!-- Sona: Defect #2166160-->
-            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/@svg:width, 0), 'pt;')" />
+            <xsl:value-of select="ooc:PtFromMeasuredUnit($shape/@svg:width, 0)" />
           </xsl:when>
           <xsl:otherwise>
             <!-- Sona: Defect #2166160-->
-            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width, 0), 'pt;')" />
+            <xsl:value-of select="ooc:PtFromMeasuredUnit($shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width, 0)" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -670,20 +672,20 @@ RefNo-1 16-Feb-2009 Sandeep S    custom-shape implemetation
           <xsl:when test="$shape/@svg:height">
             <!-- Sona: Defect #2166160-->
             <!-- Sona: Defect #2019374-->
-            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/@svg:height, 0), 'pt;')" />
+            <xsl:value-of select="ooc:PtFromMeasuredUnit($shape/@svg:height, 0)" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat(ooc:PtFromMeasuredUnit($shape/child::node()/@fo:min-height|$shapeStyle/style:graphic-properties/@fo:min-height, 0), 'pt;')" />
+            <xsl:value-of select="ooc:PtFromMeasuredUnit($shape/child::node()/@fo:min-height|$shapeStyle/style:graphic-properties/@fo:min-height, 0)" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 
       <!--code added by Chhavi for relative size in Frame - Defect #2166036-->
-      <xsl:if test="(../draw:frame or draw:frame) and string(number(substring-before($shape/@style:rel-width,'%'))) != 'NaN'">
+      <xsl:if test="(../self::draw:frame or self::draw:frame) and string(number(substring-before($shape/@style:rel-width,'%'))) != 'NaN'">
         <xsl:value-of select="concat('mso-width-percent:', substring-before($shape/@style:rel-width,'%') * 10,';')"/>
       </xsl:if>
-      <xsl:if test="(../draw:frame or draw:frame) and string(number(substring-before($shape/@style:rel-height,'%'))) != 'NaN'">
+      <xsl:if test="(../self::draw:frame or self::draw:frame) and string(number(substring-before($shape/@style:rel-height,'%'))) != 'NaN'">
         <xsl:value-of select="concat('mso-height-percent:', substring-before($shape/@style:rel-height,'%') * 10,';')"/>
       </xsl:if>
 
