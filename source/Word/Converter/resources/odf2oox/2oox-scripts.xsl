@@ -149,7 +149,10 @@
                       //return path;
                   }
               }
-              result = uri.ToString();
+              else
+              {
+                  result = uri.ToString();
+              }
           }
           catch
           {

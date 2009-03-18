@@ -62,7 +62,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </w:bookmarkStart>
-    <xsl:if test="text:bookmark">
+    <xsl:if test="self::text:bookmark">
       <w:bookmarkEnd w:id="{ooc:GetBookmarkId(@text:name)}" />
     </xsl:if>
   </xsl:template>
