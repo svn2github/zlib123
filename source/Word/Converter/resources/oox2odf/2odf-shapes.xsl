@@ -497,6 +497,8 @@
                       <xsl:call-template name="InsertShapeHeight" />
                       <xsl:call-template name="InsertshapeAbsolutePos" />
                       <xsl:call-template name="InsertShapeZindexAttribute" />
+                      <xsl:call-template name="InsertTextBoxRelSizeAttributes" />
+                      
                       <draw:text-box>
                         <xsl:apply-templates select="v:textbox" >
                           <xsl:with-param name="shapetype" select="'TextBox'" />
@@ -3333,7 +3335,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:if test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) or $shape/@w:h or
-                (contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
+                         (contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
                 not(contains($shape/@style,'mso-wrap-style:none')))">
           <xsl:attribute name="svg:height">
             <xsl:value-of select="ooc:CmFromMeasuredUnit($height)" />
@@ -3499,6 +3501,20 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertTextBoxRelSizeAttributes">
+    <xsl:param name="shape" select="." />
+
+    <xsl:if test="contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')">
+      <xsl:attribute name="style:rel-width">
+        <xsl:text>scale</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="style:rel-height">
+        <xsl:text>scale-min</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+
   </xsl:template>
 
 
