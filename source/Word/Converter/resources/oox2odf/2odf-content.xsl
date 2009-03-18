@@ -443,7 +443,7 @@
       <xsl:when test="w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText, 'INDEX' )]">
         <xsl:apply-templates select="." mode="tocstart" />
       </xsl:when>
-      <xsl:when test="@oox:index and not(w:r[not(@oox:f)])">
+      <xsl:when test="@oox:index and not(w:r[@oox:f = 1]/w:fldChar[@w:fldCharType = 'end'])">
         <!-- Ignore all paragraphs inside an index. The translation of such paragraphs is triggered by the first paragraph in the index -->
         <!-- Fix #2689877: Do not ignore the last paragraph if it contains the end of the TOC -->
       </xsl:when>
