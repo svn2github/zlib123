@@ -788,7 +788,81 @@ Copyright (c) 2007, Sonata Software Limited
           </draw:enhanced-geometry>
         </draw:custom-shape>
       </xsl:when>
+          <!--Sp2: Circular Arrow-->
 
+          <xsl:when test="$enhancePath='M f9 f10 A f11 f12 f13 f14 L f15 f16 L f17 f18 L f19 f20 L f21 f20 A f22 f23 f24 f8 Z N ' or
+                     $enhancePath='M f247 f248 A f50 f50 f211 f229 L f249 f250 A f35 f35 f213 f232 L f119 f118 L f184 f183 L f121 f120 Z N '">
+            <draw:custom-shape  draw:layer="layout" >
+                <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
+            <xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+            <xsl:with-param name="TypeId" select ="$TypeId" />
+            <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+             <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="0 0 21600 21600"
+                draw:type="circular-arrow" draw:modifiers="180 0 5500" 
+                                     draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
+               <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+                 <xsl:attribute name ="draw:mirror-horizontal">
+                   <xsl:value-of select="'true'"/>
+                 </xsl:attribute>
+               </xsl:if>
+               <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+                 <xsl:attribute name ="draw:mirror-vertical">
+                   <xsl:value-of select="'true'"/>
+                 </xsl:attribute>
+               </xsl:if>
+                <draw:equation draw:name="f0" draw:formula="$0" />
+                <draw:equation draw:name="f1" draw:formula="$1" />
+                <draw:equation draw:name="f2" draw:formula="$2" />
+                <draw:equation draw:name="f3" draw:formula="10800+$2" />
+                <draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))" />
+                <draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))" />
+                <draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))" />
+                <draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))" />
+                <draw:equation draw:name="f8" draw:formula="?f4 +10800" />
+                <draw:equation draw:name="f9" draw:formula="?f5 +10800" />
+                <draw:equation draw:name="f10" draw:formula="?f6 +10800" />
+                <draw:equation draw:name="f11" draw:formula="?f7 +10800" />
+                <draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))" />
+                <draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))" />
+                <draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))" />
+                <draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))" />
+                <draw:equation draw:name="f16" draw:formula="?f12 +10800" />
+                <draw:equation draw:name="f17" draw:formula="?f13 +10800" />
+                <draw:equation draw:name="f18" draw:formula="?f14 +10800" />
+                <draw:equation draw:name="f19" draw:formula="?f15 +10800" />
+                <draw:equation draw:name="f20" draw:formula="21600-?f3" />
+                <draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))" />
+                <draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))" />
+                <draw:equation draw:name="f23" draw:formula="?f21 +10800" />
+                <draw:equation draw:name="f24" draw:formula="?f22 +10800" />
+                <draw:equation draw:name="f25" draw:formula="$2 -2700" />
+                <draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))" />
+                <draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))" />
+                <draw:equation draw:name="f28" draw:formula="?f26 +10800" />
+                <draw:equation draw:name="f29" draw:formula="?f27 +10800" />
+                <draw:equation draw:name="f30" draw:formula="($1+45)*pi/180" />
+                <draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))" />
+                <draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31" />
+                <draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)" />
+                <draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)" />
+                <draw:equation draw:name="f35" draw:formula="?f28+?f33" />
+                <draw:equation draw:name="f36" draw:formula="?f29+?f34" />
+                <draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800" />
+                <draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800" />
+              </draw:enhanced-geometry>
+            </draw:custom-shape>
+
+          </xsl:when>
       <!-- Circular Arrow or CurvedLeftArrow or curvedRightArrow or  CurvedDownArrow or CurvedUpArrow -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='circularArrow' or p:spPr/a:prstGeom/@prst='curvedRightArrow' or p:spPr/a:prstGeom/@prst='curvedLeftArrow' or p:spPr/a:prstGeom/@prst='curvedDownArrow' or p:spPr/a:prstGeom/@prst='curvedUpArrow' or
                 $enhancePath='M f247 f248 A f50 f50 f211 f229 L f249 f250 A f35 f35 f213 f232 L f119 f118 L f184 f183 L f121 f120 Z N '">
@@ -978,10 +1052,47 @@ Copyright (c) 2007, Sonata Software Limited
           </draw:enhanced-geometry>
        </draw:custom-shape>
       </xsl:when>
-      
+          <!-- SP2: Bent-Up Arrow -->
+          <xsl:when test="$enhancePath='M f38 f65 L f71 f65 L f71 f60 L f66 f60 L f67 f38 L f46 f60 L f70 f60 L f70 f45 L f38 f45 Z N '">
+            <draw:custom-shape draw:layer="layout" >
+              <xsl:call-template name ="CreateShape">
+                <!--parameter added by yeswanth:for ODF1.1 conformance-->
+                <xsl:with-param name="varHyperLinksForShapes" select="$varHyperLinksForShapes"/>
+                <xsl:with-param name ="layId" select="$layId"/>
+                <xsl:with-param name="sldId" select="$slideId" />
+                <xsl:with-param name ="grID" select ="$GraphicId" />
+                <xsl:with-param name ="prID" select ="$ParaId" />
+                <xsl:with-param name="TypeId" select ="$TypeId" />
+                <xsl:with-param name="grpBln" select ="$grpBln" />
+                <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+                <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+                <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+              </xsl:call-template>
+              <draw:enhanced-geometry svg:viewBox="0 0 1219197 1143000"
+                                    draw:extrusion-allowed="true"
+                                    draw:text-areas="0 857250 1076322 1143000"
+                                    draw:glue-points="933447 0 647697 285750 0 1000125 538161 1143000 1076322 714375 1219197 285750"
+                                    draw:type="mso-spt100"
+                                    draw:enhanced-path="M 0 857250 L 790572 857250 L 790572 285750 L 647697 285750 L 933447 0 L 1219197 285750 L 1076322 285750 L 1076322 1143000 L 0 1143000 Z N">
+                <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+                  <xsl:attribute name ="draw:mirror-horizontal">
+                    <xsl:value-of select="'true'"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+                  <xsl:attribute name ="draw:mirror-vertical">
+                    <xsl:value-of select="'true'"/>
+                  </xsl:attribute>
+                </xsl:if>
+              </draw:enhanced-geometry>
+            </draw:custom-shape>
+          </xsl:when>
       <!-- Bent-Up Arrow -->
       <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
-      <xsl:when test="(p:nvSpPr/p:cNvPr/@name[contains(., 'bentUpArrow ')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'Bent-Up Arrow ')]) and (p:spPr/a:prstGeom/@prst='bentUpArrow')">
+      <xsl:when test="( p:nvSpPr/p:cNvPr/@name[contains(., 'bentUpArrow ')] and 
+                         not(p:nvSpPr/p:cNvPr/@name[contains(., 'Bent-Up Arrow ')]) 
+                        and p:spPr/a:prstGeom/@prst='bentUpArrow')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -1003,6 +1114,7 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="non-primitive" 
             draw:enhanced-path="M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N">
           </draw:enhanced-geometry>
+          
         </draw:custom-shape>
       </xsl:when>
       <!--End of bug fix code-->
@@ -2328,7 +2440,8 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='roundRect') or
                 $enhancePath='M f30 f29 A f39 f40 f73 f56 L f29 f36 A f40 f57 f82 f60 L f37 f31 A f61 f62 f83 f78 L f32 f30 A f67 f39 f79 f80 Z N ' or
                           $enhancePath='M f30 f29 A f39 f40 f73 f56 L f29 f36 A f40 f57 f82 f60 L f37 f31 A f61 f62 f83 f78 L f32 f30 A f67 f39 f79 f80 Z N ' or
-                          $enhancePath='M l x1 A x1 x1 cd2 cd4 L x2 t A x1 x1 3cd4 cd4 L r y2 A x1 x1 0 cd4 L x1 b A x1 x1 cd4 cd4 Z N '">
+                          $enhancePath='M l x1 A x1 x1 cd2 cd4 L x2 t A x1 x1 3cd4 cd4 L r y2 A x1 x1 0 cd4 L x1 b A x1 x1 cd4 cd4 Z N ' or
+                         $enhancePath='M f38 f37 A f47 f48 f81 f64 L f37 f44 A f48 f65 f90 f68 L f45 f39 A f69 f70 f91 f86 L f40 f38 A f75 f47 f87 f88 Z N '">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -2755,6 +2868,7 @@ Copyright (c) 2007, Sonata Software Limited
 		<!-- Frame -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='frame') or
               $enhancePath='M f17 f17 L f20 f17 L f20 f21 L f17 f21 Z N M f27 f27 L f27 f29 L f28 f29 L f28 f27 Z N ' or
+              $enhancePath='M f38 f38 L f41 f38 L f41 f42 L f38 f42 Z N M f37 f37 L f39 f37 L f39 f40 L f37 f40 Z N ' or
                           $enhancePath='M f31 f31 L f35 f31 L f35 f36 L f31 f36 Z N M f30 f30 L f33 f30 L f33 f34 L f30 f34 Z N '">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
@@ -2945,7 +3059,8 @@ Copyright (c) 2007, Sonata Software Limited
 		<!-- Bevel -->
 		<xsl:when test ="(p:spPr/a:prstGeom/@prst='bevel') or
               $enhancePath='S M f52 f52 L f53 f52 L f53 f54 L f52 f54 Z N  S M f32 f32 L f39 f32 L f53 f52 L f52 f52 Z N S M f32 f40 L f52 f54 L f53 f54 L f39 f40 Z N S M f32 f32 L f52 f52 L f52 f54 L f32 f40 Z N S M f39 f32 L f39 f40 L f53 f54 L f53 f52 Z Nf M f32 f32 L f39 f32 L f39 f40 L f32 f40 Z N M f52 f52 L f53 f52 L f53 f54 L f52 f54 Z N M f32 f32 L f52 f52 M f32 f40 L f52 f54 M f39 f32 L f53 f52 M f39 f40 L f53 f54 ' or
-                          $enhancePath='M f19 f19 L f20 f19 L f20 f21 L f19 f21 Z N M f19 f19 L f20 f19 L f25 f24 L f24 f24 Z N M f20 f19 L f20 f21 L f25 f26 L f25 f24 Z N M f20 f21 L f19 f21 L f24 f26 L f25 f26 Z N M f19 f21 L f19 f19 L f24 f24 L f24 f26 Z N '">
+                          $enhancePath='M f19 f19 L f20 f19 L f20 f21 L f19 f21 Z N M f19 f19 L f20 f19 L f25 f24 L f24 f24 Z N M f20 f19 L f20 f21 L f25 f26 L f25 f24 Z N M f20 f21 L f19 f21 L f24 f26 L f25 f26 Z N M f19 f21 L f19 f19 L f24 f24 L f24 f26 Z N ' or
+               $enhancePath='M f27 f27 L f29 f27 L f29 f30 L f27 f30 Z N M f27 f27 L f29 f27 L f31 f28 L f28 f28 Z N M f29 f27 L f29 f30 L f31 f32 L f31 f28 Z N M f29 f30 L f27 f30 L f28 f32 L f31 f32 Z N M f27 f30 L f27 f27 L f28 f28 L f28 f32 Z N '">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -3297,7 +3412,8 @@ Copyright (c) 2007, Sonata Software Limited
        </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Manual Input -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualInput'">
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualInput' or
+                       $enhancePath='M f5 f7 L f6 f5 L f6 f6 L f5 f6 L f5 f7 Z N '">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -3365,7 +3481,8 @@ Copyright (c) 2007, Sonata Software Limited
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Off-page Connector -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOffpageConnector'">
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOffpageConnector' or
+                       $enhancePath= 'M f5 f5 L f6 f5 L f6 f7 L f8 f6 L f5 f7 L f5 f5 Z N '">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -3433,7 +3550,8 @@ Copyright (c) 2007, Sonata Software Limited
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Summing Junction -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSummingJunction'">
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSummingJunction' or
+                $enhancePath='M f54 f55 A f9 f9 f35 f38 Z N M f10 f10 L f11 f11 M f10 f11 L f11 f10 '">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -3455,7 +3573,8 @@ Copyright (c) 2007, Sonata Software Limited
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Or -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOr'">
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOr' or 
+                $enhancePath='M f54 f55 A f11 f11 f35 f38 Z N M f5 f11 L f6 f11 M f11 f5 L f11 f6 '">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
