@@ -398,6 +398,7 @@
                       <xsl:call-template name="InsertShapeHeight" />
                       <xsl:call-template name="InsertshapeAbsolutePos" />
                       <xsl:call-template name="InsertShapeZindexAttribute" />
+                      <xsl:call-template name="InsertTextBoxRelSizeAttributes" />
                       <draw:text-box>
                         <xsl:apply-templates select="v:textbox" >
                           <xsl:with-param name="shapetype" select="'Rectangle'" />
