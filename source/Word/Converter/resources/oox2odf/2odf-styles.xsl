@@ -1434,25 +1434,22 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$headerId != ''">
-        <style:header>
-          <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-          <!-- change context to get header content -->
-          <xsl:for-each select="key('Part', $headerXmlDocument)">
-            <xsl:call-template name="TrackChanges" />
-            <xsl:apply-templates/>
-          </xsl:for-each>
-        </style:header>
-      </xsl:when>
       <xsl:when test="$headerId = 'newempty'">
         <style:header>
-          <text:p />
+          <text:p/>
         </style:header>
       </xsl:when>
       <xsl:otherwise>
-        <style:header>
-          <text:p />
-        </style:header>
+        <xsl:if test="$headerId != ''">
+          <style:header>
+            <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+            <!-- change context to get header content -->
+            <xsl:for-each select="key('Part', $headerXmlDocument)">
+              <xsl:call-template name="TrackChanges"/>
+              <xsl:apply-templates/>
+            </xsl:for-each>
+          </style:header>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
     <!--END clam bugfix #1802289-->
@@ -1470,11 +1467,11 @@
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="$headerIdEven != ''">
-          <!--<xsl:if test="$headerId = ''">
+          <xsl:if test="$headerId = ''">
             <style:header>
               <text:p/>
             </style:header>
-          </xsl:if>-->
+          </xsl:if>
           <style:header-left>
             <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)" />
             <!-- change context to get header content -->
@@ -1485,6 +1482,9 @@
           </style:header-left>
         </xsl:when>
         <xsl:otherwise>
+          <xsl:if test="$headerId = ''">
+            <style:header />
+          </xsl:if>
           <style:header-left>
             <text:p/>
           </style:header-left>
