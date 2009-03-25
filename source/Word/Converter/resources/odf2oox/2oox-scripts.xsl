@@ -141,6 +141,10 @@
                           // relative path inside the package
                           result = uri.ToString().Substring(uriBase.ToString().Length);
                       }
+                      else
+                      {
+                          result = uri.ToString().Substring(uriBase.ToString().Length - @"dummy.odt\".Length);
+                      }
                   }
                   else
                   {
