@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OdfWordprocessingConverterLib")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("OpenXML/ODF Translator Team")]
+[assembly: AssemblyCompany("OpenXML-ODF Translator Team")]
 [assembly: AssemblyProduct("OdfWordprocessingConverterLib")]
-[assembly: AssemblyCopyright("Copyright © OpenXML/ODF Translator Team 2006-2008")]
+[assembly: AssemblyCopyright("Copyright © OpenXML-ODF Translator Team 2006-2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
