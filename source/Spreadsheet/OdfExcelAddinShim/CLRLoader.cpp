@@ -67,11 +67,15 @@ HRESULT CCLRLoader::LoadCLR()
         0, 0, 0, 
         CLSID_CorRuntimeHost, IID_ICorRuntimeHost, (LPVOID*)&m_pCorRuntimeHost);
 
+    // FIX: The CLR might have been loaded by another add-in but not yet started
+	//      see http://blogs.msdn.com/andreww/archive/2007/11/25/com-shim-clr-loader-bug.aspx
+	//
     // If CorBintToRuntimeEx returned S_FALSE, the CLR has already been loaded.
-    if (hr == S_FALSE)
-    {
-        return hr;
-    }
+    //if (hr == S_FALSE)
+    //{
+    //    return hr;
+    //}
+
 
     // If CorBindToRuntimeEx returned a failure HRESULT, we failed to load 
     // the CLR.
