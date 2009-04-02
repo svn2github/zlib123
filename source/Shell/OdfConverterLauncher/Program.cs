@@ -91,12 +91,12 @@ namespace OdfConverterLauncher
             {
                 OfficeApplication app = null;
                 
-                // args[0] might be a short DOS name but we want the full path name
-                FileInfo fi = new FileInfo(args[0]);
-                string input = fi.FullName;
-                
                 try
                 {
+                    // args[0] might be a short DOS name but we want the full path name
+                    FileInfo fi = new FileInfo(args[0]);
+                    string input = fi.FullName;
+                
                     if (input.ToUpper().EndsWith(".ODP") || input.ToUpper().EndsWith(".OTP"))
                     {
                         app = new OfficeApplication("PowerPoint.Application", "OdfPowerPointAddin.Connect");
@@ -113,6 +113,7 @@ namespace OdfConverterLauncher
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     Trace.WriteLine(ex.ToString());
                 }
             }

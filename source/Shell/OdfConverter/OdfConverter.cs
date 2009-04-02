@@ -142,6 +142,18 @@ namespace OdfConverter.CommandLineTool
                 Console.WriteLine("Error accessing URI: " + ex.Message);
                 return;
             }
+            catch (PathTooLongException ex)
+            {
+                Environment.ExitCode = 1;
+                Console.WriteLine("Error: " + ex.Message);
+                return;
+            }
+            catch (System.IO.IOException ex)
+            {
+                Environment.ExitCode = 1;
+                Console.WriteLine("Error accessing input or output document: " + ex.Message);
+                return;
+            }
             catch (Exception ex)
             {
                 Environment.ExitCode = 1;
