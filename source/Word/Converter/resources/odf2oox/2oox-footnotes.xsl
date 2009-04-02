@@ -32,7 +32,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:ooc="urn:odf-converter"
   exclude-result-prefixes="text style office xlink draw pzip ooc">
@@ -219,21 +219,30 @@
 
   <!-- Reference from the document -->
   <xsl:template match="text:note[@text:note-class='footnote']" mode="text">
-    <w:footnoteReference>
-      <xsl:attribute name="w:id">
-        <xsl:call-template name="GenerateId">
-          <xsl:with-param name="node" select="."/>
-          <xsl:with-param name="nodetype" select="@text:note-class"/>
-        </xsl:call-template>
-      </xsl:attribute>
+    <xsl:if test="not(ancestor::draw:frame)">
+      <!-- Note: Word is not able to open document if there is a note reference contained inside VML shape 
+            This is a workaround to fix #2014947
+            This can still be further improved by re-fining the conditions for when to create a shape/frame in Word,
+            e.g. one option would be to create a frame from every draw:frame that contains note references
+            However, this is a very rare problem occuring only when converting a DOCX frame to ODT and then back to DOCX 
+            Office 2007 SP2 solves this by converting every frame to a normal paragraph.
+            -->
+      <w:footnoteReference>
+        <xsl:attribute name="w:id">
+          <xsl:call-template name="GenerateId">
+            <xsl:with-param name="node" select="."/>
+            <xsl:with-param name="nodetype" select="@text:note-class"/>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:if test="text:note-citation/@text:label">
+          <xsl:attribute name="w:customMarkFollows">1</xsl:attribute>
+        </xsl:if>
+      </w:footnoteReference>
       <xsl:if test="text:note-citation/@text:label">
-        <xsl:attribute name="w:customMarkFollows">1</xsl:attribute>
+        <w:t>
+          <xsl:value-of select="text:note-citation"/>
+        </w:t>
       </xsl:if>
-    </w:footnoteReference>
-    <xsl:if test="text:note-citation/@text:label">
-      <w:t>
-        <xsl:value-of select="text:note-citation"/>
-      </w:t>
     </xsl:if>
   </xsl:template>
 
