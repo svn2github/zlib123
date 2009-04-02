@@ -34,8 +34,9 @@ FILE0="setup.exe"
 FILE1="OdfAddInForOfficeSetup.msi"
 FILE2="extensibilityMSM.msi"
 FILE3="lockbackRegKey.msi"
-FILE4="SetupPrepare.bat"
-FILE5="WaitForProcess.exe"
+FILE4="office2003-kb907417sfxcab-ENU.exe"
+FILE5="SetupPrepare.bat"
+FILE6="WaitForProcess.exe"
 [SourceFiles]
 SourceFiles0=nl-NL
 SourceFiles1=nl-NL\KB908002\
@@ -46,6 +47,7 @@ SourceFiles2=..\..\scripts\
 [SourceFiles1]
 %FILE2%=
 %FILE3%=
-[SourceFiles2]
 %FILE4%=
+[SourceFiles2]
 %FILE5%=
+%FILE6%=
