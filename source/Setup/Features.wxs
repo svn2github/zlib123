@@ -107,6 +107,7 @@
 
 			<ComponentRef Id="RegistryEntriesWord"/>
 			<ComponentRef Id="FileAssociationOdt"/>
+      <ComponentRef Id="RegistryEntryOdtDefault"/>
 			<ComponentRef Id="RegistryEntryContextMenuOdt"/>
 
 			<ComponentRef Id="RegistryFixKB908002"/>
@@ -164,7 +165,8 @@
 			<ComponentRef Id="RegistryEntriesExcel"/>
 			
 			<ComponentRef Id="FileAssociationOds"/>
-			<ComponentRef Id="RegistryEntryContextMenuOds"/>
+      <ComponentRef Id="RegistryEntryOdsDefault"/>
+      <ComponentRef Id="RegistryEntryContextMenuOds"/>
 
 			<ComponentRef Id="RegistryFixKB908002"/>
 
@@ -187,6 +189,7 @@
 			<ComponentRef Id="RegistryEntriesPowerPoint"/>
 			
 			<ComponentRef Id="FileAssociationOdp"/>
+      <ComponentRef Id="RegistryEntryOdpDefault"/>
 			<ComponentRef Id="RegistryEntryContextMenuOdp"/>
 
 			<ComponentRef Id="RegistryFixKB908002"/>
