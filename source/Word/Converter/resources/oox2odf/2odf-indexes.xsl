@@ -1281,7 +1281,7 @@
             </xsl:variable>
 
             <!-- NOTE: OOo 3.0 does not open documents with a negative position attribute on an index-entry-tab-stop -->
-            <xsl:value-of select="ooc:MaxDouble(ooc:CmFromTwips($position), 0.0)" />
+            <xsl:value-of select="ooc:CmFromTwips(ooc:MaxDouble($position, 0.0))" />
             
           </xsl:attribute>
         </xsl:if>
@@ -1363,7 +1363,7 @@
                 </xsl:variable>
 
                 <!-- NOTE: OOo 3.0 does not open documents with a negative position attribute on an index-entry-tab-stop -->
-                <xsl:value-of select="ooc:MaxDouble(ooc:CmFromTwips($position), 0.0)" />
+                <xsl:value-of select="ooc:CmFromTwips(ooc:MaxDouble($position, 0.0))" />
 
               </xsl:attribute>
             </xsl:if>
