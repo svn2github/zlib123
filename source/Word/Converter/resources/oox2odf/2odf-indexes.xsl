@@ -1280,7 +1280,8 @@
               </xsl:choose>
             </xsl:variable>
 
-            <xsl:value-of select="ooc:CmFromTwips($position)" />
+            <!-- NOTE: OOo 3.0 does not open documents with a negative position attribute on an index-entry-tab-stop -->
+            <xsl:value-of select="ooc:MaxDouble(ooc:CmFromTwips($position), 0.0)" />
             
           </xsl:attribute>
         </xsl:if>
@@ -1360,7 +1361,10 @@
                     <xsl:with-param name="maxtabCount" select="$tabCount" />
                   </xsl:call-template>
                 </xsl:variable>
-                <xsl:value-of select="ooc:CmFromTwips($position)" />
+
+                <!-- NOTE: OOo 3.0 does not open documents with a negative position attribute on an index-entry-tab-stop -->
+                <xsl:value-of select="ooc:MaxDouble(ooc:CmFromTwips($position), 0.0)" />
+
               </xsl:attribute>
             </xsl:if>
             <xsl:if test="$leaderChar and $leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">

@@ -10,6 +10,11 @@
     <msxsl:using namespace="OdfConverter.Wordprocessing" />-->
     
     <![CDATA[
+      public double MaxDouble(double val1, double val2)
+      {
+          return Math.Max(val1, val2);
+      }
+    
       public string ToUpper(string input)
       {
           return input.ToUpper();
