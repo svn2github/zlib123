@@ -771,7 +771,7 @@
     <xsl:choose>
 
       <!--fields-->
-      <xsl:when test="@oox:fid and $ignoreFieldFlag!='true'">
+      <xsl:when test="@oox:fid and $ignoreFieldFlag!='true' and not(parent::w:p/@oox:index)">
         <xsl:call-template name="InsertComplexField" />
       </xsl:when>
 
