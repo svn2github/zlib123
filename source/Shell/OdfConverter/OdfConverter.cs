@@ -43,6 +43,7 @@ using Wordprocessing = OdfConverter.Wordprocessing;
 using System.Collections.Generic;
 using System.Net;
 using OdfConverter.OdfConverterLib;
+using System.Security.Principal;
 
 
 namespace OdfConverter.CommandLineTool
@@ -64,6 +65,37 @@ namespace OdfConverter.CommandLineTool
         private int _totalSize = 0;
         private int _progress = 0;
 
+#if !MONO
+        private static bool _ngenAssemblies = false;
+        public enum ShowCommands : int
+        {
+            SW_HIDE = 0,
+            SW_SHOWNORMAL = 1,
+            SW_NORMAL = 1,
+            SW_SHOWMINIMIZED = 2,
+            SW_SHOWMAXIMIZED = 3,
+            SW_MAXIMIZE = 3,
+            SW_SHOWNOACTIVATE = 4,
+            SW_SHOW = 5,
+            SW_MINIMIZE = 6,
+            SW_SHOWMINNOACTIVE = 7,
+            SW_SHOWNA = 8,
+            SW_RESTORE = 9,
+            SW_SHOWDEFAULT = 10,
+            SW_FORCEMINIMIZE = 11,
+            SW_MAX = 11
+        }
+
+        [DllImport("shell32.dll")]
+        static extern IntPtr ShellExecute(
+            IntPtr hwnd,
+            string lpOperation,
+            string lpFile,
+            string lpParameters,
+            string lpDirectory,
+            ShowCommands nShowCmd);
+#endif
+
         /// <summary>
         /// Main program.
         /// </summary>
@@ -77,6 +109,17 @@ namespace OdfConverter.CommandLineTool
             try
             {
                 ConversionOptions options = OdfConverter.ParseCommandLine(args);
+
+#if !MONO
+                if (_ngenAssemblies && !IsRunningOnMono())
+                {
+                    Console.WriteLine("Native images are being generated in the background." + Path.GetFileName(Assembly.GetExecutingAssembly().Location));
+                    ngenAssemblies();
+                    Console.WriteLine("Exiting.");
+                    return;
+                }
+#endif
+
                 // complete / correct conversion options
                 options.Generator = OdfConverter.GENERATOR;
                 if (string.IsNullOrEmpty(options.InputFullName))
@@ -91,7 +134,7 @@ namespace OdfConverter.CommandLineTool
                     {
                         throw new InvalidConversionOptionsException("Output filename or folder must be specified when converting remote files.");
                     }
-                    
+
                     options.InputFullNameOriginal = options.InputFullName;
                     options.InputFullName = UriLoader.DownloadFile(options.InputFullName);
                     options.InputBaseFolder = Path.GetDirectoryName(options.InputFullName);
@@ -581,7 +624,15 @@ namespace OdfConverter.CommandLineTool
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
             Console.WriteLine("     /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)");
             Console.WriteLine("     /SKIP Name         Skip a post-processing (provide the post-processor's name)");
+            Console.WriteLine();
 
+            if (!IsRunningOnMono())
+            {
+                Console.WriteLine("  Performance options:");
+                Console.WriteLine("     /NGEN              Using this option will install cached images of the executable code. This will result in");
+                Console.WriteLine("                        an improved startup time for all future conversions. If this option is used all other options");
+                Console.WriteLine("                        will be ignored and the tool will exit. Note: This option requires administrator privileges.");
+            }
         }
 
         private static ConversionOptions ParseCommandLine(string[] args)
@@ -710,6 +761,9 @@ namespace OdfConverter.CommandLineTool
                     case "-DUMP":
                         ++i; // expects one parameter
                         // do nothing here
+                        break;
+                    case "-NGEN":
+                        _ngenAssemblies = true;
                         break;
                     default:
                         if (args[i].Replace('/', '-').Replace('_', '-').StartsWith("-") && !File.Exists(args[i]))
@@ -950,6 +1004,42 @@ namespace OdfConverter.CommandLineTool
             }
             return output;
         }
+
+#if !MONO
+        private static bool IsRunningOnMono()
+        {
+            return Type.GetType("Mono.Runtime") != null;
+        }
+
+
+        private static void ngenAssemblies()
+        {
+            try
+            {
+                // get the .NET runtime string, and add the ngen exe at the end.
+                string ngenStr = Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "ngen.exe");
+                if (File.Exists(ngenStr))
+                {
+                    string verb = string.Empty;
+                    if (System.Environment.OSVersion.Version.Major >= 6)
+                    {
+                        // require elevation on Vista and above
+                        verb = "runas";
+                    }
+                    string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+                    string arguments = "/C cd " + assemblyPath + " && for %F in (*.exe;*.dll) do " + ngenStr + " \"%F\"";
+                
+                    ShellExecute(IntPtr.Zero, verb, "cmd.exe", arguments, assemblyPath, ShowCommands.SW_HIDE);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unable to ngen assemblies: " + ex.Message);
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+            }
+        }
+#endif
 
         private const int NOT_CONVERTED = 0;
         private const int VALIDATED = 1;
