@@ -60,7 +60,7 @@
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>		
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.10"/>		
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.9"/>		
-			<BypassIf Property="officePatchInstalled" Compare="ValueGreaterThanOrEqualTo" Value="5"/>
+			<BypassIf Property="officePatchInstalled" Compare="ValueGreaterThanOrEqualTo" Value="1"/>
 		</InstallConditions>
 		<ExitCodes>
         <DefaultExitCode Result="Success"/>
