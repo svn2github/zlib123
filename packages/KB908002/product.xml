@@ -25,7 +25,17 @@
     <Command PackageFile="lockbackRegKey.msi" Arguments=' /quiet'>
 		<InstallConditions>
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>
-			<BypassIf Property="lockbackRegKeyInstalled" Compare="ValueGreaterThanOrEqualTo" Value="1"/>
+			<!--  
+			   Make sure the hotfix gets installed per-user, even if it is already installed for a different user on the same machine
+			   
+         Installation state       Return integer value  Meaning
+          INSTALLSTATE_INVALIDARG	-2                    An invalid parameter was passed to the function.
+          INSTALLSTATE_UNKNOWN	  -1                    The product is not advertised or installed.
+          INSTALLSTATE_ADVERTISED	 1                    The product is advertised but not installed.
+          INSTALLSTATE_ABSENT	     2                    The product is installed for a different user.
+          INSTALLSTATE_DEFAULT	   5                    The product is installed for the current user.
+			-->
+			<BypassIf Property="lockbackRegKeyInstalled" Compare="ValueGreaterThanOrEqualTo" Value="5"/>
 		</InstallConditions>
 		<ExitCodes>
         <DefaultExitCode Result="Success"/>
@@ -35,7 +45,7 @@
     <Command PackageFile="extensibilityMSM.msi" Arguments=' /quiet'>
 		<InstallConditions>
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>
-			<BypassIf Property="extensibilityMSMInstalled" Compare="ValueGreaterThanOrEqualTo" Value="1"/>
+			<BypassIf Property="extensibilityMSMInstalled" Compare="ValueGreaterThanOrEqualTo" Value="5"/>
 		</InstallConditions>
 		<ExitCodes>
         <DefaultExitCode Result="Success"/>
@@ -48,7 +58,9 @@
 		<Command PackageFile="office2003-kb907417sfxcab-ENU.exe" Arguments=''>
 		<InstallConditions>
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>		
-			<BypassIf Property="officePatchInstalled" Compare="ValueGreaterThanOrEqualTo" Value="1"/>
+			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.10"/>		
+			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.9"/>		
+			<BypassIf Property="officePatchInstalled" Compare="ValueGreaterThanOrEqualTo" Value="5"/>
 		</InstallConditions>
 		<ExitCodes>
         <DefaultExitCode Result="Success"/>
