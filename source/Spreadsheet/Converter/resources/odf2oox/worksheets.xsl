@@ -47,6 +47,7 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
 
@@ -1464,13 +1465,34 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
     <xsl:variable name="cols">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
-				  <xsl:choose >
+				  <!--<xsl:choose >
 					  <xsl:when test ="@table:number-columns-repeated &gt; 256">
 						  <xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
 					  </xsl:when>
 					  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
           <xsl:value-of select="@table:number-columns-repeated"/>
         </xsl:when>
+				  </xsl:choose>-->
+			<xsl:variable name ="tempOfficeVersion">
+				<xsl:value-of select ="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+			</xsl:variable>
+			<xsl:choose>
+				<xsl:when test ="starts-with($tempOfficeVersion,'OpenOffice.org')">
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:when>
+				<xsl:when test ="starts-with($tempOfficeVersion,'MicrosoftOffice')">
+					<xsl:choose>
+						<xsl:when test ="@table:number-columns-repeated &gt; 256">
+							<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="@table:number-columns-repeated"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:otherwise>
 				  </xsl:choose>
 			  </xsl:when>
         <xsl:otherwise>
@@ -1858,13 +1880,34 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
     <xsl:variable name="cols">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
-				  <xsl:choose >
+				  <!--<xsl:choose >
 					  <xsl:when test ="@table:number-columns-repeated &gt; 256">
 						  <xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
 					  </xsl:when>
 					  <xsl:when test ="@table:number-columns-repeated &lt;= 256">
           <xsl:value-of select="@table:number-columns-repeated"/>
         </xsl:when>
+				  </xsl:choose>-->
+			<xsl:variable name ="tempOfficeVersion">
+				<xsl:value-of select ="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+			</xsl:variable>
+			<xsl:choose>
+				<xsl:when test ="starts-with($tempOfficeVersion,'OpenOffice.org')">
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:when>
+				<xsl:when test ="starts-with($tempOfficeVersion,'MicrosoftOffice')">
+					<xsl:choose>
+						<xsl:when test ="@table:number-columns-repeated &gt; 256">
+							<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="@table:number-columns-repeated"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="@table:number-columns-repeated"/>
+				</xsl:otherwise>
 				  </xsl:choose>
 			  </xsl:when>
 			  <xsl:otherwise>
@@ -1878,13 +1921,34 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 		<xsl:variable name ="tableNumberColumnsRepeated">
 			<xsl:choose >
 					<xsl:when test ="@table:number-columns-repeated">
-						<xsl:choose >
+						<!--<xsl:choose >
 				<xsl:when test ="@table:number-columns-repeated &gt; 256">
 					<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
 				</xsl:when>
 				<xsl:when test ="@table:number-columns-repeated &lt;= 256">
 					<xsl:value-of select="@table:number-columns-repeated"/>
 				</xsl:when>
+			</xsl:choose>-->
+						<xsl:variable name ="tempOfficeVersion">
+							<xsl:value-of select ="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+						</xsl:variable>
+						<xsl:choose>
+							<xsl:when test ="starts-with($tempOfficeVersion,'OpenOffice.org')">
+								<xsl:value-of select="@table:number-columns-repeated"/>
+							</xsl:when>
+							<xsl:when test ="starts-with($tempOfficeVersion,'MicrosoftOffice')">
+								<xsl:choose>
+									<xsl:when test ="@table:number-columns-repeated &gt; 256">
+										<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="@table:number-columns-repeated"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="@table:number-columns-repeated"/>
+							</xsl:otherwise>
 			</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>

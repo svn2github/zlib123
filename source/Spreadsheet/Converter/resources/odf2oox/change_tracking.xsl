@@ -32,6 +32,7 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
     xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
@@ -592,7 +593,7 @@
                         </xsl:with-param>-->
 						<!--Vijayeta,SP2,@table:number-columns-repeated-->
 						<xsl:with-param name="colNumber">
-							<xsl:choose>
+							<!--<xsl:choose>
 								<xsl:when test="@table:number-columns-repeated != ''">
 									<xsl:choose >
 										<xsl:when test ="@table:number-columns-repeated &gt; 256">
@@ -602,6 +603,37 @@
 											<xsl:value-of
                                         select="number($colNumber) + number(@table:number-columns-repeated)"/>
 										</xsl:when>
+									</xsl:choose>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$colNumber + 1"/>
+								</xsl:otherwise>
+							</xsl:choose>-->
+							<xsl:variable name ="tempOfficeVersion">
+								<xsl:value-of select ="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test="@table:number-columns-repeated != ''">
+									<xsl:choose>
+										<xsl:when test ="starts-with($tempOfficeVersion,'OpenOffice.org')">
+											<xsl:value-of
+                                        select="number($colNumber) + number(@table:number-columns-repeated)"/>
+										</xsl:when>
+										<xsl:when test ="starts-with($tempOfficeVersion,'MicrosoftOffice')">
+											<xsl:choose>
+												<xsl:when test ="@table:number-columns-repeated &gt; 256">
+													<xsl:value-of select ="number($colNumber) + number(256 - (16384 - number(@table:number-columns-repeated)))"/>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:value-of
+                                        select="number($colNumber) + number(@table:number-columns-repeated)"/>
+												</xsl:otherwise>
+											</xsl:choose>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of
+                                        select="number($colNumber) + number(@table:number-columns-repeated)"/>
+										</xsl:otherwise>
 									</xsl:choose>
 								</xsl:when>
 								<xsl:otherwise>

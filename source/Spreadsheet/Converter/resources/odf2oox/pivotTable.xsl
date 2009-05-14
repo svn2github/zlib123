@@ -32,6 +32,7 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -1037,7 +1038,7 @@
     </xsl:variable>-->
 
     <xsl:variable name="columns">
-      <xsl:choose>
+      <!--<xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
 				  <xsl:choose >
 					  <xsl:when test ="@table:number-columns-repeated &gt; 256">
@@ -1051,6 +1052,34 @@
         <xsl:otherwise>
           <xsl:text>1</xsl:text>
         </xsl:otherwise>
+      </xsl:choose>-->
+		<xsl:variable name ="tempOfficeVersion">
+			<xsl:value-of select ="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="@table:number-columns-repeated">
+				<xsl:choose>
+					<xsl:when test ="starts-with($tempOfficeVersion,'OpenOffice.org')">
+						<xsl:value-of select="@table:number-columns-repeated"/>
+					</xsl:when>
+					<xsl:when test ="starts-with($tempOfficeVersion,'MicrosoftOffice')">
+						<xsl:choose>
+							<xsl:when test ="@table:number-columns-repeated &gt; 256">
+								<xsl:value-of select ="256 - (16384 - @table:number-columns-repeated)"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="@table:number-columns-repeated"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="@table:number-columns-repeated"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>1</xsl:text>
+			</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
@@ -1515,7 +1544,7 @@
                 </xsl:choose>
               </xsl:with-param>-->
               <xsl:with-param name="colNumber">
-                <xsl:choose>
+                <!--<xsl:choose>
                   <xsl:when test="@table:number-columns-repeated">
 							<xsl:choose >
 								<xsl:when test ="@table:number-columns-repeated &gt; 256">
@@ -1529,6 +1558,34 @@
                   <xsl:otherwise>
                     <xsl:value-of select="$colNumber+1"/>
                   </xsl:otherwise>
+                </xsl:choose>-->
+				  <xsl:choose>
+					  <xsl:when test="@table:number-columns-repeated">
+						  <xsl:variable name ="tempOfficeVersion">
+							  <xsl:value-of select ="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+						  </xsl:variable>
+						  <xsl:choose>
+							  <xsl:when test ="starts-with($tempOfficeVersion,'OpenOffice.org')">
+								  <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+							  </xsl:when>
+							  <xsl:when test ="starts-with($tempOfficeVersion,'MicrosoftOffice')">
+								  <xsl:choose>
+									  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+										  <xsl:value-of select ="$colNumber +1 + (256 - (16384 - @table:number-columns-repeated))"/>
+									  </xsl:when>
+									  <xsl:otherwise>
+										  <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+									  </xsl:otherwise>
+								  </xsl:choose>								 
+							  </xsl:when>
+							  <xsl:otherwise>
+								  <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+							  </xsl:otherwise>
+						  </xsl:choose>
+					  </xsl:when>
+					  <xsl:otherwise>
+						  <xsl:value-of select="$colNumber+1"/>
+					  </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
 				<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
@@ -1567,7 +1624,7 @@
             </xsl:choose>
           </xsl:with-param>-->
           <xsl:with-param name="colNumber">
-            <xsl:choose>
+            <!--<xsl:choose>
               <xsl:when test="@table:number-columns-repeated">
 						<xsl:choose >
 							<xsl:when test ="@table:number-columns-repeated &gt; 256">
@@ -1581,6 +1638,34 @@
               <xsl:otherwise>
                 <xsl:value-of select="$colNumber+1"/>
               </xsl:otherwise>
+            </xsl:choose>-->
+			  <xsl:variable name ="tempOfficeVersion">
+				  <xsl:value-of select ="document('meta.xml')/office:document-meta/office:meta/meta:generator"/>
+			  </xsl:variable>
+			  <xsl:choose>
+				  <xsl:when test="@table:number-columns-repeated">
+					  <xsl:choose>
+						  <xsl:when test ="starts-with($tempOfficeVersion,'OpenOffice.org')">
+							  <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+						  </xsl:when>
+						  <xsl:when test ="starts-with($tempOfficeVersion,'MicrosoftOffice')">
+							  <xsl:choose>
+								  <xsl:when test ="@table:number-columns-repeated &gt; 256">
+									  <xsl:value-of select ="$colNumber +1 + (256 - (16384 - @table:number-columns-repeated))"/>
+								  </xsl:when>
+								  <xsl:otherwise>
+									  <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+								  </xsl:otherwise>
+							  </xsl:choose>
+						  </xsl:when>
+						  <xsl:otherwise>
+							  <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+						  </xsl:otherwise>
+					  </xsl:choose>
+				  </xsl:when>
+				  <xsl:otherwise>
+					  <xsl:value-of select="$colNumber+1"/>
+				  </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
 			<!--Vijayeta,SP2,@table:number-columns-repeated,End-->
