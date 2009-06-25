@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -1491,7 +1491,11 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-
+        <!--
+		Defect      : 2218801, Test footer
+		Code Changes: Vijayeta
+		Desc        : If a doc has only footers in even page, footer is not retained.
+		-->
     <xsl:variable name="footerId">
       <xsl:choose>
         <xsl:when test="w:footerReference/@w:type = 'default'">
@@ -1502,7 +1506,18 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+		<xsl:variable name="footerIdEven">
+			<xsl:choose>
+				<xsl:when test="w:footerReference/@w:type = 'even'">
+					<xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="preceding::w:sectPr[w:footerReference/@w:type = 'even'][1]/w:footerReference[./@w:type = 'even']/@r:id" />
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<!--additional condiditon added for the defects 2218801-->
+		<xsl:if test="$footerId != '' or ($footerId = '' and $footerIdEven != '') ">
     <xsl:if test="$footerId != ''">
       <style:footer>
         <xsl:variable name="footerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
@@ -1512,9 +1527,9 @@
           <xsl:apply-templates/>
         </xsl:for-each>
       </style:footer>
-
+			</xsl:if>
       <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:evenAndOddHeaders">
-        <xsl:variable name="footerIdEven">
+				<!--<xsl:variable name="footerIdEven">
           <xsl:choose>
             <xsl:when test="w:footerReference/@w:type = 'even'">
               <xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
@@ -1523,7 +1538,7 @@
               <xsl:value-of select="preceding::w:sectPr[w:footerReference/@w:type = 'even'][1]/w:footerReference[./@w:type = 'even']/@r:id" />
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:variable>
+				</xsl:variable>-->
         <xsl:choose>
           <xsl:when test="$footerIdEven != ''">
             <xsl:if test="$footerId = ''">

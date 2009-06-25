@@ -189,6 +189,11 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
 								</xdr:oneCellAnchor>
 							</xsl:when>
 							<xsl:when test ="$chart='true'">
+								<!--Fix for the defect  2229985 , chart Height and width-->
+								<xsl:choose>
+									<xsl:when
+									  test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ] 
+			                                or parent::node()[name() = 'draw:g']">
            <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:graphicFrame macro="">
@@ -212,6 +217,46 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
               </xdr:graphicFrame>
               <xdr:clientData/>
             </xdr:twoCellAnchor>
+							</xsl:when>
+									<xsl:when test ="not(parent::node()[name() = 'draw:g']) and ancestor::table:shapes">
+										<xdr:absoluteAnchor>
+											<xdr:pos x="1" y="0" />
+											<xdr:ext>
+												<xsl:attribute name="cx">
+													<xsl:call-template name="emu-measure">
+														<xsl:with-param name="length" select="@svg:width" />
+													</xsl:call-template>
+												</xsl:attribute>
+												<xsl:attribute name="cy">
+													<xsl:call-template name="emu-measure">
+														<xsl:with-param name="length" select="@svg:height" />
+													</xsl:call-template>
+												</xsl:attribute>
+											</xdr:ext>
+											<xdr:graphicFrame macro="">
+												<xdr:nvGraphicFramePr>
+													<xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>
+													<xdr:cNvGraphicFramePr>
+														<a:graphicFrameLocks/>
+													</xdr:cNvGraphicFramePr>
+												</xdr:nvGraphicFramePr>
+												<xdr:xfrm>
+													<a:off x="0" y="0"/>
+													<a:ext cx="0" cy="0"/>
+												</xdr:xfrm>
+												<a:graphic>
+													<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
+														<c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
+														  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+														  r:id="{generate-id(.)}"/>
+													</a:graphicData>
+												</a:graphic>
+											</xdr:graphicFrame>
+											<xdr:clientData/>
+										</xdr:absoluteAnchor>
+									</xsl:when>
+								</xsl:choose>
+								<!--Fix for the defect  2229985 -->
 							</xsl:when>
 						</xsl:choose>
             <!--</xsl:if>-->

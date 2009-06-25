@@ -2065,6 +2065,7 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name ="tmpLinefillColor">
     <xsl:param name ="parentStyle" />
     <xsl:param name ="gr" />
+    <xsl:param name ="shapeType" />
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
     <xsl:variable name="tranparencyinContent" select="substring-before(@svg:stroke-opacity,'%')"/>
@@ -2073,6 +2074,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name ="tmpLineFill">
           <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
           <xsl:with-param name="parentStyle" select="$parentStyle"/>
+          <xsl:with-param name="shapeType" select="$shapeType"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$parentStyle !='' and not(@draw:stroke or @svg:stroke-color)">
@@ -2080,6 +2082,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:call-template name ="tmpLineFill">
             <xsl:with-param name="tranparencyinStyle" select="substring-before(@svg:stroke-opacity,'%')"/>
             <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+            <xsl:with-param name="shapeType" select="$shapeType"/>
           </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
@@ -2090,6 +2093,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="tranparencyinContent"/>
     <xsl:param name="tranparencyinStyle"/>
     <xsl:param name="parentStyle"/>
+    <xsl:param name ="shapeType" />
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
     <xsl:choose>
@@ -2124,6 +2128,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:call-template>
       </xsl:when>
       <xsl:when test ="@svg:stroke-color">
+      
         <a:solidFill>
           <a:srgbClr  >
             <xsl:attribute name ="val">
@@ -2136,6 +2141,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </a:srgbClr >
         </a:solidFill>
+     
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -2230,6 +2236,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
       <xsl:call-template name ="tmpLinefillColor">
         <xsl:with-param name ="parentStyle" select="$parentStyle" />
+        <xsl:with-param name ="shapeType" select="'standard'" />
                 </xsl:call-template>
              <!-- Dash type-->
       <xsl:choose>

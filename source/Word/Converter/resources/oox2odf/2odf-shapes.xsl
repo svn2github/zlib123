@@ -1453,6 +1453,10 @@
             <xsl:with-param name="color">#ffffff</xsl:with-param>
           </xsl:call-template>
         </xsl:when>
+        <!--Vipul:Defect fix:  2706054 	SP2 - ODT roundtrip: frame - black frame -->
+        <xsl:when test="$isFilled ='f'">
+          <xsl:text>transparent</xsl:text>
+        </xsl:when>
         <xsl:otherwise>
           <!--<xsl:text>transparent</xsl:text>-->
         </xsl:otherwise>

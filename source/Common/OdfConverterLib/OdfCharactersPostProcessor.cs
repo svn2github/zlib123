@@ -345,6 +345,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
               
             }
 
+            if (strPath.Trim() == "M 10800 0 A 0 0 21600 21600 10800 0 10800 0 Z N")
+            {
+                strPath = "M 10800 0 L 10799 0 C 4835 0 0 4835 0 10799 0 16764 4835 21600 10800 21600 16764 21600 21600 16764 21600 10800 21600 4835 16764 0 10800 0 Z N";
+            }
        
             return strPath.Trim();
         }

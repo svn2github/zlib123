@@ -42,7 +42,17 @@
           </a:srgbClr>
         </a:buClr>
         </xsl:when>
-        <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true']">
+        <xsl:when test ="./text:list-level-style-number[@text:level=$level]/style:text-properties/@fo:color">
+          <a:buClr>
+            <a:srgbClr>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="substring-after(./text:list-level-style-number[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+              </xsl:attribute>
+            </a:srgbClr>
+          </a:buClr>
+        </xsl:when>
+        <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true'] or
+                  ./text:list-level-style-number[@text:level=$level]/style:text-properties[@style:use-window-font-color='true']">
         <a:buClr>
           <a:sysClr val="windowText"/>
         </a:buClr>

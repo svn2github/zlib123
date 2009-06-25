@@ -2051,22 +2051,22 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:when test="$attrName='Linespacing'">
           <xsl:variable name="lineSpc">
             <xsl:call-template name="convertUnitsToCm">
-              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:letter-spacing"/>
+              <xsl:with-param name="length"  select ="@fo:letter-spacing"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:variable name="lineSpcAtleast">
             <xsl:call-template name="convertUnitsToCm">
-              <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
+              <xsl:with-param name="length"  select ="@style:line-height-at-least"/>
             </xsl:call-template>
           </xsl:variable>
             <xsl:choose>
-              <xsl:when test ="style:paragraph-properties/@fo:line-height and 
-					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
-					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
+              <xsl:when test ="@fo:line-height and 
+					substring-before(@fo:line-height,'%') &gt; 0 and 
+					not(substring-before(@fo:line-height,'%') = 100)">
                 <a:lnSpc>
                   <a:spcPct>
                     <xsl:attribute name ="val">
-                      <xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:line-height,'%')* 1000,'#.##') "/>
+                      <xsl:value-of select ="format-number(substring-before(@fo:line-height,'%')* 1000,'#.##') "/>
                     </xsl:attribute>
                   </a:spcPct>
                 </a:lnSpc>
@@ -4906,9 +4906,10 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:value-of select ="'leftUpArrow'"/>
       </xsl:when>
       <!-- BentUp Arrow -->
+ <!-- Sonata: 2710057 -PPTX: SP2 roundtrip arrows lost  -->
       <!-- Fix for the bug 24, Internal Defects.xls, date 9th Aug '07, by vijayeta-->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100' and
-								 draw:enhanced-geometry/@draw:enhanced-path='M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N')
+      <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path='M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N'
+                or draw:enhanced-geometry/@draw:enhanced-path='M 0 857250 L 790572 857250 L 790572 285750 L 647697 285750 L 933447 0 L 1219197 285750 L 1076322 285750 L 1076322 1143000 L 0 1143000 Z N'
                  or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M ?f0 ?f19 L ?f16 ?f19 ?f16 ?f10 ?f12 ?f10 ?f14 ?f2 ?f1 ?f10 ?f17 ?f10 ?f17 ?f3 ?f0 ?f3 Z N')">
         <xsl:value-of select ="'bentUpArrow'"/>
       </xsl:when>
@@ -4970,12 +4971,16 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
 
       <!-- Circular Arrow -->
+<!-- Sonata: 2710057 -PPTX: SP2 roundtrip arrows lost  -->
       <xsl:when test ="draw:enhanced-geometry/@draw:type='circular-arrow'
-           or (draw:enhanced-geometry/@draw:type='non-primitive' and starts-with(@draw:name,'Circular Arrow'))">
+            or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 44649 357189 A ?f89 ?f90 ?f91 ?f92 44649 357189 ?f86 ?f88  W ?f93 ?f94 ?f95 ?f96 44649 357189 ?f86 ?f88 L 1012123 223630 982272 357191 833528 223630 857776 223630 A ?f136 ?f137 ?f138 ?f139 857776 223630 ?f133 ?f135  W ?f140 ?f141 ?f142 ?f143 857776 223630 ?f133 ?f135 Z N')
+            or (draw:enhanced-geometry/@draw:type='non-primitive' and draw:enhanced-geometry/@draw:enhanced-path = 'M 71438 800099 A ?f90 ?f91 ?f92 ?f93 71438 800099 ?f87 ?f89  W ?f94 ?f95 ?f96 ?f97 71438 800099 ?f87 ?f89 L 1132541 655800 1000125 800101 846791 655799 917680 655799 A ?f137 ?f138 ?f139 ?f140 917680 655799 ?f134 ?f136  W ?f141 ?f142 ?f143 ?f144 917680 655799 ?f134 ?f136 Z N')">
         <xsl:value-of select ="'circular-arrow'"/>
       </xsl:when>
-      <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 868680 L 0 457772 W 0 101727 712090 813817 0 457772 356046 101727 L 610362 101727 L 610362 0 L 813816 203454 L 610362 406908 L 610362 305181 L 356045 305181 A 203454 305181 508636 610363 356045 305181 203454 457772 L 203454 868680 Z N')">
+      <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007),2710057 -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path='M 0 868680 L 0 457772 W 0 101727 712090 813817 0 457772 356046 101727 L 610362 101727 L 610362 0 L 813816 203454 L 610362 406908 L 610362 305181 L 356045 305181 A 203454 305181 508636 610363 356045 305181 203454 457772 L 203454 868680 Z N'
+                 or (draw:enhanced-geometry/@draw:type='non-primitive' and                                                                     
+                       draw:enhanced-geometry/@draw:enhanced-path ='M ?f3 ?f6 L ?f3 ?f27 A ?f67 ?f68 ?f69 ?f70 ?f3 ?f27 ?f64 ?f66  W ?f71 ?f72 ?f73 ?f74 ?f3 ?f27 ?f64 ?f66 L ?f19 ?f17 ?f19 ?f5 ?f4 ?f15 ?f19 ?f26 ?f19 ?f25 ?f24 ?f25 A ?f114 ?f115 ?f116 ?f117 ?f24 ?f25 ?f111 ?f113  W ?f118 ?f119 ?f120 ?f121 ?f24 ?f25 ?f111 ?f113 L ?f14 ?f6 Z N')">
         <xsl:value-of select ="'bentArrow '"/>
       </xsl:when>
       <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
@@ -5152,8 +5157,9 @@ Copyright (c) 2007, Sonata Software Limited
      
       <!--End of bug fix code-->
       
-      <!--  Folded Corner (Added by A.Mathi as on 19/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='paper')">
+      <!--  Folded Corner (Added by A.Mathi as on 19/07/2007),2710057 -->
+      <xsl:when test ="draw:enhanced-geometry/@draw:type='paper'
+                   or (draw:enhanced-geometry/@draw:type='non-primitive' and  draw:enhanced-geometry/@draw:enhanced-path = 'S M ?f0 ?f2 L ?f1 ?f2 ?f1 ?f12 ?f10 ?f3 ?f0 ?f3 Z N S M ?f10 ?f3 L ?f11 ?f13 ?f1 ?f12 Z N F M ?f10 ?f3 L ?f11 ?f13 ?f1 ?f12 ?f10 ?f3 ?f0 ?f3 ?f0 ?f2 ?f1 ?f2 ?f1 ?f12 N')">
         <xsl:value-of select ="'foldedCorner '"/>
       </xsl:when>
 		<!--  Lightning Bolt (Added by A.Mathi as on 20/07/2007) -->

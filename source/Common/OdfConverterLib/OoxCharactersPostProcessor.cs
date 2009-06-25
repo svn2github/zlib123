@@ -1873,7 +1873,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 strEnhPath = Regex.Replace(strEnhPath, @"[C]\b", "c");
                 strEnhPath = Regex.Replace(strEnhPath, @"[Z]\b", "x");
                 strEnhPath = Regex.Replace(strEnhPath, @"[N]\b", "e");
-                strEnhPath = Regex.Replace(strEnhPath, @"[F]\b", "nf");
+                // Vipul:
+                strEnhPath = Regex.Replace(strEnhPath, @"[F]\b", "");
                 strEnhPath = Regex.Replace(strEnhPath, @"[S]\b", "ns");
                 strEnhPath = Regex.Replace(strEnhPath, @"[A]\b", "at");
                 strEnhPath = Regex.Replace(strEnhPath, @"[T]\b", "ae");

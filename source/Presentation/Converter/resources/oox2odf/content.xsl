@@ -727,6 +727,21 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:with-param name ="layId" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
+            <xsl:when test="name()='p:graphicFrame'">
+              <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+                <xsl:call-template name="tmpOLEObjects">
+                  <xsl:with-param name ="SlideRelationId" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
+                </xsl:call-template>
+              </xsl:if>
+
+              <xsl:if test="./a:graphic/a:graphicData/a:tbl">
+                <xsl:call-template name="tmpCreateTable">
+                  <xsl:with-param name ="TypeId" select="$SlideID" />
+                  <!--parameter added by yeswanth.s : for getting hyperlink from the .rels file using rId-->
+                  <xsl:with-param name ="slideRel" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:when>
           </xsl:choose>
         </xsl:for-each>
 
@@ -2953,6 +2968,15 @@ exclude-result-prefixes="p a r xlink rels">
                    </xsl:if>
                  </xsl:for-each>
                                         </xsl:when>
+               <xsl:when test="name()='p:graphicFrame'">
+                 <xsl:if test="./a:graphic/a:graphicData/a:tbl">
+                   <xsl:call-template name="tmpTableStyle">
+                     <xsl:with-param name="TypeId" select="substring-before($SlideId,'.xml')"/>
+                     <xsl:with-param name="DefFont" select="$DefFont"/>
+                     <xsl:with-param name="SMName" select="$SMName"/>
+                   </xsl:call-template>
+                 </xsl:if>
+               </xsl:when>
                <xsl:when test="name()='p:cxnSp'">
                  <xsl:variable name="var_pos" select="position()"/>
                  <xsl:for-each select=".">

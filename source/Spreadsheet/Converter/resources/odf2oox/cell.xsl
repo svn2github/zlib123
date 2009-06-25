@@ -2571,7 +2571,13 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                 <xsl:variable name="StyleApplyStyleName">
                   <xsl:value-of select="@style:apply-style-name"/>
                 </xsl:variable>
-
+				  <!-- 
+				  Code Changes by: Vijayeta
+				  Defect         : 2563110 , Strike Through Lost
+				 -->
+				  <xsl:variable name ="tableStyleName">
+					  <xsl:value-of select="@table:style-name"/>
+				  </xsl:variable>
                 <!--xsl:choose>
                   <xsl:when test="key('style',@table:style-name)">
                     <xsl:for-each select="key('style',@table:style-name)">
@@ -2597,11 +2603,22 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                 <!--Code Added By Sateesh Reddy Date:01-Feb-2008 -->
                 <!--RefNo-5: Changed if condition to chk for the styles in case of grouping.-->
                 <!--<xsl:if test="parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style/@style:name=@table:style-name and @table:style-name !=''">-->
-                <xsl:if test="//office:automatic-styles/style:style/@style:name=@table:style-name and @table:style-name !=''">
+				  <!-- 
+				  Code Changes by: Vijayeta
+				  Defect         : 2563110 , Strike Through Lost
+				 -->
+				  <xsl:choose>
+					  <xsl:when test="//office:automatic-styles/style:style/@style:name=@table:style-name and @table:style-name !=''">
                 <xsl:attribute name="style-number-change-post">
                   <xsl:value-of select="@table:style-name"/>
                 </xsl:attribute>
-                </xsl:if>
+					  </xsl:when>
+					  <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $tableStyleName]">
+						  <xsl:attribute name="style-number-change-post">
+							  <xsl:value-of select="@table:style-name"/>
+						  </xsl:attribute>
+					  </xsl:when>
+				  </xsl:choose>				  
               </xsl:when>
               <!-- when style is specified in column -->
               <xsl:when test="$columnCellStyle != '' ">

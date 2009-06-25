@@ -380,7 +380,8 @@ namespace Sonata.OdfConverter.Presentation
                 if (r.NodeType == XmlNodeType.Element && r.LocalName == "Relationship")
                 {
                     String target = partDir + "/" + r.GetAttribute("Target");
-
+                    if (target != "ppt/pmPRSettings.xml")
+                    {
                     // Added by lohith - if a file is external no need to have it within package
                     if (!(r.GetAttribute("TargetMode") == "External"))
                     {
@@ -411,6 +412,7 @@ namespace Sonata.OdfConverter.Presentation
                     }
                 }
             }
+        }
         }
 
         public void ValidationHandler(object sender, ValidationEventArgs args)

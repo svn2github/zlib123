@@ -55,6 +55,9 @@
     select="count(document('content.xml')/office:document-content/office:automatic-styles/text:list-style)"/>
   <xsl:variable name="stylesListStyleCount"
     select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style|document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style)"/>
+	<!-- 2684827 , variable 'stylesListOfficeStyleCount' created-->
+  <xsl:variable name="stylesListOfficeStyleCount"
+		select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style)"/>
 
   <!-- 
   *************************************************************************
@@ -293,11 +296,19 @@
         mode="numbering">
         <xsl:with-param name="offset" select="$automaticListStylesCount "/>
       </xsl:apply-templates>
+		<!--
+		Defect:  2684827 
+		Code Changes by: Vijayeta
+		Desc           : Bullets and numbering messed up, reason being, repition of num id in numbering.xml(rnd trip docx)
+						 So additional variable 'stylesListOfficeStyleCount' used to take care of the count, 
+						 if bullets are defined in styles in 'office:styles of odf
+		-->
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style"
         mode="numbering">
-        <xsl:with-param name="offset" select="$automaticListStylesCount "/>
+        <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListOfficeStyleCount "/>
       </xsl:apply-templates>
+	  <!-- End of fix for   2684827-->
       <xsl:for-each select="document('content.xml')">
         <xsl:apply-templates select="key('restarting-lists','')" mode="numbering">
           <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListStyleCount "
@@ -316,11 +327,19 @@
         mode="num">
         <xsl:with-param name="offset" select="$automaticListStylesCount "/>
       </xsl:apply-templates>
+		<!--
+		Defect:  2684827 
+		Code Changes by: Vijayeta
+		Desc           : Bullets and numbering messed up, reason being, repition of num id in numbering.xml(rnd trip docx)
+						 So additional variable 'stylesListOfficeStyleCount' used to take care of the count, 
+						 if bullets are defined in styles in 'office:styles of odf
+		-->
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style"
         mode="num">
-        <xsl:with-param name="offset" select="$automaticListStylesCount "/>
+        <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListOfficeStyleCount"/>
       </xsl:apply-templates>
+		<!--End of fix for   2684827-->
       <xsl:for-each select="document('content.xml')">
         <xsl:apply-templates select="key('restarting-lists','')" mode="num">
           <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListStyleCount "

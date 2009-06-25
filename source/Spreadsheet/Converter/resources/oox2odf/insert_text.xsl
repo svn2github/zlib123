@@ -706,9 +706,11 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
     <xsl:choose>
       <!-- when hyperlink leads to a file in network -->
-      <xsl:when test="starts-with($target,'file:///\\')">
+<!--Commenetd by vijayets to fix the defect 2682680-->
+      <!--<xsl:when test="starts-with($target,'file:///\\')">
         <xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"/>
-      </xsl:when>
+      </xsl:when>-->
+<!--Commenetd by vijayets to fix the defect 2682680-->
       <!--when hyperlink leads to www or mailto -->
       <xsl:when test="contains($target,':')">
         <xsl:value-of select="$target"/>

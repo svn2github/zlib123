@@ -815,17 +815,20 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     </xsl:variable>
 
     <chart:series chart:style-name="{concat('series',$seriesNumber)}">
+			<xsl:variable name ="pos">
+				<xsl:value-of select ="position()"/>
+			</xsl:variable>
       <!--added by sonata for bug no:2107116-->
       <!--reference to the series value-->
 			<!--added by chhavi for sp2-->
-			<xsl:if test="c:val//c:f or c:xVal//c:f">
+			<xsl:if test="c:val//c:f or c:yVal//c:f">
        <xsl:variable name="cellRange">
 					<xsl:choose>
 						<xsl:when test="c:val//c:f">
         <xsl:value-of select="c:val//c:f"/>
 						</xsl:when>
-						<xsl:when test="c:xVal//c:f">
-							<xsl:value-of select="c:xVal//c:f"/>
+						<xsl:when test="c:yVal//c:f">
+							<xsl:value-of select="c:yVal//c:f"/>
 						</xsl:when>
 					</xsl:choose>
 				</xsl:variable>
@@ -900,12 +903,77 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           </xsl:attribute>
         </xsl:if> 
           </xsl:if>
-      <!--end-->
+			<!-- Defect:  2682600 , 2186921 
+                             Code Changes By : Vijayeta
+                             Desc:           : On Reverse converssion, the source data range is not retained in ODF
+                                               Additional attributes added to maintain the link between chart abd source data.
+                         -->
+			<xsl:if test ="not(key('plotArea', c:chartSpace/@oox:part)/c:doughnutChart)">
+				
+					<xsl:variable name="apos">
+						<xsl:text>&apos;</xsl:text>
+					</xsl:variable>
+                                     <xsl:if test="c:tx//c:f">
+					<xsl:variable name ="tempRangeVal">
+						<xsl:value-of select="c:tx//c:f"/>
+					</xsl:variable>
+					<xsl:variable name="sheetname1">
+						<xsl:choose>
+							<xsl:when test ="starts-with(substring-before($tempRangeVal,'!'),$apos)">
+								<xsl:variable name ="temp">
+									<xsl:value-of select="substring(substring-before($tempRangeVal,'!'),2)"/>
+								</xsl:variable>
+								<xsl:value-of select="substring($temp,1,string-length($temp)-1)"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="substring-before($tempRangeVal,'!')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:variable name ="sheetNames">
+						<xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
+							<xsl:if test="@name = $sheetname1">
+								<xsl:variable name="checkedName">
+									<xsl:call-template name="CheckSheetName">
+										<xsl:with-param name="sheetNumber">
+											<xsl:value-of select="position()"/>
+										</xsl:with-param>
+										<xsl:with-param name="name">
+											<xsl:value-of select="@name"/>
+										</xsl:with-param>
+									</xsl:call-template>
+								</xsl:variable>
+								<!--<xsl:value-of select ="concat(@name,':',$checkedName,'::')"/>-->
+								<xsl:value-of select ="$checkedName"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:variable name ="temp1">
+						<xsl:value-of select ="concat($apos,$sheetNames,$apos,'!',substring-after($tempRangeVal,'!'))"/>
+					</xsl:variable>
+					<xsl:variable name="rangeVal">
+						<xsl:call-template name="ConvertCellRange">
+							<xsl:with-param name="cellRange" select="$temp1"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:attribute name ="chart:label-cell-address">
+						<xsl:choose>
+							<xsl:when test="contains($rangeVal,':')">
+								<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$rangeVal"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</xsl:if>
+			</xsl:if>
+			<!--Vijayeta-->
+      <!--end of code change, for defects   2682600  and  2186921 -->
       <xsl:if
         test="(key('plotArea', @oox:part)/c:scatterChart or key('plotArea', @oox:part)/c:bubbleChart) and position() = 1">
         <chart:domain>
-          <!--added for filename:c1 f1 miseryindexrev.xlsx-->
-          
+          <!--added for filename:c1 f1 miseryindexrev.xlsx-->          
           <xsl:if test="key('xNumPoints', @oox:part)//c:f">
           <xsl:variable name="cellRange">
               <xsl:value-of select="key('xNumPoints', @oox:part)//c:f"/>
@@ -938,10 +1006,8 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 									<xsl:value-of select="substring-before($tempRangeVal,'!')"/>
 								</xsl:otherwise>
 							</xsl:choose>
-
 						</xsl:variable>
 						<!--added for bug no:2557071-->
-
 						<xsl:variable name ="sheetNames">
 							<xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
 								<xsl:if test="@name = $sheetname">
@@ -1918,12 +1984,118 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
       </xsl:variable>
 
       <chart:categories>
+		  <xsl:variable name ="apos">
+			  <xsl:text >&apos;</xsl:text>
+		  </xsl:variable>
         <!--RefNo-1:ODF1.1:Avoided attribute if wrong address-->
-        <xsl:if test="1 + $points = 'NaN'">
+			<!-- Defect:  2682600 , 2186921 
+                             Code Changes By : Vijayeta
+                             Desc:           : On Reverse converssion, the source data range is not retained in ODF
+                                               Additional attributes added to maintain the link between chart abd source data.
+             -->	  
+				<xsl:choose>
+					<xsl:when test="1 + $points = 'NaN'">
         <xsl:attribute name="table:cell-range-address">
           <xsl:value-of select="concat('local-table.A2:.A',1 + $points)"/>
         </xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:variable name ="formulaRange">
+							<xsl:choose>
+								<xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:pieChart or  key('plotArea', c:chartSpace/@oox:part)/c:pie3DChart">
+									<xsl:value-of select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[position()=1]/c:cat//c:f"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:choose>
+										<xsl:when test="./parent::node()/c:scatterChart">
+											<xsl:value-of select ="./parent::node()//c:ser[position()=1]/c:xVal//c:f"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select ="./parent::node()//c:ser[position()=1]/c:cat//c:f"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+
+						<xsl:variable name ="tempRangeVal">
+							<xsl:choose>
+								<xsl:when test="(starts-with($formulaRange, '(') or 
+								  contains(substring($formulaRange,string-length($formulaRange)-1),')')) and 
+								  contains($formulaRange,',') and 
+								  contains(substring-after($formulaRange,'!'),',')">
+									<xsl:value-of select="substring(substring-before($formulaRange,','),2)"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$formulaRange"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						<!--<xsl:variable name="apos">
+							<xsl:text>&apos;</xsl:text>
+						</xsl:variable>-->
+						<xsl:variable name="sheetname">
+							<xsl:choose>
+								<xsl:when test ="starts-with($formulaRange,$apos)">
+									<xsl:variable name ="temp">
+										<xsl:value-of select="substring(substring-before($tempRangeVal,'!'),2)"/>
+									</xsl:variable>
+									<xsl:value-of select="substring($temp,1,string-length($temp)-1)"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="substring-before($tempRangeVal,'!')"/>
+								</xsl:otherwise>
+							</xsl:choose>
+
+						</xsl:variable>
+						<!--added for bug no:2557071-->
+
+						<xsl:variable name ="sheetNames">
+							<xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
+								<xsl:if test="@name = $sheetname">
+									<xsl:variable name="checkedName">
+										<xsl:call-template name="CheckSheetName">
+											<xsl:with-param name="sheetNumber">
+												<xsl:value-of select="position()"/>
+											</xsl:with-param>
+											<xsl:with-param name="name">
+												<xsl:value-of select="@name"/>
+											</xsl:with-param>
+										</xsl:call-template>
+									</xsl:variable>
+									<!--<xsl:value-of select ="concat(@name,':',$checkedName,'::')"/>-->
+									<xsl:value-of select ="$checkedName"/>
         </xsl:if>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name ="temp1">
+							<xsl:value-of select ="concat($apos,$sheetNames,$apos,'!',substring-after($tempRangeVal,'!'))"/>
+						</xsl:variable>
+						<xsl:variable name="rangeVal">
+							<xsl:call-template name="ConvertCellRange">
+								<xsl:with-param name="cellRange" select="$temp1"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:if test="not(contains($formulaRange,'#REF!')) and $sheetNames!=''">
+							<xsl:attribute name="table:cell-range-address">
+								<xsl:choose>
+									<xsl:when test="contains($rangeVal,':')">
+										<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$rangeVal"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+						</xsl:if>						
+					</xsl:otherwise>
+				</xsl:choose>
+				<!--End of code change for defects  2682600 and  2186921 -->
+				<!--<xsl:if test="1 + $points = 'NaN'">
+					<xsl:attribute name="table:cell-range-address">
+						<xsl:value-of select="concat('local-table.A2:.A',1 + $points)"/>
+					</xsl:attribute>
+				</xsl:if>-->
       </chart:categories>
       <!--End of RefNo-1-->
       <xsl:if test="c:majorGridlines">
@@ -2293,7 +2465,252 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
       <!--RefNo-1:ODF1.1:removed chart:table-number-list-->
       <!--<chart:plot-area chart:style-name="plot_area" chart:table-number-list="0" svg:x="0.26cm"  svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">-->
-			<chart:plot-area chart:style-name="plot_area" svg:x="0.26cm"  svg:y="2.087cm">
+			<chart:plot-area chart:style-name="plot_area" svg:x="0.26cm"  svg:y="2.087cm" chart:data-source-has-labels="both">
+			<!-- Defect:  2682600 , 2186921 
+                             Code Changes By : Vijayeta
+                             Desc:           : On Reverse converssion, the source data range is not retained in ODF
+                                               Additional attributes added to maintain the link between chart abd source data.
+                         -->
+				<xsl:if test ="not(key('plotArea', c:chartSpace/@oox:part)/c:doughnutChart) and not(key('plotArea', c:chartSpace/@oox:part)/c:scatterChart)">
+					<xsl:variable name="apos">
+						<xsl:text>&apos;</xsl:text>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="starts-with(key('plotArea', c:chartSpace/@oox:part)//c:ser[position()=1]/c:cat//c:f,'(') and contains(key('plotArea', c:chartSpace/@oox:part)//c:ser[position()=1]/c:cat//c:f,',')">
+							<xsl:variable name ="startRange">
+								<xsl:choose>
+									<xsl:when test ="key('plotArea', c:chartSpace/@oox:part)/c:scatterChart">
+										<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[position()=1]/c:xVal//c:f">
+											<xsl:call-template name ="GetStartMultipleRanges">
+												<xsl:with-param name ="multRanges">
+													<xsl:value-of select ="."/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:for-each>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[position()=1]/c:cat//c:f">
+											<xsl:call-template name ="GetStartMultipleRanges">
+												<xsl:with-param name ="multRanges">
+													<xsl:value-of select ="."/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:for-each>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name ="endRange">
+								<xsl:choose>
+									<xsl:when test ="key('plotArea', c:chartSpace/@oox:part)/c:scatterChart">
+										<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[last()]/c:yVal//c:f">
+											<xsl:call-template name ="GetEndMultipleRanges">
+												<xsl:with-param name ="multRanges">
+													<xsl:value-of select ="."/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:for-each>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[last()]/c:val//c:f">
+											<xsl:call-template name ="GetEndMultipleRanges">
+												<xsl:with-param name ="multRanges">
+													<xsl:value-of select ="."/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:for-each>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name="sheetname1">
+								<xsl:choose>
+									<xsl:when test ="starts-with(substring-before($startRange,'!'),$apos)">
+										<xsl:variable name ="temp">
+											<xsl:value-of select="substring(substring-before($startRange,'!'),2)"/>
+										</xsl:variable>
+										<xsl:value-of select="substring($temp,1,string-length($temp)-1)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="substring-before($startRange,'!')"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name ="sheetNames">
+								<xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
+									<xsl:if test="@name = $sheetname1">
+										<xsl:variable name="checkedName">
+											<xsl:call-template name="CheckSheetName">
+												<xsl:with-param name="sheetNumber">
+													<xsl:value-of select="position()"/>
+												</xsl:with-param>
+												<xsl:with-param name="name">
+													<xsl:value-of select="@name"/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:variable>
+										<!--<xsl:value-of select ="concat(@name,':',$checkedName,'::')"/>-->
+										<xsl:value-of select ="$checkedName"/>
+									</xsl:if>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:variable name ="temp1">
+								<xsl:call-template name ="getCompleteRange">
+									<xsl:with-param name ="startRange">
+										<xsl:value-of select ="$startRange"/>
+									</xsl:with-param>
+									<xsl:with-param name ="endRange">
+										<xsl:value-of select ="$endRange"/>
+									</xsl:with-param>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:if test="not(contains($temp1,'#REF!')) and $sheetNames!=''">
+								<xsl:attribute name ="table:cell-range-address">
+									<xsl:value-of select="$temp1"/>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name ="startRange">
+								<xsl:variable name ="start">
+									<xsl:choose>
+										<xsl:when test ="key('plotArea', c:chartSpace/@oox:part)/c:scatterChart">
+											<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[position()=1]/c:xVal//c:f">
+												<xsl:if test ="contains(.,':')">
+													<xsl:value-of select ="substring-before(.,':')"/>
+												</xsl:if>
+												<xsl:if test ="not(contains(.,':'))">
+													<xsl:value-of select ="."/>
+												</xsl:if>
+											</xsl:for-each>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[position()=1]/c:cat//c:f">											
+														<xsl:if test ="contains(.,':')">
+															<xsl:value-of select ="substring-before(.,':')"/>
+														</xsl:if>
+														<xsl:if test ="not(contains(.,':'))">
+															<xsl:value-of select ="."/>
+														</xsl:if>													
+											</xsl:for-each>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:variable>
+								<xsl:if test ="$start!='' and contains($start,'!') and not(contains($start,'#REF!'))">
+									<xsl:variable name ="startCol">
+										<xsl:call-template name="NumbersToChars">
+											<xsl:with-param name="num">
+												<xsl:variable name ="num">
+													<xsl:call-template name="GetColNum">
+														<xsl:with-param name="cell">
+															<xsl:value-of select="translate(substring-after($start,'!'),'$','')"/>
+														</xsl:with-param>
+													</xsl:call-template>
+												</xsl:variable>
+												<xsl:value-of select ="$num - 1"/>
+											</xsl:with-param>
+										</xsl:call-template>
+									</xsl:variable>
+									<xsl:variable name ="startRow">
+										<xsl:call-template name="GetRowNum">
+											<xsl:with-param name="cell" select="translate(substring-after($start,'!'),'$','')"/>
+										</xsl:call-template>
+									</xsl:variable>
+									<xsl:if test ="$startRow - 1 &gt; 0">
+									<xsl:value-of select ="concat(substring-before($start,'!'),'!$',$startCol,'$',$startRow - 1)"/>
+								</xsl:if>
+									<xsl:if test ="$startRow - 1 = 0">
+										<xsl:value-of select ="concat(substring-before($start,'!'),'!$',$startCol,'$',$startRow)"/>
+									</xsl:if>
+								</xsl:if>
+							</xsl:variable>
+							<xsl:variable name ="endRange">
+								<xsl:choose>
+									<xsl:when test ="key('plotArea', c:chartSpace/@oox:part)/c:scatterChart">
+										<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[last()]/c:yVal//c:f">										
+													<xsl:if test ="contains(.,':')">
+														<xsl:value-of select ="substring-after(.,':')"/>
+													</xsl:if>
+													<xsl:if test ="not(contains(.,':'))">
+														<xsl:value-of select ="."/>
+													</xsl:if>											
+										</xsl:for-each>
+									</xsl:when>
+									<xsl:when test ="key('plotArea', c:chartSpace/@oox:part)/c:stockChart">
+										<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)/c:stockChart/c:ser[last()]/c:val//c:f">
+											<xsl:if test ="contains(.,':')">
+												<xsl:value-of select ="substring-after(.,':')"/>
+											</xsl:if>
+											<xsl:if test ="not(contains(.,':'))">
+												<xsl:value-of select ="."/>
+											</xsl:if>
+										</xsl:for-each>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:for-each select ="key('plotArea', c:chartSpace/@oox:part)//c:ser[last()]/c:val//c:f">
+											<xsl:if test ="contains(.,':')">
+												<xsl:value-of select ="substring-after(.,':')"/>
+											</xsl:if>
+											<xsl:if test ="not(contains(.,':'))">
+												<xsl:value-of select ="."/>
+											</xsl:if>
+										</xsl:for-each>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name="sheetname1">
+								<xsl:choose>
+									<xsl:when test ="starts-with(substring-before($startRange,'!'),$apos)">
+										<xsl:variable name ="temp">
+											<xsl:value-of select="substring(substring-before($startRange,'!'),2)"/>
+										</xsl:variable>
+										<xsl:value-of select="substring($temp,1,string-length($temp)-1)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="substring-before($startRange,'!')"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name ="sheetNames">
+								<xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
+									<xsl:if test="@name = $sheetname1">
+										<xsl:variable name="checkedName">
+											<xsl:call-template name="CheckSheetName">
+												<xsl:with-param name="sheetNumber">
+													<xsl:value-of select="position()"/>
+												</xsl:with-param>
+												<xsl:with-param name="name">
+													<xsl:value-of select="@name"/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:variable>
+										<!--<xsl:value-of select ="concat(@name,':',$checkedName,'::')"/>-->
+										<xsl:value-of select ="$checkedName"/>
+									</xsl:if>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:variable name ="temp1">
+								<xsl:value-of select ="concat($apos,$sheetNames,$apos,'!',substring-after($startRange,'!'),':',$endRange)"/>
+							</xsl:variable>
+							<xsl:variable name ="Range">
+								<xsl:call-template name="ConvertCellRange">
+									<xsl:with-param name="cellRange" select="$temp1"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:if test="not(contains($Range,'#REF!')) and $sheetNames!=''">
+								<xsl:attribute name ="table:cell-range-address">
+									<xsl:choose>
+										<xsl:when test="contains($Range,':')">
+											<xsl:value-of select="concat(substring-before($Range,':'),':.',substring-after($Range,':'))"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="$Range"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+				<!--End of code change for defects  2682600 and  2186921 -->
         <!-- Axes -->
         <xsl:choose>
           <!-- stock chart type 3 and stock chart type 4 -->
@@ -4787,7 +5204,6 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   <xsl:template name="InsertDataPointsProperties">
     <!-- @Description: Inserts data points properties  -->
     <!-- @Context: c:ser -->
-
     <xsl:param name="seriesNum"/>
     <!-- (int) sequential number of currently processed series -->
     <xsl:param name="numPoints"/>
@@ -5471,5 +5887,157 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
-
+<!-- Defect:  2682600 , 2186921 
+     Code Changes By : Vijayeta
+      Desc:          : On Reverse converssion, the source data range is not retained in ODF
+                        Additional attributes added to maintain the link between chart abd source data.
+  -->
+	<xsl:template name ="GetStartMultipleRanges">
+		<xsl:param name ="multRanges"/>
+		<xsl:param name ="startRange">
+			<xsl:value-of select ="''"/>
+		</xsl:param>
+		<xsl:variable name ="newRange">
+			<xsl:choose>
+				<xsl:when test ="starts-with($multRanges,'(')">
+					<xsl:value-of select ="substring($multRanges,2)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select ="$multRanges"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="finalRange">
+			<xsl:value-of select ="$startRange"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test ="$newRange!=''">
+				<xsl:call-template name ="GetStartMultipleRanges">
+					<xsl:with-param name ="multRanges" >
+						<xsl:value-of select ="substring-after($newRange,',')"/>
+					</xsl:with-param>
+					<xsl:with-param name ="startRange" >
+						<xsl:choose>
+							<xsl:when test ="contains($newRange,',')">
+								<xsl:value-of select ="concat($finalRange,substring-before(substring-before($newRange,','),':'),'|')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="concat($finalRange,substring-before($newRange,':'),'|')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select ="$startRange"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template name ="GetEndMultipleRanges">
+		<xsl:param name ="multRanges"/>
+		<xsl:param name ="endRange">
+			<xsl:value-of select ="''"/>
+		</xsl:param>
+		<xsl:variable name ="newRange">
+			<xsl:choose>
+				<xsl:when test ="starts-with($multRanges,'(')">
+					<xsl:value-of select ="substring($multRanges,2)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select ="$multRanges"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="finalRange">
+			<xsl:value-of select ="$endRange"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test ="$newRange!=''">
+				<xsl:call-template name ="GetEndMultipleRanges">
+					<xsl:with-param name ="multRanges" >
+						<xsl:value-of select ="substring-after($newRange,',')"/>
+					</xsl:with-param>
+					<xsl:with-param name ="endRange" >
+						<xsl:choose>
+							<xsl:when test ="contains($newRange,',')">
+								<xsl:value-of select ="concat($finalRange,substring-after(substring-before($newRange,','),':'),'|')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:choose>
+									<xsl:when test ="substring($newRange,string-length($newRange))=')'">
+										<xsl:value-of select ="concat($finalRange,substring-after(substring($newRange,0,string-length($newRange)),':'),'|')"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select ="concat($finalRange,substring-after($newRange,':'),'|')"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select ="$endRange"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template name ="getCompleteRange">
+		<xsl:param name ="startRange"/>
+		<xsl:param name ="endRange"/>
+		<xsl:param name ="finalRange"/>
+		<xsl:variable name ="space">
+			<xsl:value-of select ="' '"/>
+		</xsl:variable>
+		<xsl:variable name ="finalRange1">
+			<xsl:value-of select ="$finalRange"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test ="$startRange!='' and $endRange!=''">
+				<xsl:call-template name ="getCompleteRange">
+					<xsl:with-param name ="startRange" >
+						<xsl:value-of select ="substring-after($startRange,'|')"/>
+					</xsl:with-param>
+					<xsl:with-param name ="endRange" >
+						<xsl:value-of select ="substring-after($endRange,'|')"/>
+					</xsl:with-param>
+					<xsl:with-param name ="finalRange" >
+						<xsl:value-of select ="concat($finalRange,$space,substring-before($startRange,'|'),':.',substring-before($endRange,'|'))"/>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select ="translate(substring-after($finalRange,$space),'!','.')"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template name="getChartCategoriesMultipleRanges">
+		<xsl:param name="cellRange"/>
+		<xsl:param name ="finalRange"/>
+		<xsl:variable name ="space">
+			<xsl:value-of select ="' '"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test ="$cellRange!=''">
+				<xsl:call-template name ="getChartCategoriesMultipleRanges">
+					<xsl:with-param name ="cellRange" >
+						<xsl:value-of select ="substring-after($cellRange,';')"/>
+					</xsl:with-param>
+					<xsl:with-param name ="finalRange">
+						<xsl:choose>
+							<xsl:when test ="contains($cellRange,';')">
+								<xsl:value-of select ="concat($finalRange,$space,concat(substring-before(substring-before($cellRange,';'),':'),'.:',substring-after(substring-before($cellRange,';'),':')))"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="concat($finalRange,$space,concat(substring-before($cellRange,':'),'.:',substring-after($cellRange,':')))"/>
+							</xsl:otherwise>
+						</xsl:choose>						
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>				
+				<xsl:value-of select ="substring-after($finalRange,' ')"/>					
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+<!--End of code change for defects  2682600 and  2186921 -->
 </xsl:stylesheet>

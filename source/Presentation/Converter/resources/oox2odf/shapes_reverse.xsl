@@ -112,7 +112,6 @@ Copyright (c) 2007, Sonata Software Limited
       </office:event-listeners>
       <!-- End - Mouse click hyperlinks-->
     </xsl:variable>
-
     <xsl:choose>
       <xsl:when test="p:spPr/a:prstGeom/@prst or p:spPr/a:custGeom">
         <xsl:variable name="enhancePath">
@@ -467,7 +466,8 @@ Copyright (c) 2007, Sonata Software Limited
         </draw:custom-shape>
       </xsl:when>
       <!-- UpDown Arrow (Added by A.Mathi as on 4/07/2007) -->
-      <xsl:when test = "(p:spPr/a:prstGeom/@prst='upDownArrow')" >
+      <xsl:when test = "p:spPr/a:prstGeom/@prst='upDownArrow' 
+                or $enhancePath='M f4 f12 L f6 f4 L f5 f12 L f13 f12 L f13 f14 L f5 f14 L f6 f5 L f4 f14 L f11 f14 L f11 f12 Z N '" >
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -649,6 +649,11 @@ Copyright (c) 2007, Sonata Software Limited
           draw:glue-points="457200 0 114300 608076 457200 1216152 800100 608076" 
           draw:type="mso-spt100" 
           draw:enhanced-path="M 0 1216152 L 228600 0 L 685800 0 L 914400 1216152 Z N">
+            <xsl:if test="$enhancePath='M f6 f6 L f7 f6 L f16 f7 L f17 f7 Z N '">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <xsl:call-template name="tmpFlip"/>
           </draw:enhanced-geometry>
         </draw:custom-shape>
@@ -750,6 +755,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <!-- Octagon -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='octagon') or
+                $enhancePath='M f39 f37 L f45 f37 L f40 f39 L f40 f46 L f45 f41 L f39 f41 L f37 f46 L f37 f39 Z N ' or
                 $enhancePath='M f32 f47 L f47 f32 L f51 f32 L f39 f47 L f39 f52 L f51 f40 L f47 f40 L f32 f52 Z N ' or
                           $enhancePath='M f31 f30 L f39 f30 L f32 f31 L f32 f40 L f39 f33 L f31 f33 L f30 f40 L f30 f31 Z N '">
         <draw:custom-shape draw:layer="layout" >
@@ -1015,8 +1021,9 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       
       <!-- Left-Up Arrow -->
-      <xsl:when test ="(p:spPr/a:prstGeom/@prst='leftUpArrow') or
-                $enhancePath='M f38 f67 L f60 f68 L f60 f73 L f75 f73 L f75 f60 L f69 f60 L f66 f38 L f45 f60 L f76 f60 L f76 f74 L f60 f74 L f60 f46 Z N '">
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='leftUpArrow') 
+                    or $enhancePath='M f5 f21 L f12 f16 L f12 f26 L f26 f26 L f26 f12 L f16 f12 L f21 f5 L f6 f12 L f23 f12 L f23 f23 L f12 f23 L f12 f6 Z N '
+                or $enhancePath='M f38 f67 L f60 f68 L f60 f73 L f75 f73 L f75 f60 L f69 f60 L f66 f38 L f45 f60 L f76 f60 L f76 f74 L f60 f74 L f60 f46 Z N '">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -1053,7 +1060,9 @@ Copyright (c) 2007, Sonata Software Limited
        </draw:custom-shape>
       </xsl:when>
           <!-- SP2: Bent-Up Arrow -->
-          <xsl:when test="$enhancePath='M f38 f65 L f71 f65 L f71 f60 L f66 f60 L f67 f38 L f46 f60 L f70 f60 L f70 f45 L f38 f45 Z N '">
+          <xsl:when test="$enhancePath='M f38 f65 L f71 f65 L f71 f60 L f66 f60 L f67 f38 L f46 f60 L f70 f60 L f70 f45 L f38 f45 Z N '
+                   ">
+           
             <draw:custom-shape draw:layer="layout" >
               <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -1092,7 +1101,8 @@ Copyright (c) 2007, Sonata Software Limited
       <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
       <xsl:when test="( p:nvSpPr/p:cNvPr/@name[contains(., 'bentUpArrow ')] and 
                          not(p:nvSpPr/p:cNvPr/@name[contains(., 'Bent-Up Arrow ')]) 
-                        and p:spPr/a:prstGeom/@prst='bentUpArrow')">
+                        and p:spPr/a:prstGeom/@prst='bentUpArrow') 
+                          or $enhancePath='M f3 f4 L f3 f5 L f6 f5 L f6 f0 L f0 f0 L f0 f7 L f3 f7 L f3 f2 L f1 f8 L f3 f4 Z N '">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->
@@ -1148,6 +1158,7 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Cube -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='cube') or
                 $enhancePath='S M f32 f48 L f53 f48 L f53 f39 L f32 f39 Z N S M f53 f48 L f40 f32 L f40 f54 L f53 f39 Z N S M f32 f48 L f48 f32 L f40 f32 L f53 f48 Z N F M f32 f48 L f48 f32 L f40 f32 L f40 f54 L f53 f39 L f32 f39 Z N M f32 f48 L f53 f48 L f40 f32 M f53 f48 L f53 f39 ' or
+                $enhancePath='M f37 f45 L f37 f39 L f39 f37 L f46 f37 L f46 f47 L f44 f45 Z N M f37 f39 L f39 f37 L f46 f37 L f44 f39 Z N M f44 f45 L f44 f39 L f46 f37 L f46 f47 Z N ' or
                           $enhancePath='M f28 f37 L f28 f35 L f35 f28 L f38 f28 L f38 f39 L f36 f37 Z N M f28 f35 L f35 f28 L f38 f28 L f36 f35 Z N M f36 f37 L f36 f35 L f38 f28 L f38 f39 Z N '">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
@@ -1231,6 +1242,7 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Cross (Added by A.Mathi as on 19/07/2007)-->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='plus') or
                 $enhancePath='M f17 f30 L f30 f30 L f30 f17 L f35 f17 L f35 f30 L f20 f30 L f20 f36 L f35 f36 L f35 f21 L f30 f21 L f30 f36 L f17 f36 Z N ' or
+                $enhancePath='M f36 f35 L f40 f35 L f40 f36 L f37 f36 L f37 f41 L f40 f41 L f40 f38 L f36 f38 L f36 f41 L f35 f41 L f35 f36 L f36 f36 L f36 f35 Z N ' or
                           $enhancePath='M f33 f25 L f34 f25 L f34 f33 L f26 f33 L f26 f35 L f34 f35 L f34 f27 L f33 f27 L f33 f35 L f25 f35 L f25 f33 L f33 f33 L f33 f25 Z N '">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
@@ -3012,6 +3024,7 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:when>
 		<!-- Plaque -->
 		<xsl:when test ="p:spPr/a:prstGeom/@prst='plaque' or
+                                       $enhancePath ='M f44 f43 A f55 f56 f91 f73 L f43 f51 A f56 f74 f92 f77 L f52 f45 A f78 f79 f100 f95 L f46 f44 A f84 f55 f101 f98 Z N ' or 
               $enhancePath ='M f35 f34 A f46 f47 f81 f63 L f34 f43 A f47 f64 f82 f67 L f44 f36 A f68 f69 f91 f85 L f37 f35 A f74 f46 f92 f88 Z N '">
 			<draw:custom-shape draw:layer="layout" >
 				<xsl:call-template name ="CreateShape">
@@ -3644,7 +3657,8 @@ Copyright (c) 2007, Sonata Software Limited
         </draw:custom-shape>
       </xsl:when>
       <!-- FlowChart: Extract -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartExtract'">
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartExtract' 
+                    or $enhancePath='M f7 f5 L f6 f6 L f5 f6 L f7 f5 Z N '">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
                 <!--parameter added by yeswanth:for ODF1.1 conformance-->

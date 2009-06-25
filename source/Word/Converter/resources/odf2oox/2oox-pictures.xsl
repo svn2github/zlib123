@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -340,7 +340,6 @@
       <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
         noChangeAspect="1"/>
     </wp:cNvGraphicFramePr>
-
     <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
       <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
         <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">

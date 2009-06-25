@@ -341,7 +341,9 @@ Copyright (c) 2007, Sonata Software Limited
                         <xsl:for-each select ="/office:document-content/office:automatic-styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
                           <xsl:if test="position()=1">
                           <xsl:call-template name ="getFillColor"/>
-                          <xsl:call-template name ="getLineStyle"/>
+                            <xsl:call-template name ="getLineStyle">
+                              <xsl:with-param name="parentStyle" select="../@style:parent-style-name"/>
+                            </xsl:call-template>
                           </xsl:if>
                         </xsl:for-each>
                         <!--End-->

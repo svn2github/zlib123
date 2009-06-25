@@ -115,15 +115,13 @@
     <xsl:param name="level" select="0"/>
     <xsl:param name="isFirstRow" select="'false'"/>
 
-    <xsl:message terminate="no">progress:text:p</xsl:message>
-    
+    <xsl:message terminate="no">progress:text:p</xsl:message>    
     <w:p>
       <xsl:if test="not(parent::table:table-cell)">
         <xsl:call-template name="InsertDropCap">
           <xsl:with-param name="styleName" select="@text:style-name"/>
         </xsl:call-template>
       </xsl:if>
-
       <xsl:call-template name="MarkMasterPage"/>
       <w:pPr>
         <xsl:call-template name="InsertParagraphProperties">
@@ -136,7 +134,6 @@
           <xsl:call-template name="InsertIndexTabs"/>
         </xsl:if>
       </w:pPr>
-
       <!-- if paragraph is the very first of the document, declare user variables -->
       <xsl:if test="$body/office:text/text:user-field-decls">
         <xsl:if test="generate-id(.) = $firstParaId">
@@ -524,13 +521,15 @@
             </xsl:if>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="key('styles', $styleName)">
+            <!--Sonata: Defect fix: 2684775 and 2684759 
+                In SP2 converted odt file, sometimes Toc style is not created. So, commented test="key('styles', $styleName) condition -->
+            <!--<xsl:if test="key('styles', $styleName)">-->
               <xsl:variable name="level" select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level " />
               
               <xsl:if test="number($level)">
                 <w:pStyle w:val="{concat('TOC', $level)}"/>
               </xsl:if>
-            </xsl:if>
+            <!--</xsl:if>-->
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -1055,23 +1054,8 @@
         <xsl:call-template name="GetStyleName"/>
       </xsl:variable>
       <xsl:variable name="paraStyleName" select="ancestor-or-self::text:p[1]/@text:style-name" />
-
-      <!--
-        makz: If the parent paragraph has an automatic style we must convert it's text formatting.
-        This must be done before converting the properties of the run's automatic style due to the priority
-      -->
-      <xsl:if test="key('automatic-styles', $paraStyleName)">
-        <!-- context switch -->
-        <xsl:for-each select="key('automatic-styles', $paraStyleName)">
-          <xsl:apply-templates select="style:text-properties" mode="rPr"/>
-        </xsl:for-each>
-      </xsl:if>
-
-      <!-- 
-      makz: Convert the automatic style of the run to direct formatting.
-            If the run's referenced style is no automatic style, 
-            it is a normal style, so we need to reference it.
-      -->
+      <xsl:choose>
+        <xsl:when test ="$styleName!=''">         
       <xsl:choose>
         <xsl:when test="key('automatic-styles', $styleName)">
 
@@ -1080,20 +1064,29 @@
           -->
           <xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
             <w:rStyle w:val="{key('automatic-styles', $styleName)/@style:parent-style-name}" />
-            <!--<xsl:call-template name="InsertParagraphStyle">
+								<xsl:call-template name="InsertParagraphStyle">
               <xsl:with-param name="styleName">
                 <xsl:value-of select="key('automatic-styles', $styleName)/@style:parent-style-name"/>
               </xsl:with-param>
-            </xsl:call-template>-->
+								</xsl:call-template>
           </xsl:if>
 
           <!-- 
           makz: Convert the automatic style 
           -->
           <xsl:for-each select="key('automatic-styles', $styleName)">
-            <xsl:apply-templates select="style:text-properties" mode="rPr"/>
+                <xsl:apply-templates select="style:text-properties" mode="rPr">
+                  <xsl:with-param name ="paraStylName">
+                    <xsl:value-of select ="$paraStyleName"/>
+                  </xsl:with-param>
+                </xsl:apply-templates>
           </xsl:for-each>
-
+							<xsl:if test="$styleName">
+								<!-- normal style -->
+								<xsl:call-template name="InsertRunStyle">
+									<xsl:with-param name="styleName" select="$styleName" />
+								</xsl:call-template>
+							</xsl:if>
         </xsl:when>
         <xsl:when test="$styleName">
           <!-- normal style -->
@@ -1102,6 +1095,45 @@
           </xsl:call-template>
         </xsl:when>
       </xsl:choose>
+        </xsl:when>
+        <xsl:when test ="$styleName=''">
+          <xsl:if test="key('automatic-styles', $paraStyleName)">
+            <!-- context switch -->
+            <xsl:for-each select="key('automatic-styles', $paraStyleName)">
+              <xsl:apply-templates select="style:text-properties" mode="rPr"/>
+            </xsl:for-each>
+          </xsl:if>
+					<xsl:choose>
+						<xsl:when test="key('automatic-styles', $styleName)">
+							<xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
+								<w:rStyle w:val="{key('automatic-styles', $styleName)/@style:parent-style-name}" />
+							</xsl:if>
+							<xsl:for-each select="key('automatic-styles', $styleName)">
+								<xsl:apply-templates select="style:text-properties" mode="rPr"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:when test="$styleName">
+							<xsl:call-template name="InsertRunStyle">
+								<xsl:with-param name="styleName" select="$styleName" />
+							</xsl:call-template>
+						</xsl:when>
+					</xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+      
+      
+      <!--
+        makz: If the parent paragraph has an automatic style we must convert it's text formatting.
+        This must be done before converting the properties of the run's automatic style due to the priority
+      -->
+     
+
+      <!-- 
+      makz: Convert the automatic style of the run to direct formatting.
+            If the run's referenced style is no automatic style, 
+            it is a normal style, so we need to reference it.
+      -->
+     
 
       <!-- apply text properties if needed -->
       <!-- test description : if there is an ancestor text:span or text:a,
@@ -1110,7 +1142,6 @@
       <xsl:if
         test="ancestor-or-self::*[self::text:span or self::text:a or self::text:p or self::text:h][1][self::text:span or self::text:a]
       or self::text:list-level-style-number|self::text:outline-level-style">
-
         <!-- override text properties of link -->
         <xsl:if test="ancestor::text:a/@text:style-name">
           <xsl:variable name="linkStyleName" select="parent::text:a/@text:style-name"/>
@@ -1136,7 +1167,6 @@
     <xsl:variable name="myStyle" select="key('automatic-styles', $styleName)" />
 
     <xsl:choose>
-
       <xsl:when test="$myStyle[1]/style:text-properties/@style:use-window-font-color = 'true' and $myStyle[1]/style:text-properties/@style:text-underline-type = 'none'">
         <!--dialogika, clam bugfix #1806204: don't set a style-->
       </xsl:when>

@@ -87,7 +87,6 @@
       </xsl:for-each>
     </Relationships>
   </xsl:template>
-
   <!-- Soanta: Template to create Picture fill relationship -->
   <xsl:template name="InsertShapesRelationships">
     <xsl:param name="shapes" select="." />
@@ -162,10 +161,19 @@
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
+<!--OLE,vipul-->
+
+            <xsl:choose>
+              <xsl:when test="starts-with(@xlink:href,'ObjectReplacements/')">
+                <xsl:value-of select="@xlink:href"/>
+              </xsl:when>
+              <xsl:otherwise>
             <xsl:call-template name="substring-after-last">
               <xsl:with-param name="string" select="@xlink:href" />
               <xsl:with-param name="occurrence" select="'./'" />
             </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -180,6 +188,22 @@
       <xsl:variable name="olePictureType">
         <xsl:call-template name="GetOLEPictureType">
           <xsl:with-param name="olePicture" select="$olePicture" />
+
+          <!--Sonata: Added Parameter oleType:2656673 DOCX - Embedded OLE Object not retained -->
+          <xsl:with-param name="oleType">
+            <xsl:choose>
+              <xsl:when test="starts-with(@xlink:href,'/') or starts-with(@xlink:href,'../') or starts-with(@xlink:href,'//')
+                                            or starts-with(@xlink:href,'file:///')">
+                <xsl:value-of select="'link'"/>
+              </xsl:when>
+              <xsl:when test="starts-with(@xlink:href,'./')">
+                <xsl:value-of select="'embed'"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'embed'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
 
@@ -194,7 +218,7 @@
             application/vnd.oasis.opendocument.spreadsheet
           -->
           <xsl:choose>
-            <xsl:when test="$oleType='application/vnd.sun.star.oleobject'">
+            <xsl:when test="$oleType='application/vnd.sun.star.oleobject' or $oleType='application/octet-stream'">
               <pzip:copy pzip:source="{$oleFile}" pzip:target="{concat('word/embeddings/', $oleId, '.bin')}" />
               <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                             Id="{$oleId}"
@@ -245,6 +269,17 @@
     <xsl:param name="olePictureType" />
 
     <xsl:choose>
+
+
+      <xsl:when test="$olePictureType='GDIMetaFile'">
+        <!-- copy placeholder picture -->
+        <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#" pzip:target="{concat('word/media/', $olePictureId, '.png')}" />
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                      Id="{$olePictureId}"
+                      Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                      Target="{concat('media/', $olePictureId, '.png')}" />
+      </xsl:when>
+    
       <xsl:when test="not($olePictureType='') and not($olePictureId='')">
         <!-- copy picture -->
         <pzip:copy pzip:source="{$olePicture}" pzip:target="{concat('word/media/', $olePictureId, '.', $olePictureType)}" />
@@ -275,10 +310,20 @@
   -->
   <xsl:template name="GetOLEPictureType">
     <xsl:param name="olePicture" />
+    <xsl:param name="oleType" />
+    
     <xsl:variable name="allManifestEntries" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry" />
     <xsl:variable name="type" select="$allManifestEntries[@manifest:full-path=$olePicture]/@manifest:media-type" />
 
     <xsl:choose>
+      <xsl:when test="contains($type,'application/x-openoffice-gdimetafile')">
+        <xsl:text>GDIMetaFile</xsl:text>
+      </xsl:when>
+      <xsl:when test="$type=''">
+        <xsl:if test="$oleType='link'">
+          <xsl:text>GDIMetaFile</xsl:text>
+        </xsl:if>
+      </xsl:when>
       <!-- picture is a WMF -->
       <xsl:when test="$type='application/x-openoffice-wmf;windows_formatname=&quot;Image WMF&quot;'">
         <xsl:text>wmf</xsl:text>
@@ -294,6 +339,10 @@
       <!-- picture is a JPG -->
       <xsl:when test="$type='image/jpeg'">
         <xsl:text>jpeg</xsl:text>
+      </xsl:when>
+      <!--Sonata: 2656673 DOCX - Embedded OLE Object not retained -->
+      <xsl:when test="$oleType='embed'">
+        <xsl:text>png</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text></xsl:text>

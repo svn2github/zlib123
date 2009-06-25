@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -898,11 +898,8 @@
           <xsl:with-param name="property">indent</xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-
       <xsl:otherwise>
-
         <w:ind>
-
           <xsl:attribute name="w:left">
             <xsl:value-of select="$leftInd"/>
           </xsl:attribute>
@@ -936,15 +933,14 @@
     </xsl:choose>
   </xsl:template>
 
-
-
   <!-- Text properties -->
   <xsl:template match="style:text-properties" mode="rPr">
-
+		<xsl:param name ="paraStylName"/>
     <!-- report lost attributes -->
     <xsl:if test="@style:text-blinking">
       <xsl:message terminate="no">translation.odf2oox.blinkingText</xsl:message>
     </xsl:if>
+
     <xsl:if test="@style:text-rotation-angle or @style:text-rotation-scale">
       <xsl:message terminate="no">translation.odf2oox.rotatedText</xsl:message>
     </xsl:if>
@@ -1017,7 +1013,146 @@
       </w:rFonts>
     </xsl:if>
 
-    <xsl:if test="@fo:font-weight">
+		<xsl:choose>
+			<xsl:when test="@style:font-name or @style:font-name-complex or @style:font-name-asian
+                            or @fo:font-family or @style:font-family-asian or @style:font-family-complex">
+				<w:rFonts>
+					<xsl:variable name="fontName">
+						<xsl:call-template name="ComputeFontName">
+							<xsl:with-param name="fontName">
+								<xsl:choose>
+									<xsl:when test="@style:font-name">
+										<xsl:value-of select="@style:font-name"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:if test="@fo:font-family">
+											<xsl:value-of select="@fo:font-family"/>
+										</xsl:if>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:if test="$fontName != '' ">
+						<xsl:attribute name="w:ascii">
+							<xsl:value-of select="$fontName"/>
+						</xsl:attribute>
+						<xsl:attribute name="w:hAnsi">
+							<xsl:value-of select="$fontName"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:choose>
+						<xsl:when test="@style:font-name-complex">
+							<xsl:attribute name="w:cs">
+								<xsl:call-template name="ComputeFontName">
+									<xsl:with-param name="fontName" select="@style:font-name-complex"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="@fo:font-family-complex">
+								<xsl:attribute name="w:cs">
+									<xsl:call-template name="ComputeFontName">
+										<xsl:with-param name="fontName" select="@style:font-family-complex"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+					<xsl:choose>
+						<xsl:when test="@style:font-name-asian">
+							<xsl:attribute name="w:eastAsia">
+								<xsl:call-template name="ComputeFontName">
+									<xsl:with-param name="fontName" select="@style:font-name-asian"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="@fo:font-family-asian">
+								<xsl:attribute name="w:eastAsia">
+									<xsl:call-template name="ComputeFontName">
+										<xsl:with-param name="fontName" select="@style:font-family-asian"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</w:rFonts>
+			</xsl:when>
+			<xsl:when test="not(@style:font-name or @style:font-name-complex or @style:font-name-asian
+                            or @fo:font-family or @style:font-family-asian or @style:font-family-complex)
+					        and (key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name
+					        or key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name-complex 
+					        or key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name-asian
+                            or key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-family 
+					        or key('automatic-styles', $paraStylName)/style:text-properties/@style:font-family-asian 
+					        or key('automatic-styles', $paraStylName)/style:text-properties/@style:font-family-complex)">
+				<w:rFonts>
+					<xsl:variable name="fontName">
+						<xsl:call-template name="ComputeFontName">
+							<xsl:with-param name="fontName">
+								<xsl:choose>
+									<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name">
+										<xsl:value-of select="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:if test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-family">
+											<xsl:value-of select="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-family"/>
+										</xsl:if>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:if test="$fontName != '' ">
+						<xsl:attribute name="w:ascii">
+							<xsl:value-of select="$fontName"/>
+						</xsl:attribute>
+						<xsl:attribute name="w:hAnsi">
+							<xsl:value-of select="$fontName"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:choose>
+						<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name-complex">
+							<xsl:attribute name="w:cs">
+								<xsl:call-template name="ComputeFontName">
+									<xsl:with-param name="fontName" select="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name-complex"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-family-complex">
+								<xsl:attribute name="w:cs">
+									<xsl:call-template name="ComputeFontName">
+										<xsl:with-param name="fontName" select="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-family-complex"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+					<xsl:choose>
+						<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name-asian">
+							<xsl:attribute name="w:eastAsia">
+								<xsl:call-template name="ComputeFontName">
+									<xsl:with-param name="fontName" select="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-name-asian"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-family-asian">
+								<xsl:attribute name="w:eastAsia">
+									<xsl:call-template name="ComputeFontName">
+										<xsl:with-param name="fontName" select="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-family-asian"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</w:rFonts>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@fo:font-weight">
       <xsl:choose>
         <xsl:when test="@fo:font-weight != 'normal'">
           <xsl:choose>
@@ -1036,9 +1171,54 @@
           <w:b w:val="off"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+    </xsl:if>-->
 
-    <xsl:if test="@fo:font-weight-complex">
+		<xsl:choose>
+			<xsl:when test="@fo:font-weight">
+				<xsl:choose>
+					<xsl:when test="@fo:font-weight != 'normal'">
+						<xsl:choose>
+							<xsl:when test="@fo:font-weight != 'bold' and number(@fo:font-weight)">
+								<xsl:message terminate="no">translation.odf2oox.fontWeight</xsl:message>
+								<xsl:if test="number(@fo:font-weight) &gt;= 600">
+									<w:b w:val="on"/>
+								</xsl:if>
+							</xsl:when>
+							<xsl:otherwise>
+								<w:b w:val="on"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:b w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:font-weight)
+							and key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-weight">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-weight != 'normal'">
+						<xsl:choose>
+							<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-weight != 'bold'
+									      and number(key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-weight)">
+								<xsl:message terminate="no">translation.odf2oox.fontWeight</xsl:message>
+								<xsl:if test="number(key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-weight) &gt;= 600">
+									<w:b w:val="on"/>
+    </xsl:if>
+							</xsl:when>
+							<xsl:otherwise>
+								<w:b w:val="on"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:b w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@fo:font-weight-complex">
       <xsl:choose>
         <xsl:when test="@style:font-weight-complex != 'normal'">
           <w:bCs w:val="on"/>
@@ -1047,9 +1227,35 @@
           <w:bCs w:val="off"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+    </xsl:if>-->
 
-    <xsl:if test="@fo:font-style">
+		<xsl:choose>
+			<xsl:when test="@fo:font-weight-complex">
+				<xsl:choose>
+					<xsl:when test="@style:font-weight-complex != 'normal'">
+						<w:bCs w:val="on"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:bCs w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:font-weight-complex)
+						    and key('automatic-styles', $paraStylName)/style:text-properties/@style:font-weight-complex">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-weight-complex != 'normal'">
+						<w:bCs w:val="on"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:bCs w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--modified by chhavi-->
+		<xsl:choose>
+			<xsl:when test="@fo:font-style">
       <xsl:choose>
         <xsl:when test="@fo:font-style = 'italic' or @fo:font-style = 'oblique'">
           <w:i w:val="on"/>
@@ -1058,9 +1264,16 @@
           <w:i w:val="off"/>
         </xsl:otherwise>
       </xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:font-style) 
+							and key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-style">
+				<xsl:if test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-style = 'italic'">
+					<w:i w:val="on"/>
     </xsl:if>
+			</xsl:when>
+		</xsl:choose>
 
-    <xsl:if test="@fo:font-style-complex">
+		<!--<xsl:if test="@fo:font-style-complex">
       <xsl:choose>
         <xsl:when test="@fo:font-style-complex = 'italic' or @fo:font-style-complex = 'oblique'">
           <w:iCs w:val="on"/>
@@ -1069,15 +1282,42 @@
           <w:iCs w:val="off"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+    </xsl:if>-->
 
-    <xsl:if test="@fo:text-transform or @fo:font-variant">
+		<xsl:choose>
+			<xsl:when test="@fo:font-style-complex">
+				<xsl:choose>
+					<xsl:when test="@fo:font-style-complex = 'italic' or @fo:font-style-complex = 'oblique'">
+						<w:iCs w:val="on"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:iCs w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:font-style-complex)
+							and key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-style-complex">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-style-complex = 'italic' 
+							      or key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-style-complex = 'oblique'">
+						<w:iCs w:val="on"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:iCs w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@fo:text-transform or @fo:font-variant">
       <xsl:choose>
         <xsl:when test="@fo:text-transform = 'uppercase'">
           <w:caps w:val="on"/>
         </xsl:when>
         <xsl:when test="@fo:text-transform = 'capitalize'">
+          -->
           <!-- no equivalent of capitalize in OOX spec -->
+		<!--
           <xsl:message terminate="no">translation.odf2oox.capitalizedText</xsl:message>
           <w:caps w:val="off"/>
         </xsl:when>
@@ -1089,9 +1329,53 @@
           <w:caps w:val="off"/>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
+    </xsl:if>-->
 
-    <xsl:if test="@fo:font-variant">
+		<xsl:choose>
+			<xsl:when test="@fo:text-transform or @fo:font-variant">
+				<xsl:choose>
+					<xsl:when test="@fo:text-transform = 'uppercase'">
+						<w:caps w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@fo:text-transform = 'capitalize'">
+						<!-- no equivalent of capitalize in OOX spec -->
+						<xsl:message terminate="no">translation.odf2oox.capitalizedText</xsl:message>
+						<w:caps w:val="off"/>
+					</xsl:when>
+					<xsl:when test="@fo:text-transform = 'lowercase'">
+						<xsl:message terminate="no">translation.odf2oox.lowercaseText</xsl:message>
+						<w:caps w:val="off"/>
+					</xsl:when>
+					<xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
+						<w:caps w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:text-transform or @fo:font-variant)
+							and (key('automatic-styles', $paraStylName)/style:text-properties/@fo:text-transform
+								or key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-variant)">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:text-transform = 'uppercase'">
+						<w:caps w:val="on"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:text-transform = 'capitalize'">
+						<!-- no equivalent of capitalize in OOX spec -->
+						<xsl:message terminate="no">translation.odf2oox.capitalizedText</xsl:message>
+						<w:caps w:val="off"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:text-transform = 'lowercase'">
+						<xsl:message terminate="no">translation.odf2oox.lowercaseText</xsl:message>
+						<w:caps w:val="off"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:text-transform = 'none' 
+							       or key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-variant = 'small-caps'">
+						<w:caps w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@fo:font-variant">
       <xsl:choose>
         <xsl:when test="@fo:font-variant = 'small-caps'">
           <w:smallCaps w:val="on"/>
@@ -1100,9 +1384,33 @@
           <w:smallCaps w:val="off"/>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if
+		<xsl:choose>
+			<xsl:when test="@fo:font-variant">
+				<xsl:choose>
+					<xsl:when test="@fo:font-variant = 'small-caps'">
+						<w:smallCaps w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@fo:font-weight = 'normal'">
+						<w:smallCaps w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:font-variant) and key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-variant">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-variant = 'small-caps'">
+						<w:smallCaps w:val="on"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-weight = 'normal'">
+						<w:smallCaps w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+
+		<!--<xsl:if
       test="@style:text-line-through-style != 'none' or @style:text-line-through-type != 'none' ">
       <xsl:choose>
         <xsl:when test="@style:text-line-through-type = 'double'">
@@ -1115,7 +1423,38 @@
           <w:strike w:val="on"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
+
+		<xsl:choose>
+			<xsl:when test="@style:text-line-through-style != 'none' or @style:text-line-through-type != 'none'">
+				<xsl:choose>
+					<xsl:when test="@style:text-line-through-type = 'double'">
+						<w:dstrike w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@style:text-line-through-type = 'none'">
+						<w:strike w:val="off"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:strike w:val="on"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@style:text-line-through-style or @style:text-line-through-type ) and
+							(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-line-through-style != 'none' 
+					        or key('automatic-styles', $paraStylName)/style:text-properties/@style:text-line-through-type != 'none')">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-line-through-type = 'double'">
+						<w:dstrike w:val="on"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-line-through-type = 'none'">
+						<w:strike w:val="off"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:strike w:val="on"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
 
     <xsl:if test="@style:text-line-through-width != 'none'">
       <!-- TODO : localize this -->
@@ -1127,7 +1466,7 @@
       <xsl:message terminate="no">translation.odf2oox.lineThroughColor</xsl:message>
     </xsl:if>
 
-    <xsl:if test="@style:text-outline">
+		<!--<xsl:if test="@style:text-outline">
       <xsl:choose>
         <xsl:when test="@style:text-outline = 'true'">
           <w:outline w:val="on"/>
@@ -1136,9 +1475,32 @@
           <w:outline w:val="off"/>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if test="@fo:text-shadow">
+		<xsl:choose>
+			<xsl:when test="@style:text-outline">
+				<xsl:choose>
+					<xsl:when test="@style:text-outline = 'true'">
+						<w:outline w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@style:text-outline = 'false'">
+						<w:outline w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@style:text-outline) and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-outline">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-outline = 'true'">
+						<w:outline w:val="on"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-outline = 'false'">
+						<w:outline w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@fo:text-shadow">
       <xsl:choose>
         <xsl:when test="@fo:text-shadow = 'none'">
           <w:shadow w:val="off"/>
@@ -1147,9 +1509,32 @@
           <w:shadow w:val="on"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if test="@style:font-relief">
+		<xsl:choose>
+			<xsl:when test="@fo:text-shadow">
+				<xsl:choose>
+					<xsl:when test="@fo:text-shadow = 'none'">
+						<w:shadow w:val="off"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:shadow w:val="on"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:text-shadow) and key('automatic-styles', $paraStylName)/style:text-properties/@fo:text-shadow">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:text-shadow = 'none'">
+						<w:shadow w:val="off"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:shadow w:val="on"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@style:font-relief">
       <xsl:choose>
         <xsl:when test="@style:font-relief = 'embossed'">
           <w:emboss w:val="on"/>
@@ -1162,9 +1547,41 @@
           <w:imprint w:val="off"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if test="@text:display">
+		<xsl:choose>
+			<xsl:when test="@style:font-relief">
+				<xsl:choose>
+					<xsl:when test="@style:font-relief = 'embossed'">
+						<w:emboss w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@style:font-relief = 'engraved'">
+						<w:imprint w:val="on"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:emboss w:val="off"/>
+						<w:imprint w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@style:font-relief) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:font-relief">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-relief = 'embossed'">
+						<w:emboss w:val="on"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:font-relief = 'engraved'">
+						<w:imprint w:val="on"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:emboss w:val="off"/>
+						<w:imprint w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@text:display">
       <xsl:choose>
         <xsl:when test="@text:display = 'true'">
           <w:vanish w:val="on"/>
@@ -1173,24 +1590,59 @@
           <w:vanish w:val="off"/>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
+
+		<xsl:choose>
+			<xsl:when test="@text:display">
+				<xsl:choose>
+					<xsl:when test="@text:display = 'true'">
+						<w:vanish w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@text:display = 'none'">
+						<w:vanish w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@text:display) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@text:display">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@text:display = 'true'">
+						<w:vanish w:val="on"/>
+					</xsl:when>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@text:display = 'none'">
+						<w:vanish w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
 
     <xsl:choose>
       <xsl:when test="@fo:color">
         <w:color w:val="{substring(@fo:color, 2, string-length(@fo:color) -1)}" />
       </xsl:when>
-      <xsl:when test="@style:use-window-font-color = 'true'">
+			<xsl:when test="not(@fo:color)  and (not(@style:use-window-font-color) or  @style:use-window-font-color!= 'true')">
+				<w:color w:val="{key('automatic-styles', $paraStylName)/style:text-properties/@fo:color}" />
+			</xsl:when>
+			<xsl:when test="not(@fo:color)  and @style:use-window-font-color = 'true'">
         <w:color w:val="auto" />
       </xsl:when>
     </xsl:choose>
 
+		<!--<xsl:if test="@fo:letter-spacing">
+			<w:spacing w:val="{ooc:TwipsFromMeasuredUnit(@fo:letter-spacing)}" />
+		</xsl:if>-->
 
-
-    <xsl:if test="@fo:letter-spacing">
+		<xsl:choose>
+			<xsl:when test="@fo:letter-spacing">
       <w:spacing w:val="{ooc:TwipsFromMeasuredUnit(@fo:letter-spacing)}" />
-    </xsl:if>
+			</xsl:when>
+			<xsl:when test="not(@fo:letter-spacing) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@fo:letter-spacing">
+				<w:spacing w:val="{ooc:TwipsFromMeasuredUnit(key('automatic-styles', $paraStylName)/style:text-properties/@fo:letter-spacing)}" />
+			</xsl:when>
+		</xsl:choose>
 
-    <xsl:if test="@style:text-scale">
+		<!--<xsl:if test="@style:text-scale">
       <w:w>
         <xsl:attribute name="w:val">
           <xsl:variable name="scale" select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
@@ -1205,17 +1657,65 @@
           </xsl:choose>
         </xsl:attribute>
       </w:w>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if test="@style:letter-kerning = 'true' ">
+		<xsl:choose>
+			<xsl:when test="@style:text-scale">
+				<w:w>
+					<xsl:attribute name="w:val">
+						<xsl:variable name="scale" select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
+						<xsl:choose>
+							<xsl:when test="number($scale) &lt; 600">
+								<xsl:value-of select="$scale"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:message terminate="no">translation.odf2oox.textScale600pct</xsl:message>
+								<xsl:text>600</xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</w:w>
+			</xsl:when>
+			<xsl:when test="not(@style:text-scale) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-scale">
+				<w:w>
+					<xsl:attribute name="w:val">
+						<xsl:variable name="scale" select="substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
+						<xsl:choose>
+							<xsl:when test="number($scale) &lt; 600">
+								<xsl:value-of select="$scale"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:message terminate="no">translation.odf2oox.textScale600pct</xsl:message>
+								<xsl:text>600</xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</w:w>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@style:letter-kerning = 'true' ">
       <w:kern w:val="16"/>
-    </xsl:if>
+		</xsl:if>-->
+
+		<xsl:choose>
+			<xsl:when test="@style:letter-kerning = 'true' ">
+				<w:kern w:val="16"/>
+			</xsl:when>
+			<xsl:when test="not(@style:letter-kerning) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:letter-kerning = 'true' ">
+				<w:kern w:val="16"/>
+			</xsl:when>
+		</xsl:choose>
 
     <!-- position : raise text with precise measurement -->
-    <xsl:if test="@style:text-position">
+		<!--<xsl:if test="@style:text-position">
       <xsl:if
         test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
+				-->
         <!-- first percentage value specifies distance to baseline -->
+		<!--
         <xsl:variable name="textPosition" select="substring-before(@style:text-position, '%')"/>
         
         <xsl:if test="$textPosition != '' and $textPosition != 0">
@@ -1238,9 +1738,93 @@
           </xsl:if>
         </xsl:if>
       </xsl:if>
+		</xsl:if>-->
+
+		<xsl:choose>
+			<xsl:when test="@style:text-position">
+				<xsl:if
+			  test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
+					<!-- first percentage value specifies distance to baseline -->
+					<xsl:variable name="textPosition" select="substring-before(@style:text-position, '%')"/>
+
+					<xsl:if test="$textPosition != '' and $textPosition != 0">
+						<xsl:variable name="fontHeight">
+							<xsl:call-template name="computeSize"/>
+						</xsl:variable>
+						<xsl:if test="number($fontHeight)">
+							<w:position>
+								<xsl:attribute name="w:val">
+									<xsl:choose>
+										<xsl:when test="contains($textPosition, '-')">
+											<xsl:value-of select="concat('-', round(number(substring-after($textPosition, '-')) div 100 * $fontHeight))" />
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="round(number($textPosition) div 100 * $fontHeight)"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+							</w:position>
+						</xsl:if>
+					</xsl:if>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test="not(@style:text-position) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position ">
+				<xsl:if
+			  test="not(substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, 1, 3) = 'sub') 
+			       and not(substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, 1, 5) = 'super') ">
+					<!-- first percentage value specifies distance to baseline -->
+					<xsl:variable name="textPosition" select="substring-before(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, '%')"/>
+
+					<xsl:if test="$textPosition != '' and $textPosition != 0">
+						<xsl:variable name="fontHeight">
+							<xsl:call-template name="computeSizePara">
+								<xsl:with-param name ="paraStylName" select ="$paraStylName"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:if test="number($fontHeight)">
+							<w:position>
+								<xsl:attribute name="w:val">
+									<xsl:choose>
+										<xsl:when test="contains($textPosition, '-')">
+											<xsl:value-of select="concat('-', round(number(substring-after($textPosition, '-')) div 100 * $fontHeight))" />
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="round(number($textPosition) div 100 * $fontHeight)"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+							</w:position>
+						</xsl:if>
+					</xsl:if>
     </xsl:if>
+			</xsl:when>
+		</xsl:choose>
 
     <!-- font size -->
+		<!--<xsl:choose>
+			<xsl:when test="@style:text-position">
+				<xsl:variable name="sz">
+					<xsl:call-template name="ComputePositionFontSize"/>
+				</xsl:variable>
+				<xsl:if test="number($sz)">
+					<w:sz w:val="{$sz}"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:if test="@fo:font-size">
+					<xsl:variable name="sz">
+						<xsl:call-template name="computeSize"/>
+					</xsl:variable>
+					<xsl:if test="number($sz)">
+						<w:sz w:val="{$sz}"/>
+					</xsl:if>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>-->
+
+		<xsl:choose>
+			<xsl:when test="@style:text-position or @fo:font-size">
     <xsl:choose>
       <xsl:when test="@style:text-position">
         <xsl:variable name="sz">
@@ -1261,8 +1845,38 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@style:text-position or @fo:font-size) 
+					       and (key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position 
+								or key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-size)">
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position">
+						<xsl:variable name="sz">
+							<xsl:call-template name="ComputePositionFontSizePara">
+								<xsl:with-param name ="paraStylName" select ="$paraStylName"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:if test="number($sz)">
+							<w:sz w:val="{$sz}"/>
+						</xsl:if>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-size">
+							<xsl:variable name="sz">
+								<xsl:call-template name="computeSizePara">
+									<xsl:with-param name ="paraStylName" select ="$paraStylName"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:if test="number($sz)">
+								<w:sz w:val="{$sz}"/>
+							</xsl:if>
+						</xsl:if>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
 
-    <xsl:if test="@style:font-size-complex">
+		<!--<xsl:if test="@style:font-size-complex">
       <xsl:variable name="sz">
         <xsl:call-template name="computeSize">
           <xsl:with-param name="fontStyle">style:font-size-complex</xsl:with-param>
@@ -1271,11 +1885,38 @@
       <xsl:if test="number($sz)">
         <w:szCs w:val="{$sz}"/>
       </xsl:if>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if test="@fo:background-color">
+		<xsl:choose>
+			<xsl:when test="@style:font-size-complex">
+				<xsl:variable name="sz">
+					<xsl:call-template name="computeSize">
+						<xsl:with-param name="fontStyle">style:font-size-complex</xsl:with-param>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test="number($sz)">
+					<w:szCs w:val="{$sz}"/>
+    </xsl:if>
+			</xsl:when>
+			<xsl:when test="not(@style:font-size-complex) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:font-size-complex">
+				<xsl:variable name="sz">
+					<xsl:call-template name="computeSizePara">
+						<xsl:with-param name="fontStyle">style:font-size-complex</xsl:with-param>
+						<xsl:with-param name ="paraStylName" select ="$paraStylName"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test="number($sz)">
+					<w:szCs w:val="{$sz}"/>
+				</xsl:if>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@fo:background-color">
       <xsl:variable name="stringColor">
+				-->
         <!-- try to convert to one of the 16 built-in highlight colors of Word -->
+		<!--
         <xsl:call-template name="StringType-color">
           <xsl:with-param name="RGBcolor" select="@fo:background-color"/>
         </xsl:call-template>
@@ -1285,17 +1926,66 @@
           <w:highlight w:val="none" />
         </xsl:when>
         <xsl:when test="$stringColor != '' and $stringColor != 'white' and not(ancestor::office:styles)">
+					-->
           <!-- create highlight only for automatic styles -->
+		<!--
           <w:highlight w:val="{$stringColor}" />
         </xsl:when>
         <xsl:otherwise>
+					-->
           <!-- no built-in highlight color, thus use shading instead of highlight -->
+		<!--
           <w:shd w:val="clear" w:color="auto" w:fill="{translate(@fo:background-color, 'abcdef#', 'ABCDEF')}" />
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if test="@style:text-underline-style">
+		<xsl:choose>
+			<xsl:when test="@fo:background-color">
+				<xsl:variable name="stringColor">
+					<!-- try to convert to one of the 16 built-in highlight colors of Word -->
+					<xsl:call-template name="StringType-color">
+						<xsl:with-param name="RGBcolor" select="@fo:background-color"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="@fo:background-color = 'transparent' ">
+						<w:highlight w:val="none" />
+					</xsl:when>
+					<xsl:when test="$stringColor != '' and $stringColor != 'white' and not(ancestor::office:styles)">
+						<!-- create highlight only for automatic styles -->
+						<w:highlight w:val="{$stringColor}" />
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- no built-in highlight color, thus use shading instead of highlight -->
+						<w:shd w:val="clear" w:color="auto" w:fill="{translate(@fo:background-color, 'abcdef#', 'ABCDEF')}" />
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@fo:background-color) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@fo:background-color">
+				<xsl:variable name="stringColor">
+					<!-- try to convert to one of the 16 built-in highlight colors of Word -->
+					<xsl:call-template name="StringType-color">
+						<xsl:with-param name="RGBcolor" select="key('automatic-styles', $paraStylName)/style:text-properties/@fo:background-color"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:background-color = 'transparent' ">
+						<w:highlight w:val="none" />
+					</xsl:when>
+					<xsl:when test="$stringColor != '' and $stringColor != 'white' and not(ancestor::office:styles)">
+						<!-- create highlight only for automatic styles -->
+						<w:highlight w:val="{$stringColor}" />
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- no built-in highlight color, thus use shading instead of highlight -->
+						<w:shd w:val="clear" w:color="auto" w:fill="{translate(key('automatic-styles', $paraStylName)/style:text-properties/@fo:background-color, 'abcdef#', 'ABCDEF')}" />
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+		<!--<xsl:if test="@style:text-underline-style">
       <xsl:choose>
         <xsl:when test="@style:text-underline-style != 'none' ">
           <w:u>
@@ -1373,10 +2063,172 @@
           <w:u w:val="none"/>
         </xsl:otherwise>
       </xsl:choose>
+		</xsl:if>-->
+		<xsl:choose>
+			<xsl:when test="@style:text-underline-style">
+				<xsl:choose>
+					<xsl:when test="@style:text-underline-style != 'none' ">
+						<w:u>
+							<xsl:attribute name="w:val">
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-style = 'dotted'">
+										<xsl:choose>
+											<xsl:when test="@style:text-underline-width = 'thick' ">dottedHeavy</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'bold' ">dottedHeavy</xsl:when>
+											<xsl:otherwise>dotted</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="@style:text-underline-style = 'dash' ">
+										<xsl:choose>
+											<xsl:when test="@style:text-underline-width = 'thick' ">dashedHeavy</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'bold' ">dashedHeavy</xsl:when>
+											<xsl:otherwise>dash</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="@style:text-underline-style = 'long-dash'">
+										<xsl:choose>
+											<xsl:when test="@style:text-underline-width = 'thick' ">dashLongHeavy</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'bold' ">dashLongHeavy</xsl:when>
+											<xsl:otherwise>dashLong</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="@style:text-underline-style = 'dot-dash' ">
+										<xsl:choose>
+											<xsl:when test="@style:text-underline-width = 'thick' ">dashDotHeavy</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'bold' ">dashDotHeavy</xsl:when>
+											<xsl:otherwise>dotDash</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="@style:text-underline-style = 'dot-dot-dash' ">
+										<xsl:choose>
+											<xsl:when test="@style:text-underline-width = 'thick' ">dashDotDotHeavy</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'bold' ">dashDotDotHeavy</xsl:when>
+											<xsl:otherwise>dotDotDash</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="@style:text-underline-style = 'wave' ">
+										<xsl:choose>
+											<xsl:when test="@style:text-underline-type = 'double' ">wavyDouble</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'thick' ">wavyHeavy</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'bold' ">wavyHeavy</xsl:when>
+											<xsl:otherwise>wave</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:choose>
+											<xsl:when test="@style:text-underline-type = 'double' ">double</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'thick' ">thick</xsl:when>
+											<xsl:when test="@style:text-underline-width = 'bold' ">thick</xsl:when>
+											<xsl:when test="@style:text-underline-mode = 'skip-white-space' ">words</xsl:when>
+											<xsl:otherwise>single</xsl:otherwise>
+										</xsl:choose>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+							<xsl:if test="@style:text-underline-color">
+								<xsl:attribute name="w:color">
+									<xsl:choose>
+										<xsl:when test="@style:text-underline-color = 'font-color'">auto</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of
+											  select="substring(@style:text-underline-color, 2, string-length(@style:text-underline-color)-1)"
+                    />
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
     </xsl:if>
+						</w:u>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:u w:val="none"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@style:text-underline-style) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style">
+
+				<xsl:choose>
+					<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style != 'none' ">
+						<w:u>
+							<xsl:attribute name="w:val">
+								<xsl:choose>
+									<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style = 'dotted'">
+										<xsl:choose>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'thick' ">dottedHeavy</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'bold' ">dottedHeavy</xsl:when>
+											<xsl:otherwise>dotted</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style = 'dash' ">
+										<xsl:choose>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'thick' ">dashedHeavy</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'bold' ">dashedHeavy</xsl:when>
+											<xsl:otherwise>dash</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style = 'long-dash'">
+										<xsl:choose>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'thick' ">dashLongHeavy</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'bold' ">dashLongHeavy</xsl:when>
+											<xsl:otherwise>dashLong</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style = 'dot-dash' ">
+										<xsl:choose>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'thick' ">dashDotHeavy</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'bold' ">dashDotHeavy</xsl:when>
+											<xsl:otherwise>dotDash</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style = 'dot-dot-dash' ">
+										<xsl:choose>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'thick' ">dashDotDotHeavy</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'bold' ">dashDotDotHeavy</xsl:when>
+											<xsl:otherwise>dotDotDash</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-style = 'wave' ">
+										<xsl:choose>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-type = 'double' ">wavyDouble</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'thick' ">wavyHeavy</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'bold' ">wavyHeavy</xsl:when>
+											<xsl:otherwise>wave</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:choose>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-type = 'double' ">double</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'thick' ">thick</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-width = 'bold' ">thick</xsl:when>
+											<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-mode = 'skip-white-space' ">words</xsl:when>
+											<xsl:otherwise>single</xsl:otherwise>
+										</xsl:choose>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+							<xsl:if test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-color">
+								<xsl:attribute name="w:color">
+									<xsl:choose>
+										<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-color = 'font-color'">auto</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of
+											  select="substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-color, 2, string-length(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-underline-color)-1)"
+                    />
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+							</xsl:if>
+						</w:u>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:u w:val="none"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
 
     <!-- vertAlign : raise text with as super or sub script -->
-    <xsl:if test="@style:text-position">
+		<!--<xsl:if test="@style:text-position">
       <xsl:choose>
         <xsl:when test="substring(@style:text-position, 1, 3) = 'sub' ">
           <w:vertAlign w:val="subscript"/>
@@ -1385,12 +2237,44 @@
           <w:vertAlign w:val="superscript"/>
         </xsl:when>
         <xsl:otherwise>
+					-->
           <!-- handled by position element -->
+		<!--
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
+		</xsl:if>-->
 
-    <xsl:if test="@style:text-emphasize">
+		<xsl:choose>
+			<xsl:when test="@style:text-position">
+				<xsl:choose>
+					<xsl:when test="substring(@style:text-position, 1, 3) = 'sub' ">
+						<w:vertAlign w:val="subscript"/>
+					</xsl:when>
+					<xsl:when test="substring(@style:text-position, 1, 5) = 'super' ">
+						<w:vertAlign w:val="superscript"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- handled by position element -->
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@style:text-position) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position">
+				<xsl:choose>
+					<xsl:when test="substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, 1, 3) = 'sub' ">
+						<w:vertAlign w:val="subscript"/>
+					</xsl:when>
+					<xsl:when test="substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, 1, 5) = 'super' ">
+						<w:vertAlign w:val="superscript"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- handled by position element -->
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+
+		<!--<xsl:if test="@style:text-emphasize">
       <w:em>
         <xsl:attribute name="w:val">
           <xsl:choose>
@@ -1402,7 +2286,37 @@
           </xsl:choose>
         </xsl:attribute>
       </w:em>
-    </xsl:if>
+		</xsl:if>-->
+
+		<xsl:choose>
+			<xsl:when test="@style:text-emphasize">
+				<w:em>
+					<xsl:attribute name="w:val">
+						<xsl:choose>
+							<xsl:when test="@style:text-emphasize = 'accent above' ">comma</xsl:when>
+							<xsl:when test="@style:text-emphasize = 'dot above' ">dot</xsl:when>
+							<xsl:when test="@style:text-emphasize = 'circle above' ">circle</xsl:when>
+							<xsl:when test="@style:text-emphasize = 'dot below' ">underDot</xsl:when>
+							<xsl:otherwise>none</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</w:em>
+			</xsl:when>
+			<xsl:when test="not(@style:text-emphasize) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-emphasize">
+				<w:em>
+					<xsl:attribute name="w:val">
+						<xsl:choose>
+							<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-emphasize = 'accent above' ">comma</xsl:when>
+							<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-emphasize = 'dot above' ">dot</xsl:when>
+							<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-emphasize = 'circle above' ">circle</xsl:when>
+							<xsl:when test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-emphasize = 'dot below' ">underDot</xsl:when>
+							<xsl:otherwise>none</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</w:em>
+			</xsl:when>
+		</xsl:choose>
 
     <xsl:if
       test="$default-language or (@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
@@ -1434,7 +2348,7 @@
       </w:lang>
     </xsl:if>
 
-    <xsl:if test="@style:text-combine">
+		<!--<xsl:if test="@style:text-combine">
       <xsl:choose>
         <xsl:when test="@style:text-combine = 'lines'">
           <w:eastAsianLayout>
@@ -1466,11 +2380,82 @@
           </w:eastAsianLayout>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
-  </xsl:template>
+		</xsl:if>-->
 
-
-
+		<xsl:choose>
+			<xsl:when test="@style:text-combine">
+				<xsl:choose>
+					<xsl:when test="@style:text-combine = 'lines'">
+						<w:eastAsianLayout>
+							<xsl:attribute name="w:id">
+								<xsl:number count="style:style"/>
+							</xsl:attribute>
+							<xsl:attribute name="w:combine">true</xsl:attribute>
+							<xsl:choose>
+								<xsl:when
+								  test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;' ">
+									<xsl:attribute name="w:combineBrackets">angle</xsl:attribute>
+								</xsl:when>
+								<xsl:when
+								  test="@style:text-combine-start-char = '{' and @style:text-combine-end-char = '}'">
+									<xsl:attribute name="w:combineBrackets">curly</xsl:attribute>
+								</xsl:when>
+								<xsl:when
+								  test="@style:text-combine-start-char = '(' and @style:text-combine-end-char = ')'">
+									<xsl:attribute name="w:combineBrackets">round</xsl:attribute>
+								</xsl:when>
+								<xsl:when
+								  test="@style:text-combine-start-char = '[' and @style:text-combine-end-char = ']'">
+									<xsl:attribute name="w:combineBrackets">square</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="w:combineBrackets">none</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
+						</w:eastAsianLayout>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="not(@style:text-combine) 
+					       and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine">
+				<xsl:choose>
+					<xsl:when test="@style:text-combine = 'lines'">
+						<w:eastAsianLayout>
+							<xsl:attribute name="w:id">
+								<xsl:number count="style:style"/>
+							</xsl:attribute>
+							<xsl:attribute name="w:combine">true</xsl:attribute>
+							<xsl:choose>
+								<xsl:when
+								  test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-start-char = '&lt;' 
+								        and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-end-char = '&gt;' ">
+									<xsl:attribute name="w:combineBrackets">angle</xsl:attribute>
+								</xsl:when>
+								<xsl:when
+								  test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-start-char = '{' 
+								         and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-end-char = '}'">
+									<xsl:attribute name="w:combineBrackets">curly</xsl:attribute>
+								</xsl:when>
+								<xsl:when
+								  test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-start-char = '(' 
+								        and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-end-char = ')'">
+									<xsl:attribute name="w:combineBrackets">round</xsl:attribute>
+								</xsl:when>
+								<xsl:when
+								  test="key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-start-char = '[' 
+										and key('automatic-styles', $paraStylName)/style:text-properties/@style:text-combine-end-char = ']'">
+									<xsl:attribute name="w:combineBrackets">square</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="w:combineBrackets">none</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
+						</w:eastAsianLayout>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
   <!-- footnote and endnote reference and text styles -->
   <xsl:template
     match="text:notes-configuration[@text:note-class='footnote'] | text:notes-configuration[@text:note-class='endnote']"
@@ -1573,6 +2558,81 @@
     </xsl:choose>
   </xsl:template>
 
+	<xsl:template name="computeSizePara">
+		<xsl:param name ="paraStylName"/>
+		<xsl:param name="node" select="key('automatic-styles', $paraStylName)/style:text-properties"/>
+		<xsl:param name="fontStyle">fo:font-size</xsl:param>
+		<xsl:choose>
+			<!-- when there's no unit -->
+			<xsl:when test="number($node/@*[name() = $fontStyle])">
+				<xsl:value-of select="number($node/@*[name() = $fontStyle]) * 2"/>
+			</xsl:when>
+			<xsl:when test="contains($node/@*[name() = $fontStyle], 'pt')">
+				<xsl:value-of
+				  select="round(number(substring-before($node/@*[name() = $fontStyle], 'pt')) * 2)"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- look for font size in parent context -->
+				<xsl:variable name="parentStyleName" select="$node/../@style:parent-style-name"/>
+				<xsl:variable name="value">
+					<xsl:choose>
+						<xsl:when test="$parentStyleName != '' or count($parentStyleName) &gt; 0">
+							<xsl:for-each select="document('styles.xml')">
+								<xsl:call-template name="computeSize">
+									<xsl:with-param name="node"
+									  select="key('styles', $parentStyleName)/style:text-properties"/>
+									<xsl:with-param name="fontStyle" select="$fontStyle"/>
+								</xsl:call-template>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>none</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="number($value)">
+						<xsl:choose>
+							<xsl:when test="contains($node/@*[name() = $fontStyle], '%')">
+								<xsl:value-of
+								  select="round(number(substring-before($node/@*[name() = $fontStyle], '%')) div 100 * number($value))"
+                />
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$value"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- fetch the default font size for this style family -->
+						<xsl:variable name="defaultProps">
+							<xsl:variable name="family" select="$node/../@style:family"/>
+
+							<xsl:for-each select="document('styles.xml')">
+								<xsl:choose>
+									<xsl:when test="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]">
+										<xsl:value-of select="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]" />
+									</xsl:when>
+									<xsl:otherwise>
+										<!-- when there is no other possibility -->
+										<xsl:value-of select="office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@*[name() = $fontStyle]" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name="defaultValue" select="number(substring-before($defaultProps, 'pt'))*2"/>
+						<xsl:choose>
+							<xsl:when test="contains($node/@*[name() = $fontStyle], '%')">
+								<xsl:value-of select="round(number(substring-before($node/@*[name() = $fontStyle], '%')) div 100 * number($defaultValue))" />
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$defaultValue"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
 
   <!-- Compute font size when style has raised/lowered text -->
   <xsl:template name="ComputePositionFontSize">
@@ -1597,6 +2657,35 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+	<xsl:template name="ComputePositionFontSizePara">
+		<xsl:param name ="paraStylName"/>
+		<!-- second percentage value specifies size -->
+		<xsl:variable name="percentValue">
+			<xsl:if
+			  test="not(substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, 1, 3) = 'sub') 
+			        and not(substring(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, 1, 5) = 'super') ">
+				<xsl:value-of select="substring-before(substring-after(key('automatic-styles', $paraStylName)/style:text-properties/@style:text-position, ' '), '%')"/>
+			</xsl:if>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$percentValue != '' ">
+				<xsl:variable name="fontHeight">
+					<xsl:call-template name="computeSizePara">
+						<xsl:with-param name ="paraStylName" select ="$paraStylName"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="round(number($percentValue) div 100 * $fontHeight)"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:if test="key('automatic-styles', $paraStylName)/style:text-properties/@fo:font-size">
+					<xsl:call-template name="computeSizePara">
+						<xsl:with-param name ="paraStylName" select ="$paraStylName"/>
+					</xsl:call-template>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
   <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation BEGIN-->
   <!--This template determines the master-page-name of the current paragraph searching for the

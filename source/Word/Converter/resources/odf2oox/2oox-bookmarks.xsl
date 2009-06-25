@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -149,7 +149,15 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$outlineLevel =0">
+            <xsl:value-of select="'1'"/>
+          </xsl:when>
+          <xsl:otherwise>
         <xsl:value-of select="$outlineLevel" />
+      </xsl:otherwise>
+    </xsl:choose>
+        
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -164,9 +172,18 @@
 
     <xsl:choose>
       <xsl:when test="starts-with($href, '#')">
+        <xsl:choose>
+          <xsl:when test="contains($href,'|')">
         <xsl:call-template name="DetermineReferencedText">
           <xsl:with-param name="href" select="substring-before(substring-after($href, '#'), '|')" />
         </xsl:call-template>
+      </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="DetermineReferencedText">
+              <xsl:with-param name="href" select="substring-after($href, '#')" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="substring-before($href, '.') != '' and number(substring-before($href, '.')) >= 0">
         <xsl:call-template name="DetermineReferencedText">
@@ -231,19 +248,55 @@
                 -->
                 <xsl:variable name="myText" select="string(.)" />
                 <xsl:variable name="myOutlineLevel" select="number(@text:outline-level)" />
+                <xsl:variable name="myTocRefId" >
+                  <xsl:for-each select="self::text:h/text:bookmark-start | self::text:p/text:bookmark-start" >
+                    <xsl:variable name="TocRefId" select="@text:name"/>
+                    <xsl:for-each select="$myToc/text:index-body/text:p/text:a[1]">
+                      <xsl:if test="substring-after(@xlink:href,'#')=$TocRefId">
+                        <xsl:value-of select="$TocRefId"/>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:for-each>
+                </xsl:variable>
                 <xsl:for-each select="$myToc/text:index-body/text:p">
                   <!--
                   Determine the outline level out of the href
                   -->
                   <xsl:variable name="outlinelvl">
+                    <xsl:choose>
+                      <xsl:when test="contains(text:a[1]/@xlink:href,'.')">
                     <xsl:call-template name="DetermineOutlineLevel">
                       <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
                     </xsl:call-template>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:call-template name="DetermineOutlineLevel">
+                          <xsl:with-param name="href" >
+                            <xsl:value-of select="text:a[1]/text:span[1]" />
+                          </xsl:with-param> 
+                        </xsl:call-template>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                    
                   </xsl:variable>
                   <!--
                   Determine the raw text out of the href
                   -->
                   <xsl:variable name="refText">
+                    <xsl:choose>
+                      <xsl:when test="$myTocRefId !=''">
+                        <xsl:value-of select="string(.)"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:call-template name="DetermineReferencedText">
+                         <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
+                      </xsl:call-template>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  
+                   
+                  </xsl:variable>
+                  <xsl:variable name="refTocId">
                     <xsl:call-template name="DetermineReferencedText">
                       <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
                     </xsl:call-template>
@@ -251,9 +304,19 @@
                   <!--
                   If this headings outline level and text match, this is the link that references this heading
                   -->
+                  <xsl:choose>
+                    <xsl:when test="$myTocRefId !=''">
+                      <xsl:if test="$myTocRefId = $refTocId">
+                        <xsl:value-of select="position()"/>
+                      </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
                   <xsl:if test="$myOutlineLevel = $outlinelvl and $myText = $refText">
                     <xsl:value-of select="position()"/>
                   </xsl:if>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  
                 </xsl:for-each>
               </xsl:when>
               <xsl:when test="self::text:list-header[text:h]">

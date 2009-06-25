@@ -234,13 +234,35 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
   <xsl:template match="text()[parent::dc:date]" mode="text"/>
   <xsl:template match="text()[parent::dc:date]" mode="run"/>
-
+<!-- Code Changes Done by: Vijayeta
+	 Defect Id : 2691800 , Japaneese Chrs Lost, xlsx->SP2->ODS->Translator->xlsx
+-->
   <xsl:template match="text()" mode="text">
      <!-- invalid tags handling -->
     <xsl:choose>
       <!-- when text contains invalid tags, converter recognises that part of the text is inside such tag -->
       <!-- see https://sourceforge.net/tracker/index.php?func=detail&aid=1740752&group_id=169337&atid=929855 -->
-      <xsl:when test="name(./parent::node())!='text:p' and name(./parent::node())!='text:a' and name(./parent::node())!='text:span' and name(./parent::node())!='office:annotation'"/>
+		<xsl:when test="name(./parent::node())!='text:p' and name(./parent::node())!='text:a' and name(./parent::node())!='text:span' and name(./parent::node())!='office:annotation'">
+			<xsl:choose>
+				<xsl:when test ="name(./parent::node())='text:ruby-base'">					
+					<xsl:variable name="value">
+						<xsl:value-of select="."/>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="not(contains($value, '_x'))">
+							<xsl:value-of select="$value"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="HexaDecimalValue">
+								<xsl:with-param name="value">
+									<xsl:value-of select="$value"/>
+								</xsl:with-param>
+							</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>					
+				</xsl:when>
+			</xsl:choose>
+		</xsl:when>		
       <xsl:otherwise>
     <xsl:variable name="value">
       <xsl:value-of select="."/>
