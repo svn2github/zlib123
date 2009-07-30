@@ -683,7 +683,13 @@
       <!-- NOTE: If the paragraph mark of the previous paragraph shall be treated as deleted 
                we will skip this paragraph. This paragraph has been already translated together 
                with the previous paragraph -->
-      <xsl:when test="not(key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del)">
+	<!--
+	    Code Changes: Vijayeta
+		Defect      :2770662
+        Desc        :ODT Roundtrip - Last TOC entry doubled, 
+					 hence additional condition to check if w:p has a run with attribute @w:fldCharType='end'. If yes, do not consider the paragraph
+    -->
+      <xsl:when test="not(key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del) and not(w:r/w:fldChar[@w:fldCharType='end'])">
         <xsl:variable name="numId">
           <xsl:call-template name="GetListProperty">
             <xsl:with-param name="node" select="." />
