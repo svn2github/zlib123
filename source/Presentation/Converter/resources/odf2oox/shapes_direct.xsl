@@ -2858,6 +2858,13 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="'0'"/>
 				  </xsl:attribute>
 			  </xsl:when>
+<!--1960147:center alignment of Textboxed changed to Left-->
+			  <xsl:when test ="@draw:textarea-horizontal-align='center'">
+				  <xsl:attribute name ="anchorCtr">
+					  <xsl:value-of select ="'1'"/>
+				  </xsl:attribute>
+			  </xsl:when>
+<!--end of 1960147-->
           </xsl:choose>
         </xsl:if>
 

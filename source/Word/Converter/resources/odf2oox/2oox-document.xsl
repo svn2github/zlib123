@@ -1055,10 +1055,10 @@
       </xsl:variable>
       <xsl:variable name="paraStyleName" select="ancestor-or-self::text:p[1]/@text:style-name" />
       <xsl:choose>
-        <xsl:when test ="$styleName!=''">         
+				<xsl:when test ="$styleName!=$paraStyleName or not($paraStyleName) ">
+				<!--<xsl:when test ="$styleName!=''">-->
       <xsl:choose>
         <xsl:when test="key('automatic-styles', $styleName)">
-
           <!-- 
           makz: Add the parent style of the automatic style as style ref 
           -->
@@ -1070,7 +1070,6 @@
               </xsl:with-param>
 								</xsl:call-template>
           </xsl:if>
-
           <!-- 
           makz: Convert the automatic style 
           -->
@@ -1096,7 +1095,10 @@
         </xsl:when>
       </xsl:choose>
         </xsl:when>
-        <xsl:when test ="$styleName=''">
+				<xsl:when test ="$styleName = $paraStyleName">
+					<xsl:choose>
+						<xsl:when test ="(self::text:s or self::text:span or self::text:a or self::text:h or self::text:p)">
+							<xsl:if test ="@text:style-name">
           <xsl:if test="key('automatic-styles', $paraStyleName)">
             <!-- context switch -->
             <xsl:for-each select="key('automatic-styles', $paraStyleName)">
@@ -1108,9 +1110,34 @@
 							<xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
 								<w:rStyle w:val="{key('automatic-styles', $styleName)/@style:parent-style-name}" />
 							</xsl:if>
-							<xsl:for-each select="key('automatic-styles', $styleName)">
+										<!--<xsl:for-each select="key('automatic-styles', $styleName)">
+											<xsl:apply-templates select="style:text-properties" mode="rPr"/>
+										</xsl:for-each>-->
+									</xsl:when>
+									<xsl:when test="$styleName">
+										<xsl:call-template name="InsertRunStyle">
+											<xsl:with-param name="styleName" select="$styleName" />
+										</xsl:call-template>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:if>
+						</xsl:when>
+						<xsl:when test =".!='' and 
+								         not(self::text:s or self::text:span or self::text:a or self::text:h or self::text:p)">
+							<xsl:if test="key('automatic-styles', $paraStyleName)">
+								<!-- context switch -->
+								<xsl:for-each select="key('automatic-styles', $paraStyleName)">
 								<xsl:apply-templates select="style:text-properties" mode="rPr"/>
 							</xsl:for-each>
+							</xsl:if>
+							<xsl:choose>
+								<xsl:when test="key('automatic-styles', $styleName)">
+									<xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
+										<w:rStyle w:val="{key('automatic-styles', $styleName)/@style:parent-style-name}" />
+									</xsl:if>
+									<!--<xsl:for-each select="key('automatic-styles', $styleName)">
+										<xsl:apply-templates select="style:text-properties" mode="rPr"/>
+									</xsl:for-each>-->
 						</xsl:when>
 						<xsl:when test="$styleName">
 							<xsl:call-template name="InsertRunStyle">
@@ -1120,8 +1147,8 @@
 					</xsl:choose>
         </xsl:when>
       </xsl:choose>
-      
-      
+				</xsl:when>
+			</xsl:choose>
       <!--
         makz: If the parent paragraph has an automatic style we must convert it's text formatting.
         This must be done before converting the properties of the run's automatic style due to the priority
