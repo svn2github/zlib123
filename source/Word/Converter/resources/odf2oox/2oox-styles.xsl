@@ -1042,7 +1042,7 @@
 							<xsl:value-of select="$fontName"/>
 						</xsl:attribute>
 					</xsl:if>
-					<!--Refer from Parent Node->
+					<!--Refer from Parent Node-->
 					<xsl:if test="$fontName = '' and $textProp/@style:font-name ">
 						<xsl:attribute name="w:ascii">
 							<xsl:value-of select="$textProp/@style:font-name"/>
@@ -1051,7 +1051,7 @@
 							<xsl:value-of select="$textProp/@style:font-name"/>
 						</xsl:attribute>
 					</xsl:if>
-				<!--Refer from Parent Node->
+				<!--Refer from Parent Node-->
 					<xsl:choose>
 						<xsl:when test="@style:font-name-complex">
 							<xsl:attribute name="w:cs">
