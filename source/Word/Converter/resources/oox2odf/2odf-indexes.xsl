@@ -127,7 +127,22 @@
       </xsl:apply-templates>
     </text:p>
 
-    <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text() and (not(w:r/w:fldChar) or w:r[w:fldChar]/preceding-sibling::w:r[w:t])]">
+    <!--<xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) 
+				 and descendant::text() 
+			     and (not(w:r/w:fldChar)
+			     or w:r[w:fldChar]/preceding-sibling::w:r[w:t])]">
+      <xsl:apply-templates select="following-sibling::w:p[1]" mode="index" />
+    </xsl:if>-->	
+	  <!--
+	  Index: source/Word/Converter/resources/oox2odf/2odf-indexes.xsl
+	===================================================================
+	 source/Word/Converter/resources/oox2odf/2odf-indexes.xsl	(revision 5250)
+	 source/Word/Converter/resources/oox2odf/2odf-indexes.xsl	(working copy)
+	@@ -127,7 +127,9 @@
+	  -->
+	  <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) 
+                  and descendant::text() and 
+                 (not(w:r/w:fldChar) or w:r[w:fldChar[@w:fldCharType='end']]/preceding-sibling::*[.//w:t])]">
       <xsl:apply-templates select="following-sibling::w:p[1]" mode="index" />
     </xsl:if>
 

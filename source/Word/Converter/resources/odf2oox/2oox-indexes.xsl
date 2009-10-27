@@ -1028,13 +1028,13 @@
         </xsl:if>
       </w:tabs>
     </xsl:if>
-
+	  <!-- FIX: removed to fix issue with incorrect indent in TOC when the entry is not numbered -->
     <!-- tabs before text are retained as indent if no numbering is defined -->
-    <xsl:if test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
+    <!--<xsl:if test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
       <xsl:if test="$numberingFormat = '' ">
         <w:ind w:left="{$leftTabStop}" />
       </xsl:if>
-    </xsl:if>
+    </xsl:if>-->
   </xsl:template>
 
   <!-- transform a tab stop position into indent -->

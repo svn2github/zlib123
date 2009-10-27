@@ -1098,7 +1098,8 @@
 				<xsl:when test ="$styleName = $paraStyleName">
 					<xsl:choose>
 						<xsl:when test ="(self::text:s or self::text:span or self::text:a or self::text:h or self::text:p)">
-							<xsl:if test ="@text:style-name">
+							<xsl:if test ="@text:style-name or (not(@text:style-name) and @text:c)">
+							<!--<xsl:if test ="@text:style-name">-->
           <xsl:if test="key('automatic-styles', $paraStyleName)">
             <!-- context switch -->
             <xsl:for-each select="key('automatic-styles', $paraStyleName)">

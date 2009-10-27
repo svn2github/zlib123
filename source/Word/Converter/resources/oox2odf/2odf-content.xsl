@@ -437,7 +437,6 @@
         <xsl:message terminate="no">translation.oox2odf.lists.numbering</xsl:message>
       </xsl:if>
     </xsl:if>
-
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
       <xsl:when test="w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText, 'INDEX' )]">
@@ -448,6 +447,17 @@
         <!-- Fix #2689877: Do not ignore the last paragraph if it contains the end of the TOC -->
       </xsl:when>
 
+		<xsl:when test="@oox:index and (not(w:r[1]/w:fldChar[@w:fldCharType='end']) 
+						or w:r[w:fldChar[@w:fldCharType='end']]/preceding-sibling::*[.//w:t])">
+			<!-- Ignore all paragraphs inside an index. The translation of such paragraphs is triggered by the first paragraph in the index -->
+			        <!-- Fix #2689877: Do not ignore the last paragraph if it contains the end of the TOC -->
+			        <!-- Fix #2689877: 
+               Do not ignore the last paragraph if it contains the end of the TOC 
+                (This can be an empty paragraph or a paragraph with content following the TOC in Word)
+              Ignore it if it contains the end of the TOC and there is still text (.//w:t) before the end of the TOC 
+            -->
+		</xsl:when>
+		
       <!-- ignore paragraph if it's deleted in change tracking mode-->
       <!--<xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />-->
 
@@ -683,13 +693,8 @@
       <!-- NOTE: If the paragraph mark of the previous paragraph shall be treated as deleted 
                we will skip this paragraph. This paragraph has been already translated together 
                with the previous paragraph -->
-	<!--
-	    Code Changes: Vijayeta
-		Defect      :2770662
-        Desc        :ODT Roundtrip - Last TOC entry doubled, 
-					 hence additional condition to check if w:p has a run with attribute @w:fldCharType='end'. If yes, do not consider the paragraph
-    -->
-      <xsl:when test="not(key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del) and not(w:r/w:fldChar[@w:fldCharType='end'])">
+<!--Sonata:Changes reverted, that caused Regression-->
+		<xsl:when test="not(key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del)">			
         <xsl:variable name="numId">
           <xsl:call-template name="GetListProperty">
             <xsl:with-param name="node" select="." />

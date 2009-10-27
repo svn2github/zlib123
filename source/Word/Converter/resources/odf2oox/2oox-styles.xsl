@@ -1042,6 +1042,16 @@
 							<xsl:value-of select="$fontName"/>
 						</xsl:attribute>
 					</xsl:if>
+					<!--Refer from Parent Node->
+					<xsl:if test="$fontName = '' and $textProp/@style:font-name ">
+						<xsl:attribute name="w:ascii">
+							<xsl:value-of select="$textProp/@style:font-name"/>
+						</xsl:attribute>
+						<xsl:attribute name="w:hAnsi">
+							<xsl:value-of select="$textProp/@style:font-name"/>
+						</xsl:attribute>
+					</xsl:if>
+				<!--Refer from Parent Node->
 					<xsl:choose>
 						<xsl:when test="@style:font-name-complex">
 							<xsl:attribute name="w:cs">
@@ -1236,7 +1246,7 @@
     </xsl:if>-->
 
 		<xsl:choose>
-			<xsl:when test="@fo:font-weight-complex">
+			<xsl:when test="@style:font-weight-complex">
 				<xsl:choose>
 					<xsl:when test="@style:font-weight-complex != 'normal'">
 						<w:bCs w:val="on"/>
@@ -1246,7 +1256,7 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
-			<xsl:when test="not(@fo:font-weight-complex)
+			<xsl:when test="not(@style:font-weight-complex)
 						    and $textProp/@style:font-weight-complex">
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
