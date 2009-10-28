@@ -281,7 +281,20 @@
     <xsl:param name="min" select="1" />
     <xsl:param name="max" select="9" />
 
+	  
     <xsl:variable name="Style" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level = $min]" />
+<!--
+Fixed By: Sonata
+Fix to prevent Loss of TOC contents on Update
+-->
+	  <xsl:variable name ="maxOutlineLvl">
+		  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[starts-with(@style:name,'heading_20_') or starts-with(@style:name,'Heading_20_')]/@style:default-outline-level">
+			  <xsl:sort data-type="number" order="descending"/>
+			  <xsl:if test="position()=1">
+				  <xsl:value-of select="."/>
+			  </xsl:if>
+		  </xsl:for-each>
+	  </xsl:variable>
 
     <xsl:variable name="IsDefaultHeading">
       <xsl:call-template name ="CheckDefaultHeading">
@@ -290,7 +303,6 @@
     </xsl:variable>
 
     <xsl:choose>
-
       <xsl:when test="$min &gt; $max">
         <xsl:value-of select="$max" />
       </xsl:when>
@@ -304,10 +316,22 @@
           <xsl:with-param name="max" select="$max"/>
         </xsl:call-template>
       </xsl:when>
-
+	  <xsl:otherwise>
+			<xsl:choose>
+			<xsl:when test ="$maxOutlineLvl &gt; ($min - 1)">
+				<xsl:if test ="$maxOutlineLvl &gt;= 10">
+					<xsl:value-of select="9" />
+				</xsl:if>
+				<xsl:if test ="$maxOutlineLvl &lt; 10">
+					<xsl:value-of select="$maxOutlineLvl" />
+				</xsl:if>
+			</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$min - 1" />
       </xsl:otherwise>
+			</xsl:choose>
+			<!--<xsl:value-of select="$min - 1" />-->
+		</xsl:otherwise>
 
     </xsl:choose>
   </xsl:template>
