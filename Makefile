@@ -1,4 +1,4 @@
-package := odf-converter-0.0.6
+package := odf-converter-3.0.5254
 
 top_srcdir=.
 
@@ -11,6 +11,7 @@ SUBDIRS= \
 	source/Spreadsheet/Converter \
 	source/Shell/OdfConverter
 DISTFILES= \
+	LICENSE.TXT \
 	build/common.mk \
 	source/AdditionalTools/zlib123/zconf.h \
 	source/AdditionalTools/zlib123/zlib.h
