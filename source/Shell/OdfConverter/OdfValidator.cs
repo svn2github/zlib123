@@ -49,9 +49,9 @@ namespace OdfConverter.CommandLineTool
 	
 #if MONO
 	// Dummy validation class
-	public class OdfValidator
+	public class OdfValidator : IValidator
 	{
-		public OdfValidator(Report report)
+		public OdfValidator(ConversionReport report)
 		{ 
 		}
 		public void validate(String fileName)
