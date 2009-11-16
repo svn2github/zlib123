@@ -143,7 +143,7 @@ public class Scriptf4ff3df93ecad2c4cc1cd369a654ff2d
                       }
                       else
                       {
-                          result = uri.ToString().Substring(uriBase.ToString().Length - @"dummy.odt\".Length);
+                          result = uri.ToString().Substring(uriBase.ToString().Length - "dummy.odt/".Length);
                       }
                   }
                   else
