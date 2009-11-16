@@ -1125,6 +1125,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         protected double MaxDigitWidth(string fontName, double dblSizePt)
         {
+#if MONO
+            // Avoid dependency on X11 on Linux here... just approximate
+            return dblSizePt * 0.75;
+#else
             double dblMaxDigitWidth = 0.0;
 
             // Excel does not use the specified font size, 
@@ -1166,6 +1170,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
             }
             return dblMaxDigitWidth;
+#endif
         }
 
         protected double WidthToPixel(double dblMaxDigitWidth, double preDefinedWidth, bool isWidDefined)
