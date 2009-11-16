@@ -40,9 +40,10 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.Text.RegularExpressions;
+#if !MONO
 using System.Windows.Forms;
 using System.Drawing;
-
+#endif
 
 namespace CleverAge.OdfConverter.Spreadsheet
 {
