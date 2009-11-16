@@ -25,6 +25,7 @@ dist-pre:
 dist-tarball: dist-pre
 	$(MAKE) distdir='$(package)' dist-recursive
 	rm -f $(package).tar.gz
+	find $(package) -name '*.cs' -o -name '*.xsl' | while read F; do dos2unix $$F; done
 	tar czf $(package).tar.gz $(package)
 
 dist: dist-tarball
