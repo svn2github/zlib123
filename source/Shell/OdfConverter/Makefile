@@ -43,7 +43,11 @@ SOURCE = \
     OdfConverter.cs \
     OoxValidator.cs \
     OdfValidator.cs
-DISTFILES=$(SOURCE) zlib.def
+DISTFILES=$(SOURCE) \
+    zlib.def \
+    gdiplus.config \
+    Scriptde11fab7c30a286b65ef89b0d5a9cc8d.cs \
+    Scriptd32e860abcf6c8c079ad162db5213f3c.cs
 
 all-local: OdfConverterTest.exe OdfConverter$(EXEEXT)
 
