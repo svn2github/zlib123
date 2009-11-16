@@ -2,7 +2,7 @@ top_srcdir=../../..
 include $(top_srcdir)/build/common.mk
 
 ifeq ($(OS),Cygwin)
-MACHINE_CONFIG_FILE=--machine-config $(shell cygpath -m $(shell pkg-config --variable=prefix mono))/etc/mono/2.0/machine.config
+MACHINE_CONFIG_FILE=--machine-config $(shell cygpath -m $(shell pkg-config --variable=sysconfdir mono))/mono/2.0/machine.config
 CC=gcc -mno-cygwin
 EXEEXT=.exe
 PATHSEP=;
@@ -17,7 +17,7 @@ else
 ifeq ($(OS),Darwin)
 MACHINE_CONFIG_FILE=
 else
-MACHINE_CONFIG_FILE=--machine-config "`pkg-config --variable=prefix mono`/etc/mono/2.0/machine.config"
+MACHINE_CONFIG_FILE=--machine-config "`pkg-config --variable=sysconfdir mono`/mono/2.0/machine.config"
 endif
 EXEEXT=
 PATHSEP=:
