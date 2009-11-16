@@ -67,6 +67,7 @@ ifeq ($(OS),Darwin)
 		`pkg-config --libs-only-l mono` bundle.o
 else
 	$(CC) -o OdfConverter$(EXEEXT) -Wall `pkg-config --cflags mono` main.c \
+	    -Wl,--stack=20000000 \
 	    $(KILLAT) \
 	    bundle.o \
 	    $(EXPORTDYNAMIC) \
