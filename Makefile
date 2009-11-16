@@ -1,4 +1,4 @@
-package := odf-converter-3.0.5271
+package := odf-converter-3.0.5272
 
 top_srcdir=.
 

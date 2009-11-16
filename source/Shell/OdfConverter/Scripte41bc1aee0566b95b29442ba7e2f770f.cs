@@ -8,9 +8,14 @@ using System.Xml.Xsl;
 
 namespace GeneratedAssembly
 {
-public class Scriptde11fab7c30a286b65ef89b0d5a9cc8d
+public class Scripte41bc1aee0566b95b29442ba7e2f770f
 {
 	
+    
+      public double MaxDouble(double val1, double val2)
+      {
+          return Math.Max(val1, val2);
+      }
     
       public string ToUpper(string input)
       {

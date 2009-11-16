@@ -8,7 +8,7 @@ using System.Xml.Xsl;
 
 namespace GeneratedAssembly
 {
-public class Scriptd32e860abcf6c8c079ad162db5213f3c
+public class Scriptf4ff3df93ecad2c4cc1cd369a654ff2d
 {
 	
       public string ToUpper(string input)
@@ -140,6 +140,10 @@ public class Scriptd32e860abcf6c8c079ad162db5213f3c
                       {
                           // relative path inside the package
                           result = uri.ToString().Substring(uriBase.ToString().Length);
+                      }
+                      else
+                      {
+                          result = uri.ToString().Substring(uriBase.ToString().Length - @"dummy.odt\".Length);
                       }
                   }
                   else

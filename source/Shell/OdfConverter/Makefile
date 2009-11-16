@@ -46,8 +46,8 @@ SOURCE = \
 DISTFILES=$(SOURCE) \
     zlib.def \
     gdiplus.config \
-    Scriptde11fab7c30a286b65ef89b0d5a9cc8d.cs \
-    Scriptd32e860abcf6c8c079ad162db5213f3c.cs
+    Scripte41bc1aee0566b95b29442ba7e2f770f.cs \
+    Scriptf4ff3df93ecad2c4cc1cd369a654ff2d.cs
 
 all-local: OdfConverterTest.exe OdfConverter$(EXEEXT)
 
@@ -69,13 +69,13 @@ OdfConverterTestStatic.exe : $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtilsStati
 		-reference:../../Spreadsheet/Converter/SpreadsheetStatic.dll \
 		$(SOURCE)
 
-main.c bundle.o : OdfConverterTestStatic.exe Makefile Scriptde11fab7c30a286b65ef89b0d5a9cc8d.dll Scriptd32e860abcf6c8c079ad162db5213f3c.dll
-	MONO_PATH='../../Common/OdfZipUtils$(PATHSEP)../../Common/OdfConverterLib$(PATHSEP)../../Word/Converter$(PATHSEP)../../Presentation/Converter$(PATHSEP)../../Spreadsheet/Converter' mkbundle2 -c -o main.c -oo bundle.o --deps $(MACHINE_CONFIG_FILE) $(GDIPLUS_CONFIG) OdfConverterTestStatic.exe Scriptde11fab7c30a286b65ef89b0d5a9cc8d.dll Scriptd32e860abcf6c8c079ad162db5213f3c.dll
+main.c bundle.o : OdfConverterTestStatic.exe Makefile Scripte41bc1aee0566b95b29442ba7e2f770f.dll Scriptf4ff3df93ecad2c4cc1cd369a654ff2d.dll
+	MONO_PATH='../../Common/OdfZipUtils$(PATHSEP)../../Common/OdfConverterLib$(PATHSEP)../../Word/Converter$(PATHSEP)../../Presentation/Converter$(PATHSEP)../../Spreadsheet/Converter' mkbundle2 -c -o main.c -oo bundle.o --deps $(MACHINE_CONFIG_FILE) $(GDIPLUS_CONFIG) OdfConverterTestStatic.exe Scripte41bc1aee0566b95b29442ba7e2f770f.dll Scriptf4ff3df93ecad2c4cc1cd369a654ff2d.dll
 
-Scriptde11fab7c30a286b65ef89b0d5a9cc8d.dll : Scriptde11fab7c30a286b65ef89b0d5a9cc8d.cs
+Scripte41bc1aee0566b95b29442ba7e2f770f.dll : Scripte41bc1aee0566b95b29442ba7e2f770f.cs
 	$(CSC) -t:library $<
 
-Scriptd32e860abcf6c8c079ad162db5213f3c.dll : Scriptd32e860abcf6c8c079ad162db5213f3c.cs
+Scriptf4ff3df93ecad2c4cc1cd369a654ff2d.dll : Scriptf4ff3df93ecad2c4cc1cd369a654ff2d.cs
 	$(CSC) -t:library $<
 
 OdfConverter$(EXEEXT) : main.c bundle.o $(ZLIBDEP) Makefile
