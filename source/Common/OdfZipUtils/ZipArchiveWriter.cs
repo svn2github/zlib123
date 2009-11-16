@@ -1068,7 +1068,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 }
                 else
                 {
-                return returnOutputFilePath.Substring(0, returnOutputFilePath.LastIndexOf("\\"));
+                return returnOutputFilePath.Substring(0, returnOutputFilePath.LastIndexOf(Path.DirectorySeparatorChar));
             }
         }
         }
