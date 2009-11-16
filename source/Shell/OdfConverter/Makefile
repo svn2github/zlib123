@@ -12,6 +12,7 @@ ZLIBDEP=$(ZLIB)
 ZIPOPEN=_zipOpen@8
 UNZOPEN=_unzOpen@4
 OTHERLIBS=-lole32 -loleaut32 -lws2_32 -lpsapi -luser32 -lkernel32
+STACKSIZE=-Wl,--stack=20000000
 else
 ifeq ($(OS),Darwin)
 MACHINE_CONFIG_FILE=
@@ -67,7 +68,7 @@ ifeq ($(OS),Darwin)
 		`pkg-config --libs-only-l mono` bundle.o
 else
 	$(CC) -o OdfConverter$(EXEEXT) -Wall `pkg-config --cflags mono` main.c \
-	    -Wl,--stack=20000000 \
+	    $(STACKSIZE) \
 	    $(KILLAT) \
 	    bundle.o \
 	    $(EXPORTDYNAMIC) \
