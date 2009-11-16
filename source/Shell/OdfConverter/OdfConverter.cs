@@ -625,7 +625,7 @@ namespace OdfConverter.CommandLineTool
             Console.WriteLine("     /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)");
             Console.WriteLine("     /SKIP Name         Skip a post-processing (provide the post-processor's name)");
             Console.WriteLine();
-
+#if !MONO
             if (!IsRunningOnMono())
             {
                 Console.WriteLine("  Performance options:");
@@ -633,6 +633,7 @@ namespace OdfConverter.CommandLineTool
                 Console.WriteLine("                        an improved startup time for all future conversions. If this option is used all other options");
                 Console.WriteLine("                        will be ignored and the tool will exit. Note: This option requires administrator privileges.");
             }
+#endif
         }
 
         private static ConversionOptions ParseCommandLine(string[] args)
@@ -762,9 +763,11 @@ namespace OdfConverter.CommandLineTool
                         ++i; // expects one parameter
                         // do nothing here
                         break;
+#if !MONO
                     case "-NGEN":
                         _ngenAssemblies = true;
                         break;
+#endif
                     default:
                         if (args[i].Replace('/', '-').Replace('_', '-').StartsWith("-") && !File.Exists(args[i]))
                         {
