@@ -953,6 +953,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
             }
             return dblMaxDigitWidth;
+#endif
         }
     }
 }
