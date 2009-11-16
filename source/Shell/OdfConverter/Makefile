@@ -19,6 +19,17 @@ MACHINE_CONFIG_FILE=
 else
 MACHINE_CONFIG_FILE=--machine-config "`pkg-config --variable=sysconfdir mono`/mono/2.0/machine.config"
 endif
+ifeq ($(OS),GNU/Linux)
+GDIPLUS_LIB=-Wl,--whole-archive -lgdiplus -Wl,--no-whole-archive
+GDIPLUS_LIB_ONLY_L=`pkg-config --libs-only-L libgdiplus` -L$(GDIPLUS_LIBDIR)
+GDIPLUS_LIB_ONLY_l=`pkg-config --libs-only-l libgdiplus | sed -e "s/\-lgdiplus //"`
+GDIPLUS_CONFIG=--config gdiplus.config
+else
+GDIPLUS_LIB=
+GDIPLUS_LIB_ONLY_L=
+GDIPLUS_LIB_ONLY_l=
+GDIPLUS_CONFIG=
+endif
 EXEEXT=
 PATHSEP=:
 EXPORTDYNAMIC=-Wl,--export-dynamic
@@ -55,7 +66,7 @@ OdfConverterTestStatic.exe : $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtilsStati
 		$(SOURCE)
 
 main.c bundle.o : OdfConverterTestStatic.exe Makefile
-	MONO_PATH='../../Common/OdfZipUtils$(PATHSEP)../../Common/OdfConverterLib$(PATHSEP)../../Word/Converter$(PATHSEP)../../Presentation/Converter$(PATHSEP)../../Spreadsheet/Converter' mkbundle2 -c -o main.c -oo bundle.o --deps $(MACHINE_CONFIG_FILE) OdfConverterTestStatic.exe
+	MONO_PATH='../../Common/OdfZipUtils$(PATHSEP)../../Common/OdfConverterLib$(PATHSEP)../../Word/Converter$(PATHSEP)../../Presentation/Converter$(PATHSEP)../../Spreadsheet/Converter' mkbundle2 -c -o main.c -oo bundle.o --deps $(MACHINE_CONFIG_FILE) $(GDIPLUS_CONFIG) OdfConverterTestStatic.exe
 
 OdfConverter$(EXEEXT) : main.c bundle.o $(ZLIBDEP) Makefile
 	rm -f $@
@@ -73,9 +84,10 @@ else
 	    bundle.o \
 	    $(EXPORTDYNAMIC) \
 	    -Wl,--undefined=$(ZIPOPEN) -Wl,--undefined=$(UNZOPEN) \
-	    `pkg-config --libs-only-L mono` -L../../AdditionalTools/zlib123/contrib/minizip \
-	    -Wl,-Bstatic -lmono -lzlibwapi -Wl,-Bdynamic  \
+	    `pkg-config --libs-only-L mono` $(GDIPLUS_LIB_ONLY_L) -L../../AdditionalTools/zlib123/contrib/minizip \
+	    -Wl,-Bstatic -lmono -lzlibwapi $(GDIPLUS_LIB) -Wl,-Bdynamic  \
 	    `pkg-config --libs-only-l mono | sed -e "s/\-lmono //"` \
+	    $(GDIPLUS_LIB_ONLY_l) \
 	    $(ZLIB) $(OTHERLIBS)
 endif
 ifeq ($(OS),Cygwin)
