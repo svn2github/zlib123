@@ -27,9 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<WixLocalization Culture="pl-PL" Codepage="1252" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="pl-PL" Codepage="1250" xmlns="http://schemas.microsoft.com/wix/2006/localization">
   <String Id="lcid" Localizable="no">1045</String>
-  <String Id="CodePage" Localizable="no">1252</String>
+  <String Id="CodePage" Localizable="no">1250</String>
   
   <String Id="ApplicationName">Dodatek ODF dla pakietu Microsoft Office</String>
   <String Id="ProjectName">Dodatek OpenXML/ODF Translator dla pakietu Microsoft Office</String>
