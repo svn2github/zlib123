@@ -51,13 +51,15 @@ namespace OdfConverter.OdfConverterLib
         /// 10 = Office XP
         /// 11 = Office 2003
         /// 12 = Office 2007
+        /// 14 = Office 2010
         /// </summary>
         protected enum OfficeVersion
         {
             Office2000 = 9,
             OfficeXP = 10,
             Office2003 = 11,
-            Office2007 = 12
+            Office2007 = 12,
+            Office2010 = 14
         }
 
         protected const string ALL_FILE_TYPE = "AllFileType";
@@ -74,6 +76,7 @@ namespace OdfConverter.OdfConverterLib
         /// 10 = Office XP
         /// 11 = Office 2003
         /// 12 = Office 2007
+        /// 14 = Office 2010
         /// </summary>
         protected OfficeVersion _officeVersion = OfficeVersion.Office2007;
 

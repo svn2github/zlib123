@@ -102,7 +102,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
             int saveFormat = -1;
             try
             {
-                if (_officeVersion == OfficeVersion.Office2007)
+                if (_officeVersion >= OfficeVersion.Office2007)
                 {
                     saveFormat = 12;
                 }
