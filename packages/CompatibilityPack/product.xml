@@ -22,6 +22,7 @@
     <Command PackageFile="FileFormatConverters.exe" Arguments=' /quiet'>
       <InstallConditions>
         <BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>
+        <BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.14"/>
         <BypassIf Property="compatibilityPackInstalled" Compare="ValueGreaterThanOrEqualTo" Value="1"/>
       </InstallConditions>
       <ExitCodes>

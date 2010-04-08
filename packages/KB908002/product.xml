@@ -25,6 +25,7 @@
     <Command PackageFile="lockbackRegKey.msi" Arguments=' /quiet'>
 		<InstallConditions>
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>
+			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.14"/>
 			<!--  
 			   Make sure the hotfix gets installed per-user, even if it is already installed for a different user on the same machine
 			   
@@ -45,6 +46,7 @@
     <Command PackageFile="extensibilityMSM.msi" Arguments=' /quiet'>
 		<InstallConditions>
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>
+			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.14"/>
 			<BypassIf Property="extensibilityMSMInstalled" Compare="ValueGreaterThanOrEqualTo" Value="5"/>
 		</InstallConditions>
 		<ExitCodes>
@@ -57,6 +59,7 @@
 		<!-- do not run this command quietly, Reason: The Office CD may be needed, and with /quiet the user is not asked to provide the CD. Consequently the update fails. -->
 		<Command PackageFile="office2003-kb907417sfxcab-ENU.exe" Arguments=''>
 		<InstallConditions>
+			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.14"/>
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.12"/>		
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.10"/>		
 			<BypassIf Property="WordVersion" Compare="ValueEqualTo" Value="Word.Application.9"/>		
