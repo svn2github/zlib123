@@ -724,18 +724,47 @@
           <xsl:with-param name="tblDefMar" select="$mstyle/w:bottom"/>
           <xsl:with-param name="attribute">fo:padding-bottom</xsl:with-param>
         </xsl:call-template>
+				<!--Sart - if 'START' replaces 'LEFT'-->
+				<xsl:choose>
+					<xsl:when test ="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:start">
+						<xsl:call-template name="InsertCellMargins">
+							<xsl:with-param name="tcMar" select="w:tcMar/w:start"/>
+							<xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:start"/>
+							<xsl:with-param name="tblDefMar" select="$mstyle/w:start"/>
+							<xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:left"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:left"/>
           <xsl:with-param name="tblDefMar" select="$mstyle/w:left"/>
           <xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
         </xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose >
+				<!--End  - if 'START' replaces 'LEFT'-->
+
+				<!--Sart - if 'END' replaces 'RIGHT'-->
+				<xsl:choose>
+					<xsl:when test ="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:end">
+						<xsl:call-template name="InsertCellMargins">
+							<xsl:with-param name="tcMar" select="w:tcMar/w:end"/>
+							<xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:end"/>
+							<xsl:with-param name="tblDefMar" select="$mstyle/w:end"/>
+							<xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:right"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:right"/>
           <xsl:with-param name="tblDefMar" select="$mstyle/w:right"/>
           <xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
         </xsl:call-template>
+					</xsl:otherwise >
+				</xsl:choose >
+				<!--End  - if 'END' replaces 'RIGHT'-->
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
@@ -750,16 +779,44 @@
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
           <xsl:with-param name="attribute">fo:padding-bottom</xsl:with-param>
         </xsl:call-template>
+				<!--Sart - if 'START' replaces 'LEFT'-->
+				<xsl:choose>
+					<xsl:when test ="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:left">
+						<xsl:call-template name="InsertCellMargins">
+							<xsl:with-param name="tcMar" select="w:tcMar/w:start"/>
+							<xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:start"/>
+							<xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:left"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:left"/>
           <xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
         </xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+				<!--End - if 'START' replaces 'LEFT'-->
+
+				<!--sart - if 'END' replaces 'RIGHT'-->
+				<xsl:choose>
+					<xsl:when test ="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:end">
+						<xsl:call-template name="InsertCellMargins">
+							<xsl:with-param name="tcMar" select="w:tcMar/w:end"/>
+							<xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:end"/>
+							<xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:right"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:right"/>
           <xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
         </xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose >
+				<!--end - if 'END' replaces 'RIGHT'-->
+
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
@@ -892,6 +949,14 @@
       <xsl:when test="$contextCell/preceding-sibling::w:tc">
         <!-- the cell is somewhere in the table -->
         <xsl:choose>
+					<xsl:when test="$tcBorders/w:start">
+						<!-- use the left border of the cell definition -->
+						<xsl:call-template name="InsertBorderSide">
+							<xsl:with-param name="side" select="$tcBorders/w:start"/>
+							<xsl:with-param name="sideName" select="'left'"/>
+							<xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+						</xsl:call-template>
+					</xsl:when>
           <xsl:when test="$tcBorders/w:left">
             <!-- use the left border of the cell definition -->
             <xsl:call-template name="InsertBorderSide">
@@ -940,6 +1005,22 @@
       <xsl:otherwise>
         <!-- the cell is at the left border -->
         <xsl:choose>
+					<xsl:when test="$tcBorders/w:start">
+						<!-- use the left border of the cell definition -->
+						<xsl:call-template name="InsertBorderSide">
+							<xsl:with-param name="side" select="$tcBorders/w:start"/>
+							<xsl:with-param name="sideName" select="'left'"/>
+							<xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="$tblBorders/w:start">
+						<!-- use the left border of the table definition -->
+						<xsl:call-template name="InsertBorderSide">
+							<xsl:with-param name="side" select="$tblBorders/w:start"/>
+							<xsl:with-param name="sideName" select="'left'"/>
+							<xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+						</xsl:call-template>
+					</xsl:when>
           <xsl:when test="$tcBorders/w:left">
             <!-- use the left border of the cell definition -->
             <xsl:call-template name="InsertBorderSide">
@@ -1007,6 +1088,14 @@
       <xsl:when test="$contextCell/following-sibling::w:tc">
         <!-- the cell is somewhere in the table -->
         <xsl:choose>
+					<xsl:when test="$tcBorders/w:end">
+						<!-- use the right border of the cell definition -->
+						<xsl:call-template name="InsertBorderSide">
+							<xsl:with-param name="side" select="$tcBorders/w:end"/>
+							<xsl:with-param name="sideName" select="'right'"/>
+							<xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+						</xsl:call-template>
+					</xsl:when>
           <xsl:when test="$tcBorders/w:right">
             <!-- use the right border of the cell definition -->
             <xsl:call-template name="InsertBorderSide">
@@ -1071,6 +1160,22 @@
               <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
             </xsl:call-template>
           </xsl:when>
+					<xsl:when test="$tcBorders/w:end">
+						<!-- use the right border of the cell definition -->
+						<xsl:call-template name="InsertBorderSide">
+							<xsl:with-param name="side" select="$tcBorders/w:end"/>
+							<xsl:with-param name="sideName" select="'right'"/>
+							<xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="$tblBorders/w:end">
+						<!-- use the right border of the table definition -->
+						<xsl:call-template name="InsertBorderSide">
+							<xsl:with-param name="side" select="$tblBorders/w:end"/>
+							<xsl:with-param name="sideName" select="'right'"/>
+							<xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+						</xsl:call-template>
+					</xsl:when>
           <xsl:when test="$styleId = 'TableGrid'">
             <!-- use the default border -->
             <xsl:call-template name="InsertDefaultCellBorder">
@@ -1427,6 +1532,10 @@
     <xsl:param name="styleName" />
 
     <xsl:choose>
+			<xsl:when test="$tblPr/w:tblCellMar/w:start and $tblPr/w:tblCellMar/w:start/@w:type='dxa'">
+				<!-- Direct Formatting -->
+				<xsl:value-of select="$tblPr/w:tblCellMar/w:start/@w:w"/>
+			</xsl:when>
       <xsl:when test="$tblPr/w:tblCellMar/w:left and $tblPr/w:tblCellMar/w:left/@w:type='dxa'">
         <!-- Direct Formatting -->
         <xsl:value-of select="$tblPr/w:tblCellMar/w:left/@w:w"/>

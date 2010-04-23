@@ -32,7 +32,14 @@
             <config:config-item-map-indexed config:name="Views">
               <config:config-item-map-entry>
                 <config:config-item config:name="ZoomFactor" config:type="short">
+                  <xsl:choose>
+                    <xsl:when test="contains(key('Part', 'word/settings.xml')/w:settings/w:zoom/@w:percent,'%')">
+                      <xsl:value-of select="key('Part', 'word/settings.xml')/w:settings/w:zoom/@w:percent" />
+                    </xsl:when >
+                    <xsl:otherwise>
                   <xsl:value-of select="key('Part', 'word/settings.xml')/w:settings/w:zoom/@w:percent" />
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </config:config-item>
               </config:config-item-map-entry>
             </config:config-item-map-indexed>

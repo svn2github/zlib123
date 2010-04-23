@@ -1281,11 +1281,14 @@
       <!--math, dialogika: bugfix #1804154 BEGIN-->
       <text:index-entry-tab-stop style:type="{$styleType}">
         <!--if style type is left, there must be style:position attribute -->
-
+		<!--ODf4.0M2-->
         <xsl:if test="$styleType = 'left'">
           <xsl:attribute name="style:position">
             <xsl:variable name="position">
               <xsl:choose>
+			    <xsl:when test="../../w:ind/@w:start">
+				  <xsl:value-of select="@w:pos - ../../w:ind/@w:start" />
+			    </xsl:when>
                 <xsl:when test="../../w:ind/@w:left">
                   <xsl:value-of select="@w:pos - ../../w:ind/@w:left" />
                 </xsl:when>

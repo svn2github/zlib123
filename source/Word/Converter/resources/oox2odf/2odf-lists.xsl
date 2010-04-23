@@ -422,12 +422,16 @@
       </xsl:choose>
     </xsl:variable>
 
-
+	  <!--ODf4.0M2-->
     <xsl:variable name="Left">
       <xsl:choose>
         <xsl:when test="$paragraph_ref_this_list_level">
           <!--Paragraph directly referencing this numID exists-->
           <xsl:choose>
+            <xsl:when test="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:start">
+              <!--Paragraph has direct formatting -> take this value-->
+              <xsl:value-of select="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:start"/>
+            </xsl:when>
             <xsl:when test="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:left">
               <!--Paragraph has direct formatting -> take this value-->
               <xsl:value-of select="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:left"/>
@@ -435,6 +439,10 @@
             <xsl:otherwise>
               <!--Paragraph has *NO* direct formatting-->
               <xsl:choose>
+				  <xsl:when test="$ListStyleInd/@w:start">
+					  <!--take list style value-->
+					  <xsl:value-of select="$ListStyleInd/@w:start"/>
+				  </xsl:when>
                 <xsl:when test="$ListStyleInd/@w:left">
                   <!--take list style value-->
                   <xsl:value-of select="$ListStyleInd/@w:left"/>
@@ -444,18 +452,27 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-
         <!--Paragraph directly referencing this numID does *NOT* exist-->
-
+		  <xsl:when test="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:start">
+			  <!-- Use direct formatting of paragraph referencing this paragraph style-->
+			  <xsl:value-of select="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:start"/>
+		  </xsl:when>
         <xsl:when test="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:left">
           <!-- Use direct formatting of paragraph referencing this paragraph style-->
           <xsl:value-of select="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:left"/>
         </xsl:when>
-
+		  <xsl:when test="$style/w:pPr/w:ind/@w:start">
+			  <!-- Use paragraph style value-->
+			  <xsl:value-of select="$style/w:pPr/w:ind/@w:start"/>
+		  </xsl:when>
         <xsl:when test="$style/w:pPr/w:ind/@w:left">
           <!-- Use paragraph style value-->
           <xsl:value-of select="$style/w:pPr/w:ind/@w:left"/>
         </xsl:when>
+		  <xsl:when test="w:pPr/w:ind/@w:start">
+			  <!-- Use list style value-->
+			  <xsl:value-of select="w:pPr/w:ind/@w:start"/>
+		  </xsl:when>
         <xsl:when test="w:pPr/w:ind/@w:left">
           <!-- Use list style value-->
           <xsl:value-of select="w:pPr/w:ind/@w:left"/>
