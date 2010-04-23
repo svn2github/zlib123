@@ -90,7 +90,9 @@
       </xsl:if>
 
       <!-- overwritten in each paragraph if necessary -->
-      <w:autoHyphenation w:val="true"/>
+       <!--ST_OnOff-->
+		<!--<w:autoHyphenation w:val="true"/>-->
+	  <w:autoHyphenation w:val="1"/>
       <w:consecutiveHyphenLimit w:val="0"/>
       <w:doNotHyphenateCaps w:val="false"/>
 

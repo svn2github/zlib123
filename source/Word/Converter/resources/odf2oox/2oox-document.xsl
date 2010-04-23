@@ -454,9 +454,10 @@
     </xsl:if>
 
     <!-- insert page break before table when required -->
+	 <!--St_OnOff-->
     <xsl:choose>
       <xsl:when test="$isFirstRow = 'true' ">
-        <w:pageBreakBefore/>
+        <w:pageBreakBefore w:val="1"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="InsertPageBreakBefore"/>

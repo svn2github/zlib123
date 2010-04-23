@@ -440,13 +440,13 @@
       </xsl:call-template>
     </xsl:if>
 
-    <!-- keep with next -->
+    <!-- keep with next, St_OnOff -->
     <xsl:choose>
       <xsl:when test="@fo:keep-with-next='always'">
-        <w:keepNext/>
+        <w:keepNext w:val="1" />
       </xsl:when>
       <xsl:when test="@fo:keep-with-next='auto'">
-        <w:keepNext w:val="off"/>
+        <w:keepNext w:val="0"/>
       </xsl:when>
     </xsl:choose>
 
@@ -462,21 +462,25 @@
       </xsl:when>
       <xsl:when test="@fo:break-before='auto'">
         <xsl:message terminate="no">translation.odf2oox.automaticPageBreak</xsl:message>
-        <w:pageBreakBefore w:val="off"/>
+        <!--<w:pageBreakBefore w:val="off"/>-->
+		  <w:pageBreakBefore w:val="0"/>
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
 
     <!-- widow/orphan control -->
+	  <!--St_OnOff-->
     <xsl:choose>
       <xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
         <xsl:if test="@fo:widows &gt; 2 or @fo:orphans &gt; 2">
           <xsl:message terminate="no">translation.odf2oox.numberWidowsOrphans</xsl:message>
         </xsl:if>
-        <w:widowControl w:val="on"/>
+        <!--<w:widowControl w:val="on"/>-->
+		  <w:widowControl w:val="1"/>
       </xsl:when>
       <xsl:otherwise>
-        <w:widowControl w:val="off"/>
+        <!--<w:widowControl w:val="off"/>-->
+		  <w:widowControl w:val="0"/>
       </xsl:otherwise>
     </xsl:choose>
 
@@ -558,14 +562,17 @@
     </xsl:choose>
 
     <!-- Auto space -->
+	<!--St_OnOff-->
     <xsl:if test="@style:text-autospace">
       <w:autoSpaceDN>
         <xsl:choose>
           <xsl:when test="@style:text-autospace='none'">
-            <xsl:attribute name="w:val">off</xsl:attribute>
+            <!--<xsl:attribute name="w:val">off</xsl:attribute>-->
+			  <xsl:attribute name="w:val">0</xsl:attribute>
           </xsl:when>
           <xsl:when test="@style:text-autospace='ideograph-alpha'">
-            <xsl:attribute name="w:val">on</xsl:attribute>
+            <!--<xsl:attribute name="w:val">on</xsl:attribute>-->
+			  <xsl:attribute name="w:val">1</xsl:attribute>
           </xsl:when>
         </xsl:choose>
       </w:autoSpaceDN>
@@ -1166,27 +1173,7 @@
 			</xsl:when>
 		</xsl:choose>
 
-		<!--<xsl:if test="@fo:font-weight">
-      <xsl:choose>
-        <xsl:when test="@fo:font-weight != 'normal'">
-          <xsl:choose>
-            <xsl:when test="@fo:font-weight != 'bold' and number(@fo:font-weight)">
-              <xsl:message terminate="no">translation.odf2oox.fontWeight</xsl:message>
-              <xsl:if test="number(@fo:font-weight) &gt;= 600">
-                <w:b w:val="on"/>
-              </xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
-              <w:b w:val="on"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:b w:val="off"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>-->
-
+	  <!--ST_OnOff-->
 		<xsl:choose>
 			<xsl:when test="@fo:font-weight">
 				<xsl:choose>
@@ -1195,16 +1182,19 @@
 							<xsl:when test="@fo:font-weight != 'bold' and number(@fo:font-weight)">
 								<xsl:message terminate="no">translation.odf2oox.fontWeight</xsl:message>
 								<xsl:if test="number(@fo:font-weight) &gt;= 600">
-									<w:b w:val="on"/>
+									<!--<w:b w:val="on"/>-->
+									<w:b w:val="1"/>
 								</xsl:if>
 							</xsl:when>
 							<xsl:otherwise>
-								<w:b w:val="on"/>
+								<!--<w:b w:val="on"/>-->
+								<w:b w:val="1"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:b w:val="off"/>
+						<!--<w:b w:val="off"/>-->
+						<w:b w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
@@ -1218,16 +1208,19 @@
 									      and number(@fo:font-weight)">
 								<xsl:message terminate="no">translation.odf2oox.fontWeight</xsl:message>
 								<xsl:if test="(@fo:font-weight) &gt;= 600">
-									<w:b w:val="on"/>
+									<!--<w:b w:val="on"/>-->
+									<w:b w:val="1"/>
     </xsl:if>
 							</xsl:when>
 							<xsl:otherwise>
-								<w:b w:val="on"/>
+								<!--<w:b w:val="on"/>-->
+								<w:b w:val="1"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:b w:val="off"/>
+						<!--<w:b w:val="off"/>-->
+						<w:b w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				</xsl:for-each>
@@ -1249,10 +1242,12 @@
 			<xsl:when test="@style:font-weight-complex">
 				<xsl:choose>
 					<xsl:when test="@style:font-weight-complex != 'normal'">
-						<w:bCs w:val="on"/>
+						<!--<w:bCs w:val="on"/>-->
+						<w:bCs w:val="1"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:bCs w:val="off"/>
+						<!--<w:bCs w:val="off"/>-->
+						<w:bCs w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
@@ -1261,32 +1256,37 @@
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
 						<xsl:when test="@style:font-weight-complex != 'normal'">
-						<w:bCs w:val="on"/>
+						<!--<w:bCs w:val="on"/>-->
+							<w:bCs w:val="1"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:bCs w:val="off"/>
+						<!--<w:bCs w:val="off"/>-->
+						<w:bCs w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				</xsl:for-each>
 			</xsl:when>
 		</xsl:choose>
 
-		<!--modified by chhavi-->
+		<!--St_OnOff-->
 		<xsl:choose>
 			<xsl:when test="@fo:font-style">
       <xsl:choose>
         <xsl:when test="@fo:font-style = 'italic' or @fo:font-style = 'oblique'">
-          <w:i w:val="on"/>
+          <!--<w:i w:val="on"/>-->
+			<w:i w:val="1"/>
         </xsl:when>
         <xsl:otherwise>
-          <w:i w:val="off"/>
+          <!--<w:i w:val="off"/>-->
+			<w:i w:val="0"/>
         </xsl:otherwise>
       </xsl:choose>
 			</xsl:when>
 			<xsl:when test="not(@fo:font-style) 
 							and $textProp/@fo:font-style">
 				<xsl:if test="$textProp/@fo:font-style = 'italic'">
-					<w:i w:val="on"/>
+					<!--<w:i w:val="on"/>-->
+					<w:i w:val="1"/>
     </xsl:if>
 			</xsl:when>
 		</xsl:choose>
@@ -1306,10 +1306,12 @@
 			<xsl:when test="@fo:font-style-complex">
 				<xsl:choose>
 					<xsl:when test="@fo:font-style-complex = 'italic' or @fo:font-style-complex = 'oblique'">
-						<w:iCs w:val="on"/>
+						<!--<w:iCs w:val="on"/>-->
+						<w:iCs w:val="1"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:iCs w:val="off"/>
+						<!--<w:iCs w:val="off"/>-->
+						<w:iCs w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
@@ -1319,55 +1321,40 @@
 				<xsl:choose>
 						<xsl:when test="@fo:font-style-complex = 'italic' 
 							            or @fo:font-style-complex = 'oblique'">
-						<w:iCs w:val="on"/>
+						<!--<w:iCs w:val="on"/>-->
+							<w:iCs w:val="1"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:iCs w:val="off"/>
+						<!--<w:iCs w:val="off"/>-->
+						<w:iCs w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				</xsl:for-each>
 			</xsl:when>
 		</xsl:choose>
 
-		<!--<xsl:if test="@fo:text-transform or @fo:font-variant">
-      <xsl:choose>
-        <xsl:when test="@fo:text-transform = 'uppercase'">
-          <w:caps w:val="on"/>
-        </xsl:when>
-        <xsl:when test="@fo:text-transform = 'capitalize'">
-          -->
-          <!-- no equivalent of capitalize in OOX spec -->
-		<!--
-          <xsl:message terminate="no">translation.odf2oox.capitalizedText</xsl:message>
-          <w:caps w:val="off"/>
-        </xsl:when>
-        <xsl:when test="@fo:text-transform = 'lowercase'">
-          <xsl:message terminate="no">translation.odf2oox.lowercaseText</xsl:message>
-          <w:caps w:val="off"/>
-        </xsl:when>
-        <xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
-          <w:caps w:val="off"/>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:if>-->
-
+	  <!--St_OnOff-->
 		<xsl:choose>
 			<xsl:when test="@fo:text-transform or @fo:font-variant">
 				<xsl:choose>
 					<xsl:when test="@fo:text-transform = 'uppercase'">
-						<w:caps w:val="on"/>
+						<!--<w:caps w:val="on"/>-->
+						<w:caps w:val="1"/>
 					</xsl:when>
 					<xsl:when test="@fo:text-transform = 'capitalize'">
 						<!-- no equivalent of capitalize in OOX spec -->
 						<xsl:message terminate="no">translation.odf2oox.capitalizedText</xsl:message>
-						<w:caps w:val="off"/>
+						<!--<w:caps w:val="off"/>-->
+						<w:caps w:val="0"/>
 					</xsl:when>
 					<xsl:when test="@fo:text-transform = 'lowercase'">
 						<xsl:message terminate="no">translation.odf2oox.lowercaseText</xsl:message>
-						<w:caps w:val="off"/>
+						<!--<w:caps w:val="off"/>-->
+						<w:caps w:val="0"/>
 					</xsl:when>
 					<xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
-						<w:caps w:val="off"/>
+						<!--<w:caps w:val="off"/>-->
+						<w:caps w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
@@ -1377,20 +1364,24 @@
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
 						<xsl:when test="@fo:text-transform = 'uppercase'">
-						<w:caps w:val="on"/>
+						<!--<w:caps w:val="on"/>-->
+							<w:caps w:val="1"/>
 					</xsl:when>
 						<xsl:when test="@fo:text-transform = 'capitalize'">
 						<!-- no equivalent of capitalize in OOX spec -->
 						<xsl:message terminate="no">translation.odf2oox.capitalizedText</xsl:message>
-						<w:caps w:val="off"/>
+						<!--<w:caps w:val="off"/>-->
+							<w:caps w:val="0"/>
 					</xsl:when>
 						<xsl:when test="@fo:text-transform = 'lowercase'">
 						<xsl:message terminate="no">translation.odf2oox.lowercaseText</xsl:message>
-						<w:caps w:val="off"/>
+						<!--<w:caps w:val="off"/>-->
+							<w:caps w:val="0"/>
 					</xsl:when>
 						<xsl:when test="@fo:text-transform = 'none' 
 							            or @fo:font-variant = 'small-caps'">
-						<w:caps w:val="off"/>
+						<!--<w:caps w:val="off"/>-->
+							<w:caps w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 				</xsl:for-each>
@@ -1407,15 +1398,17 @@
         </xsl:when>
       </xsl:choose>
 		</xsl:if>-->
-
+		<!--St_OnOff-->
 		<xsl:choose>
 			<xsl:when test="@fo:font-variant">
 				<xsl:choose>
 					<xsl:when test="@fo:font-variant = 'small-caps'">
-						<w:smallCaps w:val="on"/>
+						<!--<w:smallCaps w:val="on"/>-->
+						<w:smallCaps w:val="1"/>
 					</xsl:when>
 					<xsl:when test="@fo:font-weight = 'normal'">
-						<w:smallCaps w:val="off"/>
+						<!--<w:smallCaps w:val="off"/>-->
+						<w:smallCaps w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
@@ -1423,43 +1416,33 @@
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
 						<xsl:when test="@fo:font-variant = 'small-caps'">
-						<w:smallCaps w:val="on"/>
+						<!--<w:smallCaps w:val="on"/>-->
+							<w:smallCaps w:val="1"/>
 					</xsl:when>
 						<xsl:when test="/@fo:font-weight = 'normal'">
-						<w:smallCaps w:val="off"/>
+						<!--<w:smallCaps w:val="off"/>-->
+							<w:smallCaps w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 				</xsl:for-each>
 			</xsl:when>
 		</xsl:choose>
 
-
-		<!--<xsl:if
-      test="@style:text-line-through-style != 'none' or @style:text-line-through-type != 'none' ">
-      <xsl:choose>
-        <xsl:when test="@style:text-line-through-type = 'double'">
-          <w:dstrike w:val="on"/>
-        </xsl:when>
-        <xsl:when test="@style:text-line-through-type = 'none'">
-          <w:strike w:val="off"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:strike w:val="on"/>
-        </xsl:otherwise>
-      </xsl:choose>
-		</xsl:if>-->
-
+	  <!--St_onOff-->
 		<xsl:choose>
 			<xsl:when test="@style:text-line-through-style != 'none' or @style:text-line-through-type != 'none'">
 				<xsl:choose>
 					<xsl:when test="@style:text-line-through-type = 'double'">
-						<w:dstrike w:val="on"/>
+						<!--<w:dstrike w:val="on"/>-->
+						<w:dstrike w:val="1"/>
 					</xsl:when>
 					<xsl:when test="@style:text-line-through-type = 'none'">
-						<w:strike w:val="off"/>
+						<!--<w:strike w:val="off"/>-->
+						<w:strike w:val="0"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:strike w:val="on"/>
+						<!--<w:strike w:val="on"/>-->
+						<w:strike w:val="1"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
@@ -1469,13 +1452,16 @@
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
 						<xsl:when test="@style:text-line-through-type = 'double'">
-						<w:dstrike w:val="on"/>
+						<!--<w:dstrike w:val="on"/>-->
+							<w:dstrike w:val="1"/>
 					</xsl:when>
 						<xsl:when test="@style:text-line-through-type = 'none'">
-						<w:strike w:val="off"/>
+						<!--<w:strike w:val="off"/>-->
+							<w:strike w:val="0"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:strike w:val="on"/>
+						<!--<w:strike w:val="on"/>-->
+						<w:strike w:val="1"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				</xsl:for-each>
@@ -1492,25 +1478,17 @@
       <xsl:message terminate="no">translation.odf2oox.lineThroughColor</xsl:message>
     </xsl:if>
 
-		<!--<xsl:if test="@style:text-outline">
-      <xsl:choose>
-        <xsl:when test="@style:text-outline = 'true'">
-          <w:outline w:val="on"/>
-        </xsl:when>
-        <xsl:when test="@style:text-outline = 'false'">
-          <w:outline w:val="off"/>
-        </xsl:when>
-      </xsl:choose>
-		</xsl:if>-->
-
+        <!--St_OnOff-->
 		<xsl:choose>
 			<xsl:when test="@style:text-outline">
 				<xsl:choose>
 					<xsl:when test="@style:text-outline = 'true'">
-						<w:outline w:val="on"/>
+						<!--<w:outline w:val="on"/>-->
+						<w:outline w:val="1"/>
 					</xsl:when>
 					<xsl:when test="@style:text-outline = 'false'">
-						<w:outline w:val="off"/>
+						<!--<w:outline w:val="off"/>-->
+						<w:outline w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
@@ -1518,77 +1496,64 @@
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
 						<xsl:when test="@style:text-outline = 'true'">
-						<w:outline w:val="on"/>
+						<!--<w:outline w:val="on"/>-->
+							<w:outline w:val="1"/>
 					</xsl:when>
 						<xsl:when test="@style:text-outline = 'false'">
-						<w:outline w:val="off"/>
+						<!--<w:outline w:val="off"/>-->
+							<w:outline w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 				</xsl:for-each>
 			</xsl:when>
 		</xsl:choose>
 
-		<!--<xsl:if test="@fo:text-shadow">
-      <xsl:choose>
-        <xsl:when test="@fo:text-shadow = 'none'">
-          <w:shadow w:val="off"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:shadow w:val="on"/>
-        </xsl:otherwise>
-      </xsl:choose>
-		</xsl:if>-->
-
+		<!--St_OnOff-->
 		<xsl:choose>
 			<xsl:when test="@fo:text-shadow">
 				<xsl:choose>
 					<xsl:when test="@fo:text-shadow = 'none'">
-						<w:shadow w:val="off"/>
+						<!--<w:shadow w:val="off"/>-->
+						<w:shadow w:val="0"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:shadow w:val="on"/>
+						<!--<w:shadow w:val="on"/>-->
+						<w:shadow w:val="1"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
 			<xsl:when test="not(@fo:text-shadow) and $textProp/@fo:text-shadow">
 				<xsl:choose>
 					<xsl:when test="$textProp/@fo:text-shadow = 'none'">
-						<w:shadow w:val="off"/>
+						<!--<w:shadow w:val="off"/>-->
+						<w:shadow w:val="0"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:shadow w:val="on"/>
+						<!--<w:shadow w:val="on"/>-->
+						<w:shadow w:val="1"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
 		</xsl:choose>
+	
 
-		<!--<xsl:if test="@style:font-relief">
-      <xsl:choose>
-        <xsl:when test="@style:font-relief = 'embossed'">
-          <w:emboss w:val="on"/>
-        </xsl:when>
-        <xsl:when test="@style:font-relief = 'engraved'">
-          <w:imprint w:val="on"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:emboss w:val="off"/>
-          <w:imprint w:val="off"/>
-        </xsl:otherwise>
-      </xsl:choose>
-		</xsl:if>-->
-
+		<!--St_onOff-->
 		<xsl:choose>
 			<xsl:when test="@style:font-relief">
 				<xsl:choose>
 					<xsl:when test="@style:font-relief = 'embossed'">
-						<w:emboss w:val="on"/>
+						<!--<w:emboss w:val="on"/>-->
+						<w:emboss w:val="1"/>
 					</xsl:when>
 					<xsl:when test="@style:font-relief = 'engraved'">
-						<w:imprint w:val="on"/>
+						<!--<w:imprint w:val="on"/>-->
+						<w:imprint w:val="1"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:emboss w:val="off"/>
-						<w:imprint w:val="off"/>
+						<!--<w:emboss w:val="off"/>-->
+						<w:emboss w:val="0"/>
+						<!--<w:imprint w:val="off"/>-->
+						<w:imprint w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
@@ -1597,39 +1562,35 @@
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
 						<xsl:when test="@style:font-relief = 'embossed'">
-						<w:emboss w:val="on"/>
+						<!--<w:emboss w:val="on"/>-->
+							<w:emboss w:val="1"/>
 					</xsl:when>
 						<xsl:when test="@style:font-relief = 'engraved'">
-						<w:imprint w:val="on"/>
+						<!--<w:imprint w:val="on"/>-->
+							<w:imprint w:val="1"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:emboss w:val="off"/>
-						<w:imprint w:val="off"/>
+						<!--<w:emboss w:val="off"/>-->
+						<w:emboss w:val="0"/>
+						<!--<w:imprint w:val="off"/>-->
+						<w:imprint w:val="0"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				</xsl:for-each>
 			</xsl:when>
 		</xsl:choose>
 
-		<!--<xsl:if test="@text:display">
-      <xsl:choose>
-        <xsl:when test="@text:display = 'true'">
-          <w:vanish w:val="on"/>
-        </xsl:when>
-        <xsl:when test="@text:display = 'none'">
-          <w:vanish w:val="off"/>
-        </xsl:when>
-      </xsl:choose>
-		</xsl:if>-->
-
+		<!--St_OnOff-->
 		<xsl:choose>
 			<xsl:when test="@text:display">
 				<xsl:choose>
 					<xsl:when test="@text:display = 'true'">
-						<w:vanish w:val="on"/>
+						<!--<w:vanish w:val="on"/>-->
+						<w:vanish w:val="1"/>
 					</xsl:when>
 					<xsl:when test="@text:display = 'none'">
-						<w:vanish w:val="off"/>
+						<!--<w:vanish w:val="off"/>-->
+						<w:vanish w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
@@ -1638,10 +1599,12 @@
 				<xsl:for-each select ="$textProp">
 				<xsl:choose>
 						<xsl:when test="@text:display = 'true'">
-						<w:vanish w:val="on"/>
+						<!--<w:vanish w:val="on"/>-->
+							<w:vanish w:val="1"/>
 					</xsl:when>
 						<xsl:when test="@text:display = 'none'">
-						<w:vanish w:val="off"/>
+						<!--<w:vanish w:val="off"/>-->
+							<w:vanish w:val="0"/>
 					</xsl:when>
 				</xsl:choose>
 				</xsl:for-each>

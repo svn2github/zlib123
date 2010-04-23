@@ -231,21 +231,20 @@
         <xsl:when test="@w:val='center'">center</xsl:when>
         <xsl:when test="@w:val='left'">
           <xsl:choose>
-            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ])">end</xsl:when>
+						<xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">end</xsl:when>
             <xsl:otherwise>start</xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:when test="@w:val='right'">
           <xsl:choose>
-            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ])"
-              >start</xsl:when>
+						<xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">start</xsl:when>
             <xsl:otherwise>end</xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:when test="@w:val='both' or @w:val='distribute'">justify</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
-            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ])">end</xsl:when>
+						<xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">end</xsl:when>
             <xsl:otherwise>start</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
@@ -4692,7 +4691,7 @@
 
   <!-- Default properties for bidi paragraphs -->
   <xsl:template name="InsertDefaultBidiProperties">
-    <xsl:if test="w:bidi and not(w:bidi[@w:val = 'off'])">
+		<xsl:if test="w:bidi and not(w:bidi[@w:val = 'off'] or w:bidi[@w:val = '0'])">
       <xsl:if test="not(w:jc)">
         <xsl:attribute name="fo:text-align">end</xsl:attribute>
       </xsl:if>
