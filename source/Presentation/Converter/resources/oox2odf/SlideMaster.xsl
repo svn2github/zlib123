@@ -54,6 +54,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships" 
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   exclude-result-prefixes="p a style fo r rels xlink">  
   <xsl:template name="SlideMaster" >
     <xsl:call-template name="InsertContentStyle"/>
@@ -1123,7 +1124,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
                 <xsl:when test="name()='p:graphicFrame'">
-                  <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+                  <xsl:if test="./a:graphic/a:graphicData/p:oleObj or ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj">
                     <xsl:call-template name="tmpOLEObjects">
                       <xsl:with-param name ="SlideRelationId" select ="concat('ppt/slideMasters/_rels/',$slideMasterPath,'.rels')"/>
                     </xsl:call-template>
@@ -6005,7 +6006,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:graphicFrame'">
-              <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+              <xsl:if test="./a:graphic/a:graphicData/p:oleObj or ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj ">
                 <xsl:call-template name="tmpOLEObjects">
                   <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
                 <xsl:with-param name="grpBln" select="'true'"/>

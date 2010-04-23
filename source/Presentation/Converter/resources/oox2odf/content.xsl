@@ -53,6 +53,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
 xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" 
 xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"	
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
 exclude-result-prefixes="p a r xlink rels">
   <xsl:strip-space elements="*"/>
@@ -728,7 +729,13 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:call-template>
             </xsl:when>
             <xsl:when test="name()='p:graphicFrame'">
-              <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+				<!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
+     <xsl:if test="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']">
+	<!--<xsl:if test="./a:graphic/a:graphicData/p:oleObj or ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj">-->
                 <xsl:call-template name="tmpOLEObjects">
                   <xsl:with-param name ="SlideRelationId" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
                 </xsl:call-template>
@@ -998,8 +1005,7 @@ exclude-result-prefixes="p a r xlink rels">
                                             </xsl:choose>
                                           </xsl:variable>
                                           <!-- Added by lohith.ar - Code for text Hyperlinks -->
-                                          <xsl:if test="node()/a:hlinkClick">
-                                            
+                                          <xsl:if test="node()/a:hlinkClick">                                            
                                               <xsl:call-template name="AddTextHyperlinks">
                                                 <xsl:with-param name="nodeAColonR" select="node()" />
                                                 <xsl:with-param name="slideRelationId" select="$slideRel" />
@@ -1817,7 +1823,13 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:call-template>
             </xsl:when>
             <xsl:when test="name()='p:graphicFrame'">
-              <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+				<!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
+			<xsl:if test="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']">
+				<!--<xsl:if test="./a:graphic/a:graphicData/p:oleObj or  ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj">-->
                   <xsl:call-template name="tmpOLEObjects">
                     <xsl:with-param name ="SlideRelationId" select="$slideRel" />
                   </xsl:call-template>
@@ -1934,9 +1946,13 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="SlideRelationId"/>
     <xsl:param name ="grpBln"/>
     <xsl:param name ="grpCordinates"/>
- 
+	  <!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
     <xsl:variable name="RelationId">
-      <xsl:value-of select="./a:graphic/a:graphicData/p:oleObj/@r:id"/>
+      <xsl:value-of select="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']/@r:id[1]"/>
     </xsl:variable>
     <xsl:variable name="vmldrawing">
       <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing']/@Target"/>
@@ -1947,8 +1963,14 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:variable name="type">
       <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Type"/>
     </xsl:variable>
+	  <!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
     <xsl:variable name="spid">
-      <xsl:value-of select="./a:graphic/a:graphicData/p:oleObj/@spid"/>
+      <!--<xsl:value-of select="./a:graphic/a:graphicData/p:oleObj/@spid"/>-->
+		<xsl:value-of select="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']/@spid"/>
     </xsl:variable>
     <xsl:variable name="OleImageRel">
       <!-- Defect Fix:1992999	 PPTX - Roundtrip: OLE files/links lost -->
@@ -2032,7 +2054,14 @@ exclude-result-prefixes="p a r xlink rels">
       </xsl:choose>
       <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
    <xsl:choose>
-          <xsl:when test="./a:graphic/a:graphicData/p:oleObj/p:link">
+		<!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
+          <xsl:when test="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']/p:link">
+			  <!--<xsl:when test="./a:graphic/a:graphicData/p:oleObj/p:link 
+					     or ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj/p:link">--> 
             <xsl:choose>
               <xsl:when test="contains($Target,'file:///\\')">
                 <xsl:attribute name="xlink:href">
@@ -2052,7 +2081,13 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:when>
             </xsl:choose>
           </xsl:when>
-          <xsl:when test="./a:graphic/a:graphicData/p:oleObj/p:embed">
+		<!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
+		<xsl:when test="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']/p:embed">
+		<!--<xsl:when test="./a:graphic/a:graphicData/p:oleObj/p:embed or ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj/p:embed">-->		
                 <xsl:attribute name="xlink:href">
               <xsl:value-of select="concat('./',$targetOLE)"/>
             </xsl:attribute>
@@ -2065,7 +2100,13 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:attribute>
       </draw:image>
     </draw:frame>
-    <xsl:if test="./a:graphic/a:graphicData/p:oleObj/p:embed">
+	  <!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
+<xsl:if test="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']/p:embed">
+	<!--<xsl:if test="./a:graphic/a:graphicData/p:oleObj/p:embed or ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj/p:embed">-->
       <pzip:copy pzip:source="{concat('ppt',substring-after($Target,'..'))}"
                   pzip:target="{$targetOLE}"/>
     </xsl:if>
@@ -2210,8 +2251,14 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
+			   <!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
              <xsl:when test="name()='p:graphicFrame'">
-               <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+				 <xsl:if test="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']">
+					 <!--<xsl:if test="./a:graphic/a:graphicData/p:oleObj or ./a:graphic/a:graphicData/mc:AlternateContent/mc:Fallback/p:oleObj">-->
                  <xsl:call-template name="tmpOLEObjects">
                    <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
                    <xsl:with-param name ="grpBln" select="'true'" />
@@ -5716,6 +5763,7 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:value-of select="'slow'"/>
 				</xsl:when>
 				<xsl:when test="document($slidenum)/p:sld/p:transition/@spd='med'">
+					
 					<xsl:value-of select="'medium'"/>
 				</xsl:when>
 				<xsl:otherwise>
@@ -5725,7 +5773,7 @@ exclude-result-prefixes="p a r xlink rels">
 		</xsl:attribute>
 		
 		<xsl:call-template name="SlideTransSmilType">
-			<xsl:with-param name="slidenum" select="document($slidenum)/p:sld/p:transition/child::node()"/>
+			<xsl:with-param name="slidenum" select="document($slidenum)/p:sld//p:transition/child::node()"/>
 		</xsl:call-template>
 	</xsl:template>
 
@@ -5930,7 +5978,40 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:value-of select="'circle'"/>
 				</xsl:attribute>
 			</xsl:when>
-
+			<!--Vijayeta 2010-->
+			<!--Ripple-->
+			<xsl:when test="name($slidenum)='p14:ripple'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'ellipseWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select="'circle'"/>
+				</xsl:attribute>
+			</xsl:when>
+			<!--Gallery-->
+			<xsl:when test="name($slidenum)='p14:gallery'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'fade'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum[2]/@thruBlk='1'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fadeOverColor'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:fadeColor">
+							<xsl:value-of select="'#000000'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'crossfade'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:fadeColor">
+							<xsl:value-of select="'#000000'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
 			<!--diamond-->
 			<xsl:when test="name($slidenum)='p:diamond'">
 				<xsl:attribute name ="smil:type">
@@ -6197,8 +6278,7 @@ exclude-result-prefixes="p a r xlink rels">
 						</xsl:attribute>
 					</xsl:otherwise>
 				</xsl:choose>
-			</xsl:when>
-			
+			</xsl:when>			
 
 		</xsl:choose>
 	</xsl:template>

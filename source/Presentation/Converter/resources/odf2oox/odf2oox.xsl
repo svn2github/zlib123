@@ -448,7 +448,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:variable>
         <!--NotesMaster-->
         <Override PartName="/ppt/notesMasters/notesMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml"/>
-        <xsl:if test="document('styles.xml')//style:master-page/presentation:notes">
+        <!--<xsl:if test="document('styles.xml')//style:master-page/presentation:notes">-->
           <Override>
             <xsl:attribute name ="PartName">
               <xsl:value-of select ="concat('/ppt/theme/theme',$noOfMaster + 1,'.xml')"/>
@@ -457,7 +457,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select ="'application/vnd.openxmlformats-officedocument.theme+xml'"/>
             </xsl:attribute>
           </Override >
-        </xsl:if>
+        <!--</xsl:if>-->
         <!--End-->
 
 			<!-- Added By Vijayeta,Extensions of the images,to be added in package-->

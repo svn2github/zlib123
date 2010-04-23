@@ -233,6 +233,13 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:call-template>
               </xsl:variable>
                 <xsl:choose>
+                  <xsl:when test="./table:table and ./draw:image">
+                    <xsl:call-template name="tmpTables">
+                      <xsl:with-param name ="pageNo" select ="$pageNo"/>
+                      <xsl:with-param name ="shapeCount" select="$var_pos" />
+                    </xsl:call-template>
+
+                  </xsl:when>
                   <xsl:when test="./draw:object or ./draw:object-ole">
                     <xsl:call-template name="tmpOLEObjects">
                       <xsl:with-param name ="pageNo" select ="$pageNo"/>
@@ -1911,6 +1918,22 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:otherwise>
                   </xsl:choose>
+                </xsl:when>
+                <xsl:when test="./table:table and ./draw:image">
+                  <xsl:for-each select="./table:table/table:table-row/table:table-cell">
+                  <xsl:call-template name="tmpBitmapFillRel">
+                    <xsl:with-param name ="UniqueId" select="generate-id(.)" />
+                    <xsl:with-param name ="FileName" select="'content.xml'" />
+                    <xsl:with-param name ="prefix" select="'bitmap'" />
+                  </xsl:call-template>
+                    <!--To Do: Table text hyperlink-->
+                    <!--<xsl:call-template name="tmpHyperLnkBuImgRel">
+                      <xsl:with-param name ="var_pos" select="$var_pos" />
+                      <xsl:with-param name ="shapeId" select="$var_pos" />
+                      <xsl:with-param name ="UniqueId" select="generate-id(.)" />
+
+                    </xsl:call-template>-->
+                  </xsl:for-each>
                 </xsl:when>
                 <xsl:when test="./draw:image">
                   <xsl:for-each select="./draw:image">

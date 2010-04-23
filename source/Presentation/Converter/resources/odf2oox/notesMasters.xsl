@@ -169,10 +169,19 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:with-param name="length" select="style:text-properties/@fo:font-size"/>
                   </xsl:call-template>
                 </xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="$fontSize ='0' or $fontSize =''">
+                    <xsl:value-of select="'1200'"/>
+                  </xsl:when>
+                  <xsl:otherwise>
                 <xsl:call-template name ="convertToPoints">
                   <xsl:with-param name ="unit" select ="'pt'"/>
                   <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                 </xsl:call-template>
+                  </xsl:otherwise>
+                </xsl:choose>
+               
+             
               </xsl:attribute>
               <!--Font Bold attribute-->
               <xsl:if test="./style:text-properties/@fo:font-weight='bold'">
@@ -1422,6 +1431,10 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:choose>
                   <xsl:when test="./draw:text-box/text:p/text:span/@text:style-name">
                     <xsl:value-of select ="./draw:text-box/text:p/text:span/@text:style-name"/>
+                  </xsl:when>
+                  <!--Sonata: file crash in 2010-->
+                  <xsl:when test="./draw:text-box/text:p/@text:style-name">
+                    <xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="@presentation:style-name"/>

@@ -2513,6 +2513,7 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:if test="$nodeAColonR/a:hlinkClick/@action[ contains(.,'noaction')]">
       <xsl:copy-of select="$nodeTextSpan"/>
     </xsl:if>
+	  
     <xsl:if test="string-length($nodeAColonR/a:hlinkClick/@r:id) > 0">
       <xsl:variable name="RelationId">
         <xsl:value-of select="$nodeAColonR/a:hlinkClick/@r:id"/>
@@ -2573,6 +2574,16 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
+	  <!--
+	  Defect: 2948306(Office2010 Compatibility)
+	  By:     Vijayeta
+	  Desc:   If the hyperlink is not provided to the text that is supposed to contain hyperlink, 
+			  then the text is lost on reverse conversion that involves Office 2010 file. 
+	  -->
+	<xsl:if test="string-length($nodeAColonR/a:hlinkClick/@r:id) = 0">
+		<xsl:copy-of select="$nodeTextSpan"/>
+	</xsl:if>
+	  <!--End of fix for 2948306-->
   </xsl:template>
   <!-- End - Template to Add hyperlinks defined at the Text level -->
   <!-- Template to generate GUID - Folder to copy the sound files -->
@@ -4262,7 +4273,13 @@ exclude-result-prefixes="p a r xlink ">
       <xsl:for-each select ="document($pageSlide)/p:sld/p:cSld/p:spTree">
         <xsl:for-each select="node()">
           <xsl:if test="name()='p:graphicFrame'">
-            <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+            <!--<xsl:if test="./a:graphic/a:graphicData/p:oleObj ">-->
+			  <!--
+			  Defect: 2948303,PPTX:Loss of OLE Object(Office2010)
+			  By:Vijayeta
+			  Desc: Changed xpath to accomodate other nodes that appear in Office 2010 viz. mc:AlternateContent
+			  -->
+			  <xsl:if test="./a:graphic/a:graphicData//child::node()[name()='p:oleObj']">
               <manifest:file-entry manifest:media-type="application/vnd.sun.star.oleobject">
                 <xsl:attribute name="manifest:full-path">
                   <xsl:value-of select="concat('Oleobject',generate-id())"/>

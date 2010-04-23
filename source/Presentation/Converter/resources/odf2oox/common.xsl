@@ -45,6 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   exclude-result-prefixes="odf style text number draw page r presentation fo script xlink svg">
   <xsl:template name="point-measure">
     <xsl:param name="length"/>
@@ -89,6 +90,261 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="tmpGetTableWidth">
+    <xsl:param name="styleName"/>
+    <xsl:for-each select="//style:style[@style:name=$styleName]/style:table-column-properties">
+      <xsl:if test="@style:column-width">
+        <xsl:attribute name ="w">
+          <xsl:variable name="convertUnit">
+            <xsl:call-template name="getConvertUnit">
+              <xsl:with-param name="length" select="@style:column-width"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:call-template name ="convertToPoints">
+            <xsl:with-param name ="unit" select ="$convertUnit"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name ="length" select ="@style:column-width"/>
+              </xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpGetTableHeight">
+    <xsl:param name="styleName"/>
+    <xsl:for-each select="//style:style[@style:name=$styleName]/style:table-row-properties">
+      <xsl:if test="@style:row-height">
+        <xsl:attribute name ="h">
+          <xsl:variable name="convertUnit">
+            <xsl:call-template name="getConvertUnit">
+              <xsl:with-param name="length" select="@style:row-height"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:call-template name ="convertToPoints">
+            <xsl:with-param name ="unit" select ="$convertUnit"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name ="length" select ="@style:row-height"/>
+              </xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpTable">
+    <xsl:param name ="pageNo" />
+    <xsl:param name ="shapeCount" />
+    <xsl:param name ="grpFlag" />
+    <xsl:param name ="UniqueId" />
+    <xsl:choose>
+      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node() or
+                      document(concat(translate(./child::node()[1]/@xlink:href,'/',''),'/content.xml'))/child::node() ">
+        <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#"
+              pzip:target="{concat('ppt/media/','oleObjectImage_',generate-id(),'.png')}"/>
+        <p:pic>
+          <p:nvPicPr>
+            <p:cNvPr id="{$shapeCount + 1 }">
+              <xsl:attribute name="name">
+                <xsl:value-of select="concat('Picture ',$shapeCount+1)"/>
+              </xsl:attribute>
+              <xsl:attribute name="descr">
+                <xsl:value-of select="concat('oleObjectImage_',generate-id(),'.png')"/>
+              </xsl:attribute>
+            </p:cNvPr >
+            <p:cNvPicPr>
+              <a:picLocks noChangeAspect="1">
+                <xsl:choose>
+                  <xsl:when test="$grpFlag!='true'">
+                    <xsl:attribute name="noGrp">
+                      <xsl:value-of select="'1'"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                </xsl:choose>
+              </a:picLocks>
+            </p:cNvPicPr>
+            <p:nvPr/>
+          </p:nvPicPr>
+          <p:blipFill>
+            <a:blip>
+              <xsl:attribute name ="r:embed">
+                <xsl:value-of select ="concat('oleObjectImage_',generate-id())"/>
+              </xsl:attribute>
+            </a:blip >
+            <a:stretch>
+              <a:fillRect />
+            </a:stretch>
+          </p:blipFill>
+          <p:spPr>
+            <xsl:for-each select=".">
+              <xsl:choose>
+                <xsl:when test="$grpFlag='true'">
+                  <a:xfrm>
+                    <xsl:call-template name ="tmpGroupdrawCordinates"/>
+                  </a:xfrm>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name ="tmpdrawCordinates"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+            <a:prstGeom prst="rect">
+              <a:avLst/>
+            </a:prstGeom>
+          </p:spPr>
+        </p:pic>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="tmpOLE">
+          <xsl:with-param name ="pageNo" select="$pageNo" />
+          <xsl:with-param name ="shapeCount" select="$shapeCount" />
+          <xsl:with-param name ="grpFlag" select="$grpFlag" />
+          <xsl:with-param name ="UniqueId" select="$UniqueId" />
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="tmpTables">
+    <xsl:param name ="pageNo" />
+    <xsl:param name ="shapeCount" />
+    <xsl:param name ="grpFlag" />
+    <xsl:param name ="UniqueId" />
+
+    <xsl:for-each select="./child::node()[1]">
+   
+        <p:graphicFrame>
+          <p:nvGraphicFramePr>
+            <p:cNvPr>
+              <xsl:attribute name="id">
+                <xsl:value-of select="$shapeCount+1"/>
+              </xsl:attribute>
+              <xsl:attribute name="name">
+                <xsl:value-of select="concat('Table ',$shapeCount+1)"/>
+              </xsl:attribute>
+            </p:cNvPr>
+            <p:cNvGraphicFramePr>
+              <a:graphicFrameLocks noChangeAspect="1"/>
+            </p:cNvGraphicFramePr>
+            <p:nvPr/>
+          </p:nvGraphicFramePr>
+          <xsl:for-each select="..">
+            <xsl:call-template name ="tmpdrawCordinates">
+              <xsl:with-param name="grpFlag" select="$grpFlag"/>
+              <xsl:with-param name="OLETAB" select="'true'"/>
+              
+            </xsl:call-template>
+          </xsl:for-each>
+          <a:graphic>
+            <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/table">
+              <a:tbl>
+                <a:tblPr/>
+                <a:tblGrid>
+                <xsl:for-each select="table:table-column">
+                  <a:gridCol>
+                    <xsl:call-template name="tmpGetTableWidth">
+                      <xsl:with-param name="styleName">
+                        <xsl:value-of select="@table:style-name"/>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </a:gridCol>
+                </xsl:for-each>
+                </a:tblGrid>
+                <xsl:for-each select="table:table-row">
+                  <xsl:variable name="rowNo" select="position()"/>
+                  <a:tr h="342900">
+                    <xsl:call-template name="tmpGetTableHeight">
+                      <xsl:with-param name="styleName">
+                        <xsl:value-of select="@table:style-name"/>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                    <xsl:for-each select="table:table-cell | table:covered-table-cell">
+                      <xsl:variable name="colNo" select="position()"/>
+                      <a:tc>
+                        <xsl:if test="name(.)='table:covered-table-cell'">
+                          <xsl:attribute name="hMerge">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test="@table:number-columns-spanned">
+                          <xsl:attribute name="gridSpan">
+                            <xsl:value-of select="@table:number-columns-spanned"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <a:txBody>
+                          <xsl:call-template name ="getParagraphProperties">
+                            <xsl:with-param name ="fileName" select ="'content.xml'" />
+                            <xsl:with-param name ="gr" select="@table:style-name"/>
+                          </xsl:call-template>
+
+                          <xsl:choose>
+                            <xsl:when test ="text:p or text:list">
+                              <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
+                              <xsl:variable name ="masterPageName" select ="./../../../../@draw:master-page-name"/>
+                              <xsl:call-template name ="processShapeText">
+                                <xsl:with-param name ="fileName" select ="'content.xml'" />
+                                <xsl:with-param name="shapeType" select="'table'" />
+                                <xsl:with-param name ="shapeCount" select="$shapeCount" />
+                                <xsl:with-param name ="grpFlag" select="$grpFlag" />
+                                <xsl:with-param name ="UniqueId" select="$UniqueId" />
+                                <xsl:with-param name ="gr" select="@table:style-name">
+                                </xsl:with-param >
+                                <xsl:with-param name ="masterPageName" select ="$masterPageName" />
+                              </xsl:call-template>
+                            </xsl:when>
+                            <xsl:when test ="not(text:p) and not(text:list) and not(text:p or text:list)">
+                              <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:call-template name ="processShapeText">
+                                <xsl:with-param name ="fileName" select ="'content.xml'" />
+                                <xsl:with-param name="shapeType" select="'table'" />
+                                <xsl:with-param name ="shapeCount" select="$shapeCount" />
+                                <xsl:with-param name ="UniqueId" select="$UniqueId" />
+                                <xsl:with-param name ="grpFlag" select="$grpFlag" />
+                                <xsl:with-param name ="gr" select="@table:style-name"/>
+                              </xsl:call-template>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </a:txBody>
+                        <a:tcPr>
+                        <xsl:call-template name ="getTableGraphicProperties">
+                          <xsl:with-param name ="fileName" select ="'content.xml'"/>
+                          <xsl:with-param name ="gr">
+                            <xsl:choose>
+                              <xsl:when test="@table:style-name">
+                                <xsl:value-of select="@table:style-name"/>
+                              </xsl:when>
+                              <xsl:when test="../@table:default-cell-style-name">
+                                <xsl:value-of select="../@table:default-cell-style-name"/>
+                              </xsl:when>
+                            </xsl:choose>
+                          </xsl:with-param> 
+                          
+                          <xsl:with-param name ="useFirstRowStyles" select ="../../@table:use-first-row-styles"/>
+                          
+                          <xsl:with-param name ="templateName" select ="../../@table:template-name"/>
+                          <xsl:with-param name ="rowNo" select ="$rowNo"/>
+                          <xsl:with-param name ="colNo" select ="$colNo"/>
+                          <xsl:with-param name ="shapeCount" select ="generate-id(.)" />
+                          <xsl:with-param name ="grpFlag" select ="$grpFlag" />
+                          <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+                        </xsl:call-template>
+                        </a:tcPr>
+                      </a:tc>
+                   
+                    </xsl:for-each>
+                  </a:tr>
+                </xsl:for-each>
+              </a:tbl>
+            </a:graphicData>
+          </a:graphic>
+        </p:graphicFrame>
+    </xsl:for-each>
+  </xsl:template>
+  
 	<xsl:template name ="convertToPoints">
 		<xsl:param name ="unit"/>
 		<xsl:param name ="length"/>
@@ -4059,6 +4315,12 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when>
         <xsl:when test="@presentation:style-name">
           <xsl:value-of select ="@presentation:style-name"/>
+        </xsl:when>
+        <xsl:when test="@table:style-name">
+          <xsl:value-of select ="@table:style-name"/>
+        </xsl:when>
+        <xsl:when test="../@table:default-cell-style-name">
+          <xsl:value-of select ="../@table:default-cell-style-name"/>
         </xsl:when>
       </xsl:choose>
     </xsl:variable>

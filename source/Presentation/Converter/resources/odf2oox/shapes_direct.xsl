@@ -45,6 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   exclude-result-prefixes="odf style text number draw page r presentation fo script xlink svg">
   
   <!--SP2: Wrap Issue-->
@@ -349,6 +350,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name ="UniqueId" select ="$UniqueId" />
           
         </xsl:call-template>
+       
       </p:spPr>
       <p:style>
         <a:lnRef idx="0">
@@ -955,6 +957,154 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:choose>
       </xsl:if>
     </xsl:for-each>
+
+  </xsl:template>
+  <xsl:template name ="getTableGraphicProperties">
+    <xsl:param name ="fileName" />
+    <xsl:param name ="useFirstRowStyles" />
+    <xsl:param name ="gr" />
+    <xsl:param name ="templateName" />
+    <xsl:param name ="rowNo" />
+    <xsl:param name ="colNo" />
+    <xsl:param name ="shapeCount"  />
+    <xsl:param name ="grpFlag"/>
+    <xsl:param name ="UniqueId"  />
+    
+    <xsl:variable name="parentStyle">
+      <xsl:choose>
+        <xsl:when test="$useFirstRowStyles='true' and $rowNo=1">
+          <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:first-row/@text:style-name"/>
+        </xsl:when>
+        <xsl:when test="($rowNo - 1) mod 2 !=0">
+          <xsl:choose>
+            <xsl:when test="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:odd-rows/@text:style-name">
+              <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:odd-rows/@text:style-name"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:body/@text:style-name"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="($rowNo - 1) mod 2 =0">
+          <xsl:choose>
+            <xsl:when test="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:even-rows/@text:style-name">
+              <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:even-rows/@text:style-name"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:body/@text:style-name"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:when>
+        <xsl:when test="$colNo=1">
+          <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:first-column/@text:style-name"/>
+        </xsl:when>
+        <xsl:when test="$colNo mod 2=0">
+          <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:even-columns/@text:style-name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$templateName"/>
+        </xsl:otherwise>
+        <!--<xsl:when test="$colNo mod 2!=0">
+                  <xsl:value-of select="document('styles.xml')//table:table-template[@text:style-name=$templateName]/table:odd-columns/@text:style-name"/>
+                </xsl:when>-->
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="//style:style[@style:name=$gr]/style:graphic-properties">
+        <xsl:for-each select ="//style:style[@style:name=$gr]/style:graphic-properties">
+          <xsl:if test="position()=1">
+            <!-- Parent style name-->
+           
+
+            <!--LINE COLOR AND STYLE-->
+            <xsl:for-each select="../style:paragraph-properties">
+            <xsl:call-template name ="getTableLineStyle">
+        <xsl:with-param name ="parentStyle" select="$parentStyle" />
+      </xsl:call-template >
+            </xsl:for-each>
+            <!--FILL-->
+
+            <xsl:call-template name ="tmpshapefillColor">
+              <xsl:with-param name ="parentStyle" select="$parentStyle" />
+              <xsl:with-param name ="gr" select="$gr" />
+              <xsl:with-param name ="shapeCount" select ="$shapeCount" />
+              <xsl:with-param name ="grpFlag" select ="$grpFlag" />
+              <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+            </xsl:call-template >
+
+            <!-- SHADOW IMPLEMENTATION -->
+            <xsl:choose>
+              <xsl:when test="@draw:shadow='visible'">
+                <xsl:call-template name ="tmpShapeShadow">
+                  <xsl:with-param name ="parentStyle" select="$parentStyle" />
+                </xsl:call-template >
+              </xsl:when>
+              <xsl:when test="not(@draw:shadow) and $parentStyle !=''">
+                <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties[@draw:shadow='visible']">
+                  <xsl:call-template name ="tmpShapeShadow">
+                    <xsl:with-param name ="parentStyle" select="$parentStyle" />
+                  </xsl:call-template >
+                </xsl:if>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="not(//style:style[@style:name=$gr]/style:graphic-properties)">
+      
+        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$parentStyle]/style:graphic-properties">
+          <xsl:if test="position()=1">
+            <!-- Parent style name-->
+           
+            <!--LINE COLOR AND STYLE-->
+            <xsl:choose>
+              <xsl:when test="../style:paragraph-properties">
+                <xsl:for-each select="../style:paragraph-properties">
+                  <xsl:call-template name ="getTableLineStyle">
+                    <xsl:with-param name ="parentStyle" select="$parentStyle" />
+                  </xsl:call-template>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name ="getTableLineStyle">
+                  <xsl:with-param name ="parentStyle" select="$parentStyle" />
+                </xsl:call-template >
+              </xsl:otherwise>
+            </xsl:choose>
+           
+            <!--FILL-->
+
+            <xsl:call-template name ="tmpshapefillColor">
+              <xsl:with-param name ="gr" select="$parentStyle" />
+              <xsl:with-param name ="shapeCount" select ="$shapeCount" />
+              <xsl:with-param name ="grpFlag" select ="$grpFlag" />
+              <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+            </xsl:call-template >
+
+            <!-- SHADOW IMPLEMENTATION -->
+            <xsl:choose>
+              <xsl:when test="@draw:shadow='visible'">
+                <xsl:call-template name ="tmpShapeShadow">
+                  <xsl:with-param name ="parentStyle" select="$parentStyle" />
+                </xsl:call-template >
+              </xsl:when>
+              <xsl:when test="not(@draw:shadow) and $parentStyle !=''">
+                <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties[@draw:shadow='visible']">
+                  <xsl:call-template name ="tmpShapeShadow">
+                    <xsl:with-param name ="parentStyle" select="$parentStyle" />
+                  </xsl:call-template >
+                </xsl:if>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:when>
+    
+  </xsl:choose>
+    
+      
+    
 
   </xsl:template>
   <xsl:template name="tmpShapeShadow">
@@ -2367,6 +2517,171 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
     </a:ln>
   </xsl:template>
+  <!-- Get line color and style-->
+  <xsl:template name ="getTableLineStyle">
+    <xsl:param name ="parentStyle" />
+    <a:lnL>
+      <xsl:call-template name="TableLinesProp">
+        <xsl:with-param name="parentStyle" select="$parentStyle"/>
+      </xsl:call-template>
+    </a:lnL>
+    <a:lnR>
+      <xsl:call-template name="TableLinesProp">
+        <xsl:with-param name="parentStyle" select="$parentStyle"/>
+      </xsl:call-template>
+    </a:lnR>
+    <a:lnT>
+      <xsl:call-template name="TableLinesProp">
+        <xsl:with-param name="parentStyle" select="$parentStyle"/>
+      </xsl:call-template>
+    </a:lnT>
+    <a:lnB>
+      <xsl:call-template name="TableLinesProp">
+        <xsl:with-param name="parentStyle" select="$parentStyle"/>
+      </xsl:call-template>
+    </a:lnB>
+    <a:lnTlToBr>
+      <a:noFill/>
+    </a:lnTlToBr>
+    <a:lnBlToTr>
+      <a:noFill/>
+    </a:lnBlToTr>
+  </xsl:template>
+  <xsl:template name="TableLinesProp">
+    <xsl:param name ="parentStyle" />
+
+    <xsl:variable name="lnwidth">
+      <xsl:value-of select="substring-before(@fo:border,' ')"/>
+    </xsl:variable>
+    <xsl:variable name="dashType">
+      <xsl:value-of select="substring-before(substring-after(@fo:border,' '),' ')"/>
+    </xsl:variable>
+    <xsl:variable name="lineColor">
+      <xsl:value-of select=" substring-after(substring-after(@fo:border,' '),' ')"/>
+    </xsl:variable>
+    <!-- Border width -->
+    <xsl:choose>
+      <xsl:when test="@fo:border">
+        <xsl:choose>
+          <xsl:when test ="@fo:border">
+
+            <xsl:attribute name ="w">
+              <xsl:variable name="lWidth">
+                <xsl:call-template name ="convertToPoints">
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length" select="$lnwidth"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$lWidth"/>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Default border width from styles.xml-->
+          <xsl:when test ="($parentStyle != '')">
+            <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
+              <xsl:variable name="linewidth">
+                <xsl:value-of select="substring-before(@fo:border,' ')"/>
+              </xsl:variable>
+              <xsl:if test ="@fo:border">
+                <xsl:attribute name ="w">
+                  <xsl:variable name="lWidth">
+                    <xsl:call-template name ="convertToPoints">
+                      <xsl:with-param name ="unit" select ="'cm'"/>
+                      <xsl:with-param name ="length">
+                        <xsl:call-template name="convertUnitsToCm">
+                          <xsl:with-param name="length" select="$lnwidth"/>
+                        </xsl:call-template>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:value-of select="$lWidth"/>
+                </xsl:attribute>
+              </xsl:if>
+              <!-- Code for the Bug 1746356 -->
+              <xsl:if test ="$linewidth=''">
+                <xsl:attribute name ="w">
+                  <xsl:value-of select ="'0'"/>
+                </xsl:attribute>
+              </xsl:if >
+              <!-- Code for the Bug 1746356 -->
+            </xsl:for-each>
+          </xsl:when>
+
+        </xsl:choose>
+
+        <a:solidFill>
+          <a:srgbClr val="{substring-after($lineColor,'#')}"/>
+        </a:solidFill>
+        <!-- Dash type-->
+        <xsl:choose>
+          <xsl:when test ="($dashType='dash')">
+            <a:prstDash>
+              <xsl:attribute name ="val">
+                <xsl:call-template name ="getDashType">
+                  <xsl:with-param name ="stroke-dash" select ="$dashType" />
+                </xsl:call-template>
+              </xsl:attribute>
+            </a:prstDash>
+          </xsl:when>
+          <xsl:otherwise>
+            <a:prstDash val="solid"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <!-- Cap type-->
+        <a:round/>
+        <a:headEnd type="none" w="med" len="med"/>
+        <a:tailEnd type="none" w="med" len="med"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <a:lnL w="360" cap="flat" cmpd="sng" algn="ctr">
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:prstDash val="solid"/>
+          <a:round/>
+          <a:headEnd type="none" w="med" len="med"/>
+          <a:tailEnd type="none" w="med" len="med"/>
+        </a:lnL>
+        <a:lnR w="360" cap="flat" cmpd="sng" algn="ctr">
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:prstDash val="solid"/>
+          <a:round/>
+          <a:headEnd type="none" w="med" len="med"/>
+          <a:tailEnd type="none" w="med" len="med"/>
+        </a:lnR>
+        <a:lnT w="360" cap="flat" cmpd="sng" algn="ctr">
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:prstDash val="solid"/>
+          <a:round/>
+          <a:headEnd type="none" w="med" len="med"/>
+          <a:tailEnd type="none" w="med" len="med"/>
+        </a:lnT>
+        <a:lnB w="360" cap="flat" cmpd="sng" algn="ctr">
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:prstDash val="solid"/>
+          <a:round/>
+          <a:headEnd type="none" w="med" len="med"/>
+          <a:tailEnd type="none" w="med" len="med"/>
+        </a:lnB>
+        <a:lnTlToBr>
+          <a:noFill/>
+        </a:lnTlToBr>
+        <a:lnBlToTr>
+          <a:noFill/>
+        </a:lnBlToTr>
+      </xsl:otherwise>
+    </xsl:choose>
+   
+  </xsl:template>
 
 	<!-- Get Shadow Effect -->
 	<xsl:template name="getShadowEffect">
@@ -3238,7 +3553,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:choose>
         <xsl:when test ="name()='text:p'" >
         <xsl:variable name="aColonhlinkClick">
-          <xsl:if test="$grpFlag !='true'">
+          <xsl:if test="$grpFlag !='true' and $shapeType!='table'">
           <xsl:if test="text:a">
             <a:hlinkClick>
               <xsl:if test="text:a/@xlink:href[ contains(.,'#Slide')]">
