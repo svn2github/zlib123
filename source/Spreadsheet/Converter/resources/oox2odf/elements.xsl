@@ -362,6 +362,7 @@ RefNo-1 6-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             <xsl:value-of
               select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';')])"
             />
+			  		  
           </xsl:variable>
           <xsl:attribute name="table:style-name">
             <xsl:value-of select="$ConditionalStyleId"/>

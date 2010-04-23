@@ -63,6 +63,7 @@ RefNo-6 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:oox="urn:oox"
   xmlns:msxsl="urn:schemas-microsoft-com:xslt"
+  xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
   exclude-result-prefixes="e r pxsi oox msxsl">
 
   <!--<xsl:import href="relationships.xsl"/>
@@ -88,6 +89,8 @@ RefNo-6 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   <xsl:key name="SheetFormatPr" match="e:sheetFormatPr" use="@oox:part"/>
   <xsl:key name="Col" match="e:col" use="@oox:part"/>
   <xsl:key name="ConditionalFormatting" match="e:worksheet/e:conditionalFormatting" use="@oox:part"/>
+  <xsl:key name="ConditionalFormattingO14" match="e:worksheet/e:extLst/e:ext/x14:conditionalFormattings/x14:conditionalFormatting" 
+		   use="@oox:part"/>	
   <xsl:key name="ConditionalInheritance" match="e:worksheet/e:conditionalFormatting" use="@oox:id"/>
 
   <!-- recursive search and replace -->

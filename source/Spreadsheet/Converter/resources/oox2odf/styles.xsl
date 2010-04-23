@@ -54,6 +54,7 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+				xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:oox="urn:oox"
@@ -1146,8 +1147,11 @@ RefNo-5 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   </xsl:template>
 
   <!-- cell color fill in conditional -->
+<!-- Defect: 2948277
+Desc  : Also handling Cross Sheet Conditional Formatting for Office 2010.
+ -->
   <xsl:template match="e:bgColor" mode="style">
-    <xsl:if test="ancestor::e:dxf">
+    <xsl:if test="ancestor::e:dxf or ancestor::x14:dxf ">	 
       <xsl:attribute name="fo:background-color">
         <xsl:call-template name="InsertColor"/>
       </xsl:attribute>

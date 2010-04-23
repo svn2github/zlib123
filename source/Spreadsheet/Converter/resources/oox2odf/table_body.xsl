@@ -1062,14 +1062,28 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                 <xsl:variable name="ConditionalStyleID">
                   <xsl:value-of select="@oox:ConditionalStyle"/>
                 </xsl:variable>
-                
-                
+                <!-- Defect: 2948277
+		     Desc  : Also handling Cross Sheet Conditional Formatting for Office 2010
+         -->
                 <xsl:attribute name="table:style-name">
-                  
+					<xsl:variable name ="temp">
+						<xsl:value-of
+				   select="generate-id(key('ConditionalFormattingO14', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID])"
+                  />						
+					</xsl:variable>
+					<xsl:variable name ="temp1">
                   <xsl:value-of
                     select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID])"
                   />
-                  
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="string-length($temp1)>0">
+							<xsl:value-of select ="$temp1"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="$temp"/>
+						</xsl:otherwise>
+					</xsl:choose>
                 </xsl:attribute>
               </xsl:when>
             

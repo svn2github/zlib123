@@ -320,14 +320,30 @@
       <xsl:variable name="BorderStyleLeft">
         <xsl:call-template name="GetBorderStyle">
           <xsl:with-param name="style">
+            <xsl:choose>
+              <xsl:when test ="e:start/@style and e:start/@style!='none'">
+              <xsl:value-of select="e:start/@style"/>
+              </xsl:when>
+              <xsl:otherwise>
             <xsl:value-of select="e:left/@style"/>
+              </xsl:otherwise> 
+            </xsl:choose>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="BorderColorLeft">
+        <xsl:choose>
+          <xsl:when test ="e:start/e:color and e:start/e:color!='none'">
+            <xsl:for-each select="e:start/e:color">
+              <xsl:call-template name="InsertColor"/>
+            </xsl:for-each>
+          </xsl:when>
+            <xsl:otherwise>
         <xsl:for-each select="e:left/e:color">
           <xsl:call-template name="InsertColor"/>
         </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="$BorderStyleLeft != 'none'">

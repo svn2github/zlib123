@@ -130,9 +130,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             PrevRowNumber = RowNumber;
                         }
                         else
-                        {
-
-                            
+                        {                            
 
                             isCell = xtr.LocalName.Equals("c") && xtr.NamespaceURI.Equals(SPREADSHEET_ML_NS);
 
@@ -482,6 +480,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             String ConditionalCellSheet = "";
             int idConditional = 0;
 
+            bool isOffice14ConditionalFormatting = false;
+
             RelationShip rel = new RelationShip();
 
             int sqrefExist = 0;
@@ -498,15 +498,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
                          break;
                      case XmlNodeType.DocumentType:                        
                          break;
-                     case XmlNodeType.Element:
-
-                         
+                     case XmlNodeType.Element:                         
 
                          if (String.Compare(xtr.LocalName, "conditionalFormatting") == 0)
                          {
-
-                                                 
-
+                             if(String.Compare(xtr.Name, "x14:conditionalFormatting") == 0)
+                                 isOffice14ConditionalFormatting = true;
+                             if (!isOffice14ConditionalFormatting)
+                             {
                          if (xtr.HasAttributes)
                          {                            
                              while (xtr.MoveToNextAttribute())
@@ -528,9 +527,26 @@ namespace CleverAge.OdfConverter.Spreadsheet
                              }
                              idConditional++;
                          } 
+                             }
                              xtr.MoveToElement();
                          }
-
+                         //Vijayeta, 2010
+                         if (isOffice14ConditionalFormatting)
+                         {
+                             if (isOffice14ConditionalFormatting == true && String.Compare(xtr.Name, "xm:sqref") == 0)
+                             {
+                                 string Cell = ConditionalCellNumber(xtr.Value, idConditional);
+                                 if (String.Compare(Cell, "false") != 0)
+                                 {
+                                     sqrefExist = 1;
+                                     ConditionalCellSheet = ConditionalCellSheet + " " + ConditionalCellNumber(xtr.ReadInnerXml(), idConditional);
+                                 }
+                                 string value = xtr.Value;
+                                 idConditional++;
+                             }                          
+                             xtr.MoveToElement();
+                         }
+                         //Vijayeta, 2010
                          break;
                      case XmlNodeType.EndElement:                  
                          break;

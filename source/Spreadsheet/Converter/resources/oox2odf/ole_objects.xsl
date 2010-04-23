@@ -46,6 +46,7 @@ RefNo-1 15-Jul-2008 Sandeep S     1874669  Changes done to fix External Links ar
   xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r v">
 
   <!--<xsl:import href="measures.xsl"/>-->
@@ -60,7 +61,20 @@ RefNo-1 15-Jul-2008 Sandeep S     1874669  Changes done to fix External Links ar
           </xsl:for-each>
         </table:shapes>
       </xsl:when>
-      <xsl:when test="e:oleObject">
+		<!-- Defect Desc: 2948283- Link Object Missing with Office 2010 Compatibility
+			 By:          Vijayeta
+			 Desc:        Additional when condition for additional nodes in Excel 2010 for extensibility
+		-->
+		<xsl:when
+	   test="mc:AlternateContent/mc:Fallback/e:oleObject[not(@r:id)]">
+			<table:shapes>
+				<xsl:for-each select="mc:AlternateContent/mc:Fallback/e:oleObject ">
+					<xsl:call-template name="InsertOLEObjectsLinks"/>
+				</xsl:for-each>
+			</table:shapes>
+		</xsl:when>
+		<!-- End of 2948283-->
+      <xsl:when test="e:oleObject or mc:AlternateContent/mc:Fallback/e:oleObject" >
         <xsl:message terminate="no">translation.oox2odf.OLEObject</xsl:message>
       </xsl:when>
     </xsl:choose>

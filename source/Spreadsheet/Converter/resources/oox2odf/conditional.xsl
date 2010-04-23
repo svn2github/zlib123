@@ -47,6 +47,9 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
+  xmlns:xm="http://schemas.microsoft.com/office/excel/2006/main"
+				 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="e oox r">
 
@@ -179,7 +182,6 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
-
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
@@ -461,7 +463,15 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <xsl:value-of select="$Id"/>
         </xsl:with-param>
       </xsl:apply-templates>
-
+		<!-- Defect: 2948277
+		     Desc  :Cross Sheet Conditional Formatting for Office 2010
+         -->
+		<xsl:apply-templates select="e:worksheet/e:extLst/e:ext/x14:conditionalFormattings/x14:conditionalFormatting" mode="ConditionalStyle">
+			<xsl:with-param name="sheet">
+				<xsl:value-of select="$Id"/>
+			</xsl:with-param>
+		</xsl:apply-templates>
+		<!--End of Fetaure Cond Formatting 2010-->
       <xsl:apply-templates select="e:worksheet/e:sheetData/e:row/e:c" mode="ConditionalAndCellStyle">
         <xsl:with-param name="ConditionalCell">
           <xsl:value-of select="$ConditionalCell"/>
@@ -486,22 +496,43 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
   <xsl:template match="e:conditionalFormatting" mode="ConditionalStyle">
     <xsl:call-template name="InsertConditionalProperties"/>
   </xsl:template>
+	<!-- Defect: 2948277
+		     Desc  :Cross Sheet Conditional Formatting for Office 2010
+         -->
+	<xsl:template match="x14:conditionalFormatting" mode="ConditionalStyle">
+		<xsl:call-template name="InsertConditionalProperties">
+			<xsl:with-param name ="Office14" select ="'True'"/>
+		</xsl:call-template>			
+	</xsl:template>
+	<!--End of Fetaure Cond Formatting 2010-->
 
   <xsl:template name="InsertConditionalProperties">
+		<xsl:param name ="Office14"/>
     
     <style:style style:name="{generate-id(.)}" style:family="table-cell"
       style:parent-style-name="Default">
-      <xsl:call-template name="InsertConditional"/>
+		<xsl:call-template name="InsertConditional">
+			<xsl:with-param name ="Office14" select ="'True'"/>
+		</xsl:call-template>
     </style:style>
   </xsl:template>
 
   <!-- Insert Conditional -->
   <xsl:template name="InsertConditional">
+	  <xsl:param name ="Office14" select ="'False'"/>
     <!--RefNO-1:ODF1.1:to aviod text-properties if alerady inserted-->
     <xsl:param name="FrmCellFormat" select="'false'"/>
 
     <xsl:variable name="sqref">
+		<xsl:choose>
+			<xsl:when test ="$Office14='True'">
+				<xsl:value-of select="xm:sqref"/>
+			</xsl:when>
+			<xsl:otherwise>
       <xsl:value-of select="@sqref"/>
+			</xsl:otherwise>
+		</xsl:choose>
+      
     </xsl:variable>
     
     <xsl:variable name="s">
@@ -615,6 +646,133 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
       </style:map>
       </xsl:if>
     </xsl:for-each>
+
+	  <!-- Defect: 2948277
+		     Desc  :Cross Sheet Conditional Formatting for Office 2010
+         -->	 
+		<xsl:if test ="not(x14:cfRule[@type= 'dataBar'] or x14:cfRule[@type= 'colorScale'] or x14:cfRule[@type= 'iconSet'])">		
+		  <xsl:variable name ="genId">
+			  <xsl:value-of select ="x14:cfRule/x14:dxf"/>			 
+		  </xsl:variable>
+		  <xsl:variable name ="genId1">
+			  <!--msxsl:node-set($animationVal)/p:par-->
+			  <!--<xsl:value-of select="generate-id($genId)"/>-->
+			  <xsl:value-of
+				   select="concat(position(),'_',generate-id(key('ConditionalFormattingO14', ancestor::e:worksheet/@oox:part)))"
+                  />
+		  </xsl:variable>
+		  <!-- Formulas are not implemented, skip conditional with formulas-->
+		  <xsl:if test="not(x14:cfRule/@operator='containsText')">
+			  <style:map>
+				  <xsl:attribute name="style:apply-style-name">
+					  <xsl:variable name="PositionStyle">
+						  <xsl:value-of select="@dxfId"/>
+					  </xsl:variable>
+					  <xsl:choose>
+						  <!-- if there is a specified style for cells fullfilling certain condition -->
+						  <xsl:when test="x14:cfRule/@id != ''">
+							  <!--msxsl:node-set($animationVal)/p:par-->
+							  <!--<xsl:value-of select="$genId1"/>-->
+							  <xsl:value-of select="$genId1"/>
+						  </xsl:when>
+						  <!-- default style -->
+						  <xsl:otherwise>
+							  <xsl:text>Default</xsl:text>
+						  </xsl:otherwise>
+					  </xsl:choose>
+				  </xsl:attribute>
+				  <xsl:attribute name="style:base-cell-address">
+					  <xsl:value-of select ="translate(translate(x14:cfRule/xm:f,'!','.'),'$','')"/>
+				  </xsl:attribute>
+			     <xsl:variable name ="formula1">			  
+					  <xsl:text>[</xsl:text>
+					  <xsl:text>$</xsl:text>
+					  <xsl:value-of select ="translate(x14:cfRule/xm:f,'!','.')"/>				  
+					  <xsl:text>]</xsl:text>
+				  </xsl:variable>
+				  <xsl:choose>
+					  <xsl:when test="x14:cfRule/@operator='equal'">
+						  <xsl:attribute name="style:condition">
+							  <xsl:text>cell-content()=</xsl:text>
+							  <xsl:value-of select="$formula1"/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='lessThanOrEqual'">
+						  <xsl:attribute name="style:condition">
+							  <xsl:text>cell-content()&lt;=</xsl:text>
+							  <xsl:value-of select="$formula1"/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='lessThan'">
+						  <xsl:attribute name="style:condition">
+							  <xsl:text>cell-content()&lt;</xsl:text>
+							  <xsl:value-of select="$formula1"/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='greaterThan'">
+						  <xsl:attribute name="style:condition">
+							  <xsl:text>cell-content()&gt;</xsl:text>
+							  <xsl:value-of select="$formula1"/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='greaterThanOrEqual'">
+						  <xsl:attribute name="style:condition">
+							  <xsl:text>cell-content()&gt;=</xsl:text>
+							  <xsl:value-of select="$formula1"/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='notEqual'">
+						  <xsl:attribute name="style:condition">
+							  <xsl:text>cell-content()!=</xsl:text>
+							  <xsl:value-of select="$formula1"/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='between'">
+						  <xsl:variable name ="formula2">
+							  <xsl:text>[</xsl:text>
+							  <xsl:text>$</xsl:text>
+							  <xsl:value-of select ="translate(x14:cfRule/xm:f[2],'!','.')"/>
+							  <xsl:text>]</xsl:text>
+						  </xsl:variable>
+						  <xsl:attribute name="style:condition">
+							  <xsl:value-of
+								select="concat('cell-content-is-between(', $formula1, ',', $formula2, ')') "/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='notBetween'">
+						  <xsl:variable name ="formula2">
+							  <xsl:text>[</xsl:text>
+							  <xsl:text>$</xsl:text>
+							  <xsl:value-of select ="translate(x14:cfRule/xm:f[2],'!','.')"/>
+							  <xsl:text>]</xsl:text>
+						  </xsl:variable>
+						  <xsl:attribute name="style:condition">
+							  <xsl:value-of
+								select="concat('cell-content-is-not-between(', $formula1, ',', $formula2, ')') "
+              />
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:when test="x14:cfRule/@operator='containsText'">						  
+						  <xsl:attribute name="style:condition">
+							  <xsl:value-of select="concat('is-true-formula(', substring-before($formula1, '&quot;,'), '&quot;;', substring-after($formula1, '&quot;,'), ')')"
+              />
+						  </xsl:attribute>
+						  <xsl:attribute name="style:base-cell-address">
+							  <xsl:value-of select="substring-before(substring-after(x14:cfRule/xm:f, '&quot;,'), ')')"/>
+						  </xsl:attribute>
+					  </xsl:when>
+					  <xsl:otherwise>
+						  <xsl:attribute name="style:condition">
+							  <xsl:text>is-true-formula(FALSE)</xsl:text>
+							  <!--for cfRules not supported by converter;-->
+						  </xsl:attribute>
+					  </xsl:otherwise>
+				  </xsl:choose>
+			  </style:map>
+		  </xsl:if>
+		</xsl:if>
+	  <!-- End of feature Cond Formatting, cross sheet ref-->
+	  
   </xsl:template>
 
   <!-- Insert Coditional Styles -->
@@ -623,11 +781,21 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <xsl:for-each select="key('Part', 'xl/styles.xml')">
       <xsl:apply-templates select="e:styleSheet/e:dxfs/e:dxf"/>
     </xsl:for-each>
+		<xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+			<xsl:variable  name="sheet">
+				<xsl:call-template name="GetTarget">
+					<xsl:with-param name="id">
+						<xsl:value-of select="@r:id"/>
+					</xsl:with-param>
+					<xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+				</xsl:call-template>
+			</xsl:variable>				
+			<xsl:apply-templates select="key('Part', concat('xl/',$sheet))//x14:cfRule/x14:dxf" mode="Insertoffice14Styles"/>			
+			</xsl:for-each>
   </xsl:template>
 
   <xsl:template match="e:dxf">
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
-      
       <style:table-cell-properties>
         <xsl:variable name="this" select="."/>
         <xsl:apply-templates select="e:fill" mode="style"/>
@@ -639,6 +807,34 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
       </style:text-properties>
     </style:style>
   </xsl:template>
+      
+	<!-- Defect: 2948277
+		     Desc  :Cross Sheet Conditional Formatting for Office 2010
+         -->
+  <xsl:template match="x14:dxf" mode="Insertoffice14Styles">
+		<xsl:variable name ="genId">
+			<xsl:value-of select ="self::node()"/>			
+		</xsl:variable>
+		<xsl:variable name ="genId1">
+			<!--msxsl:node-set($animationVal)/p:par-->
+			<!--<xsl:value-of select="generate-id(msxsl:node-set($genId))"/>-->
+			<xsl:value-of
+				   select="concat(position(),'_',generate-id(key('ConditionalFormattingO14', ancestor::e:worksheet/@oox:part)))"
+                  />
+			</xsl:variable>
+			<style:style style:name="{$genId1}" style:family="table-cell">
+      <style:table-cell-properties>
+        <xsl:variable name="this" select="."/>
+        <xsl:apply-templates select="e:fill" mode="style"/>
+        <xsl:call-template name="InsertBorder"/>
+      </style:table-cell-properties>
+      <!--RefNo-1:ODF1.1:Moved text-properties to follow table-cell-properties-->
+      <style:text-properties>
+        <xsl:apply-templates select="e:font[1]" mode="style"/>
+      </style:text-properties>
+    </style:style>
+  </xsl:template>
+	<!-- End of feature Cond Formatting, cross sheet ref-->
 
   <!-- Insert Cell Style and Conditional Style -->
   <xsl:template match="e:c" mode="ConditionalAndCellStyle">
@@ -735,8 +931,7 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <xsl:param name="id"/>
     <xsl:param name="ConditionalInheritance"/>
     
-    <xsl:if test="substring-before($ConditionalInheritance, '|') != ''">      
-      
+    <xsl:if test="substring-before($ConditionalInheritance, '|') != ''">            
       <style:style style:family="table-cell"
       style:parent-style-name="Default">
         <xsl:attribute name="style:name">
@@ -754,14 +949,12 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <xsl:call-template name="InsertConditional">
           <!--RefNO-1:ODF1.1:to aviod text-properties if alerady inserted-->
           <xsl:with-param name="FrmCellFormat" select="'true'"/>
-        </xsl:call-template>
-      
+        </xsl:call-template>      
       </style:style>
       
     </xsl:if>
     
     <xsl:if test="substring-after($ConditionalInheritance, '|') != ''">
-
       <xsl:call-template name="ConditionalInheritanceStyle">
         <xsl:with-param name="id">
           <xsl:value-of select="$id"/>

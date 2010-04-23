@@ -67,7 +67,7 @@ RefNo-2 23-Jan-2009 Sandeep S     1828899       Changes done to replace Named ra
 
   <!-- workbook body template -->
   <xsl:template match="office:body">
-    <workbook>
+    <workbook conformance="transitional">
       <xsl:call-template name="WorkbookView"/>
       <xsl:apply-templates select="office:spreadsheet"/>
     </workbook>
