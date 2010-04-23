@@ -982,9 +982,44 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         int bytesCopied = streamCopy(fsSourceFile, _zipOutputStream);
                         Debug.WriteLine("CopyBinary : " + inputFilePath + " --> " + destination + ", bytes copied = " + bytesCopied);
                     }
+                        
+                    else
+                    {
+                         _zipOutputStream.AddEntry(destination);
+                       
+                         string CurrDir  = Environment.CurrentDirectory;
+                         inputFilePath = Path.GetFullPath(Path.Combine(CurrDir+"\\", source.Remove(0, 3))).Replace("/", "//").Replace("%20", " ");
+                         if (File.Exists(inputFilePath))
+                         {
+                             FileStream fsSourceFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read);
+                             int bytesCopied = streamCopy(fsSourceFile, _zipOutputStream);
+                             Debug.WriteLine("CopyBinary : " + inputFilePath + " --> " + destination + ", bytes copied = " + bytesCopied);
+                         }
+                         else
+                         {
+                             string[] tempPath = Assembly.GetExecutingAssembly().Location.Split('\\') ;
+                             string finalPath=null ;
+                             string separator="\\";
+                             foreach (string  item in tempPath)
+                             {
+                                 if(item.ToLower()!="source")
+                                 {
+                                     finalPath += item + separator;
+                                 }
+                                 else if (item.ToLower() == "source")
+                                 {
+                                     finalPath += item + separator + "Common\\OdfConverterLib\\resources\\Test.WAV";                                      
+                                     break;
                 }
             }
+                             FileStream fsSourceFile = new FileStream(finalPath, FileMode.Open, FileAccess.Read);
+                             int bytesCopied = streamCopy(fsSourceFile, _zipOutputStream);
+                             Debug.WriteLine("CopyBinary : " + inputFilePath + " --> " + destination + ", bytes copied = " + bytesCopied);
 
+                         }
+                    }
+                }
+            }
             catch (IOException e)
             {
                 ZipException exZip = new ZipException(e.Message);

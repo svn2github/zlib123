@@ -93,7 +93,7 @@ namespace OdfConverter.OdfConverterLib
         {
             string[] fileNames = null;
 
-            if (_officeVersion > OfficeVersion.Office2000)
+            if (_officeVersion > OfficeVersion.Office2000 && _officeVersion!=OfficeVersion.Office2010)
             {
                 LateBindingObject fileDialog = _application.Invoke("FileDialog", MsoFileDialogType.msoFileDialogFilePicker);
 
@@ -395,6 +395,7 @@ namespace OdfConverter.OdfConverterLib
         /// <param name="control">An IRibbonControl instance</param>
         public virtual void ImportOdf12(IRibbonControl control)
         {
+
             try
             {
                 importOdf();
