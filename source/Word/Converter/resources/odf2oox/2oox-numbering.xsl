@@ -533,7 +533,14 @@
           <xsl:attribute name="w:hanging">
             <xsl:choose>
               <xsl:when test="$minLabelWidthTwip = 0">
-                <xsl:value-of select="-$spaceBeforeTwip"/>
+                <xsl:choose>
+                  <xsl:when test="$spaceBeforeTwip &lt; 0">
+                    <xsl:value-of select="-$spaceBeforeTwip"/>    
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$spaceBeforeTwip"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$minLabelWidthTwip"/>

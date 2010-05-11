@@ -800,13 +800,13 @@
       </xsl:when>
 
       <xsl:otherwise>
-        <!-- return the value -->
+        <!-- return the value (The value is a ST_DecimalNumberOrPercent, therefore we need rounding here) -->
         <xsl:choose>
           <xsl:when test="$widthType = 'relative'">
-            <xsl:value-of select="($cellWidth * 5000) div 10000"/>
+            <xsl:value-of select="round(($cellWidth * 5000) div 10000)"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$cellWidth"/>
+            <xsl:value-of select="round($cellWidth)"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -918,16 +918,6 @@
   -->
   <xsl:template name="InsertCellSpan">
 
-    <!-- vertical merge -->
-    <xsl:choose>
-      <xsl:when test="@table:number-rows-spanned">
-        <w:vMerge w:val="restart" />
-      </xsl:when>
-      <xsl:when test="name(.)='table:covered-table-cell'">
-        <w:vMerge w:val="continue" />
-      </xsl:when>
-    </xsl:choose>
-
     <!-- horizontal merge -->
     <xsl:choose>
       <xsl:when test="@table:number-columns-spanned">
@@ -969,6 +959,18 @@
         </xsl:if>
       </xsl:when>
     </xsl:choose>
+
+    <!-- vertical merge -->
+    <xsl:choose>
+      <xsl:when test="@table:number-rows-spanned">
+        <w:vMerge w:val="restart" />
+      </xsl:when>
+      <xsl:when test="name(.)='table:covered-table-cell'">
+        <w:vMerge w:val="continue" />
+      </xsl:when>
+    </xsl:choose>
+
+    
 
   </xsl:template>
 

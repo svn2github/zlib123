@@ -1147,7 +1147,7 @@ Fix to prevent Loss of TOC contents on Update
   <xsl:template name="InsertIndexTabs">
     <xsl:variable name="styleName" select="@text:style-name" />
 
-    <xsl:if test="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops">
+    <xsl:if test="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops/style:tab-stop">
       <w:tabs>
         <xsl:variable name="tabInd" select="ooc:TwipsFromMeasuredUnit(key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left)" />
 
