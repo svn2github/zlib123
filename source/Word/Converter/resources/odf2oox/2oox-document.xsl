@@ -77,7 +77,7 @@
 
   <!-- main document -->
   <xsl:template name="document">
-    <w:document conformance="transitional">
+    <w:document w:conformance="transitional">
       <!-- Translate the default master page color as the document background color -->
       <xsl:for-each select="document('styles.xml')">
         <xsl:variable name="defaultBgColor" select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:background-color"/>
