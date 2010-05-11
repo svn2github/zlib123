@@ -35,6 +35,9 @@
 		</Property>
 		
 		<!-- search for installed versions of Office -->
+    <Property Id="WORD2010INSTALLROOT" Secure="yes">
+      <RegistrySearch Id="RegSearch_Word2010InstallRoot" Type="directory" Key="Software\Microsoft\Office\14.0\Word\InstallRoot" Name="Path" Root="HKLM"/>
+    </Property>
 		<Property Id="WORD2007INSTALLROOT" Secure="yes">
 			<RegistrySearch Id="RegSearch_Word2007InstallRoot" Type="directory" Key="Software\Microsoft\Office\12.0\Word\InstallRoot" Name="Path" Root="HKLM"/>
 		</Property>
@@ -48,6 +51,9 @@
 			<RegistrySearch Id="RegSearch_Word2000InstallRoot" Type="directory" Key="SOFTWARE\Microsoft\Office\9.0\Word\InstallRoot" Name="Path" Root="HKLM"/>
 		</Property>
 
+    <Property Id="EXCEL2010INSTALLROOT" Secure="yes">
+      <RegistrySearch Id="RegSearch_Excel2010InstallRoot" Type="directory" Key="Software\Microsoft\Office\14.0\Excel\InstallRoot" Name="Path" Root="HKLM"/>
+    </Property>
 		<Property Id="EXCEL2007INSTALLROOT" Secure="yes">
 			<RegistrySearch Id="RegSearch_Excel2007InstallRoot" Type="directory" Key="Software\Microsoft\Office\12.0\Excel\InstallRoot" Name="Path" Root="HKLM"/>
 		</Property>
@@ -58,7 +64,10 @@
 			<RegistrySearch Id="RegSearch_Excel2002InstallRoot" Type="directory" Key="SOFTWARE\Microsoft\Office\10.0\Excel\InstallRoot" Name="Path" Root="HKLM"/>
 		</Property>
 
-		<Property Id="POWERPOINT2007INSTALLROOT" Secure="yes">
+    <Property Id="POWERPOINT2010INSTALLROOT" Secure="yes">
+      <RegistrySearch Id="RegSearch_PowerPoint2010InstallRoot" Type="directory" Key="Software\Microsoft\Office\14.0\PowerPoint\InstallRoot" Name="Path" Root="HKLM"/>
+    </Property>
+    <Property Id="POWERPOINT2007INSTALLROOT" Secure="yes">
 			<RegistrySearch Id="RegSearch_PowerPoint2007InstallRoot" Type="directory" Key="Software\Microsoft\Office\12.0\PowerPoint\InstallRoot" Name="Path" Root="HKLM"/>
 		</Property>
 		<Property Id="POWERPOINT2003INSTALLROOT" Secure="yes">
@@ -68,7 +77,32 @@
 			<RegistrySearch Id="RegSearch_PowerPoint2002InstallRoot" Type="directory" Key="SOFTWARE\Microsoft\Office\10.0\PowerPoint\InstallRoot" Name="Path" Root="HKLM"/>
 		</Property>
 
-		<!-- detect Word 2007 template folder -->
+    <!-- detect Word 2010 template folder -->
+    <Property Id="WORD2010TEMPLATE1" Secure="yes">
+      <RegistrySearch Id="RegSearch_Word2010Template1" Type="raw" Key="Software\Policies\Microsoft\Office\14.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+    </Property>
+
+    <Property Id="WORD2010TEMPLATE2" Secure="yes">
+      <RegistrySearch Id="RegSearch_Word2010Template2" Type="raw" Key="Software\Microsoft\Office\14.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+    </Property>
+
+    <Property Id="WORD2010TEMPLATE3" Secure="yes">
+      <RegistrySearch Id="RegSearch_Word2010Template3" Type="raw" Key="Software\Policies\Microsoft\Office\14.0\Common\General" Name="UserTemplates" Root="HKCU" />
+    </Property>
+
+    <Property Id="WORD2010TEMPLATE4" Secure="yes">
+      <RegistrySearch Id="RegSearch_Word2010Template4" Type="raw" Key="Software\Microsoft\Office\14.0\Common\General" Name="UserTemplates" Root="HKCU" />
+    </Property>
+
+    <Property Id="TEMPLATEDIR2010" Secure="yes">
+      <RegistrySearch Id="RegSearch_TemplateDir2010" Type="raw" Key="Software\Microsoft\Office\14.0\Common\General" Name="Templates" Root="HKCU" />
+    </Property>
+
+    <Property Id="WORD2010TEMPLATE5" Secure="yes">
+      <DirectorySearch Id="DirSearch_Word2010Template5" Path="[AppDataFolder]Microsoft\[TEMPLATEDIR2010]" Depth="0" />
+    </Property>
+
+    <!-- detect Word 2007 template folder -->
 		<Property Id="WORD2007TEMPLATE1" Secure="yes">
 			<RegistrySearch Id="RegSearch_Word2007Template1" Type="raw" Key="Software\Policies\Microsoft\Office\12.0\Common\General" Name="SharedTemplates" Root="HKCU" />
 		</Property>
@@ -171,7 +205,15 @@
 		</Property>
 
 		<CustomAction Id="GetOfficeInfos" Property="ODFTEMPLATEFOLDER" Value="[TEMPLATEPATH]" />
-		
+
+    <!-- assigning template folder for Word 2010 -->
+    <CustomAction Id="ActionWord2010TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2010TEMPLATE1]" />
+    <CustomAction Id="ActionWord2010TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2010TEMPLATE2]" />
+    <CustomAction Id="ActionWord2010TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2010TEMPLATE3]" />
+    <CustomAction Id="ActionWord2010TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2010TEMPLATE4]" />
+    <CustomAction Id="ActionWord2010TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2010TEMPLATE5]" />
+    <CustomAction Id="ActionWord2010TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[AppDataFolder]Microsoft\Templates" />
+    
 		<!-- assigning template folder for Word 2007 -->
 		<CustomAction Id="ActionWord2007TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE1]" />
 		<CustomAction Id="ActionWord2007TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE2]" />
@@ -209,8 +251,16 @@
 			<!--<Custom Action="GetOfficeInfos" After="LaunchConditions" />-->
 			<Custom Action="GetOfficeInfos" Sequence="1" />
 
-			<!-- call custom actions for Word 2007 -->
-			<Custom Action="ActionWord2007TemplateAssign1" After="GetOfficeInfos">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2007TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+      <!-- call custom actions for Word 2010 -->
+      <Custom Action="ActionWord2010TemplateAssign1" After="GetOfficeInfos">WORD2010INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2010TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+      <Custom Action="ActionWord2010TemplateAssign2" After="ActionWord2010TemplateAssign1">WORD2010INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2010TEMPLATE1) AND WORD2010TEMPLATE2 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+      <Custom Action="ActionWord2010TemplateAssign3" After="ActionWord2010TemplateAssign2">WORD2010INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2010TEMPLATE1) AND (NOT WORD2010TEMPLATE2) AND WORD2010TEMPLATE3 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+      <Custom Action="ActionWord2010TemplateAssign4" After="ActionWord2010TemplateAssign3">WORD2010INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2010TEMPLATE1) AND (NOT WORD2010TEMPLATE2) AND (NOT WORD2010TEMPLATE3) AND WORD2010TEMPLATE4 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+      <Custom Action="ActionWord2010TemplateAssign5" After="ActionWord2010TemplateAssign4">WORD2010INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2010TEMPLATE1) AND (NOT WORD2010TEMPLATE2) AND (NOT WORD2010TEMPLATE3) AND (NOT WORD2010TEMPLATE4) AND WORD2010TEMPLATE5 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+      <Custom Action="ActionWord2010TemplateAssign6" After="ActionWord2010TemplateAssign5">WORD2010INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2010TEMPLATE1) AND (NOT WORD2010TEMPLATE2) AND (NOT WORD2010TEMPLATE3) AND (NOT WORD2010TEMPLATE4) AND (NOT WORD2010TEMPLATE5) AND (NOT ODFTEMPLATEFOLDER)</Custom>
+
+      <!-- call custom actions for Word 2007 -->
+			<Custom Action="ActionWord2007TemplateAssign1" After="ActionWord2010TemplateAssign6">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2007TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
 			<Custom Action="ActionWord2007TemplateAssign2" After="ActionWord2007TemplateAssign1">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND WORD2007TEMPLATE2 AND (NOT ODFTEMPLATEFOLDER)</Custom>
 			<Custom Action="ActionWord2007TemplateAssign3" After="ActionWord2007TemplateAssign2">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND (NOT WORD2007TEMPLATE2) AND WORD2007TEMPLATE3 AND (NOT ODFTEMPLATEFOLDER)</Custom>
 			<Custom Action="ActionWord2007TemplateAssign4" After="ActionWord2007TemplateAssign3">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND (NOT WORD2007TEMPLATE2) AND (NOT WORD2007TEMPLATE3) AND WORD2007TEMPLATE4 AND (NOT ODFTEMPLATEFOLDER)</Custom>

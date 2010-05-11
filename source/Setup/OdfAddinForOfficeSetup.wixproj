@@ -61,6 +61,7 @@
     <Compile Include="ui\MyInstallScopeDlg.wxs" />
     <Compile Include="ui\MyLicenseAgreementDlg.wxs" />
     <Compile Include="ui\MyMaintenanceWelcomeDlg.wxs" />
+    <Compile Include="ui\MyOfficeOdfDlg.wxs" />
     <Compile Include="ui\MyPrepareDlg.wxs" />
     <Compile Include="ui\MyResumeDlg.wxs" />
     <Compile Include="ui\MySetupTypeDlg.wxs" />

@@ -95,11 +95,17 @@
 	<String Id="MyInstallScopeDlgChange">&amp;Ändern...</String>
 
   <String Id="MyCustomizeDlgTree">Auswahlstruktur</String>
+
+  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}ODF-Unterstützung in Microsoft Office</String>
+  <String Id="MyOfficeOdfDlgDescription">Bitte beachten Sie die eingebaute Unterstützung für ODF in Microsoft Office.</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription">Bitte beachten Sie, dass die aktuell installierte Version von Microsoft Office bereits über Unterstützung für ODF verfügt.</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription2">Sie können das [ProductName] zusätzlich zur bestehenden ODF-Unterstützung installieren oder auf !(loc.WixUICancel) klicken, um die Installation zu beenden.</String>
+
   <String Id="CustomizeDlgDiskCost">Speicher&amp;platz</String>
   <String Id="CustomizeDlgDescription">Wählen Sie die Funktionen aus, die installiert werden sollen.</String>
   <String Id="CustomizeDlgBrowse">&amp;Ändern</String>
 
-    <String Id="msierrXmlConfigFailedRead">Ein Fehler beim Konfigurieren von XML-Dateien ist aufgetreten.</String>
+  <String Id="msierrXmlConfigFailedRead">Ein Fehler beim Konfigurieren von XML-Dateien ist aufgetreten.</String>
 	<String Id="msierrXmlConfigFailedOpen">XML Datei [3] konnte nicht geöffnet werden, Systemfehler: [2]</String>
 	<String Id="msierrXmlConfigFailedSelect">Knoten nicht gefunden: [3] In XML-Datei: [4], Systemfehler: [2]</String>
 	<String Id="msierrXmlConfigFailedSave">Änderungen in XML-Datei [3] konnten nicht gespeichert werden, Systemfehler: [2]</String>
