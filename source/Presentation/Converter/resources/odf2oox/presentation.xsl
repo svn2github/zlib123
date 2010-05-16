@@ -45,7 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
 	exclude-result-prefixes="xlink number">
  
   <xsl:template name ="presentation">
-    <p:presentation conformance="transitional">
+    <p:presentation >
       <p:sldMasterIdLst>
         
         <xsl:for-each select ="document('styles.xml')//office:master-styles/style:master-page ">

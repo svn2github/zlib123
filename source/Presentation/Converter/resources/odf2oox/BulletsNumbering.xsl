@@ -33,7 +33,7 @@
     <!--<xsl:variable name ="newLevel" select ="$level+1"/>-->
     <xsl:for-each select ="document('content.xml')//text:list-style [@style:name=$listId]">
       <xsl:choose>
-        <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color">
+        <xsl:when test ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')!=''">
         <a:buClr>
           <a:srgbClr>
             <xsl:attribute name ="val">
@@ -42,7 +42,7 @@
           </a:srgbClr>
         </a:buClr>
         </xsl:when>
-        <xsl:when test ="./text:list-level-style-number[@text:level=$level]/style:text-properties/@fo:color">
+        <xsl:when test ="substring-after(./text:list-level-style-number[@text:level=$level]/style:text-properties/@fo:color,'#')!=''">
           <a:buClr>
             <a:srgbClr>
               <xsl:attribute name ="val">

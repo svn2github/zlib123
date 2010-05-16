@@ -795,9 +795,18 @@
 
   <!-- Insert Revision Headers -->
   <xsl:template name="revisionHeaderProperties">
+    <!--<headers xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+      guid="{concat('{', '100', '}')}" diskRevisions="1" revisionId="2" version="3">-->
     <headers xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-      guid="{concat('{', '100', '}')}" diskRevisions="1" revisionId="2" version="3">
+	 diskRevisions="1" revisionId="2" version="3">
+		  <!--OpenXML Validator-->
+		  <xsl:attribute name="guid">
+			  <xsl:text>{</xsl:text>
+			  <xsl:value-of select="'sonataRevisionHeaderGuid'"/>
+			  <xsl:text>}</xsl:text>
+		  </xsl:attribute>
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
         <xsl:apply-templates
@@ -815,13 +824,19 @@
     mode="revisionHeaders">
     <xsl:param name="num"/>
 
-    <header maxSheetId="4" r:id="{generate-id()}" guid="{concat('{', $num, '}')}">
+    <header maxSheetId="4" r:id="{generate-id()}" >
+		<!--guid="{concat('{', $num, '}')}"-->
       <xsl:attribute name="userName">
         <xsl:value-of select="office:change-info/dc:creator"/>
       </xsl:attribute>
       <xsl:attribute name="dateTime">
         <xsl:value-of select="office:change-info/dc:date"/>
       </xsl:attribute>
+		<xsl:attribute name="guid">
+			<xsl:text>{</xsl:text>
+			<xsl:value-of select="'sonataRevisionHeaderGuid'"/>
+			<xsl:text>}</xsl:text>
+		</xsl:attribute>
       <sheetIdMap>
         <xsl:for-each
           select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">

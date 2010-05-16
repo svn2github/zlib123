@@ -685,9 +685,37 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 					  <xsl:value-of select ="translate(translate(x14:cfRule/xm:f,'!','.'),'$','')"/>
 				  </xsl:attribute>
 			     <xsl:variable name ="formula1">			  
+					 <xsl:variable name ="RowNum">
+						 <xsl:if test ="substring-after(x14:cfRule/xm:f,'!')!='' and not(contains(x14:cfRule/xm:f,'#REF'))">
+							 <xsl:call-template name="GetRowNum">
+								 <xsl:with-param name="cell" select="substring-after(x14:cfRule/xm:f,'!')"/>
+							 </xsl:call-template>
+						 </xsl:if>						 
+					 </xsl:variable>
+					 <xsl:variable name ="ColNum">
+						 <xsl:if test ="substring-after(x14:cfRule/xm:f,'!')!='' and not(contains(x14:cfRule/xm:f,'#REF'))">
+							 <xsl:call-template name="NumbersToChars">
+								 <xsl:with-param name="num">
+									 <xsl:variable name ="ColNumber">
+										 <xsl:call-template name="GetColNum">
+											 <xsl:with-param name="cell" select="translate(substring-after(x14:cfRule/xm:f,'!'),'$','')"/>
+										 </xsl:call-template>
+									 </xsl:variable>
+									 <xsl:value-of select ="$ColNumber - 1"/>
+								 </xsl:with-param>
+							 </xsl:call-template>
+						 </xsl:if>
+					 </xsl:variable>
 					  <xsl:text>[</xsl:text>
 					  <xsl:text>$</xsl:text>
+					 <xsl:choose>
+						 <xsl:when test ="$RowNum!='' and $ColNum!=''">
+							 <xsl:value-of select ="concat(substring-before(x14:cfRule/xm:f,'!'),'.$',$ColNum,'$',$RowNum)"/>
+						 </xsl:when>
+						 <xsl:when test ="$RowNum='' or $ColNum=''">
 					  <xsl:value-of select ="translate(x14:cfRule/xm:f,'!','.')"/>				  
+						 </xsl:when>						 
+					 </xsl:choose>
 					  <xsl:text>]</xsl:text>
 				  </xsl:variable>
 				  <xsl:choose>
@@ -729,9 +757,41 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 					  </xsl:when>
 					  <xsl:when test="x14:cfRule/@operator='between'">
 						  <xsl:variable name ="formula2">
-							  <xsl:text>[</xsl:text>
+							  <!-- <xsl:text>[</xsl:text>
 							  <xsl:text>$</xsl:text>
 							  <xsl:value-of select ="translate(x14:cfRule/xm:f[2],'!','.')"/>
+							  <xsl:text>]</xsl:text>-->						 
+						  <xsl:variable name ="RowNum">
+							  <xsl:if test ="substring-after(x14:cfRule/xm:f[2],'!')!='' and not(contains(x14:cfRule/xm:f[2],'#REF'))">
+								  <xsl:call-template name="GetRowNum">
+									  <xsl:with-param name="cell" select="substring-after(x14:cfRule/xm:f[2],'!')"/>
+								  </xsl:call-template>
+							  </xsl:if>
+						  </xsl:variable>
+						  <xsl:variable name ="ColNum">
+							  <xsl:if test ="substring-after(x14:cfRule/xm:f[2],'!')!='' and not(contains(x14:cfRule/xm:f[2],'#REF'))">
+								  <xsl:call-template name="NumbersToChars">
+									  <xsl:with-param name="num">
+										  <xsl:variable name ="ColNumber">
+											  <xsl:call-template name="GetColNum">
+												  <xsl:with-param name="cell" select="translate(substring-after(x14:cfRule/xm:f[2],'!'),'$','')"/>
+											  </xsl:call-template>
+										  </xsl:variable>
+										  <xsl:value-of select ="$ColNumber - 1"/>
+									  </xsl:with-param>
+								  </xsl:call-template>
+							  </xsl:if>						 
+						  </xsl:variable>
+							  <xsl:text>[</xsl:text>
+							  <xsl:text>$</xsl:text>
+						  <xsl:choose>
+							  <xsl:when test ="$RowNum!='' and $ColNum!=''">
+								  <xsl:value-of select ="concat(substring-before(x14:cfRule/xm:f[2],'!'),'.$',$ColNum,'$',$RowNum)"/>
+							  </xsl:when>
+							  <xsl:when test ="$RowNum='' or $ColNum=''">
+							  <xsl:value-of select ="translate(x14:cfRule/xm:f[2],'!','.')"/>
+							  </xsl:when>
+						  </xsl:choose>
 							  <xsl:text>]</xsl:text>
 						  </xsl:variable>
 						  <xsl:attribute name="style:condition">
@@ -741,10 +801,30 @@ RefNo-1 5-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 					  </xsl:when>
 					  <xsl:when test="x14:cfRule/@operator='notBetween'">
 						  <xsl:variable name ="formula2">
+							  <xsl:variable name ="RowNum">
+								  <xsl:if test ="contains(x14:cfRule/xm:f,'!')">
+									  <xsl:call-template name="GetRowNum">
+										  <xsl:with-param name="cell" select="substring-after(x14:cfRule/xm:f[2],'!')"/>
+									  </xsl:call-template>
+								  </xsl:if>
+							  </xsl:variable>
+							  <xsl:variable name ="ColNum">
+								  <xsl:if test ="contains(x14:cfRule/xm:f,'!')">
+									  <xsl:call-template name="GetColNum">
+										  <xsl:with-param name="cell" select="substring-after(x14:cfRule/xm:f[2],'!')"/>
+									  </xsl:call-template>
+								  </xsl:if>
+							  </xsl:variable>
 							  <xsl:text>[</xsl:text>
 							  <xsl:text>$</xsl:text>
+							  <xsl:choose>
+								  <xsl:when test ="$RowNum!='' and $ColNum!=''">
+									  <xsl:value-of select ="concat(substring-before(x14:cfRule/xm:f[2],'!'),'.$',$ColNum,'$',$RowNum)"/>
+								  </xsl:when>
+								  <xsl:when test ="$RowNum='' or $ColNum=''">
 							  <xsl:value-of select ="translate(x14:cfRule/xm:f[2],'!','.')"/>
-							  <xsl:text>]</xsl:text>
+								  </xsl:when>
+							  </xsl:choose>
 						  </xsl:variable>
 						  <xsl:attribute name="style:condition">
 							  <xsl:value-of

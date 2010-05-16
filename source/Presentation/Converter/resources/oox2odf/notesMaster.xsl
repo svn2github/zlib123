@@ -207,7 +207,6 @@ Copyright (c) 2007, Sonata Software Limited
     <style:graphic-properties>
       <xsl:call-template name="NotetmpGraphicProperty"/>
       <text:list-style>
-
           <xsl:for-each select ="./p:txBody/a:p">
             <xsl:call-template name="NotetmpListLevelStyle">
               <xsl:with-param name="SlideMasterFile">
@@ -2694,8 +2693,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </text:list-level-style-bullet>
           </xsl:if>
-        </xsl:when>
-      
+        </xsl:when>      
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
@@ -3412,7 +3410,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:variable name="varcolor">
               <xsl:value-of select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
             </xsl:variable>
-            <xsl:for-each select="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/p:clrMap">
+            <xsl:for-each select="/p:notesMaster/p:clrMap">
               <xsl:call-template name="NoteThemeClr">
                 <xsl:with-param name="ClrMap" select="$varcolor"/>
               </xsl:call-template>
@@ -3531,7 +3529,7 @@ Copyright (c) 2007, Sonata Software Limited
 
   <xsl:template name="NoteThemeClr">
     <xsl:param name="ClrMap"/>
-    <xsl:for-each select=".">
+    <xsl:for-each select="/p:notesMaster/p:clrMap">
       <xsl:choose>
         <xsl:when test="$ClrMap ='tx1'">
           <xsl:value-of select="@tx1" />

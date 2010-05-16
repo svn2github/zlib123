@@ -3666,9 +3666,10 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name="styleName"/>
 		<xsl:param name="loopSound"/>
 				<xsl:for-each select="//style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
-					<p:sndAc>
+					<!--OpenXMl VAlidation error Fix-->
+					<!--<p:sndAc>
 						<p:stSnd>
-					<!--loop until next sound-->
+					--><!--loop until next sound--><!--
 					<xsl:if test="$loopSound='true'">
 						<xsl:attribute name="loop">
 							<xsl:value-of select="'1'"/>
@@ -3696,11 +3697,11 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 								</xsl:variable>
 								<pzip:import pzip:source="{$pzipsourcename}" pzip:target="{concat('ppt/media/',$soundfileName)}" />
-								<!--<pzip:import pzip:source="{substring-after(@xlink:href,'/')}" pzip:target="{concat('ppt/media/',$soundfileName)}" />-->
-								<!--<pzip:copy pzip:source="{substring-after(@xlink:href,'/')}" pzip:target="{concat('ppt/media/','glasses.wav')}"/>-->
+								--><!--<pzip:import pzip:source="{substring-after(@xlink:href,'/')}" pzip:target="{concat('ppt/media/',$soundfileName)}" />--><!--
+								--><!--<pzip:copy pzip:source="{substring-after(@xlink:href,'/')}" pzip:target="{concat('ppt/media/','glasses.wav')}"/>--><!--
 							</p:snd>
 						</p:stSnd>
-					</p:sndAc>
+					</p:sndAc>-->
 				</xsl:for-each>
 	</xsl:template>
 

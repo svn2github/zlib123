@@ -1364,7 +1364,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     </xsl:if>
 
     <!-- underline color -->
-    <xsl:if test="@style:text-underline-color">
+    <!--<xsl:if test="@style:text-underline-color">-->
+	  <!--a:srgbclr val=''-->
+	  <xsl:if test ="substring-after(@style:text-underline-color,'#')!=''">
       <a:uFill>
         <a:solidFill>
           <a:srgbClr>

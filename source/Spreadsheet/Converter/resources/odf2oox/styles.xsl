@@ -342,19 +342,23 @@ RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date form
         select="office:document-content/office:automatic-styles"
         mode="fonts"/>
 		<!--Code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
-		<xsl:apply-templates
+		<!--<xsl:apply-templates
         select="office:document-content/office:automatic-styles"
-        mode="notesFonts"/>
+        mode="notesFonts"/>-->
 		<!--End of code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
-      <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
-        mode="fonts"/>
-
-
+       <!--<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
+        mode="fonts"/>-->
+		<!--style:text-properties[parent::node()[@style:family='table-cell']-->
+		<xsl:for-each select ="office:document-content/office:automatic-styles/style:style[@style:family='text']">
+			<xsl:call-template name="notesFontsspcl"/>
+		</xsl:for-each>
+		<xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/child::node()[@style:family='table-cell']/style:text-properties">
+			<xsl:call-template name="fontsspcl"/>
+		</xsl:for-each>
       <!--hyperlink font properties-->
       <xsl:choose>
         <xsl:when
           test="descendant::text:a[not(ancestor::draw:custom-shape)and not(ancestor::office:annotation)]">
-
           <xsl:call-template name="InsertHyperlinkTextStyle"/>
 
         </xsl:when>
@@ -363,6 +367,30 @@ RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date form
     </fonts>
   </xsl:template>
 
+	<xsl:template name="notesFontsspcl">
+		<xsl:param name="hyperlink"/>
+		<font>
+			<xsl:call-template name="InsertTextProperties">
+				<xsl:with-param name="mode">fonts</xsl:with-param>
+				<xsl:with-param name="hyperlink">
+					<xsl:value-of select="$hyperlink"/>
+				</xsl:with-param>
+			</xsl:call-template>
+		</font>
+	</xsl:template>
+
+	<xsl:template name="fontsspcl">
+		<xsl:param name="hyperlink"/>
+		<font>
+			<xsl:call-template name="InsertTextProperties">
+				<xsl:with-param name="mode">fonts</xsl:with-param>
+				<xsl:with-param name="hyperlink">
+					<xsl:value-of select="$hyperlink"/>
+				</xsl:with-param>
+			</xsl:call-template>
+		</font>
+	</xsl:template>
+	
   <xsl:template name="InsertFills">
     <fills>
       <fill>
@@ -371,19 +399,29 @@ RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date form
       <fill>
         <patternFill patternType="gray125"/>
       </fill>
-      <xsl:apply-templates
+
+      <xsl:for-each select="office:document-content/office:automatic-styles/child::node()/style:table-cell-properties">
+        <xsl:call-template name="InsertFillForBackground"/>
+      </xsl:for-each>
+      <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/child::node()/style:table-cell-properties">
+        <xsl:call-template name="InsertFillForBackground"/>
+      </xsl:for-each>
+      <!--<xsl:apply-templates
         select="office:document-content/office:automatic-styles"
         mode="background-color"/>
 
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
-        mode="background-color"/>
-
+        mode="background-color"/>-->
     </fills>
   </xsl:template>
-
   <xsl:template match="style:table-cell-properties" mode="background-color">
     <xsl:param name="Object"/>
-
+		<xsl:call-template name ="InsertFillForBackground">
+			<xsl:with-param name="Object" select ="$Object"/>
+		</xsl:call-template>
+  </xsl:template>
+	<xsl:template name ="InsertFillForBackground">
+		<xsl:param name="Object"/>
     <fill>
       <xsl:choose>
         <xsl:when test="@fo:background-color and @fo:background-color != 'transparent'">
@@ -401,9 +439,7 @@ RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date form
         </xsl:otherwise>
       </xsl:choose>
     </fill>
-
   </xsl:template>
-
 
   <xsl:template name="GetCellColor">
     <xsl:param name="color"/>
@@ -1145,21 +1181,21 @@ RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date form
         </xsl:attribute>
 
         <xsl:if test="$contentFontsCount !='' ">
-          <xsl:attribute name="ZMIENNA_contentFontsCount">
+          <!--<xsl:attribute name="ZMIENNA_contentFontsCount">
             <xsl:value-of select="$contentFontsCount"/>
-          </xsl:attribute>
+          </xsl:attribute>-->
         </xsl:if>
 
         <xsl:if test="$styleFontsCount !='' ">
-          <xsl:attribute name="ZMIENNA_styleFontsCount">
+          <!--<xsl:attribute name="ZMIENNA_styleFontsCount">
             <xsl:value-of select="$styleFontsCount"/>
-          </xsl:attribute>
+          </xsl:attribute>-->
         </xsl:if>
 
         <xsl:if test="$hyperlinkId !='' ">
-          <xsl:attribute name="ZMIENNA_hyperlinkId">
+          <!--<xsl:attribute name="ZMIENNA_hyperlinkId">
             <xsl:value-of select="$hyperlinkId"/>
-          </xsl:attribute>
+          </xsl:attribute>-->
         </xsl:if>
 
         <xsl:attribute name="fontId">

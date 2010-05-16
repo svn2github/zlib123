@@ -171,6 +171,11 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <!--End of RefNo-2-->
     <!--boolean to be handeled-->
     <xsl:choose>
+      <!-- <xsl:when test="@t='d'">
+        <xsl:attribute name="office:value-type">
+          <xsl:text>date</xsl:text>
+        </xsl:attribute>
+      </xsl:when>-->
       <xsl:when test="@t='s' or key('ref',@r)[@oox:part = $partId]">
         <xsl:attribute name="office:value-type">
           <xsl:text>string</xsl:text>
@@ -492,7 +497,17 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
               <xsl:text>string</xsl:text>
             </xsl:when>
             <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="@t='d'">
+                  <xsl:attribute name="office:value-type">
+                    <xsl:text>date</xsl:text>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
               <xsl:text>float</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+              
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -504,6 +519,8 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <xsl:choose>
           <xsl:when
             test="((contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)) and not(contains($numStyle, '[$$-409]') or contains($numStyle, '[$Sk-41B]') or contains($numStyle, '[$Din.-81A]') or contains($numStyle, '[$€-180C]') or contains($numStyle, '[$€-1007]'))">
+            <xsl:choose>
+              <xsl:when test ="not(@t) or @t!='d'">
             <xsl:attribute name="office:date-value">
               <xsl:call-template name="NumberToDate">
                 <xsl:with-param name="value">
@@ -519,11 +536,34 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:attribute>
+                <!--<xsl:attribute name="office:date-value">
+              
+            </xsl:attribute>-->
+              </xsl:when>
+              <xsl:when test ="@t='d'">
+                <xsl:attribute name="office:date-value">
+                  <xsl:value-of select ="./e:v"/>
+                </xsl:attribute>
+              </xsl:when>
+          </xsl:choose>
+            
           </xsl:when>
 
           <!--'and' at the end is for Latvian currency -->
           <xsl:when
             test="not(contains($numStyle,'[$Ls-426]') or contains($numStyle,'[$kr-425]') or contains($numStyle,'[$€-813]')) and (contains($strippedFormat,'h') or contains($strippedFormat,'s') or $numId = 18 or $numId = 20)">
+				<xsl:choose>
+					<xsl:when test ="@t='d'">
+						<xsl:attribute name="office:time-value">
+								<xsl:call-template name="NumberToTime">
+									<xsl:with-param name="value">
+										<xsl:value-of select="e:v"/>
+									</xsl:with-param>
+									<xsl:with-param name ="isIsoDate" select ="'true'"/>
+								</xsl:call-template>
+							</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
             <xsl:attribute name="office:time-value">
               <xsl:call-template name="NumberToTime">
                 <xsl:with-param name="value">
@@ -531,14 +571,20 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>              
           </xsl:when>
           <xsl:otherwise>
             <!--RefNo-3:ODF1.1: Avoid office value if value type is string-->
+           
+             
              <xsl:if test="$valueType != 'string'">
             <xsl:attribute name="office:value">
               <xsl:value-of select="e:v"/>
             </xsl:attribute>
             </xsl:if>
+            
+            
           </xsl:otherwise>
         </xsl:choose>
         <!--Start of RefNo-3:ODF1.1:Added office:annotation abv text node-->
@@ -573,17 +619,34 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                     </xsl:call-template>
                   </xsl:otherwise>
                 </xsl:choose>                
-              </xsl:variable>
-              
+              </xsl:variable>              
               <xsl:call-template name="FormatDate">
                 <xsl:with-param name="value">
+                    <xsl:choose>                      
+                      <xsl:when test ="@t='d'">
+                        <xsl:variable name="DateWithTime">
+                          <xsl:call-template name="CheckTime">
+                            <xsl:with-param name="value">
+                              <xsl:value-of select="e:v"/>
+                            </xsl:with-param>
+                          </xsl:call-template> 
+                        </xsl:variable>
+                        <xsl:value-of select ="$DateWithTime"/>
+                      </xsl:when>                    
+                      <xsl:otherwise>
+                        <xsl:variable name ="temp">
                   <xsl:call-template name="NumberToDate">
                     <xsl:with-param name="value">
                       <xsl:value-of select="e:v"/>
                     </xsl:with-param>
                   </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:value-of select ="$temp"/>
+                      </xsl:otherwise>
+                    </xsl:choose>                   
                 </xsl:with-param>
                 <xsl:with-param name="format">
+                    <xsl:variable name ="temp2">
                   <xsl:choose>
                     <xsl:when test="contains($formatCode,']')">
                       <xsl:value-of select="substring-after($formatCode,']')"/>
@@ -592,11 +655,14 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                       <xsl:value-of select="$formatCode"/>
                     </xsl:otherwise>
                   </xsl:choose>
+                    </xsl:variable>
+                    <xsl:value-of select ="$temp2"/>
                 </xsl:with-param>
                 <xsl:with-param name="numId">
                   <xsl:value-of select="$numId"/>
                 </xsl:with-param>
                 <xsl:with-param name="processedFormat">
+                    <xsl:variable name ="temp3">
                   <xsl:choose>
                     <xsl:when test="contains($formatCode,']')">
                       <xsl:value-of select="substring-after($formatCode,']')"/>
@@ -605,6 +671,8 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                       <xsl:value-of select="$formatCode"/>
                     </xsl:otherwise>
                   </xsl:choose>
+                    </xsl:variable>
+                    <xsl:value-of select ="$temp3"/>
                 </xsl:with-param>
                 <xsl:with-param name="numValue">
                   <xsl:value-of select="e:v"/>
@@ -614,8 +682,7 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 
             <!--'and' at the end is for Latvian currency -->
             <xsl:when
-              test="contains($strippedFormat,'h') or contains($strippedFormat,'s') and not(contains($strippedFormat,'[$Ls-426]'))">
-              
+              test="contains($strippedFormat,'h') or contains($strippedFormat,'s') and not(contains($strippedFormat,'[$Ls-426]'))">              
               <xsl:variable name="formatCode">
                 <xsl:choose>
                   <xsl:when test="$numStyle != '' ">
@@ -627,15 +694,27 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                     </xsl:call-template>
                   </xsl:otherwise>
                 </xsl:choose>                
-              </xsl:variable>
-              
+              </xsl:variable>              
               <xsl:call-template name="FormatTime">
                 <xsl:with-param name="value">
+					<xsl:choose>
+						<xsl:when test ="@t='d'">
+							<xsl:call-template name="NumberToTime">
+								<xsl:with-param name="value">
+									<xsl:value-of select="e:v"/>
+								</xsl:with-param>
+								<xsl:with-param name ="isIsoDate" select ="'true'"/>
+							</xsl:call-template>							
+						</xsl:when>
+						<xsl:otherwise>							
                   <xsl:call-template name="NumberToTime">
                     <xsl:with-param name="value">
                       <xsl:value-of select="e:v"/>
                     </xsl:with-param>
+									<xsl:with-param name ="isIsoDate" select ="'false'"/>
                   </xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
                 </xsl:with-param>
                 <xsl:with-param name="format">
                   <xsl:choose>
@@ -979,5 +1058,21 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+
+  <xsl:template name="CheckTime">
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="not(contains($value,'T'))">     
+        <xsl:value-of select="concat($value,'T','00:00:00')"/>        
+      </xsl:when>
+      <xsl:when test="(contains($value,'T'))">
+        <xsl:value-of select="e:v"/>         
+      </xsl:when>
+    </xsl:choose>
+   
+    
+  </xsl:template>
+
 
 </xsl:stylesheet>

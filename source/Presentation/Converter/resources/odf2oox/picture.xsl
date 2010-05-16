@@ -422,7 +422,11 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:param>
     <xsl:for-each select ="document($FileName)//style:style[@style:name=$grProp]/style:graphic-properties">
       <xsl:if test="position()=1">
-        <xsl:call-template name ="getLineStyle"/>
+        <!--<xsl:call-template name ="getLineStyle"/>-->
+		  <xsl:call-template name ="getLineStyle">
+			  <xsl:with-param name ="parentStyle" select ="./parent::node()/@style:parent-style-name">				  
+			  </xsl:with-param>
+		  </xsl:call-template>
       </xsl:if>
     </xsl:for-each>    
 

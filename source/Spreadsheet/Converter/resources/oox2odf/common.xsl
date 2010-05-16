@@ -1456,10 +1456,10 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
     <!-- @Descripition: converts number value to time value -->
     <!-- @Context: None -->
     <xsl:param name="value"/>
+	<xsl:param name="isIsoDate" select ="'false'"/>
 
     <xsl:choose>
       <xsl:when test="contains($value, 'E')">
-
         <xsl:variable name="Scient2time">
           <xsl:call-template name="ConvertScientific">
             <xsl:with-param name="value">
@@ -1467,8 +1467,8 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-
         <xsl:variable name="hours">
+			
           <xsl:choose>
             <xsl:when test="number($Scient2time)">
               <xsl:value-of select="floor($Scient2time * 24)"/>
@@ -1476,19 +1476,20 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
+					
           </xsl:choose>
         </xsl:variable>
-
         <!--added for ODF 1.1-->
           <xsl:variable name="newHours">
+			  <xsl:if test ="$isIsoDate='false'">
             <xsl:if test="contains($hours,'-')">
             <xsl:value-of select="substring-after($hours,'-')"/>
             </xsl:if>
+			  </xsl:if>
           </xsl:variable>
         <!--end-->
-        
-
         <xsl:variable name="minutes">
+			
           <xsl:choose>
             <xsl:when test="number($Scient2time)">
               <xsl:value-of select="floor(($Scient2time * 24 - $hours) * 60)"/>
@@ -1496,10 +1497,11 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
+          </xsl:choose>    
 
+		</xsl:variable>
         <xsl:variable name="seconds">
+			
           <xsl:choose>
             <xsl:when test="number($Scient2time)">
               <xsl:value-of select="$Scient2time * 86400 - $minutes * 60 - $hours * 3600"/>
@@ -1508,21 +1510,15 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
+				       
         </xsl:variable>
         <xsl:variable name="newSeconds">
+			<xsl:if test ="$isIsoDate='false'">
           <xsl:if test="contains($seconds,'-')">
             <xsl:value-of select="substring-after($seconds,'-')"/>
-          </xsl:if>
-        </xsl:variable>
-        <!--<xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>-->
-        
-        <!--added for ODF 1.1-->
-        <!--<xsl:if test="not(contains($hours,'-'))">
-        <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+          </xsl:if>       
         </xsl:if>
-        <xsl:if test="contains($hours,'-')">
-          <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$seconds,'S')"/>
-        </xsl:if>-->
+        </xsl:variable>        
         <xsl:choose>
           <xsl:when test="not(contains($hours,'-'))">
             <xsl:choose>
@@ -1544,21 +1540,24 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
             </xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
-        </xsl:choose>
-        <!--<xsl:if test="not(contains($hours,'-')) and not(contains($seconds,'-'))">
-          <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$seconds,'S')"/>
-        </xsl:if>
-        <xsl:if test="contains($seconds,'-')">
-          <xsl:value-of select="concat('-','PT',$newHours,'H',$minutes,'M',$newSeconds,'S')"/>
-        </xsl:if>-->
-        
+        </xsl:choose>        
         <!--end-->
-
       </xsl:when>
       <xsl:otherwise>
-
         <xsl:variable name="hours">
           <xsl:choose>
+				<xsl:when test ="$isIsoDate='true' and contains($value,':') ">
+					<xsl:value-of select ="substring-before($value,':')"/>
+				</xsl:when>
+				<xsl:when test ="$isIsoDate='true' and not(contains($value,':')) 
+						  and contains($value,'P') 
+						  and contains($value,'H') 
+						  and contains($value,'M')
+						  and contains($value,'S')">
+					<xsl:value-of select ="substring-before(substring-after($value,'PT'),'H')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					  <xsl:choose>
             <xsl:when test="number($value)">
               <xsl:value-of select="floor($value * 24)"/>
             </xsl:when>
@@ -1566,9 +1565,23 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
+				</xsl:otherwise>
+				</xsl:choose>		
         </xsl:variable>
-
         <xsl:variable name="minutes">
+          <xsl:choose>
+				<xsl:when test ="$isIsoDate='true'">
+					<xsl:value-of select ="substring-before(substring-after($value,':'),':')"/>
+				</xsl:when>
+				<xsl:when test ="$isIsoDate='true' and not(contains($value,':')) 
+						  and contains($value,'P') 
+						  and contains($value,'H') 
+						  and contains($value,'M')
+						  and contains($value,'S')">
+					<xsl:value-of select ="substring-before(substring-after($value,'H'),'M')"/>
+				</xsl:when>
+				<xsl:otherwise>
+			
           <xsl:choose>
             <xsl:when test="number($value)">
               <xsl:value-of select="floor(($value * 24 - $hours) * 60)"/>
@@ -1577,10 +1590,25 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
         </xsl:variable>
 
         <xsl:variable name="seconds">
           <xsl:choose>
+				<xsl:when test ="$isIsoDate='true'">
+					<xsl:value-of select ="substring-after(substring-after($value,':'),':')"/>
+				</xsl:when>
+				<xsl:when test ="$isIsoDate='true' and not(contains($value,':')) 
+						  and contains($value,'P') 
+						  and contains($value,'H') 
+						  and contains($value,'M')
+						  and contains($value,'S')">
+					<xsl:value-of select ="substring-before(substring-after($value,'M'),'S')"/>
+				</xsl:when>
+				<xsl:otherwise>
+
+					<xsl:choose>
             <xsl:when test="number($value)">
               <xsl:value-of select="$value * 86400 - $minutes * 60 - $hours * 3600"/>
             </xsl:when>
@@ -1588,6 +1616,8 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
         </xsl:variable>
      <!--added by sonata for ODF 1.1-->
         <xsl:variable name="newSeconds">

@@ -90,7 +90,10 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
               <xsl:apply-templates mode="run" select="text:p"/>
             </xsl:when>
             <xsl:otherwise>
-              <t xml:space="preserve"><xsl:apply-templates mode="text" select="text:p"/></t>
+              <!--<t xml:space="preserve">-->
+			  <t>				  
+				  <xsl:apply-templates mode="text" select="text:p"/>
+			  </t>
             </xsl:otherwise>
           </xsl:choose>
         </pxsi:maxlength>
@@ -136,7 +139,10 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
             </xsl:otherwise>
           </xsl:choose>
           <!--End of RefNo-2-->
-          <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
+          <!--<t xml:space="preserve">-->
+			<t>				
+			  <xsl:apply-templates mode="text"/>
+		  </t>
         </r>
       </xsl:when>
       <!-- when text:span is inside a comment -->
@@ -150,7 +156,10 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
               <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
             </xsl:with-param>
           </xsl:apply-templates>
-          <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
+          <!--<t xml:space="preserve">-->
+			<t>				
+			  <xsl:apply-templates mode="text"/>
+		  </t>
         </r>
       </xsl:when>
       <xsl:otherwise/>
@@ -217,9 +226,20 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       </xsl:variable>
       <!-- caution with 'Enters' because they can result with additional space in output text -->
       <xsl:choose>
-        <xsl:when test="not(contains($value, '_x'))"><t xml:space="preserve"><xsl:value-of select="$value"/></t></xsl:when>
+        <xsl:when test="not(contains($value, '_x'))">
+			<!--<t xml:space="preserve">-->
+			<t>
+				<xsl:if test ="$value='&#32;' or string-length(normalize-space($value))=0">
+					<xsl:attribute name ="xml:space">
+						<xsl:value-of select ="'preserve'"/>
+					</xsl:attribute>
+				</xsl:if>
+				<xsl:value-of select="$value"/>
+			</t>
+		</xsl:when>
         <xsl:otherwise>
-          <t xml:space="preserve">
+          <!--<t xml:space="preserve">-->
+			<t>				
           <xsl:call-template name="HexaDecimalValue">
             <xsl:with-param name="value">
               <xsl:value-of select="$value"/>
@@ -269,6 +289,11 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="not(contains($value, '_x'))">
+		  <xsl:if test ="$value='&#32;' or string-length(normalize-space($value))=0">			  
+			  <xsl:attribute name ="xml:space">
+				  <xsl:value-of select ="'preserve'"/>
+			  </xsl:attribute>			 
+		  </xsl:if>		  		  
         <xsl:value-of select="$value"/>
       </xsl:when>
       <xsl:otherwise>
@@ -284,7 +309,11 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   </xsl:template>
 
   <xsl:template match="text:s" mode="text">
-
+	  <xsl:if test ="position()=1">
+		  <xsl:attribute name ="xml:space">
+			  <xsl:value-of select ="'preserve'"/>
+		  </xsl:attribute>
+	  </xsl:if>
     <xsl:call-template name="InsertRepeatSpaces">
       <xsl:with-param name="nr">
         <xsl:text>1</xsl:text>
@@ -311,8 +340,7 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   
   <xsl:template name="InsertRepeatSpaces">
     <xsl:param name="nr"/>
-    <xsl:param name="repeat"/>
-    
+    <xsl:param name="repeat"/>    
     <xsl:text> </xsl:text>
     
     <xsl:if test="$nr &lt; $repeat">
@@ -364,7 +392,10 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
         </xsl:choose>
         <!--End of RefNo-2-->
       </xsl:for-each>
-      <t xml:space="preserve"><xsl:value-of select="'&#xD;'"/></t>
+      <t xml:space="preserve">
+		<!--<t>-->
+		  <xsl:value-of select="'&#xD;'"/>
+	  </t>
     </r>
     <!--RefNo-1:Adde condition or child::*//text() to consider text() in any level-->
     <xsl:if test="text() or text:span/text() or child::*//text()">

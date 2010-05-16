@@ -414,7 +414,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
               <xsl:attribute name="sz">
                 <xsl:for-each select ="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties">
-                  <xsl:call-template name ="convertToPoints">
+                  <xsl:call-template name ="STTextFontSizeInPoints">
                     <xsl:with-param name ="unit" select ="'pt'"/>
                     <xsl:with-param name ="length" select ="@fo:font-size"/>
                   </xsl:call-template>
@@ -425,7 +425,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:otherwise>
               <xsl:attribute name="sz">
                 <xsl:for-each select ="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$ParId]/style:text-properties">
-                  <xsl:call-template name ="convertToPoints">
+                  <xsl:call-template name ="STTextFontSizeInPoints">
                     <xsl:with-param name ="unit" select ="'pt'"/>
                     <xsl:with-param name ="length" select ="@fo:font-size"/>
                   </xsl:call-template>
@@ -648,6 +648,9 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
     </a:p>
   </xsl:template>
+  
+  
+  
   <xsl:template name ="handoutPagenumber">
     <xsl:param name ="Id"/>
     <a:bodyPr vert="horz" lIns="91440" tIns="45720" rIns="91440" bIns="45720" rtlCol="0" />
@@ -687,7 +690,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
               <xsl:attribute name="sz">
                 <xsl:for-each select ="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties">
-                  <xsl:call-template name ="convertToPoints">
+                  <xsl:call-template name ="STTextFontSizeInPoints">
                     <xsl:with-param name ="unit" select ="'pt'"/>
                     <xsl:with-param name ="length" select ="@fo:font-size"/>
                   </xsl:call-template>
@@ -697,7 +700,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:otherwise>
               <xsl:attribute name="sz">
                 <xsl:for-each select ="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$ParId]/style:text-properties">
-                  <xsl:call-template name ="convertToPoints">
+                  <xsl:call-template name ="STTextFontSizeInPoints">
                     <xsl:with-param name ="unit" select ="'pt'"/>
                     <xsl:with-param name ="length" select ="@fo:font-size"/>
                   </xsl:call-template>
@@ -934,7 +937,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:font-size">
               <xsl:attribute name="sz">
                 <xsl:for-each select ="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties">
-                  <xsl:call-template name ="convertToPoints">
+                  <xsl:call-template name ="STTextFontSizeInPoints">
                     <xsl:with-param name ="unit" select ="'pt'"/>
                     <xsl:with-param name ="length" select ="@fo:font-size"/>
                   </xsl:call-template>
@@ -945,7 +948,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:otherwise>
               <xsl:attribute name="sz">
                 <xsl:for-each select ="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$ParId]/style:text-properties">
-                  <xsl:call-template name ="convertToPoints">
+                  <xsl:call-template name ="STTextFontSizeInPoints">
                     <xsl:with-param name ="unit" select ="'pt'"/>
                     <xsl:with-param name ="length" select ="@fo:font-size"/>
                   </xsl:call-template>

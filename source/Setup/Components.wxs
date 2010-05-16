@@ -255,6 +255,7 @@
             <File Id="License" Name="License.txt" Source="$(var.ProjectDir)License.txt" DiskId="1" KeyPath="yes" />
           </Component>
 
+
           <!-- ODF-compatible Templates -->
           <Directory Id="Templates" Name="Templates">
             <Component Id="Templates2007" Guid="58DEE7A9-FDC9-4E8D-B031-B13B3ED18706">
@@ -366,6 +367,14 @@
             </Component>
           </Directory>
 
+			<!-- Dummy Wav Folder-->
+			<Directory Id="RESOURCES" Name="resources">
+				<Component Id="DummyWav1" Guid="7426EA73-97C2-451D-82CC-7931504518A3">
+					<File Id="DummyWavTestFile1" Name="Test.WAV"
+						  Source="$(var.OdfConverterLib.TargetDir)\resources\Test.WAV"
+						  DiskId="1" KeyPath="yes" />
+				</Component>
+			</Directory>
 
           <!--  Word template folder  -->
           <Directory Id="ODFTEMPLATEFOLDER" Name="Templates">
@@ -409,6 +418,8 @@
         </Directory>
       </Directory>
 
+	
+		
       <!-- Start menu entries -->
       <Directory Id="ProgramMenuFolder" SourceName="Blah">
         <!-- ProgramMenuFolder is a special folder, Windows installer will generate the correct dir names -->

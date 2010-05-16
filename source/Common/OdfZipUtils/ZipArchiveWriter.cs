@@ -997,21 +997,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                          }
                          else
                          {
-                             string[] tempPath = Assembly.GetExecutingAssembly().Location.Split('\\') ;
-                             string finalPath=null ;
-                             string separator="\\";
-                             foreach (string  item in tempPath)
-                             {
-                                 if(item.ToLower()!="source")
-                                 {
-                                     finalPath += item + separator;
-                                 }
-                                 else if (item.ToLower() == "source")
-                                 {
-                                     finalPath += item + separator + "Common\\OdfConverterLib\\resources\\Test.WAV";                                      
-                                     break;
-                }
-            }
+                           
+                             string tempPath =Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);                         
+                             string finalPath = Path.Combine(tempPath, "resources\\Test.WAV");                             
                              FileStream fsSourceFile = new FileStream(finalPath, FileMode.Open, FileAccess.Read);
                              int bytesCopied = streamCopy(fsSourceFile, _zipOutputStream);
                              Debug.WriteLine("CopyBinary : " + inputFilePath + " --> " + destination + ", bytes copied = " + bytesCopied);

@@ -179,6 +179,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 this.nextWriter.WriteString(GetColumnWidth(text.Substring(18)));
             }
+            else if (text.StartsWith("sonataRevisionHeaderGuid"))
+            {
+                Guid revisionHeaderGuid = System.Guid.NewGuid();
+                string revisionHeader = revisionHeaderGuid.ToString();             
+                this.nextWriter.WriteString(revisionHeaderGuid.ToString().ToUpper(System.Globalization.CultureInfo.InvariantCulture));
+            }
             
             //End of RefNo-1
             else

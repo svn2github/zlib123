@@ -376,23 +376,8 @@
             <xsl:value-of select="$colNumber"/>
           </xsl:with-param>
         </xsl:call-template>
-      </xsl:variable>
-      
-	  <!--Vijayeta,SP2,@table:number-columns-repeated-->
-      <!--<xsl:variable name="ColCharEnd">
-        <xsl:call-template name="NumbersToChars">
-          <xsl:with-param name="num">
-            <xsl:choose>
-              <xsl:when test="@table:number-columns-repeated != ''">
-                        <xsl:value-of select="$colNumber + @table:number-columns-repeated - $RepetedCol + 1"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$colNumber"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>-->
+      </xsl:variable>      
+	 
       <xsl:variable name="ColCharEnd">
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
@@ -998,8 +983,7 @@
   
   <xsl:template name="InsertConditionalCellElement">
     <xsl:param name="tableName"/>
-    <xsl:param name="ConditionalCellStyle"></xsl:param>
-    
+    <xsl:param name="ConditionalCellStyle"></xsl:param>    
    
     <xsl:variable name="styleName">
         <xsl:value-of select="substring-before($ConditionalCellStyle, '|')"/>
@@ -1007,13 +991,15 @@
    
     <xsl:variable name="quot">
       <xsl:text>&quot;</xsl:text>
-    </xsl:variable>
-    
+    </xsl:variable>    
     <!-- if cell style has condition -->
+	  <xsl:variable name ="condStyleTblColDummy">
+		  <xsl:value-of select ="./table:table-column[@table:default-cell-style-name=$styleName]/@table:style-name"/>
+	  </xsl:variable>
     <!-- there was a case where condition was "cell-content()=#NAME?G$45" and it caused a crash (but there can be #NAME condition as text occurence) -->
-    <xsl:if test="table:table-row/table:table-cell/@table:style-name = $styleName or 
-			(not(table:table-row/table:table-cell/@table:style-name) and ./table:table-column/@table:default-cell-style-name=$styleName)">
-		
+    <xsl:if test="(table:table-row/table:table-cell/@table:style-name = $styleName) or 
+			($condStyleTblColDummy!='')">
+		<!--table:table-row/table:table-cell/@table:style-name='') and-->
     <xsl:choose>
 		
       <!-- Formulas are not implemented. We rejected conditional with formulas. -->

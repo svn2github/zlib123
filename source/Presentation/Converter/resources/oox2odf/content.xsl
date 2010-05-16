@@ -2135,6 +2135,7 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:with-param name="rowPosition" select ="$rowPosition" />
                   <xsl:with-param name="grID" select ="$GraphicId" />
                   <xsl:with-param name="TypeId" select ="$TypeId" />
+                  <xsl:with-param name="prID" select ="concat('SLTableGr',$TypeId,'PARA',position(),generate-id(./child::node()/a:p))" />
                   <xsl:with-param name="sldId" select ="$TypeId" />
                   <xsl:with-param name ="SlideRelationId" select="$slideRel"/>
                 </xsl:call-template>

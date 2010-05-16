@@ -572,7 +572,7 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
             </xsl:choose>
           </xsl:variable>
 
-          <xsl:if test="$zoom">
+          <xsl:if test="$zoom!=''">
             <xsl:attribute name="zoomScale">
               <xsl:value-of select="$zoom"/>
             </xsl:attribute>

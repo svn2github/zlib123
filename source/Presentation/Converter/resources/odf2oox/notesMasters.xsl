@@ -108,6 +108,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:variable>
           <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName]">
             <!--Margin-->
+			  <xsl:if test="position()=1">			  
             <xsl:call-template name ="tmpMarLeft"/>
             <!--End-->
             <!--Indent-->
@@ -174,7 +175,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select="'1200'"/>
                   </xsl:when>
                   <xsl:otherwise>
-                <xsl:call-template name ="convertToPoints">
+                <xsl:call-template name ="STTextFontSizeInPoints">
                   <xsl:with-param name ="unit" select ="'pt'"/>
                   <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                 </xsl:call-template>
@@ -250,7 +251,7 @@ Copyright (c) 2007, Sonata Software Limited
               <a:solidFill>
                 <a:srgbClr>
                   <xsl:choose>
-                    <xsl:when test="./style:text-properties/@fo:color">
+                    <xsl:when test="substring-after(./style:text-properties/@fo:color,'#')!=''">
                       <xsl:attribute name="val">
                         <xsl:value-of select="substring-after(./style:text-properties/@fo:color,'#')" />
                       </xsl:attribute>
@@ -295,6 +296,7 @@ Copyright (c) 2007, Sonata Software Limited
               <a:ea typeface="+mn-ea"/>
               <a:cs typeface="+mn-cs"/>
             </a:defRPr>
+			  </xsl:if>
           </xsl:for-each>
         </a:lvl1pPr>
         <!--<a:lvl1pPr marL="0" algn="l" defTabSz="914400" rtl="0" eaLnBrk="1" latinLnBrk="0" hangingPunct="1">
@@ -505,7 +507,7 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:call-template>
                       </xsl:variable>
 
-                      <xsl:call-template name ="convertToPoints">
+                      <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -793,7 +795,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name="length" select="@fo:font-size"/>
                         </xsl:call-template>
                       </xsl:variable>
-                      <xsl:call-template name ="convertToPoints">
+                      <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -1160,7 +1162,7 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:call-template>
                       </xsl:variable>
 
-                      <xsl:call-template name ="convertToPoints">
+                      <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -1452,7 +1454,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name="length" select="@fo:font-size"/>
                         </xsl:call-template>
                       </xsl:variable>
-                      <xsl:call-template name ="convertToPoints">
+                      <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>

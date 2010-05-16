@@ -2776,7 +2776,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
-            <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:clrMap">
+                  <xsl:for-each select="/child::node()/p:clrMap">
               <xsl:call-template name="tmpThemeClr">
                 <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
               </xsl:call-template>

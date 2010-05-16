@@ -194,7 +194,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             //Shadow calculation
             else if (text.Contains("a-outerShdw-dist") || text.Contains("a-outerShdw-dir"))
             {
-
                 this.nextWriter.WriteString(EvalShadowExpression(text));
             }
             // This condition is to check for hyperlink relative path 
@@ -635,6 +634,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     x = Math.Sqrt(arrValue1 * arrValue1 + arrValue2 * arrValue2);
                     x = Math.Round(x * 360000);
+//OpenXML Validation Error-fix
+                    //added by yeswanth for conformance ST_PositiveCoordinate
+                    if (x > 27273042316900)
+                        x = 27273042316900;
                 }
                 if (arrVal[0].Contains("a-outerShdw-dir"))
                 {
@@ -1124,8 +1127,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     val1 = FML1;
                 }
             }
-
-
 
             return "val " + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", val1);
         }

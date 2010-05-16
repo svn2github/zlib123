@@ -789,7 +789,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test="$fontSize &gt; 0 ">
        
         <xsl:attribute name ="sz">
-          <xsl:call-template name ="convertToPoints">
+          <xsl:call-template name ="STTextFontSizeInPoints">
             <xsl:with-param name ="unit" select ="'pt'"/>
             <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
           </xsl:call-template>

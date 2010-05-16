@@ -1174,7 +1174,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:when test="@draw:shadow-color">
 					<xsl:value-of select="substring-after(@draw:shadow-color,'#')"/>
 				</xsl:when>
-				<xsl:when test="not(@draw:shadow-color)">
+				<xsl:when test="not(@draw:shadow-color) and document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties">
 					<xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties">
 						<xsl:value-of select="substring-after(@draw:shadow-color,'#')"/>
 					</xsl:for-each>
@@ -2277,8 +2277,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param  name="opacity" select="substring-before(@svg:stroke-opacity,'%')"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test ="@svg:stroke-color">
-      
+      <xsl:when test ="@svg:stroke-color">      
         <a:solidFill>
           <a:srgbClr  >
             <xsl:attribute name ="val">
@@ -2290,8 +2289,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="parentStyle" select="$parentStyle"/>
             </xsl:call-template>
           </a:srgbClr >
-        </a:solidFill>
-     
+        </a:solidFill>     
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -3801,7 +3799,10 @@ Copyright (c) 2007, Sonata Software Limited
 							</xsl:variable>
 							<xsl:if test ="$VarSz!=''">
 								<xsl:attribute name ="sz">
-									<xsl:value-of select ="substring-before($VarSz,'pt')*100"/>
+                                    <xsl:call-template name ="STTextFontSizeInPoints">
+                                      <xsl:with-param name ="unit" select ="'pt'"/>
+                                      <xsl:with-param name ="length" select ="$VarSz"/>
+                                    </xsl:call-template>
 								</xsl:attribute>
 							</xsl:if>
 						</xsl:if>
@@ -3942,7 +3943,10 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:variable>
 				<xsl:if test ="$VarSz!=''">
 					<xsl:attribute name ="sz">
-						<xsl:value-of select ="substring-before($VarSz,'pt')*100"/>
+                    <xsl:call-template name ="STTextFontSizeInPoints">
+                      <xsl:with-param name ="unit" select ="'pt'"/>
+                      <xsl:with-param name ="length" select ="$VarSz"/>
+                    </xsl:call-template>
 					</xsl:attribute>
 				</xsl:if>				
               <a:latin charset="0"  >

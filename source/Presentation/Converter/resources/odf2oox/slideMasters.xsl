@@ -474,6 +474,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select="concat($slideMasterName,'-title')"/>
             </xsl:variable>
             <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$titleName]">
+				  <xsl:if test="position()=1">
               <xsl:attribute name ="algn">
                 <!--fo:text-align-->
                 <xsl:choose >
@@ -523,7 +524,7 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:attribute name="sz">
-                    <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                       <xsl:with-param name ="unit" select ="'pt'"/>
                       <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                     </xsl:call-template>
@@ -598,11 +599,14 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:attribute >
                   </xsl:when>
                 </xsl:choose>
+
                 <a:solidFill>
                   <a:srgbClr>
                     <xsl:attribute name="val">
+									  <xsl:if test="substring-after(./style:text-properties/@fo:color,'#')!=''">
                       <xsl:value-of select="substring-after(./style:text-properties/@fo:color,'#')" />
-                      <xsl:if test="not(./style:text-properties/@fo:color)">
+									  </xsl:if>
+									  <xsl:if test="substring-after(./style:text-properties/@fo:color,'#')=''">
                         <xsl:value-of select="'000000'" />
                       </xsl:if>
                     </xsl:attribute>
@@ -640,6 +644,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <a:ea typeface="+mj-ea"/>
                 <a:cs typeface="+mj-cs"/>
               </a:defRPr>
+				  </xsl:if>
             </xsl:for-each>
           </a:lvl1pPr>
         </p:titleStyle>
@@ -653,6 +658,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select="concat($slideMasterName,'-outline1')"/>
               </xsl:variable>
               <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName]">
+				  <xsl:if test="position()=1">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true'">
@@ -761,7 +767,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+                      <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -860,7 +866,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:solidFill>
                     <a:srgbClr>
                       <xsl:choose>
-                        <xsl:when test="./style:text-properties/@fo:color">
+                        <xsl:when test="substring-after(./style:text-properties/@fo:color,'#')!=''">
                           <xsl:attribute name="val">
                             <xsl:value-of select="substring-after(./style:text-properties/@fo:color,'#')" />
                           </xsl:attribute>
@@ -905,6 +911,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl1pPr>
             <a:lvl2pPr>
@@ -915,6 +922,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
               </xsl:variable>
               <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName2]">
+				  <xsl:if test="position()=1">
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
                     <xsl:variable name="margin">
@@ -1028,7 +1036,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -1210,6 +1218,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl2pPr>
             <a:lvl3pPr>
@@ -1226,6 +1235,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name ="length" select ="./style:paragraph-properties/@fo:margin-left"/>
                 </xsl:call-template>
               </xsl:attribute>-->
+				  <xsl:if test="position()=1">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -1338,7 +1348,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -1521,6 +1531,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
 
             </a:lvl3pPr>
@@ -1538,6 +1549,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name ="length" select ="./style:paragraph-properties/@fo:margin-left"/>
                 </xsl:call-template>
               </xsl:attribute>-->
+				  <xsl:if test="position()=1">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -1648,7 +1660,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -1830,6 +1842,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl4pPr>
             <a:lvl5pPr>
@@ -1841,6 +1854,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:variable>
               <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName5]">
                 <!--Margin-->
+				  <xsl:if test="position()=1">
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
                     <xsl:variable name="margin">
@@ -1945,7 +1959,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -2127,6 +2141,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl5pPr>
             <a:lvl6pPr>
@@ -2137,6 +2152,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
               </xsl:variable>
               <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName6]">
+				  <xsl:if test="position()=1">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -2247,7 +2263,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -2429,6 +2445,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl6pPr>
             <a:lvl7pPr>
@@ -2439,6 +2456,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
               </xsl:variable>
               <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName7]">
+				  <xsl:if test="position()=1">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -2548,7 +2566,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -2730,6 +2748,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl7pPr>
             <a:lvl8pPr>
@@ -2740,6 +2759,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
               </xsl:variable>
               <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName8]">
+				  <xsl:if test="position()=1">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -2849,7 +2869,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -3031,6 +3051,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl8pPr>
             <a:lvl9pPr>
@@ -3042,6 +3063,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:variable>
               <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName9]">
                 <!--Margin-->
+				  <xsl:if test="position()=1">
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
                     <xsl:variable name="margin">
@@ -3151,7 +3173,7 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:variable>
 
                     <xsl:attribute name="sz">
-                      <xsl:call-template name ="convertToPoints">
+								  <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -3334,6 +3356,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <a:ea typeface="+mn-ea"/>
                   <a:cs typeface="+mn-cs"/>
                 </a:defRPr>
+				  </xsl:if>
               </xsl:for-each>
             </a:lvl9pPr>
           </p:bodyStyle>
@@ -4568,7 +4591,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:with-param name="length" select="@fo:font-size"/>
                     </xsl:call-template>
                   </xsl:variable>
-                      <xsl:call-template name ="convertToPoints">
+                      <xsl:call-template name ="STTextFontSizeInPoints">
                         <xsl:with-param name ="unit" select ="'pt'"/>
                         <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
                       </xsl:call-template>
@@ -4733,12 +4756,12 @@ Copyright (c) 2007, Sonata Software Limited
               <a:solidFill>
                 <a:srgbClr>
                     <xsl:choose>
-                    <xsl:when test="document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:color">
-                      <xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">
+                    <xsl:when test="substring-after(document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:color,'#')!=''">
+                      <!--<xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">-->
                         <xsl:attribute name="val">
-                          <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
+                          <xsl:value-of select="substring-after(document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:color,'#')"/>
                         </xsl:attribute>
-                      </xsl:for-each>
+                      <!--</xsl:for-each>-->
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:attribute name="val">

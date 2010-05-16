@@ -3047,7 +3047,7 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:variable>
         <style:style style:family="paragraph">
           <xsl:attribute name ="style:name">
-            <xsl:value-of select ="concat($ParaId,generate-id())"/>
+            <xsl:value-of select ="concat($ParaId,generate-id(),position())"/>
           </xsl:attribute >
           <style:paragraph-properties  text:enable-numbering="false" >
             <xsl:if test ="parent::node()/a:bodyPr/@vert='vert'">

@@ -345,6 +345,28 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:for-each>
   </xsl:template>
   
+  <xsl:template name ="STTextFontSizeInPoints">
+    <xsl:param name ="unit"/>
+    <xsl:param name ="length"/>
+    <xsl:variable name="varSz">
+      <xsl:call-template name="convertToPoints">
+        <xsl:with-param name="unit" select="$unit"/>
+        <xsl:with-param name="length" select="$length"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$varSz &gt; 4000">
+        <xsl:value-of select="4000"/>
+      </xsl:when>
+      <xsl:when test="$varSz &lt; 1">
+        <xsl:value-of select="1"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$varSz"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template >
+  
 	<xsl:template name ="convertToPoints">
 		<xsl:param name ="unit"/>
 		<xsl:param name ="length"/>
@@ -750,7 +772,7 @@ Copyright (c) 2007, Sonata Software Limited
 
         <xsl:if test="$fontSize &gt; 0 ">
 				<xsl:attribute name ="sz">
-					<xsl:call-template name ="convertToPoints">
+					<xsl:call-template name ="STTextFontSizeInPoints">
 						<xsl:with-param name ="unit" select ="'pt'"/>
 						<xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
 					</xsl:call-template>
@@ -926,12 +948,16 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
 			<xsl:if test ="style:text-properties/@fo:color">
 				<a:solidFill>
+            <xsl:variable name="varSrgbVal">
+              <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
 					<a:srgbClr  >
 						<xsl:attribute name ="val">
-							<!--<xsl:value-of   select ="substring-after(style:text-properties/@fo:color,'#')"/>-->
-							<xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+                  <xsl:value-of select ="$varSrgbVal"/>
 						</xsl:attribute>
 					</a:srgbClr >
+            </xsl:if>            
 				</a:solidFill>
 			</xsl:if>
       <xsl:if test ="not(style:text-properties/@fo:color) and ($flagPresentationClass='No' or $prClassName='subtitle')">
@@ -977,31 +1003,42 @@ Copyright (c) 2007, Sonata Software Limited
 
       <!-- Underline color -->
       <xsl:if test ="style:text-properties/@style:text-underline-color">
-        <a:uFill>
-          <a:solidFill>
-            <a:srgbClr>
               <xsl:choose>
                 <xsl:when test="style:text-properties/@style:text-underline-color='font-color'">
-                  <xsl:attribute name ="val">
-                    <xsl:if test="style:text-properties/@fo:color">
+					<xsl:choose>
+						<xsl:when test="style:text-properties/@fo:color">
+        <a:uFill>
+          <a:solidFill>
+            <a:srgbClr>             
+                  <xsl:attribute name ="val">                    
                     <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
-                    </xsl:if>
-                    <xsl:if test="not(style:text-properties/@fo:color)">
+
+										</xsl:attribute>
+									</a:srgbClr>
+								</a:solidFill>
+							</a:uFill>
+						</xsl:when>
+						<xsl:when test="not(style:text-properties/@fo:color) and document('styles.xml')//style:style[@style:name = $parentStyleName]/style:text-properties/@fo:color">
                       <xsl:for-each select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:text-properties">
-                        <xsl:value-of select ="translate(substring-after(@fo:color,'#'),$lcletters,$ucletters)"/>
-                      </xsl:for-each>
-                    </xsl:if>
+								<xsl:if test="position()=1">
+									<a:uFill>
+										<a:solidFill>
+											<a:srgbClr>
+												<xsl:attribute name ="val">
+                        <xsl:value-of select ="translate(substring-after(@fo:color,'#'),$lcletters,$ucletters)"/>                     
                   </xsl:attribute>
+											</a:srgbClr>
+										</a:solidFill>
+									</a:uFill>
+								</xsl:if>
+							</xsl:for-each>
+						</xsl:when>
+					</xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
-              </xsl:attribute>
+                    <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>             
                 </xsl:otherwise>
-              </xsl:choose>
-            </a:srgbClr>
-          </a:solidFill>
-        </a:uFill>
+              </xsl:choose>          
       </xsl:if>
       <xsl:if test ="not(style:text-properties/@style:text-underline-color) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
@@ -1507,9 +1544,13 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:choose>
         <xsl:when test ="style:graphic-properties/@draw:fill='solid'">
           <a:solidFill>
+              <xsl:variable name="varSrgbVal">
+                <xsl:value-of select ="translate(substring-after(style:graphic-properties/@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+              </xsl:variable>
+              <xsl:if test="$varSrgbVal != ''">
             <a:srgbClr  >
               <xsl:attribute name ="val">
-                <xsl:value-of select ="translate(substring-after(style:graphic-properties/@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+                    <xsl:value-of select ="$varSrgbVal"/>
               </xsl:attribute>
                 <xsl:choose>
                   <xsl:when test="$opacity!=''">
@@ -1526,8 +1567,8 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:if>
                   </xsl:otherwise>
                 </xsl:choose>
-
             </a:srgbClr >
+              </xsl:if>              
           </a:solidFill>
         </xsl:when>
         <xsl:when test ="style:graphic-properties/@draw:fill='none'">
@@ -1948,11 +1989,16 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:choose>
             <xsl:when test="@fo:color">
               <a:solidFill>
+                <xsl:variable name="varSrgbVal">
+                  <xsl:value-of select ="translate(substring-after(@fo:color,'#'),$lcletters,$ucletters)"/>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
                 <a:srgbClr  >
                   <xsl:attribute name ="val">
-                    <xsl:value-of select ="translate(substring-after(@fo:color,'#'),$lcletters,$ucletters)"/>
+                      <xsl:value-of select ="$varSrgbVal"/>
                   </xsl:attribute>
                 </a:srgbClr >
+                </xsl:if>
               </a:solidFill>
             </xsl:when>
             <xsl:when test="@style:use-window-font-color='true'">
@@ -2151,11 +2197,16 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test ="@style:text-underline-color">
               <a:uFill>
                 <a:solidFill>
+                  <xsl:variable name="varSrgbVal">
+                    <xsl:value-of select ="substring-after(@style:text-underline-color,'#')"/>
+                  </xsl:variable>
+                  <xsl:if test="$varSrgbVal != ''">
                   <a:srgbClr>
                     <xsl:attribute name ="val">
-                      <xsl:value-of select ="substring-after(@style:text-underline-color,'#')"/>
+                        <xsl:value-of select ="$varSrgbVal"/>
                     </xsl:attribute>
                   </a:srgbClr>
+                  </xsl:if>                  
                 </a:solidFill>
               </a:uFill>
             </xsl:when>
@@ -2915,7 +2966,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:if>
             </a:endParaRPr>
           </xsl:if>
-          <!--End, Bug 1744106 fixed by vijayeta, date 16th Aug '07, add a new templaet to set font size and family in endPara-->
+          <!--End, Bug 1744106 fixed by vijayeta, date 16th Aug '07, add a new template to set font size and family in endPara-->
         </xsl:if>
         <xsl:if test ="./text:line-break">
           <xsl:call-template name ="processBR">
@@ -3035,7 +3086,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:variable>
       <xsl:if test="$fontSize > 0">
         <xsl:attribute name="sz">
-          <xsl:call-template name="convertToPoints">
+          <xsl:call-template name="STTextFontSizeInPoints">
             <xsl:with-param name="unit" select="'pt'" />
             <xsl:with-param name="length" select="concat($fontSize,'pt')" />
           </xsl:call-template>
@@ -3083,7 +3134,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:variable>
       <xsl:if test="$fontSize &gt; 0 ">
         <xsl:attribute name ="sz">
-          <xsl:call-template name ="convertToPoints">
+          <xsl:call-template name ="STTextFontSizeInPoints">
             <xsl:with-param name ="unit" select ="'pt'"/>
             <xsl:with-param name ="length" select ="concat($fontSize,'pt')"/>
           </xsl:call-template>
@@ -3152,12 +3203,16 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
       <xsl:if test ="style:text-properties/@fo:color">
         <a:solidFill>
+            <xsl:variable name="varSrgbVal">
+              <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
           <a:srgbClr  >
             <xsl:attribute name ="val">
-              <!--<xsl:value-of   select ="substring-after(style:text-properties/@fo:color,'#')"/>-->
-              <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+                  <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
           </a:srgbClr >
+            </xsl:if>
         </a:solidFill>
       </xsl:if>
       <!-- Text Shadow fix -->
@@ -3183,11 +3238,16 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test ="style:text-properties/style:text-underline-color">
         <a:uFill>
           <a:solidFill>
+              <xsl:variable name="varSrgbVal">
+                <xsl:value-of select ="substring-after(style:text-properties/style:text-underline-color,'#')"/>
+              </xsl:variable>
+              <xsl:if test="$varSrgbVal != ''">
             <a:srgbClr>
               <xsl:attribute name ="val">
-                <xsl:value-of select ="substring-after(style:text-properties/style:text-underline-color,'#')"/>
+                    <xsl:value-of select ="$varSrgbVal"/>
               </xsl:attribute>
             </a:srgbClr>
+              </xsl:if>
           </a:solidFill>
         </a:uFill>
       </xsl:if>
@@ -3231,12 +3291,16 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
       <xsl:if test ="style:text-properties/@fo:color">
         <a:solidFill>
+            <xsl:variable name="varSrgbVal">
+              <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
           <a:srgbClr  >
             <xsl:attribute name ="val">
-              <!--<xsl:value-of   select ="substring-after(style:text-properties/@fo:color,'#')"/>-->
-              <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+                  <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
           </a:srgbClr >
+            </xsl:if>          
         </a:solidFill>
       </xsl:if>
       <!-- Text Shadow fix -->
@@ -4232,7 +4296,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="listItemCount" />
     
     <xsl:variable name="forCount" select="position()" />
-    <xsl:for-each select ="child::node()[position()]">
+    <!--to avoid duplicate rIds in .rels file-->
+    <xsl:for-each select ="child::node()[position()=1]">
       <xsl:choose >
         <xsl:when test ="name()='text:list-item'">
           <xsl:variable name ="blvl">
@@ -6337,8 +6402,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name ="listId" select="$listId" />
           <xsl:with-param name ="grpFlag" select="$grpFlag" />
           <xsl:with-param name ="UniqueId" select="$UniqueId" />
-          <xsl:with-param name ="listItemCount" select="generate-id()" />
-          
+          <xsl:with-param name ="listItemCount" select="generate-id()" />          
         </xsl:call-template>
       </xsl:if>
     </xsl:for-each>
