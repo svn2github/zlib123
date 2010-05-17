@@ -194,16 +194,6 @@
 
 			<ComponentRef Id="RegistryFixKB908002"/>
 
-		</Feature>
-		<Feature Id="resources"
-				 Title="resources"
-				 Level="1"
-				 ConfigurableDirectory="RESOURCES"
-				 Description="resources"
-				 AllowAdvertise='no'
-				 TypicalDefault='install'
-				 >
-			<ComponentRef Id="DummyWav1"/>
-		</Feature>
+		</Feature>	
 	</Fragment>
 </Wix>

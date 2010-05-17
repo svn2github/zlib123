@@ -366,15 +366,7 @@
               </RegistryKey>
             </Component>
           </Directory>
-
-			<!-- Dummy Wav Folder-->
-			<Directory Id="RESOURCES" Name="resources">
-				<Component Id="DummyWav1" Guid="7426EA73-97C2-451D-82CC-7931504518A3">
-					<File Id="DummyWavTestFile1" Name="Test.WAV"
-						  Source="$(var.OdfConverterLib.TargetDir)\resources\Test.WAV"
-						  DiskId="1" KeyPath="yes" />
-				</Component>
-			</Directory>
+		
 
           <!--  Word template folder  -->
           <Directory Id="ODFTEMPLATEFOLDER" Name="Templates">
