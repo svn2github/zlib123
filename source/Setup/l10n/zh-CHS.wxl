@@ -93,10 +93,10 @@
   <String Id="MyInstallScopeDlgPerUserDescription">[ProductName] 将安装在每用户文件夹中，且仅对您的用户帐户可用。您不需要具备本地管理员权限。</String>
   <String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}安装范围</String>
 
-  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}ODF Support in Microsoft Office</String>
-  <String Id="MyOfficeOdfDlgDescription"></String>
-  <String Id="MyOfficeOdfDlgDetailedDescription">Please note that the version of Microsoft Office that you have currently installed already supports ODF natively.</String>
-  <String Id="MyOfficeOdfDlgDetailedDescription2">You can decide to install [ProductName] in addition to the existing ODF support or press !(loc.WixUICancel) to exit setup.</String>
+  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}Microsoft Office 中的 ODF 支持</String>
+  <String Id="MyOfficeOdfDlgDescription">请注意您的 Office 版本中的自带 ODF 支持。</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription">请注意，您当前安装的 Microsoft Office 版本本身已支持 ODF。</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription2">除现有 ODF 支持外，您可以决定安装 [ProductName] 或按 !(loc.WixUICancel) 退出设置。</String>
 
   <String Id="BrowseDlg_Title">[ProductName] 安装程序</String>
   <String Id="BrowseDlgBannerBitmap">WixUI_Bmp_Banner</String>

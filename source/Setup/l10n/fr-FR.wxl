@@ -102,10 +102,10 @@
   <String Id="CustomizeDlgLocationLabel">Emplacement :</String>
   <String Id="MyCustomizeDlgTree">Arborescence des sélections</String>
 
-  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}ODF Support in Microsoft Office</String>
-  <String Id="MyOfficeOdfDlgDescription"></String>
-  <String Id="MyOfficeOdfDlgDetailedDescription">Please note that the version of Microsoft Office that you have currently installed already supports ODF natively.</String>
-  <String Id="MyOfficeOdfDlgDetailedDescription2">You can decide to install [ProductName] in addition to the existing ODF support or press !(loc.WixUICancel) to exit setup.</String>
+  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}Support du format ODF avec Microsoft Office</String>
+  <String Id="MyOfficeOdfDlgDescription">La version de Microsoft Office installée inclut déjà le support du format ODF.</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription">Veuillez noter que la version de Microsoft Office que vous utilisez inclut déjà le support du format ODF. </String>
+  <String Id="MyOfficeOdfDlgDetailedDescription2">Vous pouvez choisir d’installer [ProductName] en plus du support du format ODF déjà inclus dans Microsoft Office. Ou bien, vous pouvez annuler l’installation en cliquant sur le bouton !(loc.WixUICancel).</String>
 
   <String Id="ErrorDlgErrorIconTooltip">Icône d'informations</String>
   <String Id="ErrorDlgErrorText">Texte d'informations</String>

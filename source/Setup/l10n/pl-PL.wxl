@@ -94,10 +94,10 @@
 
   <String Id="MyCustomizeDlgTree">Drzewo wyborów</String>
 
-  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}ODF Support in Microsoft Office</String>
-  <String Id="MyOfficeOdfDlgDescription"></String>
-  <String Id="MyOfficeOdfDlgDetailedDescription">Please note that the version of Microsoft Office that you have currently installed already supports ODF natively.</String>
-  <String Id="MyOfficeOdfDlgDetailedDescription2">You can decide to install [ProductName] in addition to the existing ODF support or press !(loc.WixUICancel) to exit setup.</String>
+  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}Obsługa formatu ODF w pakiecie Microsoft Office</String>
+  <String Id="MyOfficeOdfDlgDescription">Zainstalowana wersja pakietu Office oferuje natywną obsługę formatu ODF.</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription">Aktualnie zainstalowana wersja pakietu Microsoft Office już obsługuje format ODF natywnie.</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription2">Możesz zainstalować dodatek [ProductName] niezależnie od istniejącej obsługi formatu ODF lub nacisnąć przycisk !(loc.WixUICancel), aby zakończyć pracę Instalatora.</String>
 
   <String Id="msierrXmlConfigFailedOpen">Nie można otworzyć pliku XML [3], błąd systemu: [2]</String>
   <String Id="msierrXmlConfigFailedRead">Podczas konfigurowania plików XML wystąpił błąd.</String>

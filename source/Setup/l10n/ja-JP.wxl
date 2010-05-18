@@ -92,10 +92,10 @@
   <String Id="MyInstallScopeDlgFolderLabel">インストール フォルダ(&amp;F):</String>
   <String Id="MyInstallScopeDlgChange">変更(&amp;C)...</String>
 
-  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}ODF Support in Microsoft Office</String>
-  <String Id="MyOfficeOdfDlgDescription"></String>
-  <String Id="MyOfficeOdfDlgDetailedDescription">Please note that the version of Microsoft Office that you have currently installed already supports ODF natively.</String>
-  <String Id="MyOfficeOdfDlgDetailedDescription2">You can decide to install [ProductName] in addition to the existing ODF support or press !(loc.WixUICancel) to exit setup.</String>
+  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}Microsoft Office での ODF サポート</String>
+  <String Id="MyOfficeOdfDlgDescription">ご使用のバージョンの Office では、ODF がネイティブ サポートされています。</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription">現在インストールされている バージョンの Microsoft Office ではすでに ODF がネイティブ サポートされています。</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription2">既存の ODF サポートに加えて [ProductName] をインストールできます。このままセットアップを終了するには !(loc.WixUICancel) を押してください。</String>
 
   <String Id="msierrXmlConfigFailedOpen">XML ファイル[3]を開けませんでした、システム エラー: [2]</String>
   <String Id="msierrXmlConfigFailedRead">XML ファイルの構成中にエラーが発生しました。</String>

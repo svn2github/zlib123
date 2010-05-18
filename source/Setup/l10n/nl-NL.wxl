@@ -92,10 +92,10 @@
   <String Id="MyInstallScopeDlgPerUserDescription">[ProductName] wordt in een gebruikersspecifieke map geïnstalleerd en wordt alleen beschikbaar gesteld aan uw gebruikersaccount. Hiervoor hebt u geen lokale beheerdersrechten (Administrator) nodig.</String>
   <String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}Installatiebereik</String>
 
-  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}ODF Support in Microsoft Office</String>
-  <String Id="MyOfficeOdfDlgDescription"></String>
-  <String Id="MyOfficeOdfDlgDetailedDescription">Please note that the version of Microsoft Office that you have currently installed already supports ODF natively.</String>
-  <String Id="MyOfficeOdfDlgDetailedDescription2">You can decide to install [ProductName] in addition to the existing ODF support or press !(loc.WixUICancel) to exit setup.</String>
+  <String Id="MyOfficeOdfDlgTitle">{\WixUI_Font_Title}ODF-ondersteuning in Microsoft Office</String>
+  <String Id="MyOfficeOdfDlgDescription">Uw versie van Microsoft Office biedt ODF-ondersteuning.</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription">De huidige geïnstalleerde versie van Microsoft Office beschikt al over ondersteuning voor ODF.</String>
+  <String Id="MyOfficeOdfDlgDetailedDescription2">U kunt [ProductName] installeren naast de bestaande ODF-ondersteuning of de installatie afsluiten door op !(loc.WixUICancel) te klikken.</String>
 
   <String Id="UITextNewFolder">Map|Nieuwe map</String>
 

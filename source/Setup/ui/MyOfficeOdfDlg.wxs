@@ -37,7 +37,7 @@
         <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
         <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
 
-        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MyOfficeOdfDlgTitle)" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MyOfficeOdfDlgTitle)" />
         <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MyOfficeOdfDlgDescription)" />
         <Control Id="DetailedDescription" Type="Text" X="25" Y="55" Height="30" Width="300" Transparent="yes" NoPrefix="yes" Text="!(loc.MyOfficeOdfDlgDetailedDescription)" />
         
