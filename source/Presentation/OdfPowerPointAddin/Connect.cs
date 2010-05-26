@@ -109,6 +109,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
             switch (this._officeVersion)
             {
                 case OfficeVersion.Office2007:
+                case OfficeVersion.Office2010:
                     doc.Invoke("SaveAs", fileName, PpSaveAsFileType.ppSaveAsOpenXMLPresentation, MsoTriState.msoFalse);
                     break;
 
@@ -277,6 +278,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                                 RestoreDefault(oldFormat);
                                 break;
                             case OfficeVersion.Office2007:
+                            case OfficeVersion.Office2010:
                                 // duplicate the file
                                 object newName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
                                 File.Copy((string)sourceFileName, (string)newName);
