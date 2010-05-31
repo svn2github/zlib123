@@ -62,8 +62,8 @@
   <xsl:import href="2odf-sections.xsl" />
 
   <xsl:strip-space elements="*" />
-  <xsl:preserve-space elements="w:p" />
-  <xsl:preserve-space elements="w:r" />
+  <!--<xsl:preserve-space elements="w:p" />
+  <xsl:preserve-space elements="w:r" />-->
 
   <xsl:key name="InstrText" match="w:instrText" use="''" />
   <xsl:key name="bookmarkStart" match="w:bookmarkStart" use="@w:id" />
@@ -806,9 +806,7 @@
 
       <!-- attach automatic style-->
       <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
-        <text:span text:style-name="{generate-id(self::node())}">
-          <xsl:apply-templates />
-        </text:span>
+        <text:span text:style-name="{generate-id(self::node())}"><xsl:apply-templates /></text:span>
       </xsl:when>
 
       <!--default scenario-->
@@ -934,9 +932,7 @@
       <xsl:when test="not(contains(., '  ') or substring(., 1, 1) = ' ')">
         <xsl:choose>
           <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink' and ../w:rPr/w:color">
-            <text:span text:style-name="{generate-id(..)}">
-              <xsl:value-of select="." />
-            </text:span>
+            <text:span text:style-name="{generate-id(..)}"><xsl:value-of select="." /></text:span>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="." />
@@ -947,9 +943,7 @@
         <!--converts whitespaces sequence to text:s-->
         <xsl:choose>
           <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink' and ../w:rPr/w:color">
-            <text:span text:style-name="{generate-id(..)}">
-              <xsl:call-template name="InsertWhiteSpaces" />
-            </text:span>
+            <text:span text:style-name="{generate-id(..)}"><xsl:call-template name="InsertWhiteSpaces" /></text:span>
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="InsertWhiteSpaces" />
@@ -965,9 +959,7 @@
     <xsl:if test="not(preceding-sibling::w:t[1]) and not(parent::w:r/preceding-sibling::w:r[1])">
       <xsl:variable name="prev-paragraph" select="ancestor-or-self::w:p[1]/preceding-sibling::w:p[1]" />
       <xsl:if test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap]">
-        <text:span text:style-name="{generate-id($prev-paragraph/w:r[1])}">
-          <xsl:value-of select="$prev-paragraph/w:r[1]/w:t" />
-        </text:span>
+        <text:span text:style-name="{generate-id($prev-paragraph/w:r[1])}"><xsl:value-of select="$prev-paragraph/w:r[1]/w:t" /></text:span>
       </xsl:if>
     </xsl:if>
   </xsl:template>
@@ -1076,10 +1068,8 @@
 
   <!-- symbols -->
   <xsl:template match="w:sym">
-    <text:span text:style-name="{generate-id(.)}">
-      <!-- character post-processing -->
-      <pchar:symbol pchar:code="{@w:char}" />
-    </text:span>
+    <!-- character post-processing -->
+    <text:span text:style-name="{generate-id(.)}"><pchar:symbol pchar:code="{@w:char}" /></text:span>
   </xsl:template>
 
   <!-- ignore text in automatic styles mode -->

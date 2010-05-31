@@ -143,7 +143,7 @@
                       }
                       else
                       {
-                          result = uri.ToString().Substring(uriBase.ToString().Length - @"dummy.odt\".Length);
+                          result = "../" + uri.ToString().Substring(uriBase.ToString().Length - @"dummy.odt\".Length);
                       }
                   }
                   else

@@ -651,7 +651,7 @@ Fix to prevent Loss of TOC contents on Update
             <xsl:if test="@fo:font-weight = 'bold' ">
               <w:instrText xml:space="preserve">\b </w:instrText>
             </xsl:if>
-            <xsl:if test="@fo:font-style = 'italic' ">
+            <xsl:if test="@fo:font-style = 'italic' or @style:font-style-complex = 'italic'">
               <w:instrText xml:space="preserve">\i </w:instrText>
             </xsl:if>
           </xsl:for-each>

@@ -177,7 +177,6 @@
     <!-- field creating is triggered by the first w:instrText or in case the field wraps over several paragraphs -->
     <xsl:if test="@oox:fStart">
       <text:span text:style-name="{generate-id(.)}">
-
         <xsl:variable name="fieldCode">
           <xsl:call-template name="BuildFieldCode" />
         </xsl:variable>
@@ -188,7 +187,6 @@
           <xsl:with-param name="fieldDisplayValue" select="key('fieldRunsByParaId', @oox:fpid)[@oox:fid = $fieldId]" />
           <xsl:with-param name="isLocked" select="@oox:flocked = '1'" />
         </xsl:call-template>
-
       </text:span>
     </xsl:if>
   </xsl:template>
@@ -1555,7 +1553,7 @@
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumber">
     <xsl:param name="fieldCode" />
-    
+
     <xsl:variable name="docName">
       <xsl:call-template name="GetDocumentName" />
     </xsl:variable>

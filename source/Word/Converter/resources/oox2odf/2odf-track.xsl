@@ -186,9 +186,7 @@
 
   <xsl:template name="TrackChangesInsertMade">
     <text:change-start text:change-id="{generate-id(.)}" />
-    <text:span text:style-name="{generate-id(.)}">
-      <xsl:apply-templates />
-    </text:span>
+    <text:span text:style-name="{generate-id(.)}"><xsl:apply-templates /></text:span>
     <text:change-end text:change-id="{generate-id(.)}" />
   </xsl:template>
 
@@ -204,9 +202,7 @@
 
   <xsl:template name="TrackChangesChangesMade">
     <text:change-start text:change-id="{generate-id(.)}" />
-    <text:span text:style-name="{generate-id(.)}">
-      <xsl:value-of select="descendant::text()" />
-    </text:span>
+    <text:span text:style-name="{generate-id(.)}"><xsl:value-of select="descendant::text()" /></text:span>
     <text:change-end text:change-id="{generate-id(.)}" />
   </xsl:template>
 

@@ -1291,21 +1291,28 @@
       </xsl:when>
     </xsl:choose>
 
-    <!--<xsl:if test="@fo:font-style-complex">
-      <xsl:choose>
-        <xsl:when test="@fo:font-style-complex = 'italic' or @fo:font-style-complex = 'oblique'">
-          <w:iCs w:val="on"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:iCs w:val="off"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>-->
-
     <xsl:choose>
-      <xsl:when test="@fo:font-style-complex">
+      <xsl:when test="@style:font-style-complex">
         <xsl:choose>
-          <xsl:when test="@fo:font-style-complex = 'italic' or @fo:font-style-complex = 'oblique'">
+          <xsl:when test="@style:font-style-complex = 'italic' or @style:font-style-complex = 'oblique'">
+            <w:iCs w:val="1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:iCs w:val="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="not(@style:font-style-complex) and $textProp/@style:font-style-complex">
+        <xsl:if test="$textProp/@style:font-style-complex = 'italic'">
+          <w:iCs w:val="1"/>
+        </xsl:if>
+      </xsl:when>
+    </xsl:choose>
+    
+    <xsl:choose>
+      <xsl:when test="@style:font-style-complex">
+        <xsl:choose>
+          <xsl:when test="@style:font-style-complex = 'italic' or @style:font-style-complex = 'oblique'">
             <!--<w:iCs w:val="on"/>-->
             <w:iCs w:val="1"/>
           </xsl:when>
@@ -1315,12 +1322,12 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="not(@fo:font-style-complex)
-							and $textProp/@fo:font-style-complex">
+      <xsl:when test="not(@style:font-style-complex)
+							and $textProp/@style:font-style-complex">
         <xsl:for-each select ="$textProp">
           <xsl:choose>
-            <xsl:when test="@fo:font-style-complex = 'italic' 
-							            or @fo:font-style-complex = 'oblique'">
+            <xsl:when test="@style:font-style-complex = 'italic' 
+							            or @style:font-style-complex = 'oblique'">
               <!--<w:iCs w:val="on"/>-->
               <w:iCs w:val="1"/>
             </xsl:when>
@@ -2292,6 +2299,10 @@
       </w:em>
 		</xsl:if>-->
 
+    <xsl:if test="@style:script-type = 'complex'">
+      <w:cs />
+    </xsl:if>
+      
     <xsl:choose>
       <xsl:when test="@style:text-emphasize">
         <w:em>
