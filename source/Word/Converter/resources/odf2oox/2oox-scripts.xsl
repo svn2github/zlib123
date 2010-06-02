@@ -108,6 +108,11 @@
       
       public string UriFromPath(string path)
       {
+          return UriFromPath(path, false);
+      }
+      
+      public string UriFromPath(string path, bool absolute)
+      {
           string result = string.Empty;
               
           try
@@ -143,7 +148,17 @@
                       }
                       else
                       {
-                          result = "../" + uri.ToString().Substring(uriBase.ToString().Length - @"dummy.odt\".Length);
+                          if (absolute)
+                          {
+                              result = uri.ToString();
+                          }
+                          else
+                          {
+                              Uri uriCurrentDir = new Uri(
+                                  Environment.CurrentDirectory.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? 
+                                    Environment.CurrentDirectory : Environment.CurrentDirectory + System.IO.Path.DirectorySeparatorChar);
+                              result = uriCurrentDir.MakeRelativeUri(uri).ToString(); //uri.ToString().Substring(uriBase.ToString().Length - @"dummy.odt\".Length);
+                          }
                       }
                   }
                   else

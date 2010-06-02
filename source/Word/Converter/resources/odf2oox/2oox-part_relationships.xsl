@@ -164,7 +164,7 @@
 <!--OLE,vipul-->
 
             <xsl:choose>
-              <xsl:when test="starts-with(@xlink:href,'ObjectReplacements/')">
+              <xsl:when test="starts-with(@xlink:href,'ObjectReplacements/' or starts-with(@xlink:href, '..'))">
                 <xsl:value-of select="@xlink:href"/>
               </xsl:when>
               <xsl:otherwise>
@@ -242,7 +242,7 @@
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                         Id="{$oleId}"
                         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
-                        Target="{ooc:UriFromPath(@xlink:href)}"
+                        Target="{ooc:UriFromPath(@xlink:href, true())}"
                         TargetMode="External" />
 
           <xsl:call-template name="HandleOlePreview">
