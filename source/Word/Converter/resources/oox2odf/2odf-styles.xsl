@@ -231,20 +231,20 @@
         <xsl:when test="@w:val='center'">center</xsl:when>
         <xsl:when test="@w:val='left'">
           <xsl:choose>
-						<xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">end</xsl:when>
+            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">end</xsl:when>
             <xsl:otherwise>start</xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:when test="@w:val='right'">
           <xsl:choose>
-						<xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">start</xsl:when>
+            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">start</xsl:when>
             <xsl:otherwise>end</xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:when test="@w:val='both' or @w:val='distribute'">justify</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
-						<xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">end</xsl:when>
+            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ] or parent::w:pPr/w:bidi[@w:val = '0' ])">end</xsl:when>
             <xsl:otherwise>start</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
@@ -363,7 +363,13 @@
 
   <!-- text hiddent -->
   <xsl:template match="w:vanish" mode="rPrChildren">
-    <xsl:attribute name="text:display">true</xsl:attribute>
+    <!-- TODO: w:vanish is a toggle property. This needs to be handled correctly. -->
+    <xsl:attribute name="text:display">
+      <xsl:choose>
+        <xsl:when test="@w:val = 0">true</xsl:when>
+        <xsl:otherwise>none</xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template match="w:em" mode="rPrChildren">
@@ -1490,7 +1496,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-        <!--
+    <!--
 		Defect      : 2218801, Test footer
 		Code Changes: Vijayeta
 		Desc        : If a doc has only footers in even page, footer is not retained.
@@ -1505,30 +1511,30 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-		<xsl:variable name="footerIdEven">
-			<xsl:choose>
-				<xsl:when test="w:footerReference/@w:type = 'even'">
-					<xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="preceding::w:sectPr[w:footerReference/@w:type = 'even'][1]/w:footerReference[./@w:type = 'even']/@r:id" />
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<!--additional condiditon added for the defects 2218801-->
-		<xsl:if test="$footerId != '' or ($footerId = '' and $footerIdEven != '') ">
-    <xsl:if test="$footerId != ''">
-      <style:footer>
-        <xsl:variable name="footerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-        <!-- change context to get footer content -->
-        <xsl:for-each select="key('Part', $footerXmlDocument)">
-          <xsl:call-template name="TrackChanges" />
-          <xsl:apply-templates/>
-        </xsl:for-each>
-      </style:footer>
-			</xsl:if>
+    <xsl:variable name="footerIdEven">
+      <xsl:choose>
+        <xsl:when test="w:footerReference/@w:type = 'even'">
+          <xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="preceding::w:sectPr[w:footerReference/@w:type = 'even'][1]/w:footerReference[./@w:type = 'even']/@r:id" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!--additional condiditon added for the defects 2218801-->
+    <xsl:if test="$footerId != '' or ($footerId = '' and $footerIdEven != '') ">
+      <xsl:if test="$footerId != ''">
+        <style:footer>
+          <xsl:variable name="footerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="key('Part', $footerXmlDocument)">
+            <xsl:call-template name="TrackChanges" />
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:footer>
+      </xsl:if>
       <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:evenAndOddHeaders">
-				<!--<xsl:variable name="footerIdEven">
+        <!--<xsl:variable name="footerIdEven">
           <xsl:choose>
             <xsl:when test="w:footerReference/@w:type = 'even'">
               <xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
@@ -2595,27 +2601,27 @@
 
           <!--math, dialogika: bugfix #1775344 BEGIN-->
           <!--get indent from default properties-->
-					<!-- ODF4.0M2-->
+          <!-- ODF4.0M2-->
           <xsl:attribute name="fo:margin-left">
-						<xsl:choose>
-							<xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start">
-								<xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start)" />
-							</xsl:when>
-							<xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left">
-            <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left)" />
-							</xsl:when>
-						</xsl:choose>
+            <xsl:choose>
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start">
+                <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start)" />
+              </xsl:when>
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left">
+                <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left)" />
+              </xsl:when>
+            </xsl:choose>
           </xsl:attribute>
 
           <xsl:attribute name="fo:margin-right">
-						<xsl:choose>
-							<xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end">
-								<xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end)" />
-							</xsl:when>
-							<xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right">
-            <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right)" />
-							</xsl:when>
-						</xsl:choose>					
+            <xsl:choose>
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end">
+                <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end)" />
+              </xsl:when>
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right">
+                <xsl:value-of select="ooc:CmFromTwips(key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right)" />
+              </xsl:when>
+            </xsl:choose>
           </xsl:attribute>
           <xsl:attribute name="fo:text-indent">
             <xsl:choose>
@@ -2983,20 +2989,20 @@
           </xsl:choose>
         </xsl:variable>
 
-				<!-- ODF4.0M2-->
+        <!-- ODF4.0M2-->
         <xsl:variable name="LeftNumber">
           <xsl:choose>
-						<xsl:when test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:start">
-							<xsl:value-of select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:start"/>
-						</xsl:when>
-						<xsl:when test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left">
-							<xsl:value-of select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
+            <xsl:when test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:start">
+              <xsl:value-of select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:start"/>
+            </xsl:when>
+            <xsl:when test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left">
+              <xsl:value-of select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
               />
             </xsl:when>
-						<xsl:when test="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:start">
-							<xsl:value-of select="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:start" />
-						</xsl:when>
-						<xsl:when test="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
+            <xsl:when test="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:start">
+              <xsl:value-of select="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:start" />
+            </xsl:when>
+            <xsl:when test="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
               <xsl:value-of select="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left" />
             </xsl:when>
           </xsl:choose>
@@ -3034,7 +3040,7 @@
         </xsl:variable>
 
         <!-- left indent -->
-				<!-- ODF4.0M2-->
+        <!-- ODF4.0M2-->
         <xsl:choose>
           <xsl:when test="$FirstLine != 'NaN'">
             <xsl:value-of select="$IndLeft"/>
@@ -3042,25 +3048,25 @@
           <xsl:when test=" $LeftNumber = '' and $IndLeft =''">
             <xsl:for-each select="key('Part', 'word/styles.xml')">
               <xsl:choose>
-								<xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start">
-									<xsl:choose>
-										<xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start != '' and key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''">
-											<xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
+                <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start">
+                  <xsl:choose>
+                    <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start != '' and key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''">
+                      <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
                   />
-										</xsl:when>
-										<xsl:otherwise>0</xsl:otherwise>
-									</xsl:choose>
-								</xsl:when>
-								<xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
-									<xsl:choose>
-										<xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != '' and key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''">
-											<xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
-                  />
+                    </xsl:when>
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
                 </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
+                <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
+                  <xsl:choose>
+                    <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != '' and key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''">
+                      <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
+                  />
+                    </xsl:when>
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
               </xsl:choose>
-								</xsl:when>
-							</xsl:choose>
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="$IndLeft != ''">
@@ -3088,9 +3094,9 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-					<xsl:when test="w:ind/@w:start != ''">
-						<xsl:value-of select="w:ind/@w:start"/>
-					</xsl:when>
+          <xsl:when test="w:ind/@w:start != ''">
+            <xsl:value-of select="w:ind/@w:start"/>
+          </xsl:when>
           <xsl:when test="w:ind/@w:left != ''">
             <xsl:value-of select="w:ind/@w:left"/>
           </xsl:when>
@@ -3431,18 +3437,18 @@
 
     <xsl:choose>
       <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
-			<xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start != ''">
-				<xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start "/>
-			</xsl:when>
+      <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start != ''">
+        <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:start "/>
+      </xsl:when>
 
       <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
         <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
       </xsl:when>
 
       <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">-->
-			<xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:start != ''">
-				<xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:start" />
-			</xsl:when>
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:start != ''">
+        <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:start" />
+      </xsl:when>
 
       <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left" />
@@ -3465,16 +3471,16 @@
       <xsl:when test="$StyleId = ''">
         <xsl:choose>
           <!-- use the default style -->
-					<xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:start">
-						<xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:start" />
-					</xsl:when>
+          <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:start">
+            <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:start" />
+          </xsl:when>
           <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
             <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
           </xsl:when>
 
-					<xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start != ''">
-						<xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start"/>
-					</xsl:when>
+          <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start != ''">
+            <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:start"/>
+          </xsl:when>
           <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
             <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
           </xsl:when>
@@ -3494,9 +3500,9 @@
     <xsl:param name="StyleId" />
 
     <xsl:choose>
-			<xsl:when test="w:ind/@w:end != ''">
-				<xsl:value-of select="w:ind/@w:end"/>
-			</xsl:when>
+      <xsl:when test="w:ind/@w:end != ''">
+        <xsl:value-of select="w:ind/@w:end"/>
+      </xsl:when>
       <xsl:when test="w:ind/@w:right != ''">
         <xsl:value-of select="w:ind/@w:right"/>
       </xsl:when>
@@ -3524,17 +3530,17 @@
     </xsl:variable>
 
     <xsl:choose>
-			<xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:end != ''">
-				<xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:end "/>
-			</xsl:when>
+      <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:end != ''">
+        <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:end "/>
+      </xsl:when>
       <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right != ''">
         <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right "/>
       </xsl:when>
 
       <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right != ''">-->
-			<xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:end != ''">
-				<xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:end" />
-			</xsl:when>
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:end != ''">
+        <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:end" />
+      </xsl:when>
       <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right != ''">
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right" />
       </xsl:when>
@@ -3557,16 +3563,16 @@
           <xsl:when test="$StyleId = ''">
             <!-- use the default style -->
             <xsl:choose>
-							<xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:end">
-								<xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:end" />
-							</xsl:when>
+              <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:end">
+                <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:end" />
+              </xsl:when>
               <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right">
                 <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right" />
               </xsl:when>
 
-							<xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end != ''">
-								<xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end"/>
-							</xsl:when>
+              <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end != ''">
+                <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:end"/>
+              </xsl:when>
               <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
                 <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
               </xsl:when>
@@ -3695,17 +3701,17 @@
     <!-- left indent -->
     <xsl:variable name="IndLeft">
       <xsl:choose>
-				<xsl:when test="w:ind/@w:start != ''">
-					<xsl:value-of select="number(w:ind/@w:start)"/>
-				</xsl:when>
+        <xsl:when test="w:ind/@w:start != ''">
+          <xsl:value-of select="number(w:ind/@w:start)"/>
+        </xsl:when>
         <xsl:when test="w:ind/@w:left != ''">
           <xsl:value-of select="number(w:ind/@w:left)"/>
         </xsl:when>
-				
+
         <!-- Automatic styles should not duplicate the inherited fo:margin-left property (cf. 15.5.17 of ODF v 1.0 spec)  -->
-				<xsl:when test="key('StyleId', $StyleId)/w:pPr/w:ind/@w:start != '' and $CheckIfList != 'true'">
-					<xsl:value-of select="key('StyleId', $StyleId)/w:pPr/w:ind/@w:start" />
-				</xsl:when>
+        <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:ind/@w:start != '' and $CheckIfList != 'true'">
+          <xsl:value-of select="key('StyleId', $StyleId)/w:pPr/w:ind/@w:start" />
+        </xsl:when>
         <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:ind/@w:left != '' and $CheckIfList != 'true'">
           <xsl:value-of select="key('StyleId', $StyleId)/w:pPr/w:ind/@w:left" />
         </xsl:when>
@@ -4395,10 +4401,10 @@
             </xsl:variable>
             <xsl:variable name="Left">
               <xsl:choose>
-								<xsl:when test="w:ind/@w:start">
-									<!--Paragraph has direct formatting -> take this value-->
-									<xsl:value-of select="w:ind/@w:start"/>
-								</xsl:when>
+                <xsl:when test="w:ind/@w:start">
+                  <!--Paragraph has direct formatting -> take this value-->
+                  <xsl:value-of select="w:ind/@w:start"/>
+                </xsl:when>
                 <xsl:when test="w:ind/@w:left">
                   <!--Paragraph has direct formatting -> take this value-->
                   <xsl:value-of select="w:ind/@w:left"/>
@@ -4406,29 +4412,29 @@
                 <xsl:otherwise>
                   <!--Paragraph has *NO* direct formatting-->
                   <xsl:choose>
-										<xsl:when test="$DirectListLevelDefinition/w:pPr/w:ind/@w:start">
-											<!--take directly referenced list style value -->
-											<xsl:value-of select="$DirectListLevelDefinition/w:pPr/w:ind/@w:start"/>
-										</xsl:when>
+                    <xsl:when test="$DirectListLevelDefinition/w:pPr/w:ind/@w:start">
+                      <!--take directly referenced list style value -->
+                      <xsl:value-of select="$DirectListLevelDefinition/w:pPr/w:ind/@w:start"/>
+                    </xsl:when>
                     <xsl:when test="$DirectListLevelDefinition/w:pPr/w:ind/@w:left">
                       <!--take directly referenced list style value -->
                       <xsl:value-of select="$DirectListLevelDefinition/w:pPr/w:ind/@w:left"/>
                     </xsl:when>
 
-										<xsl:when test="$ParagraphStyleDefinition/w:pPr/w:ind/@w:start">
-											<!--take paragraph style value-->
-											<xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:ind/@w:start"/>
-										</xsl:when>
+                    <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:ind/@w:start">
+                      <!--take paragraph style value-->
+                      <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:ind/@w:start"/>
+                    </xsl:when>
                     <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:ind/@w:left">
                       <!--take paragraph style value-->
                       <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:ind/@w:left"/>
                     </xsl:when>
 
-										<xsl:when test="$IndirectListLevelDefinition/w:pPr/w:ind/@w:start">
-											<!--take list style value referenced by paragraph style-->
-											<xsl:value-of select="$IndirectListLevelDefinition/w:pPr/w:ind/@w:left"/>
-										</xsl:when>
-										<xsl:when test="$IndirectListLevelDefinition/w:pPr/w:ind/@w:start">
+                    <xsl:when test="$IndirectListLevelDefinition/w:pPr/w:ind/@w:start">
+                      <!--take list style value referenced by paragraph style-->
+                      <xsl:value-of select="$IndirectListLevelDefinition/w:pPr/w:ind/@w:left"/>
+                    </xsl:when>
+                    <xsl:when test="$IndirectListLevelDefinition/w:pPr/w:ind/@w:start">
                       <!--take list style value referenced by paragraph style-->
                       <xsl:value-of select="$IndirectListLevelDefinition/w:pPr/w:ind/@w:left"/>
                     </xsl:when>
@@ -4691,7 +4697,7 @@
 
   <!-- Default properties for bidi paragraphs -->
   <xsl:template name="InsertDefaultBidiProperties">
-		<xsl:if test="w:bidi and not(w:bidi[@w:val = 'off'] or w:bidi[@w:val = '0'])">
+    <xsl:if test="w:bidi and not(w:bidi[@w:val = 'off'] or w:bidi[@w:val = '0'])">
       <xsl:if test="not(w:jc)">
         <xsl:attribute name="fo:text-align">end</xsl:attribute>
       </xsl:if>
