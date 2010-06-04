@@ -504,30 +504,38 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
             <a:uFill>
               <a:solidFill>
+                <xsl:variable name="varSrgbVal">
+                  <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
                 <a:srgbClr>
                   <xsl:attribute name ="val">
                     <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
                   </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
               </a:solidFill>
             </a:uFill>
           </xsl:if>
           <!--end-->
           <a:solidFill>
-            <a:srgbClr>
+            <xsl:variable name="varSrgbVal">
               <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color">
-                  <xsl:attribute name="val">
-                    <xsl:value-of select="substring-after(./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </xsl:when>
+                       <xsl:value-of select="substring-after(./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color,'#')"/>
+                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:attribute name="val">
-                    <xsl:value-of select="'000000'"/>
-                  </xsl:attribute>
+              <xsl:value-of select="'000000'"/>                 
                 </xsl:otherwise>
               </xsl:choose>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
+              <a:srgbClr>
+                <xsl:attribute name ="val">
+                  <xsl:value-of select ="$varSrgbVal"/>
+                </xsl:attribute>
             </a:srgbClr>
+            </xsl:if>
           </a:solidFill>
           <xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
             <a:effectLst>
@@ -648,9 +656,6 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
     </a:p>
   </xsl:template>
-  
-  
-  
   <xsl:template name ="handoutPagenumber">
     <xsl:param name ="Id"/>
     <a:bodyPr vert="horz" lIns="91440" tIns="45720" rIns="91440" bIns="45720" rtlCol="0" />
@@ -778,35 +783,38 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
             <a:uFill>
               <a:solidFill>
+                <xsl:variable name="varSrgbVal">
+                  <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
                 <a:srgbClr>
                   <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                      <xsl:value-of select ="$varSrgbVal"/>
                   </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
               </a:solidFill>
             </a:uFill>
           </xsl:if>
           <!--end-->
           <a:solidFill>
-            <a:srgbClr>
-              <!--<xsl:variable name="textId">
-                <xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
-              </xsl:variable>-->
+            <xsl:variable name="varSrgbVal">
               <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color">
-
-                  <xsl:attribute name="val">
                     <xsl:value-of select="substring-after(./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color,'#')"/>
-
-                  </xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:attribute name="val">
-                    <xsl:value-of select="'000000'"/>
-                  </xsl:attribute>
-                </xsl:otherwise>
+               <xsl:value-of select="'000000'"/>
+                  </xsl:otherwise>
               </xsl:choose>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
+              <a:srgbClr>
+                <xsl:attribute name ="val">
+                  <xsl:value-of select ="$varSrgbVal"/>
+                </xsl:attribute>
             </a:srgbClr>
+            </xsl:if>
           </a:solidFill>
           <xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
             <a:effectLst>
@@ -1027,30 +1035,38 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
             <a:uFill>
               <a:solidFill>
+                <xsl:variable name="varSrgbVal">
+                  <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
                 <a:srgbClr>
                   <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                      <xsl:value-of select ="$varSrgbVal"/>
                   </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
               </a:solidFill>
             </a:uFill>
           </xsl:if>
           <!--end-->
           <a:solidFill>
-            <a:srgbClr>
+            <xsl:variable name="varSrgbVal">
               <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color">
-                  <xsl:attribute name="val">
-                    <xsl:value-of select="substring-after(./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </xsl:when>
+                     <xsl:value-of select="substring-after(./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:color,'#')"/>
+                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:attribute name="val">
-                    <xsl:value-of select="'000000'"/>
-                  </xsl:attribute>
-                </xsl:otherwise>
+               <xsl:value-of select="'000000'"/>
+               </xsl:otherwise>
               </xsl:choose>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
+              <a:srgbClr>
+                <xsl:attribute name ="val">
+                  <xsl:value-of select ="$varSrgbVal"/>
+                </xsl:attribute>
             </a:srgbClr>
+            </xsl:if>
           </a:solidFill>
           <xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
             <a:effectLst>

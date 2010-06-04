@@ -249,30 +249,38 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:when>
               </xsl:choose>
               <a:solidFill>
-                <a:srgbClr>
+                <xsl:variable name="varSrgbVal">
                   <xsl:choose>
                     <xsl:when test="substring-after(./style:text-properties/@fo:color,'#')!=''">
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="substring-after(./style:text-properties/@fo:color,'#')" />
-                      </xsl:attribute>
-                    </xsl:when>
+                                              <xsl:value-of select="substring-after(./style:text-properties/@fo:color,'#')" />
+                                         </xsl:when>
                     <xsl:otherwise>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="'000000'" />
-                      </xsl:attribute>
-                    </xsl:otherwise>
+                               <xsl:value-of select="'000000'" />
+                      </xsl:otherwise>
                   </xsl:choose>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
+                  <a:srgbClr>
+                    <xsl:attribute name ="val">
+                      <xsl:value-of select ="$varSrgbVal"/>
+                    </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
               </a:solidFill>
               <!--Underline Color-->
               <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
                 <a:uFill>
                   <a:solidFill>
+                    <xsl:variable name="varSrgbVal">
+                      <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                    </xsl:variable>
+                    <xsl:if test="$varSrgbVal != ''">
                     <a:srgbClr>
                       <xsl:attribute name ="val">
-                        <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                          <xsl:value-of select ="$varSrgbVal"/>
                       </xsl:attribute>
                     </a:srgbClr>
+                    </xsl:if>
                   </a:solidFill>
                 </a:uFill>
               </xsl:if>
@@ -415,11 +423,16 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$presentationId] ">
           <xsl:if test="./style:graphic-properties/@draw:fill='solid'">
             <a:solidFill>
+              <xsl:variable name="varSrgbVal">
+                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+              </xsl:variable>
+              <xsl:if test="$varSrgbVal != ''">
               <a:srgbClr>
                 <xsl:attribute name="val">
-                  <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                    <xsl:value-of select ="$varSrgbVal"/>
                 </xsl:attribute>
               </a:srgbClr>
+              </xsl:if>
             </a:solidFill>
           </xsl:if>
           <!--End-->
@@ -604,32 +617,41 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
                 <a:uFill>
                   <a:solidFill>
+                    <xsl:variable name="varSrgbVal">
+                      <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                    </xsl:variable>
+                    <xsl:if test="$varSrgbVal != ''">
                     <a:srgbClr>
                       <xsl:attribute name ="val">
-                        <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                          <xsl:value-of select ="$varSrgbVal"/>
                       </xsl:attribute>
                     </a:srgbClr>
+                    </xsl:if>
                   </a:solidFill>
                 </a:uFill>
               </xsl:if>
               <!--end-->
               <a:solidFill>
-                <a:srgbClr>
+
+                <xsl:variable name="varSrgbVal">
                   <xsl:choose>
                     <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:color">
                       <xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
-                        <xsl:attribute name="val">
-                          <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
-                        </xsl:attribute>
-                      </xsl:for-each>
+                                                 <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
+                                             </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="'000000'"/>
-                      </xsl:attribute>
-                    </xsl:otherwise>
+                                             <xsl:value-of select="'000000'"/>
+                                         </xsl:otherwise>
                   </xsl:choose>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
+                  <a:srgbClr>
+                    <xsl:attribute name ="val">
+                      <xsl:value-of select ="$varSrgbVal"/>
+                    </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
               </a:solidFill>
               <xsl:if test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
                 <a:effectLst>
@@ -705,11 +727,16 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$presentationId] ">
           <xsl:if test="./style:graphic-properties/@draw:fill='solid'">
             <a:solidFill>
+              <xsl:variable name="varSrgbVal">
+                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+              </xsl:variable>
+              <xsl:if test="$varSrgbVal != ''">
               <a:srgbClr>
                 <xsl:attribute name="val">
-                  <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                    <xsl:value-of select ="$varSrgbVal"/>
                 </xsl:attribute>
               </a:srgbClr>
+              </xsl:if>
             </a:solidFill>
           </xsl:if>
           <!--Line Style-->
@@ -892,32 +919,41 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
                 <a:uFill>
                   <a:solidFill>
+                    <xsl:variable name="varSrgbVal">
+                      <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                    </xsl:variable>
+                    <xsl:if test="$varSrgbVal != ''">
                     <a:srgbClr>
                       <xsl:attribute name ="val">
-                        <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                          <xsl:value-of select ="$varSrgbVal"/>
                       </xsl:attribute>
                     </a:srgbClr>
+                    </xsl:if>
                   </a:solidFill>
                 </a:uFill>
               </xsl:if>
               <!--end-->
               <a:solidFill>
-                <a:srgbClr>
+
+                <xsl:variable name="varSrgbVal">
                   <xsl:choose>
                     <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:color">
                       <xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
-                        <xsl:attribute name="val">
-                          <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
-                        </xsl:attribute>
-                      </xsl:for-each>
+                                                <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
+                                             </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="'000000'"/>
-                      </xsl:attribute>
-                    </xsl:otherwise>
+                                          <xsl:value-of select="'000000'"/>
+                                         </xsl:otherwise>
                   </xsl:choose>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
+                  <a:srgbClr>
+                    <xsl:attribute name ="val">
+                      <xsl:value-of select ="$varSrgbVal"/>
+                    </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
               </a:solidFill>
               <xsl:if test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
                 <a:effectLst>
@@ -1071,11 +1107,16 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$presentationId] ">
           <xsl:if test="./style:graphic-properties/@draw:fill='solid'">
             <a:solidFill>
+              <xsl:variable name="varSrgbVal">
+                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+              </xsl:variable>
+              <xsl:if test="$varSrgbVal != ''">
               <a:srgbClr>
                 <xsl:attribute name="val">
-                  <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                    <xsl:value-of select ="$varSrgbVal"/>
                 </xsl:attribute>
               </a:srgbClr>
+              </xsl:if>
             </a:solidFill>
           </xsl:if>
           <!--Line Style-->
@@ -1259,32 +1300,41 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
                 <a:uFill>
                   <a:solidFill>
+                    <xsl:variable name="varSrgbVal">
+                      <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                    </xsl:variable>
+                    <xsl:if test="$varSrgbVal != ''">
                     <a:srgbClr>
                       <xsl:attribute name ="val">
-                        <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                          <xsl:value-of select ="$varSrgbVal"/>
                       </xsl:attribute>
                     </a:srgbClr>
+                    </xsl:if>
                   </a:solidFill>
                 </a:uFill>
               </xsl:if>
               <!--end-->
               <a:solidFill>
-                <a:srgbClr>
+                <xsl:variable name="varSrgbVal">
                   <xsl:choose>
                     <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:color">
                       <xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
-                        <xsl:attribute name="val">
-                          <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
-                        </xsl:attribute>
-                      </xsl:for-each>
+                                          <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
+                                            </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="'000000'"/>
-                      </xsl:attribute>
-                    </xsl:otherwise>
+                                          <xsl:value-of select="'000000'"/>
+                                       </xsl:otherwise>
                   </xsl:choose>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
+                  <a:srgbClr>
+                    <xsl:attribute name ="val">
+                      <xsl:value-of select ="$varSrgbVal"/>
+                    </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
+
               </a:solidFill>
               <xsl:if test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
                 <a:effectLst>
@@ -1360,11 +1410,16 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$presentationId] ">
           <xsl:if test="./style:graphic-properties/@draw:fill='solid'">
             <a:solidFill>
+              <xsl:variable name="varSrgbVal">
+                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+              </xsl:variable>
+              <xsl:if test="$varSrgbVal != ''">
               <a:srgbClr>
                 <xsl:attribute name="val">
-                  <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                    <xsl:value-of select ="$varSrgbVal"/>
                 </xsl:attribute>
               </a:srgbClr>
+              </xsl:if>
             </a:solidFill>
           </xsl:if>
           <!--Line Style-->
@@ -1552,32 +1607,40 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
                 <a:uFill>
                   <a:solidFill>
+                    <xsl:variable name="varSrgbVal">
+                      <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                    </xsl:variable>
+                    <xsl:if test="$varSrgbVal != ''">
                     <a:srgbClr>
                       <xsl:attribute name ="val">
-                        <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+                          <xsl:value-of select ="$varSrgbVal"/>
                       </xsl:attribute>
                     </a:srgbClr>
+                    </xsl:if>
                   </a:solidFill>
                 </a:uFill>
               </xsl:if>
               <!--end-->
               <a:solidFill>
-                <a:srgbClr>
+                <xsl:variable name="varSrgbVal">
                   <xsl:choose>
                     <xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:color">
                       <xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
-                        <xsl:attribute name="val">
-                          <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
-                        </xsl:attribute>
-                      </xsl:for-each>
+                                                <xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
+                                            </xsl:for-each>
                     </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="'000000'"/>
-                      </xsl:attribute>
+                    <xsl:otherwise>                     
+                        <xsl:value-of select="'000000'"/>                   
                     </xsl:otherwise>
                   </xsl:choose>
+                </xsl:variable>
+                <xsl:if test="$varSrgbVal != ''">
+                  <a:srgbClr>
+                    <xsl:attribute name ="val">
+                      <xsl:value-of select ="$varSrgbVal"/>
+                    </xsl:attribute>
                 </a:srgbClr>
+                </xsl:if>
               </a:solidFill>
               <xsl:if test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
                 <a:effectLst>
@@ -1850,9 +1913,13 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="opacity" />
     <xsl:if test ="$fill-color != ''">
       <a:solidFill>
+        <xsl:variable name="varSrgbVal">
+          <xsl:value-of select ="substring-after($fill-color,'#')"/>
+        </xsl:variable>
+        <xsl:if test="$varSrgbVal != ''">
         <a:srgbClr>
           <xsl:attribute name ="val">
-            <xsl:value-of select ="substring-after($fill-color,'#')"/>
+              <xsl:value-of select ="$varSrgbVal"/>
           </xsl:attribute>
           <xsl:if test ="$opacity != ''">
             <a:alpha>
@@ -1868,6 +1935,8 @@ Copyright (c) 2007, Sonata Software Limited
             </a:alpha>
           </xsl:if>
         </a:srgbClr>
+        </xsl:if>
+
       </a:solidFill>
     </xsl:if>
   </xsl:template>

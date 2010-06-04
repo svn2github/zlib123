@@ -141,16 +141,21 @@ Copyright (c) 2007, Sonata Software Limited
               <p:bg>
                 <p:bgPr>
                   <a:solidFill>
-                    <a:srgbClr>
-                      <xsl:attribute name="val">
+                    <xsl:variable name="varSrgbVal">
                         <xsl:if test="@draw:fill-color">
                           <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
                         </xsl:if>
                         <xsl:if test="not(@draw:fill-color)">
                           <xsl:value-of select="'ffffff'" />
                         </xsl:if>
+                    </xsl:variable>
+                    <xsl:if test="$varSrgbVal != ''">
+                      <a:srgbClr>
+                        <xsl:attribute name ="val">
+                          <xsl:value-of select ="$varSrgbVal"/>
                       </xsl:attribute>
                     </a:srgbClr>
+                    </xsl:if>
                   </a:solidFill>
                   <a:effectLst />
                 </p:bgPr>

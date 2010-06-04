@@ -852,12 +852,16 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
       <xsl:if test ="style:text-properties/@fo:color">
         <a:solidFill>
+          <xsl:variable name="varSrgbVal">
+            <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+          </xsl:variable>
+          <xsl:if test="$varSrgbVal != ''">
           <a:srgbClr  >
             <xsl:attribute name ="val">
-              <!--<xsl:value-of   select ="substring-after(style:text-properties/@fo:color,'#')"/>-->
-              <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+                <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
           </a:srgbClr >
+          </xsl:if>
         </a:solidFill>
       </xsl:if>
       <!-- Text Shadow fix -->
@@ -883,11 +887,16 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test ="style:text-properties/style:text-underline-color">
         <a:uFill>
           <a:solidFill>
+            <xsl:variable name="varSrgbVal">
+              <xsl:value-of select ="substring-after(style:text-properties/style:text-underline-color,'#')"/>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
             <a:srgbClr>
               <xsl:attribute name ="val">
-                <xsl:value-of select ="substring-after(style:text-properties/style:text-underline-color,'#')"/>
+                  <xsl:value-of select ="$varSrgbVal"/>
               </xsl:attribute>
             </a:srgbClr>
+            </xsl:if>
           </a:solidFill>
         </a:uFill>
       </xsl:if>
@@ -1881,11 +1890,16 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:choose>
         <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color">
           <a:buClr>
+            <xsl:variable name="varSrgbVal">
+              <xsl:value-of select ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
             <a:srgbClr>
               <xsl:attribute name ="val">
-                <xsl:value-of select ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+                  <xsl:value-of select ="$varSrgbVal"/>
               </xsl:attribute>
             </a:srgbClr>
+            </xsl:if>           
           </a:buClr>
         </xsl:when>
         <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true']">

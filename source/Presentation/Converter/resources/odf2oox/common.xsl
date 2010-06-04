@@ -355,11 +355,11 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$varSz &gt; 4000">
-        <xsl:value-of select="4000"/>
+			<xsl:when test="$varSz &gt; 400000">
+				<xsl:value-of select="400000"/>
       </xsl:when>
-      <xsl:when test="$varSz &lt; 1">
-        <xsl:value-of select="1"/>
+			<xsl:when test="$varSz &lt; 100">
+				<xsl:value-of select="100"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$varSz"/>
@@ -1009,12 +1009,16 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test="style:text-properties/@fo:color">
         <a:uFill>
           <a:solidFill>
+											<xsl:variable name="varSrgbVal">
+												<xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+											</xsl:variable>
+											<xsl:if test="$varSrgbVal != ''">
             <a:srgbClr>             
                   <xsl:attribute name ="val">                    
-                    <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
-
+														<xsl:value-of select ="$varSrgbVal"/>
 										</xsl:attribute>
 									</a:srgbClr>
+											</xsl:if>
 								</a:solidFill>
 							</a:uFill>
 						</xsl:when>
@@ -1023,11 +1027,16 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:if test="position()=1">
 									<a:uFill>
 										<a:solidFill>
+													<xsl:variable name="varSrgbVal">
+														<xsl:value-of select ="translate(substring-after(@fo:color,'#'),$lcletters,$ucletters)"/>
+													</xsl:variable>
+													<xsl:if test="$varSrgbVal != ''">
 											<a:srgbClr>
 												<xsl:attribute name ="val">
-                        <xsl:value-of select ="translate(substring-after(@fo:color,'#'),$lcletters,$ucletters)"/>                     
+																<xsl:value-of select ="$varSrgbVal"/>
                   </xsl:attribute>
 											</a:srgbClr>
+													</xsl:if>
 										</a:solidFill>
 									</a:uFill>
 								</xsl:if>
@@ -1279,8 +1288,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:choose>
-         
+        <xsl:choose>         
           <xsl:when test ="style:paragraph-properties/@fo:line-height and 
 					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
 					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
@@ -1709,67 +1717,87 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:choose>
             <xsl:when test="@draw:style='linear'">
           <a:gs pos="0">
-            <a:srgbClr>
-                  <xsl:attribute name="val">
+								<xsl:variable name="varSrgbVal">
                     <xsl:if test="@draw:start-color">
                       <xsl:value-of select="substring-after(@draw:start-color,'#')" />
                     </xsl:if>
                     <xsl:if test="not(@draw:start-color)">
                       <xsl:value-of select="'ffffff'" />
                     </xsl:if>
+								</xsl:variable>
+								<xsl:if test="$varSrgbVal != ''">
+									<a:srgbClr>
+										<xsl:attribute name ="val">
+											<xsl:value-of select ="$varSrgbVal"/>
                   </xsl:attribute>
                <xsl:call-template name="tmpshapeTransperancy">
                 <xsl:with-param name="tranparency" select="$opacity"/>
               </xsl:call-template>
             </a:srgbClr >
+								</xsl:if>
           </a:gs>
           <a:gs pos="100000">
-            <a:srgbClr>
-              <xsl:attribute name="val">
+								<xsl:variable name="varSrgbVal">
                 <xsl:if test="@draw:end-color">
                   <xsl:value-of select="substring-after(@draw:end-color,'#')" />
                 </xsl:if>
                 <xsl:if test="not(@draw:end-color)">
                   <xsl:value-of select="'ffffff'" />
                 </xsl:if>
+								</xsl:variable>
+								<xsl:if test="$varSrgbVal != ''">
+									<a:srgbClr>
+										<xsl:attribute name="val">
+											<xsl:value-of select ="$varSrgbVal"/>
               </xsl:attribute>
               <xsl:call-template name="tmpshapeTransperancy">
                 <xsl:with-param name="tranparency" select="$opacity"/>
               </xsl:call-template>
             </a:srgbClr>
+								</xsl:if>
           </a:gs>
            
             </xsl:when>
             <xsl:otherwise>
               <a:gs pos="0">
-                <a:srgbClr>
-                  <xsl:attribute name="val">
+								<xsl:variable name="varSrgbVal">
                     <xsl:if test="@draw:end-color">
                       <xsl:value-of select="substring-after(@draw:end-color,'#')" />
                     </xsl:if>
                     <xsl:if test="not(@draw:end-color)">
                       <xsl:value-of select="'ffffff'" />
                     </xsl:if>
+								</xsl:variable>
+								<xsl:if test="$varSrgbVal != ''">
+									<a:srgbClr>
+										<xsl:attribute name="val">
+											<xsl:value-of select ="$varSrgbVal"/>
                   </xsl:attribute>
                   <xsl:call-template name="tmpshapeTransperancy">
                     <xsl:with-param name="tranparency" select="$opacity"/>
                   </xsl:call-template>
                 </a:srgbClr>
+								</xsl:if>
               </a:gs>
               <a:gs pos="100000">
-                <a:srgbClr>
-                  <xsl:attribute name="val">
+								<xsl:variable name="varSrgbVal">
                     <xsl:if test="@draw:start-color">
                       <xsl:value-of select="substring-after(@draw:start-color,'#')" />
                     </xsl:if>
                     <xsl:if test="not(@draw:start-color)">
                       <xsl:value-of select="'ffffff'" />
                     </xsl:if>
+								</xsl:variable>
+								<xsl:if test="$varSrgbVal != ''">
+									<a:srgbClr>
+										<xsl:attribute name="val">
+											<xsl:value-of select ="$varSrgbVal"/>
                   </xsl:attribute>
                   <xsl:call-template name="tmpshapeTransperancy">
                     <xsl:with-param name="tranparency" select="$opacity"/>
                   </xsl:call-template>
                 </a:srgbClr >
+								</xsl:if>
               </a:gs>
             </xsl:otherwise>
           </xsl:choose>
@@ -5885,9 +5913,13 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test="@draw:fill='solid'">
         <xsl:if test="@draw:fill-color">
           <a:solidFill>
+						<xsl:variable name="varSrgbVal">
+							<xsl:value-of select="substring-after(@draw:fill-color,'#')"/>
+						</xsl:variable>
+						<xsl:if test="$varSrgbVal != ''">
             <a:srgbClr>
               <xsl:attribute name="val">
-                <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
+									<xsl:value-of select="$varSrgbVal" />
               </xsl:attribute>
               <xsl:if test ="@draw:opacity">
                 <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
@@ -5896,6 +5928,7 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:call-template>
               </xsl:if>
             </a:srgbClr>
+						</xsl:if>
           </a:solidFill>
         </xsl:if>
       </xsl:when>
@@ -6611,7 +6644,8 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="starts-with(@xlink:href,'/')"></xsl:when>
             <xsl:when test="starts-with(@xlink:href,'\\') or starts-with(@xlink:href,'//')"></xsl:when>
           <xsl:otherwise>
-            <pzip:copy pzip:source="{translate(@xlink:href,'/','')}" pzip:target="{concat('ppt/embeddings/',translate(translate(@xlink:href,' ',''),'/',''),'.bin')}" />
+						<!--<pzip:copy pzip:source="{translate(@xlink:href,'/','')}" pzip:target="{concat('ppt/embeddings/',translate(translate(@xlink:href,' ',''),'/',''),'.bin')}" />-->
+						<pzip:copy pzip:source="{translate(@xlink:href,'/','')}" pzip:target="{concat('ppt/embeddings/',translate(translate(translate(@xlink:href,' ',''),'/',''),':','_'),'.bin')}" />
           </xsl:otherwise>
           </xsl:choose>
           <xsl:if test="./parent::node()/draw:image/@xlink:href !=''">

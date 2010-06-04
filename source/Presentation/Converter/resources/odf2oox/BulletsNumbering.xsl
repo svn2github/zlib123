@@ -35,20 +35,30 @@
       <xsl:choose>
         <xsl:when test ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')!=''">
         <a:buClr>
+            <xsl:variable name="varSrgbVal">
+              <xsl:value-of select ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
           <a:srgbClr>
             <xsl:attribute name ="val">
-              <xsl:value-of select ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+                  <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
           </a:srgbClr>
+            </xsl:if>
         </a:buClr>
         </xsl:when>
         <xsl:when test ="substring-after(./text:list-level-style-number[@text:level=$level]/style:text-properties/@fo:color,'#')!=''">
           <a:buClr>
+            <xsl:variable name="varSrgbVal">
+              <xsl:value-of select ="substring-after(./text:list-level-style-number[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+            </xsl:variable>
+            <xsl:if test="$varSrgbVal != ''">
             <a:srgbClr>
               <xsl:attribute name ="val">
-                <xsl:value-of select ="substring-after(./text:list-level-style-number[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+                  <xsl:value-of select ="$varSrgbVal"/>
               </xsl:attribute>
             </a:srgbClr>
+            </xsl:if>
           </a:buClr>
         </xsl:when>
         <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true'] or

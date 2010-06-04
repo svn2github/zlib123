@@ -2225,8 +2225,9 @@ exclude-result-prefixes="p a r xlink ">
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
+            <!--changed by yeswanth - bug#2961087 : changed to false for draw:auto-grow-height-->
         <xsl:attribute name="draw:auto-grow-height">
-          <xsl:value-of select ="'true'"/>
+              <xsl:value-of select ="'false'"/>
         </xsl:attribute>
         <xsl:attribute name="draw:auto-grow-width">
           <xsl:value-of select ="'false'"/>
@@ -2246,6 +2247,7 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:otherwise>
     </xsl:choose>
     <!--Wrap text in shape -->
+    <!--doubt : 2961087-->
     <xsl:choose>
       <xsl:when test="not(@wrap)">
         <xsl:attribute name ="fo:wrap-option">

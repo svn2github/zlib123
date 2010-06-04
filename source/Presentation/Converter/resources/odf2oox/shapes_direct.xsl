@@ -2050,9 +2050,13 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:choose>
       <xsl:when test ="@draw:fill='solid'">
         <a:solidFill>
+          <xsl:variable name="varSrgbVal">
+            <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+          </xsl:variable>
+          <xsl:if test="$varSrgbVal != ''">
           <a:srgbClr  >
             <xsl:attribute name ="val">
-              <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+                <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
             <xsl:call-template name="tmpFillTransperancy">
               <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
@@ -2060,6 +2064,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="parentStyle" select="$parentStyle"/>
             </xsl:call-template>
           </a:srgbClr >
+          </xsl:if>
         </a:solidFill>
       </xsl:when>
       <xsl:when test ="@draw:fill='none'">
@@ -2092,9 +2097,13 @@ Copyright (c) 2007, Sonata Software Limited
       
       <xsl:when test ="@draw:fill-color">
         <a:solidFill>
+          <xsl:variable name="varSrgbVal">
+            <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+          </xsl:variable>
+          <xsl:if test="$varSrgbVal != ''">
           <a:srgbClr  >
             <xsl:attribute name ="val">
-              <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+                <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
             <xsl:call-template name="tmpFillTransperancy">
               <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
@@ -2102,6 +2111,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="parentStyle" select="$parentStyle"/>
             </xsl:call-template>
           </a:srgbClr >
+          </xsl:if>
         </a:solidFill>
       </xsl:when>
     </xsl:choose>
@@ -2249,8 +2259,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:choose>
       <xsl:when test ="@draw:stroke='solid' or @draw:stroke='dash'">
         <a:solidFill>
-          <a:srgbClr  >
-            <xsl:attribute name ="val">
+          <xsl:variable name="varSrgbVal">
               <xsl:if test="@svg:stroke-color">
               <xsl:value-of select ="translate(substring-after(@svg:stroke-color,'#'),$lcletters,$ucletters)"/>
               </xsl:if>
@@ -2259,6 +2268,11 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select ="translate(substring-after(@svg:stroke-color,'#'),$lcletters,$ucletters)"/>
                 </xsl:for-each>
               </xsl:if>
+          </xsl:variable>
+          <xsl:if test="$varSrgbVal != ''">
+            <a:srgbClr>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
             <xsl:call-template name="tmpLineTransperancy">
               <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
@@ -2266,6 +2280,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="parentStyle" select="$parentStyle"/>
             </xsl:call-template>
           </a:srgbClr >
+          </xsl:if>
         </a:solidFill>
       </xsl:when>
       <xsl:when test ="@draw:stroke='none'">
@@ -2279,9 +2294,13 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <xsl:when test ="@svg:stroke-color">      
         <a:solidFill>
+          <xsl:variable name="varSrgbVal">
+            <xsl:value-of select ="translate(substring-after(@svg:stroke-color,'#'),$lcletters,$ucletters)"/>
+          </xsl:variable>
+          <xsl:if test="$varSrgbVal != ''">
           <a:srgbClr  >
             <xsl:attribute name ="val">
-              <xsl:value-of select ="translate(substring-after(@svg:stroke-color,'#'),$lcletters,$ucletters)"/>
+                <xsl:value-of select ="$varSrgbVal"/>
             </xsl:attribute>
             <xsl:call-template name="tmpLineTransperancy">
               <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
@@ -2289,6 +2308,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="parentStyle" select="$parentStyle"/>
             </xsl:call-template>
           </a:srgbClr >
+          </xsl:if>
         </a:solidFill>     
       </xsl:when>
     </xsl:choose>
@@ -2562,7 +2582,6 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test="@fo:border">
         <xsl:choose>
           <xsl:when test ="@fo:border">
-
             <xsl:attribute name ="w">
               <xsl:variable name="lWidth">
                 <xsl:call-template name ="convertToPoints">
@@ -2607,11 +2626,19 @@ Copyright (c) 2007, Sonata Software Limited
               <!-- Code for the Bug 1746356 -->
             </xsl:for-each>
           </xsl:when>
-
         </xsl:choose>
 
         <a:solidFill>
-          <a:srgbClr val="{substring-after($lineColor,'#')}"/>
+          <xsl:variable name="varSrgbVal">
+            <xsl:value-of select ="substring-after($lineColor,'#')"/>
+          </xsl:variable>
+          <xsl:if test="$varSrgbVal != ''">
+            <a:srgbClr>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="$varSrgbVal"/>
+              </xsl:attribute>
+            </a:srgbClr>
+          </xsl:if>
         </a:solidFill>
         <!-- Dash type-->
         <xsl:choose>
@@ -2634,48 +2661,25 @@ Copyright (c) 2007, Sonata Software Limited
         <a:tailEnd type="none" w="med" len="med"/>
       </xsl:when>
       <xsl:otherwise>
-        <a:lnL w="360" cap="flat" cmpd="sng" algn="ctr">
+        <xsl:attribute name="w">
+          <xsl:value-of select="'360'"/>
+        </xsl:attribute>
+        <xsl:attribute name="cap">
+          <xsl:value-of select="'flat'"/>
+        </xsl:attribute>
+        <xsl:attribute name="cmpd">
+          <xsl:value-of select="'sng'"/>
+        </xsl:attribute>
+        <xsl:attribute name="algn">
+          <xsl:value-of select="'ctr'"/>
+        </xsl:attribute>        
           <a:solidFill>
             <a:srgbClr val="FFFFFF"/>
           </a:solidFill>
           <a:prstDash val="solid"/>
           <a:round/>
           <a:headEnd type="none" w="med" len="med"/>
-          <a:tailEnd type="none" w="med" len="med"/>
-        </a:lnL>
-        <a:lnR w="360" cap="flat" cmpd="sng" algn="ctr">
-          <a:solidFill>
-            <a:srgbClr val="FFFFFF"/>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-          <a:round/>
-          <a:headEnd type="none" w="med" len="med"/>
-          <a:tailEnd type="none" w="med" len="med"/>
-        </a:lnR>
-        <a:lnT w="360" cap="flat" cmpd="sng" algn="ctr">
-          <a:solidFill>
-            <a:srgbClr val="FFFFFF"/>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-          <a:round/>
-          <a:headEnd type="none" w="med" len="med"/>
-          <a:tailEnd type="none" w="med" len="med"/>
-        </a:lnT>
-        <a:lnB w="360" cap="flat" cmpd="sng" algn="ctr">
-          <a:solidFill>
-            <a:srgbClr val="FFFFFF"/>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-          <a:round/>
-          <a:headEnd type="none" w="med" len="med"/>
-          <a:tailEnd type="none" w="med" len="med"/>
-        </a:lnB>
-        <a:lnTlToBr>
-          <a:noFill/>
-        </a:lnTlToBr>
-        <a:lnBlToTr>
-          <a:noFill/>
-        </a:lnBlToTr>
+          <a:tailEnd type="none" w="med" len="med"/>       
       </xsl:otherwise>
     </xsl:choose>
    
@@ -2690,6 +2694,7 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name="shadowOpacity" />
 
 		<a:effectLst>
+      <xsl:if test="$shadowColor != ''">
 			<a:outerShdw>
 				<xsl:attribute name="blurRad">
 					<xsl:value-of select="50800"/>
@@ -2765,7 +2770,6 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:attribute name="val">
 						<xsl:value-of select="$shadowColor"/>
 					</xsl:attribute>
-
 					<a:alpha>
 						<xsl:attribute name="val">
               <!--<xsl:value-of select="$shadowOpacity"/>-->
@@ -2781,6 +2785,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</a:alpha>
 				</a:srgbClr>
 			</a:outerShdw>
+      </xsl:if>
 		</a:effectLst>
 	</xsl:template>
 	
@@ -2790,9 +2795,13 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="opacity" />
     <xsl:if test ="$fill-color != ''">
       <a:solidFill>
+        <xsl:variable name="varSrgbVal">
+          <xsl:value-of select ="substring-after($fill-color,'#')"/>
+        </xsl:variable>
+        <xsl:if test="$varSrgbVal != ''">
         <a:srgbClr>
           <xsl:attribute name ="val">
-            <xsl:value-of select ="substring-after($fill-color,'#')"/>
+              <xsl:value-of select ="$varSrgbVal"/>
           </xsl:attribute>
           <xsl:if test ="$opacity != ''">
             <a:alpha>
@@ -2808,6 +2817,7 @@ Copyright (c) 2007, Sonata Software Limited
             </a:alpha>
           </xsl:if>
         </a:srgbClr>
+        </xsl:if>
       </a:solidFill>
     </xsl:if>
   </xsl:template>
