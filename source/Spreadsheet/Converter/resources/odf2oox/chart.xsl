@@ -2506,45 +2506,116 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               <xsl:choose>
                     <!-- Sonata:edited to fix # 2155191-->
                 <xsl:when
-                      test="@chart:data-label-number = 'value' or @chart:data-label-number = 'percentage' or @chart:data-label-text = 'true' or @chart:data-label-number = 'value-and-percentage' ">
-                  <!-- value -->
-                  <xsl:if test="@chart:data-label-number = 'value' ">
-                    <c:showVal val="1"/>
-                  </xsl:if>
-                  <!-- percent -->
-                  <xsl:if test="@chart:data-label-number = 'percentage'">
+                      test="@chart:data-label-number = 'value' 
+					  or @chart:data-label-number = 'percentage' 
+					  or @chart:data-label-text = 'true' 
+					  or @chart:data-label-number = 'value-and-percentage' ">
+					<xsl:variable name="value">
                     <xsl:choose>
-                      <!--changed condition by sonata for no. format of datalabels for bug no:2557071,filename:TR_Diagrammtypen.DE.xlsx-->
-                      <!--<xsl:when test="$chartType = 'chart:circle' ">-->
-                      <xsl:when test="$chartType = 'chart:circle' or $chartType = 'chart:ring' ">
-                        <c:showPercent val="1"/>
+							<xsl:when test ="@chart:data-label-number = 'value'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-number)">
+								<xsl:value-of select ="0"/>
                       </xsl:when>
                       <xsl:otherwise>
-                    <c:showVal val="1"/>
+								<xsl:value-of select ="0"/>
                       </xsl:otherwise>
                     </xsl:choose>
-                  </xsl:if>
-                  <!-- percent and value -->
-                  <xsl:if test="@chart:data-label-number = 'value-and-percentage' ">
-                    <c:showVal val="1"/>
+					</xsl:variable>
+
+					<xsl:variable name="percentage">
                     <xsl:choose>
-                      <xsl:when test="$chartType = 'chart:circle' ">
-                        <c:showPercent val="1"/>
+							<xsl:when test ="@chart:data-label-number = 'percentage'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-number)">
+								<xsl:value-of select ="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					
+					<xsl:variable name="valuepercentage">
+						<xsl:choose>
+							<xsl:when test ="@chart:data-label-number = 'value-and-percentage'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-number)">
+								<xsl:value-of select ="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:variable name="text">
+						<xsl:choose>
+							<xsl:when test ="@chart:data-label-text = 'true'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-text)">
+								<xsl:value-of select ="0"/>
                       </xsl:when>
                       <xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:variable name="symbol">
+						<xsl:choose>
+							<xsl:when test ="@chart:data-label-symbol = 'true'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-symbol)">
+								<xsl:value-of select ="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:choose>
+						<!--<xsl:when test ="number($value)=1">
+							<c:showVal val="1"/>
+							<c:showPercent val="$percentage"/>
+							<c:showCatName val="$text"/>
+							<c:showLegendKey val="$symbol"/>
+							<c:showSerName val="0"/>
+						</xsl:when>-->
+						<xsl:when test ="number($percentage)=1 and $chartType = 'chart:circle' or $chartType = 'chart:ring'">
                       <c:showPercent val="1"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
+						</xsl:when>
+						<xsl:when test ="number($percentage)=1 and not($chartType = 'chart:circle' or $chartType = 'chart:ring')">
+							<c:showVal val="1"/>
+							<c:showPercent val="{number($percentage)}"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
+						</xsl:when>
+						<xsl:when test ="number($valuepercentage)=1">
+							<c:showVal val="1"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
+							<c:showPercent val="1"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<c:showVal val="{number($value)}"/>
+							<c:showPercent val="{number($percentage)}"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
                       </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:if>
-                  <!-- name -->
-                  <xsl:if test="@chart:data-label-text = 'true' ">
-                    <c:showCatName val="1"/>
-                  </xsl:if>
-                  <!-- icon -->
-                <!-- Defect:#2157110 -->
-                  <xsl:if test="@chart:data-label-symbol = 'true' ">
-                    <c:showLegendKey val="1"/>
-                  </xsl:if>
+                    </xsl:choose>                  
                 </xsl:when>
                 <xsl:otherwise>
                   <c:delete val="1"/>
@@ -2578,7 +2649,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     </xsl:when>-->
                   </xsl:choose>
             </xsl:for-each>
-
             <!-- lable text properties -->
             <c:txPr>
               <a:bodyPr rot="0" vert="horz"/>
@@ -2599,7 +2669,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 
       </xsl:if>
           </xsl:variable>
-
           <xsl:choose>
             <xsl:when test="$chartType = 'chart:ring' ">
               
@@ -2626,29 +2695,32 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     <xsl:value-of select="$chartDirectory"/>
                   </xsl:with-param>
                 </xsl:call-template>
-
-
               </xsl:for-each>
             </xsl:when>
-
             <xsl:otherwise>
               <xsl:for-each select="key('series','')[position() = $number]/chart:data-point[1]">
-
                 <xsl:call-template name="InsertDataPointsShapeProperties">
                   <xsl:with-param name="parentStyleName" select="$styleName"/>
                   <xsl:with-param name="ChartDirectory">
                     <xsl:value-of select="$chartDirectory"/>
                   </xsl:with-param>
                 </xsl:call-template>
-
               </xsl:for-each>
             </xsl:otherwise>
-          </xsl:choose>
-     
-          <c:dLbls>
+          </xsl:choose>     
+          <!--<c:dLbls>-->
             <xsl:choose>
               <xsl:when test="$chartType = 'chart:ring' ">
                 <xsl:for-each select="key('series','')[last()]">
+				 <!--<xsl:if test="@chart:style-name and key('style',@chart:style-name)/style:chart-properties">-->
+			   <xsl:variable name ="chrtStlName">
+				 <xsl:value-of select ="@chart:style-name"/>
+			   </xsl:variable>
+			   <xsl:if test=" $chrtStlName!='' 
+								  and (key('style',$chrtStlName)/style:chart-properties/@chart:data-label-number 
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-text
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-symbol)">
+				  <c:dLbls>
                   <xsl:call-template name="InsertDataLableShapeProperties">
                     <xsl:with-param name="totalPoints" select="$numPoints"/>
                     <xsl:with-param name="series" select="$number"/>
@@ -2656,13 +2728,22 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                       <xsl:value-of select="$chartDirectory"/>
                     </xsl:with-param>
                     <xsl:with-param name="chartType" select="$chartType"/>
-                    
                   </xsl:call-template>
+					  <xsl:copy-of select="$lableAttributes"/>
+				  </c:dLbls>
+				 </xsl:if>
                 </xsl:for-each>
               </xsl:when>
      <xsl:when test="$reverseCategories = 'true' ">
                 <xsl:for-each select="key('series','')[position() = $number]/chart:data-point[last()]">
-
+                  <xsl:variable name ="chrtStlName">
+                    <xsl:value-of select ="./parent::node()/@chart:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test=" $chrtStlName!='' 
+                              and (key('style',$chrtStlName)/style:chart-properties/@chart:data-label-number 
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-text
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-symbol)">
+					        <c:dLbls>
                   <xsl:call-template name="InsertDataLableShapeProperties">
                     <xsl:with-param name="parentStyleName" select="$styleName"/>
                     <xsl:with-param name="reverse" select=" 'true' "/>
@@ -2671,13 +2752,45 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     </xsl:with-param>
                     <xsl:with-param name="chartType" select="$chartType"/>
                   </xsl:call-template>
-
-
+						        <xsl:copy-of select="$lableAttributes"/>
+					        </c:dLbls>
+					</xsl:if>
+                </xsl:for-each>
+              </xsl:when>
+			  <xsl:when test="$chartType = 'chart:scatter' ">
+					<xsl:for-each select="key('series','')[last()]">
+						<!--<xsl:if test="@chart:style-name and key('style',@chart:style-name)/style:chart-properties">-->
+						<xsl:variable name ="chrtStlName">
+							<xsl:value-of select ="@chart:style-name"/>
+						</xsl:variable>
+						<!--<xsl:if test=" $chrtStlName!='' 
+								  and (key('style',$chrtStlName)/style:chart-properties/@chart:data-label-number 
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-text
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-symbol)">-->
+							<c:dLbls>
+								<xsl:call-template name="InsertDataLableShapeProperties">
+									<xsl:with-param name="totalPoints" select="$numPoints"/>
+									<xsl:with-param name="series" select="$number"/>
+									<xsl:with-param name="ChartDirecotry">
+										<xsl:value-of select="$chartDirectory"/>
+									</xsl:with-param>
+									<xsl:with-param name="chartType" select="$chartType"/>
+								</xsl:call-template>
+								<xsl:copy-of select="$lableAttributes"/>
+							</c:dLbls>
+						<!--</xsl:if>-->
                 </xsl:for-each>
               </xsl:when>
   <xsl:otherwise>
                 <xsl:for-each select="key('series','')[position() = $number]/chart:data-point[1]">
-
+					      <xsl:variable name ="chrtStlName">
+						      <xsl:value-of select ="./parent::node()/@chart:style-name"/>
+					      </xsl:variable>
+					      <xsl:if test=" $chrtStlName!='' 
+                              and (key('style',$chrtStlName)/style:chart-properties/@chart:data-label-number 
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-text
+                                  or key('style',$chrtStlName)/style:chart-properties/@chart:data-label-symbol)">
+						      <c:dLbls>
                   <xsl:call-template name="InsertDataLableShapeProperties">
                     <xsl:with-param name="parentStyleName" select="$styleName"/>
                     <xsl:with-param name="ChartDirectory">
@@ -2685,11 +2798,14 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     </xsl:with-param>
                     <xsl:with-param name="chartType" select="$chartType"/>
                   </xsl:call-template>
+							      <xsl:copy-of select="$lableAttributes"/>
+						      </c:dLbls>
+				      	</xsl:if>
     </xsl:for-each>
               </xsl:otherwise>
             </xsl:choose>
-            <xsl:copy-of select="$lableAttributes"/>
-        </c:dLbls>
+            <!--<xsl:copy-of select="$lableAttributes"/>-->
+        <!--</c:dLbls>-->
   <!-- error indicator -->
       <xsl:for-each select="key('series','')[position() = $number]">
         <xsl:if test="chart:error-indicator">
@@ -2697,13 +2813,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             <xsl:value-of
               select="key('style',$styleName)/style:chart-properties/@chart:error-category"/>
           </xsl:variable>
-
           <!-- only this types can be converted -->
           <xsl:if test="$type = 'constant' or $type = 'percentage' ">
             <c:errBars>
-
               <xsl:for-each select="key('style',$styleName)/style:chart-properties">
-
                 <!-- indicators -->
                 <c:errBarType val="both">
                   <xsl:attribute name="val">
@@ -2721,7 +2834,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     </xsl:choose>
                   </xsl:attribute>
                 </c:errBarType>
-
                 <!-- error type -->
                 <xsl:choose>
                   <!-- fixed value -->
@@ -2772,9 +2884,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     </c:val>
                   </xsl:when>
                 </xsl:choose>
-
               </xsl:for-each>
-
               <!-- error indicator graphic properties -->
               <xsl:for-each select="chart:error-indicator">
                 <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
@@ -2785,7 +2895,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                   </c:spPr>
                 </xsl:for-each>
               </xsl:for-each>
-
             </c:errBars>
           </xsl:if>
         </xsl:if>
@@ -2975,7 +3084,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           </xsl:choose>
         </xsl:for-each>
       </xsl:if>
-
       <xsl:choose>
         <!-- insert X and Y values-->
 <!--Fix for the defects 2138187 , Sonata-->
@@ -3636,6 +3744,42 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 														</xsl:otherwise>
 													</xsl:choose>
                   </c:f>
+					<c:strCache>
+						<c:ptCount val="{$numPoints}"/>
+							<xsl:choose>
+							<xsl:when test="$reverseCategories = 'true' ">
+								<xsl:for-each select="key('rows','')">
+									<xsl:choose>
+										<xsl:when test="$chartType = 'chart:bar' and key('style',ancestor::chart:chart/chart:plot-area/@chart:style-name )/style:chart-properties/@chart:vertical='true' ">
+											<xsl:call-template name="InsertCategories">
+												<xsl:with-param name="numCategories" select="$numPoints"/>
+											</xsl:call-template>
+										</xsl:when>
+										<!--condition added for file name:Pie_Chart_Legend.xlsx-->
+										<xsl:when test="$chartType = 'chart:circle' ">
+											<xsl:call-template name="InsertCategories">
+												<xsl:with-param name="numCategories" select="$numPoints"/>
+											</xsl:call-template>
+										</xsl:when>
+										<!--end-->
+										<xsl:otherwise>
+											<xsl:call-template name="InsertCategoriesReverse">
+												<xsl:with-param name="numCategories" select="$numPoints"/>
+											</xsl:call-template>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:for-each select="key('rows','')">
+									<xsl:call-template name="InsertCategories">
+										<xsl:with-param name="numCategories" select="$numPoints"/>
+										<xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+									</xsl:call-template>
+								</xsl:for-each>
+							</xsl:otherwise>
+						</xsl:choose>
+					</c:strCache>
                 </c:strRef>
               </c:cat>
               </xsl:if>
@@ -3780,7 +3924,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           </xsl:choose>             
         </xsl:otherwise>
       </xsl:choose>
-
       <!-- smooth line -->
       <xsl:for-each select="ancestor::chart:chart">
         <xsl:if test="@chart:class = 'chart:line' or @chart:class = 'chart:scatter' ">
@@ -4212,12 +4355,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <a:p>
             <a:pPr>
               <a:defRPr>
-
                 <xsl:for-each select="key('style',@chart:style-name)/style:text-properties">
                   <!-- template common with text-box-->
                   <xsl:call-template name="InsertRunProperties"/>
                 </xsl:for-each>
-
               </a:defRPr>
             </a:pPr>
             <a:endParaRPr lang="pl-PL"/>
@@ -4236,44 +4377,112 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               <!-- Sonata:edited to fix # 2155191-->
               <xsl:when
                 test="@chart:data-label-number = 'value' or @chart:data-label-number = 'percentage' or @chart:data-label-text = 'true' or @chart:data-label-number = 'value-and-percentage' ">
-                <!-- value -->
-                <xsl:if test="@chart:data-label-number = 'value' ">
-                  <c:showVal val="1"/>
-                </xsl:if>
-                <!-- percent -->
-                <xsl:if test="@chart:data-label-number = 'percentage'">
+					<xsl:variable name="value">
                   <xsl:choose>
-                    <!--changed condition by sonata for no. format of datalabels for bug no:2557071,filename:TR_Diagrammtypen.DE.xlsx-->
-                    <!--<xsl:when test="$chartType = 'chart:circle' ">-->
-                    <xsl:when test="$chartType = 'chart:circle' or $chartType = 'chart:ring' ">
-                      <c:showPercent val="1"/>
+							<xsl:when test ="@chart:data-label-number = 'value'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-number)">
+								<xsl:value-of select ="0"/>
                     </xsl:when>
                     <xsl:otherwise>
-                     <c:showVal val="1"/>
+								<xsl:value-of select ="0"/>
                     </xsl:otherwise>
                   </xsl:choose>
-                </xsl:if>
-                <!-- percent and value -->
-                <xsl:if test="@chart:data-label-number = 'value-and-percentage' ">
-                  <c:showVal val="1"/>
+					</xsl:variable>
+
+					<xsl:variable name="percentage">
                   <xsl:choose>
-                    <xsl:when test="$chartType = 'chart:circle' ">
-                      <c:showPercent val="1"/>
+							<xsl:when test ="@chart:data-label-number = 'percentage'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-number)">
+								<xsl:value-of select ="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:variable name="valuepercentage">
+						<xsl:choose>
+							<xsl:when test ="@chart:data-label-number = 'value-and-percentage'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-number)">
+								<xsl:value-of select ="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:variable name="text">
+						<xsl:choose>
+							<xsl:when test ="@chart:data-label-text = 'true'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-text)">
+								<xsl:value-of select ="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:variable name="symbol">
+						<xsl:choose>
+							<xsl:when test ="@chart:data-label-symbol = 'true'">
+								<xsl:value-of select ="1"/>
+							</xsl:when>
+							<xsl:when test ="not(@chart:data-label-symbol)">
+								<xsl:value-of select ="0"/>
                     </xsl:when>
                     <xsl:otherwise>
+								<xsl:value-of select ="0"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:choose>
+						<!--<xsl:when test ="number($value)=1">
+							<c:showVal val="1"/>
+							<c:showPercent val="$percentage"/>
+							<c:showCatName val="$text"/>
+							<c:showLegendKey val="$symbol"/>
+							<c:showSerName val="0"/>
+						</xsl:when>-->
+						<xsl:when test ="number($percentage)=1 and $chartType = 'chart:circle' or $chartType = 'chart:ring'">
+							<c:showPercent val="1"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
+						</xsl:when>
+						<xsl:when test ="number($percentage)=1 and not($chartType = 'chart:circle' or $chartType = 'chart:ring')">
+							<c:showVal val="1"/>
                      <c:showPercent val="1"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
+						</xsl:when>
+						<xsl:when test ="number($valuepercentage)=1">
+							<c:showVal val="1"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
+							<c:showPercent val="1"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<c:showVal val="{number($value)}"/>
+							<c:showPercent val="{number($percentage)}"/>
+							<c:showCatName val="{number($text)}"/>
+							<c:showLegendKey val="{number($symbol)}"/>
+							<c:showSerName val="0"/>
                     </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:if>
-                <!-- name -->
-                <xsl:if test="@chart:data-label-text = 'true' ">
-                  <c:showCatName val="1"/>
-                </xsl:if>
-                <!-- icon -->
-                  <!-- Defect:#2157110 -->
-                <xsl:if test="@chart:data-label-symbol = 'true' ">
-                  <c:showLegendKey val="1"/>
-                </xsl:if>
+                  </xsl:choose>              
               </xsl:when>
               <xsl:otherwise>
                 <c:delete val="1"/>

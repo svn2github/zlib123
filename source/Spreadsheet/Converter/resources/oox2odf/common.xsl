@@ -1547,7 +1547,21 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
         <xsl:variable name="hours">
           <xsl:choose>
 				<xsl:when test ="$isIsoDate='true' and contains($value,':') ">
+					<xsl:choose >
+						<xsl:when test ="contains($value,'T')
+								  and not(contains($value,'P')) 
+								  and not(contains($value,'H'))
+								  and not(contains($value,'M'))
+								  and not(contains($value,'S'))">
+							<xsl:variable name ="time">
+								<xsl:value-of select ="substring-after($value,'T')"/>
+							</xsl:variable>							
+							<xsl:value-of select ="substring-before($time,':')"/>
+						</xsl:when>
+						<xsl:when test ="not(contains($value,'T'))">
 					<xsl:value-of select ="substring-before($value,':')"/>
+				</xsl:when>
+					</xsl:choose>					
 				</xsl:when>
 				<xsl:when test ="$isIsoDate='true' and not(contains($value,':')) 
 						  and contains($value,'P') 
@@ -1570,8 +1584,22 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
         </xsl:variable>
         <xsl:variable name="minutes">
           <xsl:choose>
-				<xsl:when test ="$isIsoDate='true'">
+				<xsl:when test ="$isIsoDate='true' and contains($value,':') ">
+					<xsl:choose >
+						<xsl:when test ="contains($value,'T')
+								  and not(contains($value,'P')) 
+								  and not(contains($value,'H'))
+								  and not(contains($value,'M'))
+								  and not(contains($value,'S'))">
+							<xsl:variable name ="time">
+								<xsl:value-of select ="substring-after($value,'T')"/>
+							</xsl:variable>
+							<xsl:value-of select ="substring-before(substring-after($time,':'),':')"/>
+						</xsl:when>
+						<xsl:when test ="not(contains($value,'T'))">
 					<xsl:value-of select ="substring-before(substring-after($value,':'),':')"/>
+				</xsl:when>
+					</xsl:choose>					
 				</xsl:when>
 				<xsl:when test ="$isIsoDate='true' and not(contains($value,':')) 
 						  and contains($value,'P') 
@@ -1596,8 +1624,22 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
 
         <xsl:variable name="seconds">
           <xsl:choose>
-				<xsl:when test ="$isIsoDate='true'">
+				<xsl:when test ="$isIsoDate='true' and contains($value,':') ">
+					<xsl:choose >
+						<xsl:when test ="contains($value,'T')
+								  and not(contains($value,'P')) 
+								  and not(contains($value,'H'))
+								  and not(contains($value,'M'))
+								  and not(contains($value,'S'))">
+							<xsl:variable name ="time">
+								<xsl:value-of select ="substring-after($value,'T')"/>
+							</xsl:variable>
+							<xsl:value-of select ="substring-after(substring-after($time,':'),':')"/>
+						</xsl:when>
+						<xsl:when test ="not(contains($value,'T'))">
 					<xsl:value-of select ="substring-after(substring-after($value,':'),':')"/>
+				</xsl:when>
+					</xsl:choose>				
 				</xsl:when>
 				<xsl:when test ="$isIsoDate='true' and not(contains($value,':')) 
 						  and contains($value,'P') 
@@ -1607,7 +1649,6 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
 					<xsl:value-of select ="substring-before(substring-after($value,'M'),'S')"/>
 				</xsl:when>
 				<xsl:otherwise>
-
 					<xsl:choose>
             <xsl:when test="number($value)">
               <xsl:value-of select="$value * 86400 - $minutes * 60 - $hours * 3600"/>

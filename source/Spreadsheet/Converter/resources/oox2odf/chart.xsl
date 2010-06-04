@@ -894,7 +894,8 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <xsl:attribute name="chart:values-cell-range-address">
 						<xsl:choose>
 							<xsl:when test="contains($rangeVal,':')">
-								<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>
+										<xsl:value-of select="concat(translate(substring-before($rangeVal,':'),'$',''),':.',translate(substring-after($rangeVal,':'),'$',''))"/>
+										<!--<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>-->
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="$rangeVal"/>
@@ -909,8 +910,7 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                                                Additional attributes added to maintain the link between chart abd source data.
                          -->
 			<xsl:if test ="not(key('plotArea', c:chartSpace/@oox:part)/c:doughnutChart)">
-				
-					<xsl:variable name="apos">
+									<xsl:variable name="apos">
 						<xsl:text>&apos;</xsl:text>
 					</xsl:variable>
                                      <xsl:if test="c:tx//c:f">
@@ -959,7 +959,8 @@ RefNo-1 12-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 					<xsl:attribute name ="chart:label-cell-address">
 						<xsl:choose>
 							<xsl:when test="contains($rangeVal,':')">
-								<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>
+								<xsl:value-of select="concat(translate(substring-before($rangeVal,':'),'$',''),':.',translate(substring-after($rangeVal,':'),'$',''))"/>
+								<!--<xsl:value-of select="concat(substring-before($rangeVal,':'),':.',substring-after($rangeVal,':'))"/>-->
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="$rangeVal"/>

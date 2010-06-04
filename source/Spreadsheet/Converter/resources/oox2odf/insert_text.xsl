@@ -542,17 +542,23 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
               </xsl:when>
               <xsl:when test ="@t='d'">
                 <xsl:attribute name="office:date-value">
+					<xsl:variable name="DateWithTime">
+						<xsl:call-template name="CheckTime">
+							<xsl:with-param name="value">
                   <xsl:value-of select ="./e:v"/>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:value-of select ="$DateWithTime"/>                  
                 </xsl:attribute>
               </xsl:when>
-          </xsl:choose>
-            
+          </xsl:choose>            
           </xsl:when>
-
           <!--'and' at the end is for Latvian currency -->
           <xsl:when
             test="not(contains($numStyle,'[$Ls-426]') or contains($numStyle,'[$kr-425]') or contains($numStyle,'[$€-813]')) and (contains($strippedFormat,'h') or contains($strippedFormat,'s') or $numId = 18 or $numId = 20)">
 				<xsl:choose>
+					
 					<xsl:when test ="@t='d'">
 						<xsl:attribute name="office:time-value">
 								<xsl:call-template name="NumberToTime">
@@ -604,10 +610,8 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
         <!--End of RefNo-3-->
         <text:p>
           <xsl:choose>
-
             <xsl:when
-              test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
-              
+              test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">             
               <xsl:variable name="formatCode">
                 <xsl:choose>
                   <xsl:when test="$numStyle != '' ">
@@ -1064,7 +1068,49 @@ RefNo-3 8-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
     <xsl:param name="value"/>
     <xsl:choose>
       <xsl:when test="not(contains($value,'T'))">     
+		  <xsl:choose>
+			  <xsl:when test ="contains($value,':') or contains($value,'.')">
+				  <xsl:variable name="YearAndDay">
+					  <xsl:call-template name="CalculateYearAndDay">
+						  <xsl:with-param name="days">							  
+						     <xsl:value-of select="0"/>								 
+						  </xsl:with-param>
+						  <xsl:with-param name="currentYear">1900</xsl:with-param>
+					  </xsl:call-template>
+				  </xsl:variable>
+
+				  <!-- year -->
+				  <xsl:variable name="years">
+					  <xsl:value-of select="substring-before($YearAndDay,':') - 1900"/>
+				  </xsl:variable>
+
+				  <xsl:variable name="dateInLastYear">
+					  <xsl:value-of select="substring-after($YearAndDay,':')"/>
+				  </xsl:variable>
+
+				  <!-- month and day -->
+				  <xsl:variable name="monthsAndDays">
+					  <xsl:call-template name="DaysToMonthsAndDays">
+						  <xsl:with-param name="days">
+							  <xsl:value-of select="$dateInLastYear"/>
+						  </xsl:with-param>
+						  <xsl:with-param name="ExtraDay">
+							  <xsl:choose>
+								  <xsl:when
+									test="((1900 + $years - 4 * floor((1900 + $years) div 4)) = 0 and (1900 + $years - 100 * floor((1900 + $years) div 100) != 0)) or (1900 + $years - 400 * floor((1900 + $years) div 400)) = 0"
+                                            >1</xsl:when>
+								  <xsl:otherwise>0</xsl:otherwise>
+							  </xsl:choose>
+						  </xsl:with-param>
+					  </xsl:call-template>
+				  </xsl:variable>
+				  <xsl:value-of
+					select="concat((1900+$years),'-',$monthsAndDays,'T',$value)"/>
+			  </xsl:when>
+			  <xsl:otherwise>
         <xsl:value-of select="concat($value,'T','00:00:00')"/>        
+			  </xsl:otherwise>
+		  </xsl:choose>             
       </xsl:when>
       <xsl:when test="(contains($value,'T'))">
         <xsl:value-of select="e:v"/>         

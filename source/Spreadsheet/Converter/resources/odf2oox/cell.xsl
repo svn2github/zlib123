@@ -3393,6 +3393,9 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                     or (contains(@table:formula,$tblRef))                    
                     or (contains(@office:string-value,'#NAME?'))
                     or (contains(@office:string-value,'#N/A'))                                        
+				
+				    or (contains(@office:string-value,'#N/D'))
+				
                     or (text:p='Err:511')
                     or (text:p='#VALUE!')
                     or (text:p='Err:504')
@@ -3424,6 +3427,9 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                     or (text:p='Err:532')
                     or (text:p='#REF!')
                     or (text:p='#N/A')
+				
+					or (text:p='#N/D')
+				
                     or (text:p='#NAME?')
                     or (text:p='#NOM ?')
                     or (text:p='#DIV/0!')

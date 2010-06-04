@@ -1041,30 +1041,42 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
           <!-- check if conditional -->
           <xsl:if
             test="@s  or $CheckIfConditional != 'false'">
-            <xsl:choose>
-            
+            <xsl:choose>            
               <xsl:when test="$CheckIfConditional != 'false' and @s != ''">
                 <xsl:variable name="ConditionalStyleID">
                   <xsl:value-of select="@oox:ConditionalStyle"/>
-                </xsl:variable>
-                
-                
-                <xsl:attribute name="table:style-name">
-                  
+                </xsl:variable>               
+                <xsl:attribute name="table:style-name">                  
+					<xsl:variable name ="temp">
                   <xsl:value-of
-                    select="concat(generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID]), @s)"
+				   select="generate-id(key('ConditionalFormattingO14', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID])"
                   />
+					</xsl:variable>
+					<xsl:variable name ="temp1">
+						<xsl:value-of
+						  select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID])"
+                  />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="string-length($temp1)>0">
+							<xsl:value-of select ="$temp1"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="$temp"/>
+						</xsl:otherwise>
+					</xsl:choose>			
                   
+					<!--<xsl:value-of
+                    select="concat(generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID]), @s)"
+                  />-->                  
                 </xsl:attribute>
-              </xsl:when>
-              
+              </xsl:when>              
               <xsl:when test="$CheckIfConditional != 'false'">
                 <xsl:variable name="ConditionalStyleID">
                   <xsl:value-of select="@oox:ConditionalStyle"/>
                 </xsl:variable>
                 <!-- Defect: 2948277
-		     Desc  : Also handling Cross Sheet Conditional Formatting for Office 2010
-         -->
+					   Desc  : Also handling Cross Sheet Conditional Formatting for Office 2010-->
                 <xsl:attribute name="table:style-name">
 					<xsl:variable name ="temp">
 						<xsl:value-of
@@ -1085,10 +1097,8 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
 						</xsl:otherwise>
 					</xsl:choose>
                 </xsl:attribute>
-              </xsl:when>
-            
-            <xsl:when test="@s">
-              
+              </xsl:when>            
+            <xsl:when test="@s">              
               <xsl:choose>
                 <xsl:when test="$CheckIfMerge != 'false'">
                   <xsl:attribute name="table:style-name">
@@ -1108,12 +1118,8 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
                 </xsl:attribute>
             </xsl:otherwise>
               </xsl:choose>
-              
             </xsl:when>
             </xsl:choose>
-            
-            
-            
             <xsl:if test="$horizontal = 'centerContinuous' and e:v">
             <xsl:variable name="continous">
             <xsl:call-template name="CountContinuous"/>
@@ -1124,81 +1130,8 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
             <xsl:attribute name="table:number-rows-spanned">
             <xsl:text>1</xsl:text>
             </xsl:attribute>
+            </xsl:if>            
             </xsl:if>
-            
-            </xsl:if>
-
-          <!-- check if conditional -->
-          <!--xsl:if
-            test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
-            <xsl:choose>
-
-              <xsl:when
-                test="@s and contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
-                <xsl:variable name="CellStyleId">
-                  <xsl:value-of select="generate-id(key('Xf', $this/@s))"/>
-                </xsl:variable>
-                <xsl:variable name="ConditionalStyleId">
-                  <xsl:value-of
-                    select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')])"
-                  />
-                </xsl:variable>
-                <xsl:attribute name="table:style-name">
-                  <xsl:for-each select="key('Part', 'xl/styles.xml')">
-                    <xsl:value-of select="concat($CellStyleId, $ConditionalStyleId)"/>
-                  </xsl:for-each>
-                </xsl:attribute>
-              </xsl:when>
-
-              <xsl:when test="@s">
-                <xsl:choose>
-                  <xsl:when test="$CheckIfMerge != 'false'">
-                    <xsl:attribute name="table:style-name">
-                      <xsl:value-of select="concat(generate-id(key('Xf', @s)), generate-id(key('Xf', @s)))"/>
-                    </xsl:attribute>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:attribute name="table:style-name">
-                      <xsl:choose>
-                        <xsl:when test="$horizontal = 'centerContinuous'">
-                          <xsl:value-of select="concat(generate-id(key('Xf', @s)), generate-id(key('Xf', @s)))"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="generate-id(key('Xf', @s))"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:attribute>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:when>
-
-              <xsl:otherwise>
-                <xsl:attribute name="table:style-name">
-                  <xsl:value-of
-                    select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')])"
-                  />
-                </xsl:attribute>
-              </xsl:otherwise>
-            </xsl:choose>
-
-
-
-            <xsl:if test="$horizontal = 'centerContinuous' and e:v">
-              <xsl:variable name="continous">
-                <xsl:call-template name="CountContinuous"/>
-              </xsl:variable>
-              <xsl:attribute name="table:number-columns-spanned">
-                <xsl:value-of select="$continous"/>
-              </xsl:attribute>
-              <xsl:attribute name="table:number-rows-spanned">
-                <xsl:text>1</xsl:text>
-              </xsl:attribute>
-            </xsl:if>
-
-          </xsl:if-->
-
-          <!-- chceck if DataValidation -->
-
           <xsl:if
             test="contains(concat(';', $ValidationCell), concat(';', $rowNum, ':', $colNum, ';'))">
             <xsl:variable name="ValidationStyle">
@@ -1210,10 +1143,6 @@ RefNo-1 7-Jan-2009 Sandeep S     ODF1.1   Changes done for ODF1.1 conformance
               <xsl:value-of select="(concat('val', $sheetNr, $ValidationStyle + 1))"/>
             </xsl:attribute>
           </xsl:if>
-
-          
-          
-          
           <xsl:if test="e:v">
             <xsl:call-template name="InsertText">
               <xsl:with-param name="position">
