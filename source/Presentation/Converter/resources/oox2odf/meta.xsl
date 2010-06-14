@@ -50,7 +50,7 @@ Copyright (c) 2007, Sonata Software Limited
         <!-- generator -->
         <meta:generator>
           <xsl:value-of select="$generator"/>
-          <xsl:value-of select="concat(' ', $app-version)"/>
+          <!--<xsl:value-of select="concat(' ', $app-version)"/>-->
         </meta:generator>
         <!-- title -->
         <xsl:if test="document('docProps/core.xml')/cp:coreProperties/dc:title">
